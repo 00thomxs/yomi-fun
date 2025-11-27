@@ -1,13 +1,28 @@
-"use client"
-
-import { MARKETS_DATA } from "@/lib/mock-data"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { MoreHorizontal, Edit, Trash, ExternalLink, PlayCircle, StopCircle } from "lucide-react"
+import { Edit, ExternalLink, PlayCircle } from "lucide-react"
 import Link from "next/link"
+import { createClient } from "@/lib/supabase/server"
 
-export default function AdminDashboard() {
-  // Use Mock Data for now
-  const markets = MARKETS_DATA
+export default async function AdminDashboard() {
+  const supabase = await createClient()
+  
+  // Fetch real markets
+  const { data: markets, error } = await supabase
+    .from('markets')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error("Error fetching markets:", error)
+  }
+
+  // Mock stats for now (would require more complex queries)
+  const stats = [
+    { label: "Volume Total", value: "0", suffix: <CurrencySymbol /> },
+    { label: "Marchés Actifs", value: markets?.filter(m => m.status === 'open').length.toString() || "0", suffix: "" },
+    { label: "Utilisateurs", value: "1", suffix: "" }, // To be updated
+    { label: "Revenus (Est.)", value: "0", suffix: "€" },
+  ]
 
   return (
     <div className="space-y-8">
@@ -29,12 +44,7 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: "Volume Total", value: "12.5M", suffix: <CurrencySymbol /> },
-          { label: "Marchés Actifs", value: "12", suffix: "" },
-          { label: "Utilisateurs", value: "1,240", suffix: "" },
-          { label: "Revenus (Est.)", value: "4,500", suffix: "€" },
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <div key={i} className="p-6 rounded-xl bg-card border border-border">
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
               {stat.label}
@@ -72,7 +82,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {markets.map((market) => (
+              {markets?.map((market) => (
                 <tr key={market.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 font-medium max-w-md truncate">
                     {market.question}
@@ -86,19 +96,19 @@ export default function AdminDashboard() {
                     {market.volume}
                   </td>
                   <td className="px-6 py-4">
-                    {market.isLive ? (
+                    {market.status === 'open' ? (
                       <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-bold uppercase">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Live
                       </span>
                     ) : (
                       <span className="text-muted-foreground text-xs font-bold uppercase">
-                        Fermé
+                        {market.status}
                       </span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-muted-foreground">
-                    {market.countdown}
+                    {new Date(market.closes_at).toLocaleDateString('fr-FR')}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -115,6 +125,13 @@ export default function AdminDashboard() {
                   </td>
                 </tr>
               ))}
+              {(!markets || markets.length === 0) && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                    Aucun marché trouvé. Créez-en un !
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -122,4 +139,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-

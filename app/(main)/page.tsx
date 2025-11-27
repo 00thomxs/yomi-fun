@@ -1,30 +1,16 @@
-"use client"
+import { createClient } from "@/lib/supabase/server"
+import { HomeContainer } from "@/components/containers/home-container"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { HomeView } from "@/components/views/home-view"
-import { useUser } from "@/contexts/user-context"
-import type { Market } from "@/lib/types"
+export default async function HomePage() {
+  const supabase = await createClient()
+  
+  const { data: markets } = await supabase
+    .from('markets')
+    .select(`
+      *,
+      outcomes (*)
+    `)
+    .order('created_at', { ascending: false })
 
-export default function HomePage() {
-  const router = useRouter()
-  const { placeBet } = useUser()
-  const [activeCategory, setActiveCategory] = useState("trending")
-
-  const handleMarketClick = (market: Market) => {
-    router.push(`/market/${market.id}`)
-  }
-
-  const handleBet = (market: string, choice: string, amount: number, odds?: number) => {
-    placeBet(market, choice, amount, odds)
-  }
-
-  return (
-    <HomeView
-      onBet={handleBet}
-      onMarketClick={handleMarketClick}
-      activeCategory={activeCategory}
-      setActiveCategory={setActiveCategory}
-    />
-  )
+  return <HomeContainer initialMarkets={markets || []} />
 }
