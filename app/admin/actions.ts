@@ -17,16 +17,6 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   const closesAt = formData.get('closesAt') as string
   const outcomes = JSON.parse(formData.get('outcomes') as string)
 
-  // --- MOCK MODE (Temporaire) ---
-  // Simuler un délai réseau
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  console.log('--- MOCK CREATE MARKET ---')
-  console.log({ question, category, description, imageUrl, closesAt, outcomes })
-  
-  // En mode mock, on ne fait rien de plus pour l'instant
-  // Dans la vraie vie, on insérerait dans Supabase ici :
-  /*
   const supabase = await createClient()
   
   // 1. Insert Market
@@ -35,35 +25,44 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
     .insert({
       question,
       category,
-      description,
-      image_url: imageUrl,
+      description: description || null,
+      image_url: imageUrl || null,
       closes_at: closesAt,
       status: 'open',
-      type: outcomes.length > 2 ? 'multi' : 'binary'
+      type: outcomes.length > 2 ? 'multi' : 'binary',
+      is_live: true, // Default to live for now
+      volume: 0
     })
     .select()
     .single()
 
-  if (marketError) return { error: marketError.message }
+  if (marketError) {
+    console.error('Market creation error:', marketError)
+    return { error: `Erreur création marché: ${marketError.message}` }
+  }
 
   // 2. Insert Outcomes
   const outcomesData = outcomes.map((o: any) => ({
     market_id: market.id,
     name: o.name,
     color: o.color,
-    probability: 100 / outcomes.length // Start equal
+    probability: 100 / outcomes.length, // Start equal
+    is_winner: null
   }))
 
   const { error: outcomesError } = await supabase
     .from('outcomes')
     .insert(outcomesData)
 
-  if (outcomesError) return { error: outcomesError.message }
-  */
+  if (outcomesError) {
+    console.error('Outcomes creation error:', outcomesError)
+    // Cleanup: delete market if outcomes fail
+    await supabase.from('markets').delete().eq('id', market.id)
+    return { error: `Erreur création réponses: ${outcomesError.message}` }
+  }
 
   revalidatePath('/admin')
   revalidatePath('/')
   
-  return { success: true, message: 'Marché créé avec succès (Simulation)' }
+  return { success: true, message: 'Marché créé avec succès !' }
 }
-
