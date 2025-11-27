@@ -27,7 +27,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
 
   // Category filtering with null checks
   const filteredMarkets = activeCategory === "trending"
-    ? validMarkets.filter((m) => m.isLive)
+    ? validMarkets.filter((m) => m.is_featured)
     : activeCategory === "all"
       ? validMarkets
       : validMarkets.filter((m) => m.category && m.category.toLowerCase() === activeCategory.toLowerCase())
