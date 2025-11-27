@@ -16,6 +16,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   const description = formData.get('description') as string
   const imageUrl = formData.get('imageUrl') as string
   const closesAt = formData.get('closesAt') as string
+  const isFeatured = formData.get('isFeatured') === 'on'
   const outcomes = JSON.parse(formData.get('outcomes') as string)
 
   const supabase = await createClient()
@@ -32,6 +33,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
       status: 'open',
       type,
       is_live: true,
+      is_featured: isFeatured,
       volume: 0
     })
     .select()

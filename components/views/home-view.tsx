@@ -1,8 +1,9 @@
 "use client"
 
-import { Flame, Globe, Gamepad2, Music, Wifi, Tv, Trophy, Newspaper, Clock, Zap } from "lucide-react"
+import { Flame, Globe, Clock, Zap } from "lucide-react"
 import { MarketCard } from "@/components/market/market-card"
 import type { Market, BinaryMarket } from "@/lib/types"
+import { CATEGORIES } from "@/lib/constants"
 
 type HomeViewProps = {
   markets: Market[]
@@ -13,25 +14,16 @@ type HomeViewProps = {
 }
 
 export function HomeView({ markets, onBet, onMarketClick, activeCategory, setActiveCategory }: HomeViewProps) {
-  // Determine featured market dynamically (Live Binary Market preferred)
-  const featuredMarket = (markets.find((m) => m.isLive && m.type === 'binary') || markets[0]) as BinaryMarket | undefined
-
-  const categories = [
-    { id: "trending", label: "Trending", icon: Flame },
-    { id: "all", label: "All", icon: Globe },
-    { id: "esport", label: "Esport", icon: Gamepad2 },
-    { id: "musique", label: "Musique", icon: Music },
-    { id: "reseaux", label: "Reseaux", icon: Wifi },
-    { id: "stream", label: "Stream", icon: Tv },
-    { id: "sport", label: "Sport", icon: Trophy },
-    { id: "faits divers", label: "Faits Divers", icon: Newspaper },
-  ]
+  // Determine featured market dynamically (is_featured preferred, then Live Binary Market)
+  const featuredMarket = (markets.find((m) => m.is_featured && m.isLive && m.type === 'binary') || 
+                         markets.find((m) => m.isLive && m.type === 'binary') || 
+                         markets[0]) as BinaryMarket | undefined
 
   const filteredMarkets =
     activeCategory === "trending"
-      ? markets.filter((m) => m.isLive)
+      ? markets.filter((m) => m.is_featured) // Trending = Featured markets
       : activeCategory === "all"
-        ? markets
+        ? markets // All = All markets
         : markets.filter((m) => m.category?.toLowerCase() === activeCategory.toLowerCase())
 
   return (
@@ -88,7 +80,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
       {/* Category Filter */}
       <div className="sticky top-0 z-40 -mx-4 px-4 py-3 backdrop-blur-xl bg-background/90 border-b border-border">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-          {categories.map((category) => {
+          {CATEGORIES.map((category) => {
             const Icon = category.icon
             return (
               <button
@@ -115,7 +107,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold tracking-tight uppercase flex items-center gap-2">
           {(() => {
-            const cat = categories.find((c) => c.id === activeCategory)
+            const cat = CATEGORIES.find((c) => c.id === activeCategory)
             if (cat) {
               const Icon = cat.icon
               return (

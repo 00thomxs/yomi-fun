@@ -4,7 +4,9 @@ import { createMarket } from "@/app/admin/actions"
 import { useToast } from "@/hooks/use-toast"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart } from "lucide-react"
+import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart, Star } from "lucide-react"
+
+import { MARKET_CATEGORIES } from "@/lib/constants"
 
 export default function CreateMarketPage() {
   const router = useRouter()
@@ -149,14 +151,11 @@ export default function CreateMarketPage() {
             <div className="space-y-2">
               <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Catégorie</label>
               <select name="category" className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all">
-                <option>YouTube</option>
-                <option>Twitch</option>
-                <option>Musique</option>
-                <option>Sport</option>
-                <option>Cinéma</option>
-                <option>Politique</option>
-                <option>Réseaux</option>
-                <option>TV</option>
+                {MARKET_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
