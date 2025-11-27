@@ -21,15 +21,25 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
     placeBet(marketQuestion, choice, amount, odds)
   }
 
-  // Helper to generate fake chart history
-  const generateHistory = (basePrice: number, points: number, labelSuffix: string) => {
+  // Helper to generate fake chart history that ends at current price
+  const generateHistory = (currentPrice: number, points: number, labelSuffix: string) => {
     const data = []
-    let price = basePrice
-    for (let i = 0; i < points; i++) {
-      price = price + (Math.random() - 0.5) * 10
-      price = Math.max(1, Math.min(99, price))
-      data.push({ time: `${i}${labelSuffix}`, price })
+    let price = currentPrice
+    
+    // Generate backwards from current price
+    for (let i = points - 1; i >= 0; i--) {
+      data.unshift({ time: `${i}${labelSuffix}`, price: Math.round(price * 10) / 10 })
+      // Add volatility
+      const change = (Math.random() - 0.5) * 5
+      price = price - change // Go back in time
+      price = Math.max(5, Math.min(95, price)) // Clamp between 5 and 95
     }
+    
+    // Ensure the last point is exactly the current price
+    if (data.length > 0) {
+        data[data.length - 1].price = currentPrice
+    }
+    
     return data
   }
 

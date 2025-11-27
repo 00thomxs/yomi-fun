@@ -2,7 +2,7 @@
 
 import { createMarket } from "@/app/admin/actions"
 import { useToast } from "@/hooks/use-toast"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart, Star } from "lucide-react"
 
@@ -184,6 +184,41 @@ export default function CreateMarketPage() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">Le marché sera automatiquement clôturé à cette date.</p>
+          </div>
+
+          {/* Options de mise en avant */}
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-white/5 border border-border">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500/20 text-amber-500">
+                <Star className="w-4 h-4 fill-current" />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="isFeatured" className="text-sm font-medium cursor-pointer select-none">Trending</label>
+                <p className="text-xs text-muted-foreground">Apparaît dans l'onglet "Trending"</p>
+              </div>
+              <input 
+                type="checkbox" 
+                id="isFeatured" 
+                name="isFeatured"
+                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-white/5 border border-border">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary">
+                <PieChart className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="isHeadline" className="text-sm font-medium cursor-pointer select-none">A la Une</label>
+                <p className="text-xs text-muted-foreground">Grande image en haut de la page</p>
+              </div>
+              <input 
+                type="checkbox" 
+                id="isHeadline" 
+                name="isHeadline"
+                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+              />
+            </div>
           </div>
         </div>
 
