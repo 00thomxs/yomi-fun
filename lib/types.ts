@@ -13,6 +13,7 @@ export type BinaryMarket = {
   bgImage: string
   volatility: string
   isLive: boolean
+  is_featured?: boolean // Added for trending markets
   yesPrice: number
   noPrice: number
   countdown: string
@@ -32,6 +33,7 @@ export type MultiOutcomeMarket = {
   image: string
   bgImage: string
   isLive: boolean
+  is_featured?: boolean // Added for trending markets
   countdown: string
   historyData: { time: string; [key: string]: number | string }[]
 }
