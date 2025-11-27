@@ -1,57 +1,79 @@
 "use client"
 
+import Link from "next/link"
 import { Home, User, ShoppingBag, Trophy, Zap } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { SidebarButton } from "@/components/layout/sidebar-button"
 import type { ActiveBet } from "@/lib/types"
 
 type LeftSidebarProps = {
   activeTab: string
   showLeaderboard: boolean
   activeBets: ActiveBet[]
-  onNavigate: (tab: string) => void
-  onShowLeaderboard: () => void
+}
+
+function SidebarLink({
+  href,
+  icon,
+  label,
+  active,
+}: {
+  href: string
+  icon: React.ReactNode
+  label: string
+  active: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+        active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+      }`}
+    >
+      {icon}
+      <span className="text-sm font-semibold tracking-tight">{label}</span>
+    </Link>
+  )
 }
 
 export function LeftSidebar({
   activeTab,
   showLeaderboard,
   activeBets,
-  onNavigate,
-  onShowLeaderboard,
 }: LeftSidebarProps) {
   return (
     <aside className="hidden lg:block lg:col-span-2 lg:sticky lg:top-4 lg:h-fit">
       <div className="space-y-4">
         <div className="p-4">
-          <YomiLogo />
+          <Link href="/">
+            <YomiLogo />
+          </Link>
         </div>
 
         <nav className="space-y-1">
-          <SidebarButton
+          <SidebarLink
+            href="/"
             icon={<Home className="w-5 h-5" />}
             label="Home"
             active={activeTab === "home" && !showLeaderboard}
-            onClick={() => onNavigate("home")}
           />
-          <SidebarButton
+          <SidebarLink
+            href="/shop"
             icon={<ShoppingBag className="w-5 h-5" />}
             label="Shop"
             active={activeTab === "shop"}
-            onClick={() => onNavigate("shop")}
           />
-          <SidebarButton
+          <SidebarLink
+            href="/profile"
             icon={<User className="w-5 h-5" />}
             label="Profil"
             active={activeTab === "profile"}
-            onClick={() => onNavigate("profile")}
           />
-          <SidebarButton
+          <SidebarLink
+            href="/leaderboard"
             icon={<Trophy className="w-5 h-5" />}
             label="Classement"
             active={showLeaderboard}
-            onClick={onShowLeaderboard}
           />
         </nav>
 
@@ -83,4 +105,3 @@ export function LeftSidebar({
     </aside>
   )
 }
-

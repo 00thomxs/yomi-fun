@@ -1,0 +1,279 @@
+"use client"
+
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { createClient } from "@/lib/supabase/client"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
+import type { ActiveBet } from "@/lib/types"
+
+// Types
+type User = {
+  id: string
+  username: string
+  email: string
+  avatar: string
+} | null
+
+type Profile = {
+  id: string
+  username: string
+  avatar_url: string | null
+  balance: number
+  xp: number
+  level: number
+  streak: number
+  total_bets: number
+  total_won: number
+  win_rate: number
+}
+
+type UserContextType = {
+  // User state
+  user: User
+  profile: Profile | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  
+  // Auth actions
+  signIn: (email: string, password: string) => Promise<{ error?: string }>
+  signUp: (email: string, password: string, username: string) => Promise<{ error?: string }>
+  signOut: () => Promise<void>
+  
+  // Balance
+  userBalance: number
+  setUserBalance: (balance: number) => void
+  
+  // Bets
+  activeBets: ActiveBet[]
+  placeBet: (market: string, choice: string, amount: number, odds?: number) => boolean
+  clearBets: () => void
+}
+
+// Context
+const UserContext = createContext<UserContextType | undefined>(undefined)
+
+// Provider
+export function UserProvider({ children }: { children: ReactNode }) {
+  const { toast } = useToast()
+  const supabase = createClient()
+  
+  // Auth state
+  const [user, setUser] = useState<User>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  
+  // App state
+  const [userBalance, setUserBalance] = useState(10000) // Default starting balance
+  const [activeBets, setActiveBets] = useState<ActiveBet[]>([])
+
+  const isAuthenticated = user !== null
+
+  // Fetch user profile from Supabase
+  const fetchProfile = useCallback(async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) {
+      console.error('Error fetching profile:', error)
+      return null
+    }
+
+    return data as Profile
+  }, [supabase])
+
+  // Convert Supabase user to app user
+  const setUserFromSupabase = useCallback(async (supabaseUser: SupabaseUser | null) => {
+    if (!supabaseUser) {
+      setUser(null)
+      setProfile(null)
+      setUserBalance(10000)
+      setIsLoading(false)
+      return
+    }
+
+    // Fetch profile
+    const userProfile = await fetchProfile(supabaseUser.id)
+    
+    if (userProfile) {
+      setProfile(userProfile)
+      setUserBalance(userProfile.balance)
+      setUser({
+        id: supabaseUser.id,
+        username: userProfile.username,
+        email: supabaseUser.email || '',
+        avatar: userProfile.avatar_url || '/images/avatar.jpg',
+      })
+    } else {
+      // Profile not yet created (new user)
+      setUser({
+        id: supabaseUser.id,
+        username: supabaseUser.user_metadata?.username || `user_${supabaseUser.id.slice(0, 8)}`,
+        email: supabaseUser.email || '',
+        avatar: supabaseUser.user_metadata?.avatar_url || '/images/avatar.jpg',
+      })
+    }
+    
+    setIsLoading(false)
+  }, [fetchProfile])
+
+  // Listen for auth state changes
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserFromSupabase(session?.user ?? null)
+    })
+
+    // Listen for changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setUserFromSupabase(session?.user ?? null)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth, setUserFromSupabase])
+
+  // Sign in with email/password
+  const signIn = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      toast({
+        title: "Erreur de connexion",
+        description: error.message,
+        variant: "destructive",
+      })
+      return { error: error.message }
+    }
+
+    toast({
+      title: "Connexion réussie !",
+      description: `Bienvenue !`,
+      duration: 3000,
+    })
+
+    return {}
+  }, [supabase.auth, toast])
+
+  // Sign up with email/password
+  const signUp = useCallback(async (email: string, password: string, username: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+        },
+      },
+    })
+
+    if (error) {
+      toast({
+        title: "Erreur d'inscription",
+        description: error.message,
+        variant: "destructive",
+      })
+      return { error: error.message }
+    }
+
+    toast({
+      title: "Compte créé !",
+      description: "Vérifie tes emails pour confirmer ton compte.",
+      duration: 5000,
+    })
+
+    return {}
+  }, [supabase.auth, toast])
+
+  // Sign out
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    setProfile(null)
+    setActiveBets([])
+    
+    toast({
+      title: "Déconnexion",
+      description: "À bientôt !",
+      duration: 2000,
+    })
+  }, [supabase.auth, toast])
+
+  // Place bet
+  const placeBet = useCallback((market: string, choice: string, amount: number, odds?: number): boolean => {
+    if (userBalance < amount) {
+      toast({
+        title: "Pas assez de Zeny!",
+        duration: 2000,
+        variant: "destructive",
+      })
+      return false
+    }
+
+    setUserBalance((prev) => prev - amount)
+    
+    const newBet: ActiveBet = {
+      id: `${Date.now()}`,
+      market: market.slice(0, 40) + (market.length > 40 ? "..." : ""),
+      choice,
+      amount,
+      odds: odds || 1.5,
+    }
+    
+    setActiveBets((prev) => [...prev, newBet])
+    
+    toast({
+      title: (
+        <span>
+          Pari placé: {choice} pour {amount} <CurrencySymbol />
+        </span>
+      ),
+      description: market,
+      duration: 3000,
+    })
+    
+    return true
+  }, [userBalance, toast])
+
+  // Clear bets
+  const clearBets = useCallback(() => {
+    setActiveBets([])
+  }, [])
+
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        profile,
+        isAuthenticated,
+        isLoading,
+        signIn,
+        signUp,
+        signOut,
+        userBalance,
+        setUserBalance,
+        activeBets,
+        placeBet,
+        clearBets,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  )
+}
+
+// Hook
+export function useUser() {
+  const context = useContext(UserContext)
+  if (context === undefined) {
+    throw new Error("useUser must be used within a UserProvider")
+  }
+  return context
+}

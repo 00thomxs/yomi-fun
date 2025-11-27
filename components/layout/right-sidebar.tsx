@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Flame, Activity, Trophy } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket } from "@/lib/types"
@@ -7,15 +8,11 @@ import type { Market, BinaryMarket } from "@/lib/types"
 type RightSidebarProps = {
   trendingMarkets: Market[]
   userBalance: number
-  onMarketClick: (market: Market) => void
-  onShowLeaderboard: () => void
 }
 
 export function RightSidebar({
   trendingMarkets,
   userBalance,
-  onMarketClick,
-  onShowLeaderboard,
 }: RightSidebarProps) {
   return (
     <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-4 lg:h-fit space-y-4">
@@ -29,10 +26,10 @@ export function RightSidebar({
           {trendingMarkets.map((market) => {
             const CategoryIcon = market.categoryIcon
             return (
-              <button
+              <Link
                 key={market.id}
-                onClick={() => onMarketClick(market)}
-                className="w-full text-left p-3 rounded-lg bg-white/5 border border-border hover:border-white/20 transition-all"
+                href={`/market/${market.id}`}
+                className="block w-full text-left p-3 rounded-lg bg-white/5 border border-border hover:border-white/20 transition-all"
               >
                 <div className="flex items-center gap-2 mb-1.5">
                   <CategoryIcon className="w-3 h-3 text-muted-foreground" />
@@ -55,7 +52,7 @@ export function RightSidebar({
                   )}
                   <span className="text-xs text-muted-foreground font-mono">• {market.volume}</span>
                 </div>
-              </button>
+              </Link>
             )
           })}
         </div>
@@ -107,14 +104,13 @@ export function RightSidebar({
             </div>
           ))}
         </div>
-        <button
-          onClick={onShowLeaderboard}
-          className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-bold tracking-tight uppercase hover:bg-primary/90 transition-all"
+        <Link
+          href="/leaderboard"
+          className="block w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-bold tracking-tight uppercase hover:bg-primary/90 transition-all text-center"
         >
           Voir le Classement
-        </button>
+        </Link>
       </div>
     </aside>
   )
 }
-

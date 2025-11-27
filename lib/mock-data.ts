@@ -24,7 +24,13 @@ export const SHOP_BONNIE = "/images/shop-bonnie.jpg"
 export const SHOP_JAPAN = "/images/shop-japan.avif"
 export const SHOP_NORDVPN = "/images/shop-nordvpn.jpg"
 
-// Chart Data Generators
+// Seeded random number generator (deterministic)
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000
+  return x - Math.floor(x)
+}
+
+// Chart Data Generators (deterministic - no hydration mismatch)
 export function generateSyncedChartData(
   points: number,
   targetProbability: number,
@@ -32,17 +38,19 @@ export function generateSyncedChartData(
 ): ChartDataPoint[] {
   const data: ChartDataPoint[] = []
   const target = targetProbability
+  const baseSeed = targetProbability * 100 + points
 
-  let currentPrice = Math.random() * 40 + 30
+  let currentPrice = seededRandom(baseSeed) * 40 + 30
 
   for (let i = 0; i < points; i++) {
+    const seed = baseSeed + i * 7.3
     const trendToTarget = currentPrice + (target - currentPrice) * 0.15
-    const volatility = (Math.random() - 0.5) * 15
+    const volatility = (seededRandom(seed) - 0.5) * 15
     currentPrice = trendToTarget + volatility
     currentPrice = Math.max(2, Math.min(98, currentPrice))
 
     if (i === points - 1) {
-      currentPrice = target + (Math.random() - 0.5) * 3
+      currentPrice = target + (seededRandom(seed + 0.5) - 0.5) * 3
       currentPrice = Math.max(2, Math.min(98, currentPrice))
     }
 
@@ -57,10 +65,12 @@ export function generateSyncedChartData(
 
 export function generateVolatileChartData(points: number, targetProbability: number): ChartDataPoint[] {
   const data: ChartDataPoint[] = []
-  let currentPrice = targetProbability - 15 + Math.random() * 30
+  const baseSeed = targetProbability * 50 + points * 3
+  let currentPrice = targetProbability - 15 + seededRandom(baseSeed) * 30
 
   for (let i = 0; i < points; i++) {
-    const volatility = (Math.random() - 0.5) * 20
+    const seed = baseSeed + i * 5.7
+    const volatility = (seededRandom(seed) - 0.5) * 20
     const trendToTarget = currentPrice + (targetProbability - currentPrice) * 0.1
     currentPrice = trendToTarget + volatility
     currentPrice = Math.max(5, Math.min(95, currentPrice))
@@ -84,13 +94,15 @@ export function generateMultiOutcomeData(
   labels: string[],
 ): MultiOutcomeDataPoint[] {
   const data: MultiOutcomeDataPoint[] = []
+  const baseSeed = outcomes.reduce((acc, o) => acc + o.probability, 0) + points
 
   for (let i = 0; i < points; i++) {
     const point: MultiOutcomeDataPoint = { time: labels[i % labels.length] }
 
-    outcomes.forEach((outcome) => {
+    outcomes.forEach((outcome, j) => {
+      const seed = baseSeed + i * 3.3 + j * 11.7
       const target = outcome.probability
-      const volatility = (Math.random() - 0.5) * 8
+      const volatility = (seededRandom(seed) - 0.5) * 8
       let value = target + volatility * (1 - i / points)
       value = Math.max(1, Math.min(99, value))
       if (i === points - 1) value = target

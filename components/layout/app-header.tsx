@@ -1,42 +1,79 @@
 "use client"
 
-import { Trophy, Zap } from "lucide-react"
+import Link from "next/link"
+import { Trophy, Zap, User, LogOut } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import type { ActiveBet } from "@/lib/types"
+import { useUser } from "@/contexts/user-context"
 
-type AppHeaderProps = {
-  userBalance: number
-  activeBets: ActiveBet[]
-  onWalletClick: () => void
-  onShowLeaderboard: () => void
-}
+export function AppHeader() {
+  const { user, isAuthenticated, userBalance, activeBets, signOut } = useUser()
 
-export function AppHeader({ userBalance, activeBets, onWalletClick, onShowLeaderboard }: AppHeaderProps) {
   return (
     <>
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border rounded-xl mb-6">
         <div className="flex items-center justify-between px-5 py-4">
           <div className="lg:hidden">
-            <YomiLogo />
+            <Link href="/">
+              <YomiLogo />
+            </Link>
           </div>
           <div className="flex items-center gap-3 ml-auto">
-            <button
-              onClick={onShowLeaderboard}
+            {/* Leaderboard button - mobile only */}
+            <Link
+              href="/leaderboard"
               className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all lg:hidden"
             >
               <Trophy className="w-5 h-5 text-white/80" />
-            </button>
-            <button
-              onClick={onWalletClick}
-              className="px-4 py-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all"
-            >
+            </Link>
+
+            {/* Wallet */}
+            <div className="px-4 py-2.5 rounded-lg bg-card border border-border">
               <span className="flex items-center gap-2 text-sm font-semibold tracking-tight">
                 <CurrencySymbol className="text-primary" />
                 <span className="font-mono font-bold">{userBalance.toLocaleString()}</span>
               </span>
-            </button>
+            </div>
+
+            {/* Login/User button */}
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all">
+                  <img
+                    src={user?.avatar || "/images/avatar.jpg"}
+                    alt={user?.username}
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                  <span className="text-sm font-semibold hidden sm:inline">@{user?.username}</span>
+                </button>
+                
+                {/* Dropdown menu */}
+                <div className="absolute right-0 top-full mt-2 w-48 py-2 rounded-xl bg-card border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-xl">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Mon Profil
+                  </Link>
+                  <button
+                    onClick={signOut}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Déconnexion
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all"
+              >
+                Se connecter
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -52,7 +89,7 @@ export function AppHeader({ userBalance, activeBets, onWalletClick, onShowLeader
               </span>
             </div>
             <span className="text-xs font-mono text-muted-foreground">
-              {activeBets.reduce((sum, bet) => sum + bet.amount, 0)} <CurrencySymbol /> engages
+              {activeBets.reduce((sum, bet) => sum + bet.amount, 0)} <CurrencySymbol /> engagés
             </span>
           </div>
         </div>
@@ -60,4 +97,3 @@ export function AppHeader({ userBalance, activeBets, onWalletClick, onShowLeader
     </>
   )
 }
-
