@@ -22,13 +22,13 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
   }
 
   // Helper to generate fake chart history
-  const generateHistory = (basePrice: number) => {
+  const generateHistory = (basePrice: number, points: number, labelSuffix: string) => {
     const data = []
     let price = basePrice
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < points; i++) {
       price = price + (Math.random() - 0.5) * 10
       price = Math.max(1, Math.min(99, price))
-      data.push({ time: `${i}h`, price })
+      data.push({ time: `${i}${labelSuffix}`, price })
     }
     return data
   }
@@ -49,9 +49,9 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
       noPrice: (100 - prob) / 100,
       volatility: "Moyenne", // Mock
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
-      history24h: generateHistory(prob), // Mock Chart
-      history7d: [],
-      historyAll: []
+      history24h: generateHistory(prob, 24, 'h'), // Mock Chart
+      history7d: generateHistory(prob, 7, 'j'), // Mock Chart
+      historyAll: generateHistory(prob, 30, 'j') // Mock Chart
     } as BinaryMarket
   } else {
     market = {
@@ -73,4 +73,3 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
     />
   )
 }
-
