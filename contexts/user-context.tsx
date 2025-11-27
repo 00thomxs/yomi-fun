@@ -7,12 +7,17 @@ import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import type { ActiveBet } from "@/lib/types"
 
+// --- CONFIGURATION ---
+// Mettre à true si la connexion Supabase est bloquée (ex: sandbox Cursor)
+const IS_MOCK_MODE = false 
+
 // Types
 type User = {
   id: string
   username: string
   email: string
   avatar: string
+  role?: 'user' | 'admin'
 } | null
 
 type Profile = {
@@ -26,6 +31,7 @@ type Profile = {
   total_bets: number
   total_won: number
   win_rate: number
+  role?: 'user' | 'admin'
 }
 
 type UserContextType = {
@@ -71,6 +77,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Fetch user profile from Supabase
   const fetchProfile = useCallback(async (userId: string) => {
+    if (IS_MOCK_MODE) {
+      return {
+        id: userId,
+        username: "AdminTest",
+        avatar_url: "/images/avatar.jpg",
+        balance: 50000,
+        xp: 1200,
+        level: 5,
+        streak: 10,
+        total_bets: 25,
+        total_won: 15000,
+        win_rate: 65,
+        role: 'admin' as const, // Force admin role in mock mode
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    }
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -106,6 +130,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         username: userProfile.username,
         email: supabaseUser.email || '',
         avatar: userProfile.avatar_url || '/images/avatar.jpg',
+        role: userProfile.role
       })
     } else {
       // Profile not yet created (new user)
@@ -122,6 +147,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
+    if (IS_MOCK_MODE) {
+      // Restore mock session from localStorage
+      const storedUser = localStorage.getItem('mockUser')
+      if (storedUser) {
+        const mockUser = JSON.parse(storedUser)
+        // Small delay to simulate loading
+        setTimeout(() => setUserFromSupabase(mockUser), 100)
+      } else {
+        setIsLoading(false)
+      }
+      return
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserFromSupabase(session?.user ?? null)
@@ -139,6 +177,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Sign in with email/password
   const signIn = useCallback(async (email: string, password: string) => {
+    if (IS_MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 500)) // Fake delay
+      const mockUser = {
+        id: "mock-user-id",
+        email: email,
+        user_metadata: { username: "AdminTest" }
+      } as any
+      setUserFromSupabase(mockUser)
+      localStorage.setItem('mockUser', JSON.stringify(mockUser))
+      
+      toast({
+        title: "Mode Simulation",
+        description: "Connecté en tant qu'Admin (Mock)",
+        duration: 3000,
+      })
+      return {}
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -160,10 +216,28 @@ export function UserProvider({ children }: { children: ReactNode }) {
     })
 
     return {}
-  }, [supabase.auth, toast])
+  }, [supabase.auth, toast, setUserFromSupabase])
 
   // Sign up with email/password
   const signUp = useCallback(async (email: string, password: string, username: string) => {
+    if (IS_MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 500)) // Fake delay
+      const mockUser = {
+        id: "mock-user-id",
+        email: email,
+        user_metadata: { username: username }
+      } as any
+      setUserFromSupabase(mockUser)
+      localStorage.setItem('mockUser', JSON.stringify(mockUser))
+
+      toast({
+        title: "Mode Simulation",
+        description: "Compte créé avec succès (Mock)",
+        duration: 3000,
+      })
+      return {}
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -190,11 +264,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
     })
 
     return {}
-  }, [supabase.auth, toast])
+  }, [supabase.auth, toast, setUserFromSupabase])
 
   // Sign out
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    if (!IS_MOCK_MODE) {
+      await supabase.auth.signOut()
+    } else {
+      localStorage.removeItem('mockUser')
+    }
     setUser(null)
     setProfile(null)
     setActiveBets([])
