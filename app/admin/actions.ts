@@ -69,3 +69,22 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   
   return { success: true, message: 'Marché créé avec succès !' }
 }
+
+export async function deleteMarket(formData: FormData): Promise<{ error?: string; success?: boolean }> {
+  const marketId = formData.get('marketId') as string
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('markets')
+    .delete()
+    .eq('id', marketId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  
+  return { success: true }
+}
