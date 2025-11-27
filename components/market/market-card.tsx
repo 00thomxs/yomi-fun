@@ -1,9 +1,10 @@
 "use client"
 
-import { Clock, Users, Activity } from "lucide-react"
+import { Clock, Users, Activity, HelpCircle } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { generateVolatileChartData } from "@/lib/mock-data"
+import { CATEGORIES } from "@/lib/constants"
 
 type MarketCardProps = {
   market: Market
@@ -12,15 +13,17 @@ type MarketCardProps = {
 }
 
 export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
-  const CategoryIcon = market.categoryIcon
+  // Find correct icon from constants
+  const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
+  const CategoryIcon = categoryDef?.icon || HelpCircle
 
   // Generate volatile chart data for binary cards
-  const volatileChartData = market.type === "binary" ? generateVolatileChartData(20, market.probability) : []
+  const volatileChartData = market.type === "binary" ? generateVolatileChartData(20, (market as BinaryMarket).probability || 50) : []
 
   if (market.type === "multi") {
     const sortedOutcomes = [...market.outcomes].sort((a, b) => b.probability - a.probability)
     const topTwo = sortedOutcomes.slice(0, 2)
-    const remainingCount = market.outcomes.length - 2
+    const remainingCount = Math.max(0, market.outcomes.length - 2)
 
     return (
       <div
@@ -31,7 +34,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer"
       >
         <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
-          <img src={market.bgImage || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
+          {market.bgImage ? (
+            <img 
+              src={market.bgImage} 
+              alt="" 
+              className="w-full h-full object-cover"
+              onError={(e) => e.currentTarget.style.display = 'none'} 
+            />
+          ) : (
+            <div className="w-full h-full bg-slate-800" />
+          )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-br from-card via-card/98 to-card/95" />
 
@@ -40,7 +52,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             <div className="flex items-center gap-2">
               <CategoryIcon className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                {market.category}
+                {categoryDef?.label || market.category || "Divers"}
               </span>
               {market.isLive && (
                 <>
@@ -54,7 +66,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
               <Clock className="w-3 h-3" />
-              {market.countdown}
+              {market.countdown || "-"}
             </div>
           </div>
 
@@ -72,7 +84,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.question, `OUI ${outcome.name}`, 100, 100 / outcome.probability)
+                      onBet(market.question, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
                     }}
                     className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
                   >
@@ -81,11 +93,11 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.question, `NON ${outcome.name}`, 100, 100 / (100 - outcome.probability))
+                      onBet(market.question, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
                     }}
                     className="py-1.5 px-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition-all"
                   >
-                    NON {100 - outcome.probability}%
+                    NON {100 - (outcome.probability || 0)}%
                   </button>
                 </div>
               </div>
@@ -96,9 +108,11 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t border-border">
             <span className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />
-              <span className="font-mono">{market.volume}</span>
+              <span className="font-mono">{market.volume || 0}</span>
             </span>
-            <span className="text-primary text-xs font-medium hover:underline">+{remainingCount} outcomes...</span>
+            {remainingCount > 0 && (
+              <span className="text-primary text-xs font-medium hover:underline">+{remainingCount} outcomes...</span>
+            )}
           </div>
         </div>
       </div>
@@ -107,6 +121,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
 
   // Binary market card
   const binaryMarket = market as BinaryMarket
+  const prob = binaryMarket.probability || 50
 
   return (
     <div
@@ -117,7 +132,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer"
     >
       <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
-        <img src={market.bgImage || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
+        {market.bgImage ? (
+          <img 
+            src={market.bgImage} 
+            alt="" 
+            className="w-full h-full object-cover"
+            onError={(e) => e.currentTarget.style.display = 'none'} 
+          />
+        ) : (
+          <div className="w-full h-full bg-slate-800" />
+        )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-br from-card via-card/98 to-card/95" />
 
@@ -126,7 +150,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <div className="flex items-center gap-2">
             <CategoryIcon className="w-4 h-4 text-muted-foreground" />
             <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              {market.category}
+              {categoryDef?.label || market.category || "Divers"}
             </span>
             {market.isLive && (
               <>
@@ -140,7 +164,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
             <Clock className="w-3 h-3" />
-            {market.countdown}
+            {market.countdown || "-"}
           </div>
         </div>
 
@@ -152,14 +176,14 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             <AreaChart data={volatileChartData}>
               <defs>
                 <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={binaryMarket.probability >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0.3} />
-                  <stop offset="100%" stopColor={binaryMarket.probability >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0} />
+                  <stop offset="0%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <Area
                 type="monotone"
                 dataKey="price"
-                stroke={binaryMarket.probability >= 50 ? "#10b981" : "#f43f5e"}
+                stroke={prob >= 50 ? "#10b981" : "#f43f5e"}
                 strokeWidth={1.5}
                 fill={`url(#gradient-${market.id})`}
                 dot={false}
@@ -171,12 +195,12 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Users className="w-3.5 h-3.5" />
-            <span className="font-mono">{market.volume}</span>
+            <span className="font-mono">{market.volume || 0}</span>
           </span>
           <span>•</span>
           <span className="flex items-center gap-1">
             <Activity className="w-3.5 h-3.5" />
-            <span>{binaryMarket.volatility}</span>
+            <span>{binaryMarket.volatility || "Moyenne"}</span>
           </span>
         </div>
 
@@ -185,20 +209,20 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onBet(market.question, "OUI", 100, 1 / binaryMarket.yesPrice)
+              onBet(market.question, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
             }}
             className="py-3.5 px-4 rounded-lg bg-emerald-500/10 border border-emerald-500/50 font-bold tracking-tight hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all text-emerald-400 text-base"
           >
-            OUI • <span className="font-mono">{binaryMarket.probability}%</span>
+            OUI • <span className="font-mono">{prob}%</span>
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onBet(market.question, "NON", 100, 1 / binaryMarket.noPrice)
+              onBet(market.question, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
             }}
             className="py-3.5 px-4 rounded-lg bg-rose-500/10 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/20 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
           >
-            NON • <span className="font-mono">{100 - binaryMarket.probability}%</span>
+            NON • <span className="font-mono">{100 - prob}%</span>
           </button>
         </div>
       </div>
