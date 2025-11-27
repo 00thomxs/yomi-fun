@@ -1,30 +1,38 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Calendar, Image as ImageIcon, Type, List, Plus, X } from "lucide-react"
-
 import { createMarket } from "@/app/admin/actions"
 import { useToast } from "@/hooks/use-toast"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart } from "lucide-react"
 
 export default function CreateMarketPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
-  const [outcomes, setOutcomes] = useState([{ name: "OUI", color: "#10b981" }, { name: "NON", color: "#f43f5e" }])
   
-  const addOutcome = () => {
-    setOutcomes([...outcomes, { name: "", color: "#3b82f6" }])
+  // Market Type
+  const [marketType, setMarketType] = useState<'binary' | 'multi'>('binary')
+  
+  // Outcomes State
+  const [binaryProb, setBinaryProb] = useState(50)
+  const [multiOutcomes, setMultiOutcomes] = useState([
+    { name: "", probability: 0, color: "#3b82f6" },
+    { name: "", probability: 0, color: "#ec4899" }
+  ])
+
+  const addMultiOutcome = () => {
+    setMultiOutcomes([...multiOutcomes, { name: "", probability: 0, color: "#8b5cf6" }])
   }
 
-  const removeOutcome = (index: number) => {
-    setOutcomes(outcomes.filter((_, i) => i !== index))
+  const removeMultiOutcome = (index: number) => {
+    setMultiOutcomes(multiOutcomes.filter((_, i) => i !== index))
   }
 
-  const updateOutcome = (index: number, field: 'name' | 'color', value: string) => {
-    const newOutcomes = [...outcomes]
+  const updateMultiOutcome = (index: number, field: string, value: any) => {
+    const newOutcomes = [...multiOutcomes]
     newOutcomes[index] = { ...newOutcomes[index], [field]: value }
-    setOutcomes(newOutcomes)
+    setMultiOutcomes(newOutcomes)
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,7 +40,20 @@ export default function CreateMarketPage() {
     setIsLoading(true)
     
     const formData = new FormData(e.currentTarget)
-    formData.append('outcomes', JSON.stringify(outcomes))
+    
+    // Construct outcomes based on type
+    let finalOutcomes = []
+    if (marketType === 'binary') {
+      finalOutcomes = [
+        { name: "OUI", probability: binaryProb, color: "#10b981" },
+        { name: "NON", probability: 100 - binaryProb, color: "#f43f5e" }
+      ]
+    } else {
+      finalOutcomes = multiOutcomes
+    }
+    
+    formData.append('type', marketType)
+    formData.append('outcomes', JSON.stringify(finalOutcomes))
     
     const result = await createMarket(formData)
     
@@ -59,111 +80,189 @@ export default function CreateMarketPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Nouveau Marché</h1>
         <p className="text-muted-foreground mt-1">
-          Créez un événement de prédiction
+          Configuration de l'événement
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Basic Info */}
+        
+        {/* 1. Type de Marché */}
+        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+          <h2 className="font-semibold flex items-center gap-2">
+            <PieChart className="w-4 h-4 text-primary" />
+            Type de Marché
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setMarketType('binary')}
+              className={`p-4 rounded-lg border transition-all text-center ${
+                marketType === 'binary' 
+                  ? 'bg-primary/10 border-primary text-primary font-bold' 
+                  : 'bg-white/5 border-transparent hover:bg-white/10'
+              }`}
+            >
+              Binaire (Oui/Non)
+            </button>
+            <button
+              type="button"
+              onClick={() => setMarketType('multi')}
+              className={`p-4 rounded-lg border transition-all text-center ${
+                marketType === 'multi' 
+                  ? 'bg-primary/10 border-primary text-primary font-bold' 
+                  : 'bg-white/5 border-transparent hover:bg-white/10'
+              }`}
+            >
+              Choix Multiple
+            </button>
+          </div>
+        </div>
+
+        {/* 2. Informations Générales */}
         <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <Type className="w-4 h-4 text-primary" />
-            Informations Générales
+            Informations
           </h2>
           
           <div className="space-y-2">
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Question</label>
             <input 
+              name="question"
               type="text"
-              placeholder="Ex: Squeezie va-t-il gagner le GP Explorer ?"
+              placeholder="Ex: Squeezie va-t-il gagner ?"
               className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Description (Optionnel)</label>
+            <textarea 
+              name="description"
+              placeholder="Détails supplémentaires..."
+              className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all min-h-[80px]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Catégorie</label>
-              <select className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all">
+              <select name="category" className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all">
                 <option>YouTube</option>
                 <option>Twitch</option>
                 <option>Musique</option>
                 <option>Sport</option>
                 <option>Cinéma</option>
                 <option>Politique</option>
+                <option>Réseaux</option>
+                <option>TV</option>
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Date de fin</label>
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input 
-                  type="datetime-local"
-                  className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Image URL</label>
-            <div className="relative">
-              <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Image URL</label>
               <input 
+                name="imageUrl"
                 type="url"
                 placeholder="https://..."
-                className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all"
+                className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all"
               />
             </div>
           </div>
-        </div>
 
-        {/* Outcomes */}
-        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold flex items-center gap-2">
-              <List className="w-4 h-4 text-primary" />
-              Réponses Possibles
-            </h2>
-            <button 
-              type="button"
-              onClick={addOutcome}
-              className="text-xs font-bold text-primary hover:underline uppercase"
-            >
-              + Ajouter
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {outcomes.map((outcome, idx) => (
-              <div key={idx} className="flex gap-3">
+          {/* Date & Heure */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Date de fin</label>
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input 
-                  type="color"
-                  value={outcome.color}
-                  onChange={(e) => updateOutcome(idx, 'color', e.target.value)}
-                  className="w-12 h-12 rounded-lg bg-transparent border-0 p-0 cursor-pointer"
-                />
-                <input 
-                  type="text"
-                  value={outcome.name}
-                  onChange={(e) => updateOutcome(idx, 'name', e.target.value)}
-                  placeholder={`Réponse ${idx + 1}`}
-                  className="flex-1 bg-white/5 border border-border rounded-lg px-4 outline-none focus:border-primary/50 transition-all"
+                  name="closesAt"
+                  type="datetime-local"
+                  className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none"
                   required
                 />
-                {outcomes.length > 2 && (
-                  <button 
-                    type="button"
-                    onClick={() => removeOutcome(idx)}
-                    className="p-3 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
               </div>
-            ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Le marché sera automatiquement clôturé à cette date.</p>
           </div>
+        </div>
+
+        {/* 3. Probabilités & Réponses */}
+        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+          <h2 className="font-semibold flex items-center gap-2">
+            <List className="w-4 h-4 text-primary" />
+            {marketType === 'binary' ? 'Probabilité Initiale' : 'Réponses Possibles'}
+          </h2>
+
+          {marketType === 'binary' ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-emerald-400">OUI : {binaryProb}%</span>
+                <span className="font-bold text-rose-400">NON : {100 - binaryProb}%</span>
+              </div>
+              <input 
+                type="range" 
+                min="1" 
+                max="99" 
+                value={binaryProb} 
+                onChange={(e) => setBinaryProb(parseInt(e.target.value))}
+                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <p className="text-xs text-muted-foreground text-center">
+                Ajustez la probabilité de départ. Le NON est calculé automatiquement.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {multiOutcomes.map((outcome, idx) => (
+                <div key={idx} className="flex gap-3 items-center">
+                  <input 
+                    type="text"
+                    value={outcome.name}
+                    onChange={(e) => updateMultiOutcome(idx, 'name', e.target.value)}
+                    placeholder={`Réponse ${idx + 1}`}
+                    className="flex-1 bg-white/5 border border-border rounded-lg px-4 py-2 outline-none focus:border-primary/50 transition-all"
+                    required
+                  />
+                  <div className="w-24 relative">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                    <input 
+                      type="number"
+                      value={outcome.probability}
+                      onChange={(e) => updateMultiOutcome(idx, 'probability', parseFloat(e.target.value))}
+                      className="w-full bg-white/5 border border-border rounded-lg px-3 py-2 outline-none focus:border-primary/50 text-right"
+                      placeholder="0"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <input 
+                    type="color"
+                    value={outcome.color}
+                    onChange={(e) => updateMultiOutcome(idx, 'color', e.target.value)}
+                    className="w-10 h-10 rounded-lg bg-transparent border-0 p-0 cursor-pointer shrink-0"
+                  />
+                  {multiOutcomes.length > 2 && (
+                    <button 
+                      type="button"
+                      onClick={() => removeMultiOutcome(idx)}
+                      className="p-2 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button 
+                type="button"
+                onClick={addMultiOutcome}
+                className="w-full py-2 border border-dashed border-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" /> Ajouter une réponse
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Submit */}
@@ -197,4 +296,3 @@ export default function CreateMarketPage() {
     </div>
   )
 }
-

@@ -10,6 +10,7 @@ export type CreateMarketState = {
 }
 
 export async function createMarket(formData: FormData): Promise<CreateMarketState> {
+  const type = formData.get('type') as 'binary' | 'multi'
   const question = formData.get('question') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
@@ -29,8 +30,8 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
       image_url: imageUrl || null,
       closes_at: closesAt,
       status: 'open',
-      type: outcomes.length > 2 ? 'multi' : 'binary',
-      is_live: true, // Default to live for now
+      type,
+      is_live: true,
       volume: 0
     })
     .select()
@@ -46,7 +47,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
     market_id: market.id,
     name: o.name,
     color: o.color,
-    probability: 100 / outcomes.length, // Start equal
+    probability: parseFloat(o.probability),
     is_winner: null
   }))
 
