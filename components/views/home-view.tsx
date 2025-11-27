@@ -1,6 +1,6 @@
 "use client"
 
-import { Flame, Globe, Clock, Zap } from "lucide-react"
+import { Flame, Globe, Gamepad2, Music, Wifi, Tv, Trophy, Newspaper, Clock, Zap } from "lucide-react"
 import { MarketCard } from "@/components/market/market-card"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -14,34 +14,47 @@ type HomeViewProps = {
 }
 
 export function HomeView({ markets, onBet, onMarketClick, activeCategory, setActiveCategory }: HomeViewProps) {
-  // Determine featured market dynamically (is_featured preferred, then Live Binary Market)
-  const featuredMarket = (markets.find((m) => m.is_featured && m.isLive && m.type === 'binary') || 
-                         markets.find((m) => m.isLive && m.type === 'binary') || 
-                         markets[0]) as BinaryMarket | undefined
+  // Safe filtering
+  const validMarkets = markets || []
+  
+  // Determine featured market dynamically
+  const featuredMarket = (
+    validMarkets.find((m) => m.is_featured && m.isLive && m.type === 'binary') || 
+    validMarkets.find((m) => m.isLive && m.type === 'binary') || 
+    validMarkets[0]
+  ) as BinaryMarket | undefined
 
-  const filteredMarkets =
-    activeCategory === "trending"
-      ? markets.filter((m) => m.is_featured) // Trending = Featured markets
-      : activeCategory === "all"
-        ? markets // All = All markets
-        : markets.filter((m) => m.category && m.category.toLowerCase() === activeCategory.toLowerCase())
+  // Category filtering with null checks
+  const filteredMarkets = activeCategory === "trending"
+    ? validMarkets.filter((m) => m.isLive)
+    : activeCategory === "all"
+      ? validMarkets
+      : validMarkets.filter((m) => m.category && m.category.toLowerCase() === activeCategory.toLowerCase())
 
   return (
     <div className="space-y-6">
       {/* Featured Market Hero */}
       {featuredMarket && featuredMarket.type === 'binary' && (
         <div className="relative overflow-hidden rounded-xl bg-card border border-border h-[380px]">
-          <img
-            src={featuredMarket.bgImage || "/placeholder.svg"}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {featuredMarket.bgImage ? (
+            <img
+              src={featuredMarket.bgImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+          )}
+          
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/60" />
 
           <div className="relative h-full p-6 flex flex-col justify-end space-y-4">
             <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-md bg-black/60 backdrop-blur-sm border border-white/10">
               <Clock className="w-3 h-3 text-muted-foreground" />
-              <span className="text-xs font-mono text-white">{featuredMarket.countdown}</span>
+              <span className="text-xs font-mono text-white">{featuredMarket.countdown || "Bientôt"}</span>
             </div>
 
             {featuredMarket.isLive && (
@@ -51,18 +64,18 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               </div>
             )}
             <h2 className="text-3xl font-bold tracking-tight text-balance leading-tight text-shadow-lg">
-              {featuredMarket.question}
+              {featuredMarket.question || "Question indisponible"}
             </h2>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-bold tracking-tight">
-                <span className="text-white font-mono">{featuredMarket.probability}% OUI</span>
-                <span className="text-white/60 font-mono">{100 - featuredMarket.probability}% NON</span>
+                <span className="text-white font-mono">{featuredMarket.probability || 50}% OUI</span>
+                <span className="text-white/60 font-mono">{100 - (featuredMarket.probability || 50)}% NON</span>
               </div>
               <div className="relative h-2 rounded-full bg-white/10 overflow-hidden">
                 <div
                   className="absolute left-0 top-0 h-full bg-white rounded-full"
-                  style={{ width: `${featuredMarket.probability}%` }}
+                  style={{ width: `${featuredMarket.probability || 50}%` }}
                 />
               </div>
             </div>
@@ -131,7 +144,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
           ))
         ) : (
           <div className="col-span-full text-center py-12 text-muted-foreground">
-            Aucun événement dans cette catégorie pour le moment.
+            Aucun événement trouvé.
           </div>
         )}
       </div>
