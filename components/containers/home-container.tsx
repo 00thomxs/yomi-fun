@@ -24,16 +24,25 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
   }
 
   // Transform Supabase data to match Market type if needed
-  // For now assuming they match roughly or we adapt in HomeView
-  const markets = initialMarkets.map(m => ({
-    ...m,
-    // Add missing fields required by UI with default values
-    bgImage: m.image_url || "/placeholder.svg",
-    probability: 50, // TODO: Fetch real probability
-    countdown: new Date(m.closes_at).toLocaleDateString(),
-    yesPrice: 0.5,
-    noPrice: 0.5
-  }))
+  const markets = initialMarkets.map(m => {
+    // Find probability for binary markets
+    let probability = 50
+    if (m.type === 'binary' && m.outcomes && m.outcomes.length > 0) {
+      const yesOutcome = m.outcomes.find((o: any) => o.name === 'OUI')
+      if (yesOutcome) probability = yesOutcome.probability
+    }
+
+    return {
+      ...m,
+      // Add missing fields required by UI with default values
+      bgImage: m.image_url || "/placeholder.svg",
+      probability: probability,
+      countdown: m.closes_at ? new Date(m.closes_at).toLocaleDateString() : "Bientôt",
+      yesPrice: probability / 100, // Approx price
+      noPrice: (100 - probability) / 100,
+      is_featured: m.is_featured // Ensure featured flag is passed
+    }
+  })
 
   return (
     <HomeView
@@ -45,4 +54,3 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
     />
   )
 }
-

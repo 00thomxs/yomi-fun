@@ -24,7 +24,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
       ? markets.filter((m) => m.is_featured) // Trending = Featured markets
       : activeCategory === "all"
         ? markets // All = All markets
-        : markets.filter((m) => m.category?.toLowerCase() === activeCategory.toLowerCase())
+        : markets.filter((m) => m.category && m.category.toLowerCase() === activeCategory.toLowerCase())
 
   return (
     <div className="space-y-6">
