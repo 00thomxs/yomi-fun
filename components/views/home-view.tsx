@@ -13,8 +13,8 @@ type HomeViewProps = {
 }
 
 export function HomeView({ markets, onBet, onMarketClick, activeCategory, setActiveCategory }: HomeViewProps) {
-  // TODO: Determine featured market dynamically
-  const featuredMarket = markets.find((m) => m.isLive) as BinaryMarket || markets[0] as BinaryMarket
+  // Determine featured market dynamically (Live Binary Market preferred)
+  const featuredMarket = (markets.find((m) => m.isLive && m.type === 'binary') || markets[0]) as BinaryMarket | undefined
 
   const categories = [
     { id: "trending", label: "Trending", icon: Flame },
@@ -37,7 +37,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
   return (
     <div className="space-y-6">
       {/* Featured Market Hero */}
-      {featuredMarket && (
+      {featuredMarket && featuredMarket.type === 'binary' && (
         <div className="relative overflow-hidden rounded-xl bg-card border border-border h-[380px]">
           <img
             src={featuredMarket.bgImage || "/placeholder.svg"}
