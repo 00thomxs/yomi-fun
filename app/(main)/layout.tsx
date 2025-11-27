@@ -10,7 +10,7 @@ import { MARKETS_DATA } from "@/lib/mock-data"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { activeBets, userBalance } = useUser()
+  const { activeBets, userBalance, isAuthenticated } = useUser()
 
   // Determine active tab from pathname
   const getActiveTab = () => {
@@ -60,6 +60,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <RightSidebar
           trendingMarkets={trendingMarkets}
           userBalance={userBalance}
+          isAuthenticated={isAuthenticated}
         />
       </div>
 

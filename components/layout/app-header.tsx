@@ -28,13 +28,15 @@ export function AppHeader() {
               <Trophy className="w-5 h-5 text-white/80" />
             </Link>
 
-            {/* Wallet */}
-            <div className="px-4 py-2.5 rounded-lg bg-card border border-border">
-              <span className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <CurrencySymbol className="text-primary" />
-                <span className="font-mono font-bold">{userBalance.toLocaleString()}</span>
-              </span>
-            </div>
+            {/* Wallet - only show when authenticated */}
+            {isAuthenticated && (
+              <div className="px-4 py-2.5 rounded-lg bg-card border border-border">
+                <span className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+                  <CurrencySymbol className="text-primary" />
+                  <span className="font-mono font-bold">{userBalance.toLocaleString()}</span>
+                </span>
+              </div>
+            )}
 
             {/* Login/User button */}
             {isAuthenticated ? (

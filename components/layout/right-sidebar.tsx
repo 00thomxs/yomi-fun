@@ -8,11 +8,13 @@ import type { Market, BinaryMarket } from "@/lib/types"
 type RightSidebarProps = {
   trendingMarkets: Market[]
   userBalance: number
+  isAuthenticated?: boolean
 }
 
 export function RightSidebar({
   trendingMarkets,
   userBalance,
+  isAuthenticated = false,
 }: RightSidebarProps) {
   return (
     <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-4 lg:h-fit space-y-4">
@@ -58,28 +60,30 @@ export function RightSidebar({
         </div>
       </div>
 
-      {/* Wallet Widget */}
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-primary" />
-          <h3 className="text-sm font-bold tracking-tight uppercase">Portefeuille</h3>
-        </div>
-        <div className="space-y-3">
-          <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-            <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Balance</p>
-            <p className="text-2xl font-bold tracking-tight">
-              <CurrencySymbol className="text-primary" /> <span className="font-mono">{userBalance.toLocaleString()}</span>
-            </p>
+      {/* Wallet Widget - only show when authenticated */}
+      {isAuthenticated && (
+        <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Activity className="w-5 h-5 text-primary" />
+            <h3 className="text-sm font-bold tracking-tight uppercase">Portefeuille</h3>
           </div>
-          <div className="p-3 rounded-lg bg-white/5 border border-border">
-            <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Benefice Net</p>
-            <p className="text-2xl font-bold tracking-tight text-white">
-              <span className="text-emerald-400 font-mono">+8,450</span>
-              <span className="text-emerald-400 text-sm font-mono ml-2">+12%</span>
-            </p>
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Balance</p>
+              <p className="text-2xl font-bold tracking-tight">
+                <CurrencySymbol className="text-primary" /> <span className="font-mono">{userBalance.toLocaleString()}</span>
+              </p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/5 border border-border">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Benefice Net</p>
+              <p className="text-2xl font-bold tracking-tight text-white">
+                <span className="text-emerald-400 font-mono">+8,450</span>
+                <span className="text-emerald-400 text-sm font-mono ml-2">+12%</span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Top Players Widget */}
       <div className="rounded-xl bg-card border border-border p-5 space-y-4">
