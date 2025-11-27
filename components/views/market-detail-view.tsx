@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Clock } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { generateMultiOutcomeData, TIME_LABELS_1H, TIME_LABELS_4H, TIME_LABELS_1J } from "@/lib/mock-data"
+import { CATEGORIES } from "@/lib/constants"
 
 type MarketDetailViewProps = {
   market: Market
@@ -22,7 +23,9 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
 
-  const CategoryIcon = market.categoryIcon
+  // Find correct icon from constants
+  const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
+  const CategoryIcon = categoryDef?.icon || HelpCircle
 
   const getBinaryChartData = () => {
     if (market.type !== "binary") return []
@@ -94,7 +97,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <CategoryIcon className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{market.category}</p>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{categoryDef?.label || market.category}</p>
             {market.isLive && (
               <>
                 <span className="text-muted-foreground">•</span>
@@ -548,4 +551,3 @@ function BetAmountInput({
     </>
   )
 }
-
