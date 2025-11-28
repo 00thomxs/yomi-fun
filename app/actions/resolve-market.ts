@@ -83,23 +83,30 @@ export async function resolveMarket(
       const payout = bet.potential_payout // Calculated at bet time
       console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
 
-      // A. Update User Balance
-      // We fetch current balance first to be safe, or use atomic increment
-      const { error: balanceError } = await supabase.rpc('increment_balance', {
-        user_id: bet.user_id,
-        amount: payout
-      })
-
-      // Fallback if RPC doesn't exist (though highly recommended to create it)
-      if (balanceError) {
-        console.log(`[RESOLVE] RPC increment_balance failed, using fallback:`, balanceError)
-        // Try manual update (less safe for concurrency)
-        const { data: userProfile } = await supabase.from('profiles').select('balance').eq('id', bet.user_id).single()
-        if (userProfile) {
-          const { error: profileUpdateError } = await supabase.from('profiles').update({
-            balance: userProfile.balance + payout
-          }).eq('id', bet.user_id)
-          if (profileUpdateError) console.error(`[RESOLVE_ERROR] Profile balance update failed:`, profileUpdateError)
+      // A. Update User Balance and Stats
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('balance, total_won, win_rate, total_bets')
+        .eq('id', bet.user_id)
+        .single()
+      
+      if (userProfile) {
+        const newTotalWon = (userProfile.total_won || 0) + payout
+        const newWinRate = userProfile.total_bets > 0 
+          ? Math.round(((userProfile.total_won || 0) + 1) / userProfile.total_bets * 100) 
+          : 100
+        
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({
+            balance: userProfile.balance + payout,
+            total_won: newTotalWon,
+            win_rate: Math.min(newWinRate, 100) // Cap at 100%
+          })
+          .eq('id', bet.user_id)
+        
+        if (profileUpdateError) {
+          console.error(`[RESOLVE_ERROR] Profile update failed:`, profileUpdateError)
         }
       }
 
