@@ -33,7 +33,9 @@ export async function resolveMarket(
   // 2. Update Market Status
   // We mark it resolved and set the winner
   // Note: Column is 'is_live' in DB (snake_case), not 'isLive'
-  const { error: marketError } = await supabase
+  console.log(`[RESOLVE] Attempting to update market ${marketId} to resolved`)
+  
+  const { data: updatedMarket, error: marketError } = await supabase
     .from('markets')
     .update({
       is_live: false, // Column name in DB is snake_case
@@ -41,8 +43,15 @@ export async function resolveMarket(
       winner_outcome_id: winningOutcomeId
     })
     .eq('id', marketId)
+    .select()
+    .single()
 
-  if (marketError) return { error: `Erreur mise à jour marché: ${marketError.message}` }
+  if (marketError) {
+    console.error(`[RESOLVE_ERROR] Market update failed:`, marketError)
+    return { error: `Erreur mise à jour marché: ${marketError.message}` }
+  }
+  
+  console.log(`[RESOLVE] Market updated successfully:`, updatedMarket)
 
   // 3. Fetch all pending bets for this market
   const { data: bets, error: betsError } = await supabase

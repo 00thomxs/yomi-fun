@@ -38,6 +38,15 @@ export async function placeBet(
 
   if (marketError || !market) return { error: "Marché introuvable." }
 
+  // Fetch outcomes to get the REAL probability (not calculated from pools)
+  const { data: marketOutcomes } = await supabase
+    .from('outcomes')
+    .select('id, name, probability')
+    .eq('market_id', marketId)
+
+  const yesOutcome = marketOutcomes?.find(o => o.name === 'OUI')
+  const noOutcome = marketOutcomes?.find(o => o.name === 'NON')
+
   // 2.5 Check if already bet
   const { data: existingBet } = await supabase
     .from('bets')
@@ -55,15 +64,13 @@ export async function placeBet(
   // Odds = 1 / Probability.
   // Payout = Investment * Odds.
   
-  const poolYes = Number(market.pool_yes)
-  const poolNo = Number(market.pool_no)
-  const updatedTotalPool = poolYes + poolNo
+  const poolYes = Number(market.pool_yes) || 100 // Default pool if empty
+  const poolNo = Number(market.pool_no) || 100
   
-  // 1. Calculate current probability BEFORE bet
-  // Avoid division by zero
-  const safeTotal = updatedTotalPool === 0 ? 200 : updatedTotalPool // Fallback for empty markets
-  const probYesBefore = poolYes === 0 ? 0.5 : poolYes / safeTotal
-  const probNoBefore = poolNo === 0 ? 0.5 : poolNo / safeTotal
+  // Use the REAL probability from outcomes table (not calculated from pools)
+  // This is what the user sees on the UI
+  const probYesBefore = yesOutcome ? yesOutcome.probability / 100 : 0.5
+  const probNoBefore = noOutcome ? noOutcome.probability / 100 : 0.5
   
   let odds = 0
   let potentialPayout = 0
@@ -75,30 +82,30 @@ export async function placeBet(
 
   if (outcome === 'YES') {
     // Betting on YES
-    // Odds based on current probability
+    // Odds based on current probability from outcomes table
     odds = 1 / probYesBefore
     
     // Cap odds to avoid infinite payout on low liquidity
-    if (odds > 20) odds = 20 // Max 20x
+    if (odds > 100) odds = 100 // Max 100x (for 1% probability)
     if (odds < 1.01) odds = 1.01 // Min 1.01x
     
     potentialPayout = investment * odds
     
     // Update Pools: Add to YES to increase its share (price/prob goes UP)
     newPoolYes = poolYes + investment
-    // We don't touch NO pool in this simplified model, 
-    // or we could reduce it slightly to simulate swap, but adding to YES is enough to shift prob.
   } else {
     // Betting on NON
     odds = 1 / probNoBefore
     
-    if (odds > 20) odds = 20
+    if (odds > 100) odds = 100
     if (odds < 1.01) odds = 1.01
     
     potentialPayout = investment * odds
     
     newPoolNo = poolNo + investment
   }
+  
+  console.log(`[BET_CALC] Outcome: ${outcome}, Prob: ${outcome === 'YES' ? probYesBefore : probNoBefore}, Odds: ${odds}, Payout: ${potentialPayout}`)
   
   // Current Odds for record
   const currentOdds = odds
