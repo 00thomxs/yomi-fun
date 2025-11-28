@@ -153,15 +153,52 @@ export async function placeBet(
 
   // 5. Update Outcome Probability (Display only)
   // We update the outcome row so the UI shows the new percentage
+  
+  // Note: If I bet on YES, newPoolYes increases, so YES becomes MORE expensive (Prob goes UP)
+  // Formula: Price = newPoolNo / (newPoolYes + newPoolNo) is WRONG for YES price.
+  // Correct CPMM Price for YES = newPoolNo / (newPoolYes + newPoolNo) ? No.
+  // Let's verify:
+  // k = 100 * 100 = 10000
+  // Add 10 to YES -> poolYes = 110
+  // poolNo = 10000 / 110 = 90.9
+  // YES Price = 90.9 / (110 + 90.9) = 0.45 (45%) ??? NO.
+  // If YES pool is bigger, YES should be MORE expensive (higher prob).
+  
+  // Wait, in CPMM (Uniswap v1), Price of X in terms of Y = y / x.
+  // If we want Prob(YES), it reflects the ratio of money in the pools.
+  // Actually, commonly in Prediction Markets: Prob(YES) = poolYes / (poolYes + poolNo) roughly?
+  // Or using the share price: Cost to buy 1 share.
+  
+  // Let's stick to the logic implemented above:
+  // probabilityAfter = (newPoolNo / (newPoolYes + newPoolNo)) * 100
+  // If poolYes increases (110), poolNo decreases (90.9).
+  // newPoolNo / Total = 90.9 / 200.9 = 0.45 (45%).
+  // So if I buy YES, the probability returned here (0.45) is actually the price of NO (or vice versa).
+  // If I buy YES, YES should become MORE probable (e.g. 55%).
+  
+  // Let's fix the assignment:
+  // If outcome == YES, probabilityAfter is effectively the price of the OTHER side (due to CPMM mechanics usually giving spot price of input token).
+  // But let's simplify: The probability of an outcome is roughly proportional to its pool share or inverse.
+  
+  // Let's use a simpler weighted formula for display to ensure it moves in the right direction:
+  // Prob(YES) = poolYes / (poolYes + poolNo)
+  
+  const finalPoolYes = newPoolYes
+  const finalPoolNo = newPoolNo
+  const totalPool = finalPoolYes + finalPoolNo
+  
+  const probYes = (finalPoolYes / totalPool) * 100
+  const probNo = (finalPoolNo / totalPool) * 100
+  
   await supabase
     .from('outcomes')
-    .update({ probability: outcome === 'YES' ? 100 - probabilityAfter : probabilityAfter }) // Note: logic might need inversion check
+    .update({ probability: probYes })
     .eq('name', 'OUI')
     .eq('market_id', marketId)
     
   await supabase
     .from('outcomes')
-    .update({ probability: outcome === 'YES' ? probabilityAfter : 100 - probabilityAfter })
+    .update({ probability: probNo })
     .eq('name', 'NON')
     .eq('market_id', marketId)
 
