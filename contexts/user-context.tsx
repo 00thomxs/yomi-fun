@@ -76,6 +76,45 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = user !== null
 
+  // Fetch active bets
+  const fetchActiveBets = useCallback(async (userId: string) => {
+    if (IS_MOCK_MODE) return
+
+    const { data: bets, error } = await supabase
+      .from('bets')
+      .select(`
+        id,
+        amount,
+        odds_at_bet,
+        outcome_id,
+        markets (
+          question
+        ),
+        outcomes (
+          name
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching bets:', error)
+      return
+    }
+
+    if (bets) {
+      const formattedBets: ActiveBet[] = bets.map((bet: any) => ({
+        id: bet.id,
+        market: bet.markets?.question || "Marché inconnu",
+        choice: bet.outcomes?.name || "Choix inconnu",
+        amount: bet.amount,
+        odds: bet.odds_at_bet || 1.0
+      }))
+      setActiveBets(formattedBets)
+    }
+  }, [supabase])
+
   // Fetch user profile from Supabase
   const fetchProfile = useCallback(async (userId: string) => {
     if (IS_MOCK_MODE) {
@@ -107,8 +146,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return null
     }
 
+    // Fetch active bets in parallel
+    fetchActiveBets(userId)
+
     return data as Profile
-  }, [supabase])
+  }, [supabase, fetchActiveBets])
 
   // Convert Supabase user to app user
   const setUserFromSupabase = useCallback(async (supabaseUser: SupabaseUser | null) => {
@@ -116,6 +158,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setUser(null)
       setProfile(null)
       setUserBalance(10000)
+      setActiveBets([])
       setIsLoading(false)
       return
     }
@@ -348,14 +391,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
         })
         
         // Add to active bets for UI feedback (will be refreshed on page reload)
+        // We can fetch the market question if needed, but for now let's use generic
         const newBet: ActiveBet = {
           id: `${Date.now()}`,
-          market: marketId, // TODO: Fetch market question
+          market: "Pari en cours...", // Will be fetched on reload
           choice,
           amount,
           odds: odds || 1.0, // Odds are dynamic now
         }
         setActiveBets((prev) => [...prev, newBet])
+        // Re-fetch active bets to have full details
+        if (user) fetchActiveBets(user.id)
+        
         return true
       }
       
@@ -369,7 +416,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       })
       return false
     }
-  }, [userBalance, toast])
+  }, [userBalance, toast, user, fetchActiveBets])
 
   // Clear bets
   const clearBets = useCallback(() => {
