@@ -17,12 +17,22 @@ export default async function AdminDashboard() {
     console.error("Error fetching markets:", error)
   }
 
-  // Mock stats for now (would require more complex queries)
+  // Fetch real stats
+  const { count: userCount } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+
+  // Calculate total volume from all markets
+  const totalVolume = markets?.reduce((sum, m) => sum + (m.volume || 0), 0) || 0
+
+  // Estimate revenue (2% fee on volume)
+  const estimatedRevenue = Math.round(totalVolume * 0.02)
+
   const stats = [
-    { label: "Volume Total", value: "0", suffix: <CurrencySymbol /> },
+    { label: "Volume Total", value: totalVolume.toLocaleString('fr-FR'), suffix: <CurrencySymbol /> },
     { label: "Marchés Actifs", value: markets?.filter(m => m.status === 'open').length.toString() || "0", suffix: "" },
-    { label: "Utilisateurs", value: "1", suffix: "" }, // To be updated
-    { label: "Revenus (Est.)", value: "0", suffix: "€" },
+    { label: "Utilisateurs", value: (userCount || 0).toString(), suffix: "" },
+    { label: "Revenus (Est.)", value: estimatedRevenue.toLocaleString('fr-FR'), suffix: <CurrencySymbol /> },
   ]
 
   return (
