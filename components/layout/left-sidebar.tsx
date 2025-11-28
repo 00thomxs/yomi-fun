@@ -116,7 +116,7 @@ export function LeftSidebar({
                     {bet.status === 'won' && (
                       <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold">
                         <CheckCircle className="w-3 h-3" />
-                        Gagné ! +{bet.potential_payout?.toFixed(0) || bet.amount * bet.odds} <CurrencySymbol />
+                        Gagné ! +{bet.potential_payout?.toFixed(0) || Math.round(bet.amount * bet.odds)} <CurrencySymbol />
                       </span>
                     )}
                     {bet.status === 'lost' && (
