@@ -1,5 +1,5 @@
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { Edit, ExternalLink, PlayCircle } from "lucide-react"
+import { Edit, ExternalLink, PlayCircle, Gavel } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { DeleteMarket } from "@/app/admin/components/delete-button"
@@ -116,12 +116,20 @@ export default async function AdminDashboard() {
                       <Link 
                         href={`/market/${market.id}`}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                        title="Voir"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Link>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+                      <Link
+                        href={`/admin/resolve/${market.id}`}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300"
+                        title="Résoudre"
+                      >
+                        <Gavel className="w-4 h-4" />
+                      </Link>
+                      {/* <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground">
                         <Edit className="w-4 h-4" />
-                      </button>
+                      </button> */}
                       <DeleteMarket marketId={market.id} />
                     </div>
                   </td>
