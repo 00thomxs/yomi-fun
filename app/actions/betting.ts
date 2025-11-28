@@ -38,6 +38,18 @@ export async function placeBet(
 
   if (marketError || !market) return { error: "Marché introuvable." }
 
+  // 2.5 Check if already bet
+  const { data: existingBet } = await supabase
+    .from('bets')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('market_id', marketId)
+    .single()
+
+  if (existingBet) {
+    return { error: "Vous avez déjà parié sur ce marché." }
+  }
+
   // --- 3. CORE LOGIC: CPMM (Automated Market Maker) ---
   // k = x * y (constante)
   const poolYes = Number(market.pool_yes)
