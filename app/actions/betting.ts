@@ -23,7 +23,7 @@ export async function placeBet(
   // 2. Fetch Market Data & User Balance (Parallel for speed, but serialized for safety later)
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('balance')
+    .select('balance, total_bets')
     .eq('id', user.id)
     .single()
 
