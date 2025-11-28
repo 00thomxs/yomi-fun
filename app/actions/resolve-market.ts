@@ -76,9 +76,12 @@ export async function resolveMarket(
   // But for MVP/Next.js Action context, we'll do it sequentially or batched.
 
   for (const bet of bets) {
+    console.log(`[RESOLVE] Processing bet ${bet.id}, outcome_id: ${bet.outcome_id}, winning: ${winningOutcomeId}`)
+    
     if (bet.outcome_id === winningOutcomeId) {
       // WINNER
       const payout = bet.potential_payout // Calculated at bet time
+      console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
 
       // A. Update User Balance
       // We fetch current balance first to be safe, or use atomic increment
@@ -89,24 +92,36 @@ export async function resolveMarket(
 
       // Fallback if RPC doesn't exist (though highly recommended to create it)
       if (balanceError) {
+        console.log(`[RESOLVE] RPC increment_balance failed, using fallback:`, balanceError)
         // Try manual update (less safe for concurrency)
         const { data: userProfile } = await supabase.from('profiles').select('balance').eq('id', bet.user_id).single()
         if (userProfile) {
-          await supabase.from('profiles').update({
+          const { error: profileUpdateError } = await supabase.from('profiles').update({
             balance: userProfile.balance + payout
           }).eq('id', bet.user_id)
+          if (profileUpdateError) console.error(`[RESOLVE_ERROR] Profile balance update failed:`, profileUpdateError)
         }
       }
 
       // B. Update Bet Status
-      await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      if (betUpdateError) {
+        console.error(`[RESOLVE_ERROR] Bet status update to 'won' failed:`, betUpdateError)
+      } else {
+        console.log(`[RESOLVE] Bet ${bet.id} status updated to 'won'`)
+      }
       
       payoutsCount++
       totalPaid += payout
 
     } else {
       // LOSER
-      await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      if (betUpdateError) {
+        console.error(`[RESOLVE_ERROR] Bet status update to 'lost' failed:`, betUpdateError)
+      } else {
+        console.log(`[RESOLVE] Bet ${bet.id} status updated to 'lost'`)
+      }
     }
   }
 
