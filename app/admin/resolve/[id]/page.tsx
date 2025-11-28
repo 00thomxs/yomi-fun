@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import ResolveButton from './resolve-button'
 
-export default async function ResolvePage({ params }: { params: { id: string } }) {
+export default async function ResolvePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -22,7 +23,7 @@ export default async function ResolvePage({ params }: { params: { id: string } }
         probability
       )
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error) {
@@ -32,12 +33,12 @@ export default async function ResolvePage({ params }: { params: { id: string } }
         <pre className="mt-4 p-4 bg-black/50 rounded overflow-auto">
           {JSON.stringify(error, null, 2)}
         </pre>
-        <p className="mt-4 text-sm">ID demandé : {params.id}</p>
+        <p className="mt-4 text-sm">ID demandé : {id}</p>
       </div>
     )
   }
 
-  if (!market) return <div className="p-8">Marché introuvable (ID: {params.id})</div>
+  if (!market) return <div className="p-8">Marché introuvable (ID: {id})</div>
 
   return (
     <div className="container max-w-4xl mx-auto py-10">
