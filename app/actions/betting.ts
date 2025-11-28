@@ -50,48 +50,58 @@ export async function placeBet(
     return { error: "Vous avez déjà parié sur ce marché." }
   }
 
-  // --- 3. CORE LOGIC: CPMM (Automated Market Maker) ---
-  // k = x * y (constante)
+  // --- 3. CORE LOGIC: SIMPLIFIED DYNAMIC ODDS (Hybrid) ---
+  // We want Payout > Investment.
+  // Odds = 1 / Probability.
+  // Payout = Investment * Odds.
+  
   const poolYes = Number(market.pool_yes)
   const poolNo = Number(market.pool_no)
-  const k = poolYes * poolNo
-
+  const totalPool = poolYes + poolNo
+  
+  // 1. Calculate current probability BEFORE bet
+  // Avoid division by zero
+  const safeTotal = totalPool === 0 ? 200 : totalPool // Fallback for empty markets
+  const probYesBefore = poolYes === 0 ? 0.5 : poolYes / safeTotal
+  const probNoBefore = poolNo === 0 ? 0.5 : poolNo / safeTotal
+  
+  let odds = 0
+  let potentialPayout = 0
   let newPoolYes = poolYes
   let newPoolNo = poolNo
-  let sharesReceived = 0
-  let probabilityAfter = 0
-
-  // Fee (Commission) - 2% for the platform
-  const fee = amount * 0.02
+  
+  const fee = amount * 0.02 // 2% fee
   const investment = amount - fee
 
   if (outcome === 'YES') {
-    // User adds Money to YES pool
+    // Betting on YES
+    // Odds based on current probability
+    odds = 1 / probYesBefore
+    
+    // Cap odds to avoid infinite payout on low liquidity
+    if (odds > 20) odds = 20 // Max 20x
+    if (odds < 1.01) odds = 1.01 // Min 1.01x
+    
+    potentialPayout = investment * odds
+    
+    // Update Pools: Add to YES to increase its share (price/prob goes UP)
     newPoolYes = poolYes + investment
-    // We calculate new NO pool to keep K constant
-    newPoolNo = k / newPoolYes
-    // Shares received = what was removed from NO pool
-    sharesReceived = poolNo - newPoolNo
-    
-    // New Prob (Spot Price) = Price of YES in terms of NO
-    // Price = poolNo / (poolYes + poolNo) approx
-    probabilityAfter = (newPoolNo / (newPoolYes + newPoolNo)) * 100 // Inverse relation in CPMM
+    // We don't touch NO pool in this simplified model, 
+    // or we could reduce it slightly to simulate swap, but adding to YES is enough to shift prob.
   } else {
-    // User adds Money to NO pool
-    newPoolNo = poolNo + investment
-    newPoolYes = k / newPoolNo
-    sharesReceived = poolYes - newPoolYes
+    // Betting on NON
+    odds = 1 / probNoBefore
     
-    probabilityAfter = (newPoolNo / (newPoolYes + newPoolNo)) * 100
+    if (odds > 20) odds = 20
+    if (odds < 1.01) odds = 1.01
+    
+    potentialPayout = investment * odds
+    
+    newPoolNo = poolNo + investment
   }
-
-  // Odds = Payout / Investment
-  const potentialPayout = sharesReceived // In prediction markets, shares = payout if win (usually 1 share = 1€)
-  // Wait... simplifying for MVP:
-  // Let's say "shares" are actually the payout amount directly.
-  // If I bet 100 and receive 150 shares, I win 150 if I'm right.
   
-  const currentOdds = potentialPayout / amount
+  // Current Odds for record
+  const currentOdds = odds
 
   // 4. TRANSACTION (Simulation via chained calls, real ACID would need Postgres Function)
   

@@ -54,7 +54,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                 {categoryDef?.label || market.category || "Divers"}
               </span>
-              {market.isLive && (
+              {market.isLive ? (
                 <>
                   <span className="text-muted-foreground">•</span>
                   <div className="flex items-center gap-1">
@@ -62,6 +62,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                     <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
                   </div>
                 </>
+              ) : (
+                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                  Terminé
+                </div>
               )}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
@@ -152,7 +156,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {categoryDef?.label || market.category || "Divers"}
             </span>
-            {market.isLive && (
+            {market.isLive ? (
               <>
                 <span className="text-muted-foreground">•</span>
                 <div className="flex items-center gap-1">
@@ -160,6 +164,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
                 </div>
               </>
+            ) : (
+              <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                Terminé
+              </div>
             )}
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">

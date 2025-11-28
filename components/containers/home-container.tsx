@@ -18,7 +18,11 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
   // DEBUG: Log received markets to console
   useEffect(() => {
     console.log("HomeContainer received markets:", initialMarkets)
-    console.log("Mapped markets example:", markets[0])
+    if (initialMarkets.length > 0) {
+       const m = initialMarkets[0]
+       console.log(`Market[0] DB State: id=${m.id}, status=${m.status}, is_live=${m.is_live}`)
+       console.log(`Market[0] UI State: isLive=${m.is_live && m.status !== 'resolved'}`)
+    }
   }, [initialMarkets])
 
   const handleMarketClick = (market: Market) => {
