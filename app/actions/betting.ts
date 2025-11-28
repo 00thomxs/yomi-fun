@@ -57,11 +57,11 @@ export async function placeBet(
   
   const poolYes = Number(market.pool_yes)
   const poolNo = Number(market.pool_no)
-  const totalPool = poolYes + poolNo
+  const updatedTotalPool = poolYes + poolNo
   
   // 1. Calculate current probability BEFORE bet
   // Avoid division by zero
-  const safeTotal = totalPool === 0 ? 200 : totalPool // Fallback for empty markets
+  const safeTotal = updatedTotalPool === 0 ? 200 : updatedTotalPool // Fallback for empty markets
   const probYesBefore = poolYes === 0 ? 0.5 : poolYes / safeTotal
   const probNoBefore = poolNo === 0 ? 0.5 : poolNo / safeTotal
   
