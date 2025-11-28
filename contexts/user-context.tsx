@@ -6,6 +6,7 @@ import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import type { ActiveBet } from "@/lib/types"
+import { placeBet as placeBetAction } from "@/app/actions/betting"
 
 // --- CONFIGURATION ---
 // Mettre à true si la connexion Supabase est bloquée (ex: sandbox Cursor)
@@ -52,7 +53,7 @@ type UserContextType = {
   
   // Bets
   activeBets: ActiveBet[]
-  placeBet: (market: string, choice: string, amount: number, odds?: number) => boolean
+  placeBet: (marketId: string, choice: string, amount: number, odds?: number) => Promise<boolean>
   clearBets: () => void
 }
 
@@ -285,39 +286,89 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [supabase.auth, toast])
 
   // Place bet
-  const placeBet = useCallback((market: string, choice: string, amount: number, odds?: number): boolean => {
-    if (userBalance < amount) {
+  const placeBet = useCallback(async (marketId: string, choice: string, amount: number, odds?: number): Promise<boolean> => {
+    if (IS_MOCK_MODE) {
+      // Mock behavior
+      if (userBalance < amount) {
+        toast({
+          title: "Pas assez de Zeny!",
+          duration: 2000,
+          variant: "destructive",
+        })
+        return false
+      }
+      setUserBalance((prev) => prev - amount)
+      
+      const newBet: ActiveBet = {
+        id: `${Date.now()}`,
+        market: marketId, // Mock uses marketId as name
+        choice,
+        amount,
+        odds: odds || 1.5,
+      }
+      setActiveBets((prev) => [...prev, newBet])
       toast({
-        title: "Pas assez de Zeny!",
-        duration: 2000,
+        title: (
+          <span>
+            Pari placé: {choice} pour {amount} <CurrencySymbol />
+          </span>
+        ),
+        description: "Simulation",
+        duration: 3000,
+      })
+      return true
+    }
+
+    // REAL BETTING LOGIC via Server Action
+    try {
+      // Extract YES/NO from choice string "OUI" / "NON"
+      const outcome = choice.includes("OUI") ? "YES" : "NO"
+      
+      const result = await placeBetAction(marketId, outcome, amount)
+      
+      if (result.error) {
+        toast({
+          title: "Erreur lors du pari",
+          description: result.error,
+          variant: "destructive",
+        })
+        return false
+      }
+
+      if (result.success && result.newBalance !== undefined) {
+        setUserBalance(result.newBalance)
+        toast({
+          title: (
+            <span>
+              Pari placé: {choice} pour {amount} <CurrencySymbol />
+            </span>
+          ),
+          description: "Transaction validée !",
+          duration: 3000,
+        })
+        
+        // Add to active bets for UI feedback (will be refreshed on page reload)
+        const newBet: ActiveBet = {
+          id: `${Date.now()}`,
+          market: marketId, // TODO: Fetch market question
+          choice,
+          amount,
+          odds: odds || 1.0, // Odds are dynamic now
+        }
+        setActiveBets((prev) => [...prev, newBet])
+        return true
+      }
+      
+      return false
+    } catch (error) {
+      console.error("Bet error:", error)
+      toast({
+        title: "Erreur technique",
+        description: "Une erreur est survenue lors du pari.",
         variant: "destructive",
       })
       return false
     }
-
-    setUserBalance((prev) => prev - amount)
-    
-    const newBet: ActiveBet = {
-      id: `${Date.now()}`,
-      market: market.slice(0, 40) + (market.length > 40 ? "..." : ""),
-      choice,
-      amount,
-      odds: odds || 1.5,
-    }
-    
-    setActiveBets((prev) => [...prev, newBet])
-    
-    toast({
-      title: (
-        <span>
-          Pari placé: {choice} pour {amount} <CurrencySymbol />
-        </span>
-      ),
-      description: market,
-      duration: 3000,
-    })
-    
-    return true
   }, [userBalance, toast])
 
   // Clear bets
