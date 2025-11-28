@@ -49,6 +49,8 @@ export type ActiveBet = {
   choice: string
   amount: number
   odds: number
+  status: 'pending' | 'won' | 'lost'
+  potential_payout?: number
 }
 
 // Chart Data Types

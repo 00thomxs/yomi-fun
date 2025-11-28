@@ -87,6 +87,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         amount,
         odds_at_bet,
         outcome_id,
+        status,
+        potential_payout,
         markets (
           question
         ),
@@ -95,8 +97,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         )
       `)
       .eq('user_id', userId)
-      .eq('status', 'pending')
       .order('created_at', { ascending: false })
+      .limit(10)
 
     if (error) {
       console.error('Error fetching bets:', error)
@@ -109,7 +111,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         market: bet.markets?.question || "Marché inconnu",
         choice: bet.outcomes?.name || "Choix inconnu",
         amount: bet.amount,
-        odds: bet.odds_at_bet || 1.0
+        odds: bet.odds_at_bet || 1.0,
+        status: bet.status || 'pending',
+        potential_payout: bet.potential_payout
       }))
       setActiveBets(formattedBets)
     }
@@ -348,6 +352,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         choice,
         amount,
         odds: odds || 1.5,
+        status: 'pending'
       }
       setActiveBets((prev) => [...prev, newBet])
       toast({
@@ -398,6 +403,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           choice,
           amount,
           odds: odds || 1.0, // Odds are dynamic now
+          status: 'pending'
         }
         setActiveBets((prev) => [...prev, newBet])
         // Re-fetch active bets to have full details

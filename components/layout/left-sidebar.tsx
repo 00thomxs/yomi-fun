@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Home, User, ShoppingBag, Trophy, Zap } from "lucide-react"
+import { Home, User, ShoppingBag, Trophy, Zap, CheckCircle, XCircle, Clock } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { ActiveBet } from "@/lib/types"
@@ -82,19 +82,49 @@ export function LeftSidebar({
           <div className="rounded-xl bg-card border border-border p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-primary" />
-              <h3 className="text-xs font-bold tracking-tight uppercase">Mes Paris Actifs</h3>
+              <h3 className="text-xs font-bold tracking-tight uppercase">Mes Paris</h3>
             </div>
             <div className="space-y-2 max-h-48 overflow-y-auto">
-              {activeBets.slice(-3).map((bet) => (
-                <div key={bet.id} className="p-2 rounded-lg bg-white/5 border border-border text-xs">
+              {activeBets.slice(0, 5).map((bet) => (
+                <div 
+                  key={bet.id} 
+                  className={`p-2 rounded-lg border text-xs ${
+                    bet.status === 'won' 
+                      ? 'bg-emerald-500/10 border-emerald-500/30' 
+                      : bet.status === 'lost' 
+                        ? 'bg-rose-500/10 border-rose-500/30'
+                        : 'bg-white/5 border-border'
+                  }`}
+                >
                   <p className="font-medium truncate">{bet.market}</p>
-                  <div className="flex justify-between mt-1">
+                  <div className="flex justify-between items-center mt-1">
                     <span className={`font-bold ${bet.choice === "OUI" ? "text-emerald-400" : "text-rose-400"}`}>
                       {bet.choice}
                     </span>
                     <span className="font-mono font-bold text-muted-foreground">
                       <CurrencySymbol /> {bet.amount}
                     </span>
+                  </div>
+                  {/* Status Badge */}
+                  <div className="mt-1.5 flex items-center gap-1">
+                    {bet.status === 'pending' && (
+                      <span className="flex items-center gap-1 text-[10px] text-yellow-400">
+                        <Clock className="w-3 h-3" />
+                        En cours
+                      </span>
+                    )}
+                    {bet.status === 'won' && (
+                      <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold">
+                        <CheckCircle className="w-3 h-3" />
+                        Gagné ! +{bet.potential_payout?.toFixed(0) || bet.amount * bet.odds} <CurrencySymbol />
+                      </span>
+                    )}
+                    {bet.status === 'lost' && (
+                      <span className="flex items-center gap-1 text-[10px] text-rose-400">
+                        <XCircle className="w-3 h-3" />
+                        Perdu
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
