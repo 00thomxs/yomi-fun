@@ -22,6 +22,28 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
 
   const supabase = await createClient()
   
+  // Calculate initial pools based on probability (for binary markets)
+  // Total liquidity = 1000 (can be adjusted)
+  const INITIAL_LIQUIDITY = 1000
+  let poolYes = INITIAL_LIQUIDITY / 2
+  let poolNo = INITIAL_LIQUIDITY / 2
+  
+  if (type === 'binary' && outcomes.length >= 2) {
+    // Find OUI outcome probability
+    const ouiOutcome = outcomes.find((o: any) => o.name === 'OUI')
+    if (ouiOutcome) {
+      const probYes = parseFloat(ouiOutcome.probability) / 100
+      // Set pools proportional to probability
+      // prob = poolYes / (poolYes + poolNo)
+      // With total = 1000: poolYes = prob * 1000, poolNo = (1-prob) * 1000
+      poolYes = Math.round(probYes * INITIAL_LIQUIDITY)
+      poolNo = Math.round((1 - probYes) * INITIAL_LIQUIDITY)
+      // Ensure minimum pool values
+      if (poolYes < 10) poolYes = 10
+      if (poolNo < 10) poolNo = 10
+    }
+  }
+
   // 1. Insert Market
   const { data: market, error: marketError } = await supabase
     .from('markets')
@@ -36,7 +58,9 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
       is_live: true,
       is_featured: isFeatured,
       is_headline: isHeadline,
-      volume: 0
+      volume: 0,
+      pool_yes: poolYes,
+      pool_no: poolNo
     })
     .select()
     .single()
