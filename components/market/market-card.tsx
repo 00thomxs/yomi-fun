@@ -84,7 +84,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.question, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
+                      onBet(market.id, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
                     }}
                     className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
                   >
@@ -93,7 +93,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.question, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
+                      onBet(market.id, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
                     }}
                     className="py-1.5 px-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition-all"
                   >
@@ -209,7 +209,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onBet(market.question, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
+              onBet(market.id, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
             }}
             className="py-3.5 px-4 rounded-lg bg-emerald-500/10 border border-emerald-500/50 font-bold tracking-tight hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all text-emerald-400 text-base"
           >
@@ -218,7 +218,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onBet(market.question, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
+              onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
             }}
             className="py-3.5 px-4 rounded-lg bg-rose-500/10 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/20 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
           >

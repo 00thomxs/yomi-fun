@@ -17,8 +17,8 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
     router.back()
   }
 
-  const handleBet = (marketQuestion: string, choice: string, amount: number, odds?: number) => {
-    placeBet(marketQuestion, choice, amount, odds)
+  const handleBet = (marketId: string, choice: string, amount: number, odds?: number) => {
+    placeBet(marketId, choice, amount, odds)
   }
 
   // Helper to generate fake chart history that ends at current price

@@ -76,9 +76,9 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
     if (amount > 0) {
       if (market.type === "binary") {
         const displayChoice = betChoice === "YES" ? "OUI" : "NON"
-        onBet(market.question, displayChoice, amount)
+        onBet(market.id, displayChoice, amount)
       } else {
-        onBet(market.question, `${betType} ${betChoice}`, amount)
+        onBet(market.id, `${betType} ${betChoice}`, amount)
       }
       setBetAmount("")
     }
