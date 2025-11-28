@@ -18,10 +18,12 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
   const validMarkets = markets || []
   
   // Determine featured market dynamically
+  // Priority: Headline (binary) -> Featured (binary) -> First Binary -> First available
   const featuredMarket = (
     validMarkets.find((m) => m.is_headline && m.type === 'binary') || 
     validMarkets.find((m) => m.is_featured && m.type === 'binary') || 
     validMarkets.find((m) => m.type === 'binary') ||
+    // If no binary market, take first one but Hero will need to handle non-binary or be hidden
     validMarkets[0]
   ) as BinaryMarket | undefined
 
