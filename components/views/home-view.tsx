@@ -64,10 +64,14 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               <span className="text-xs font-mono text-white">{featuredMarket.countdown || "Bientôt"}</span>
             </div>
 
-            {featuredMarket.isLive && (
+            {featuredMarket.isLive ? (
               <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-bold tracking-tight uppercase">
                 <Zap className="w-3 h-3" />
                 Live Event
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-tight uppercase">
+                🔒 Terminé
               </div>
             )}
             <h2 className="text-3xl font-bold tracking-tight text-balance leading-tight text-shadow-lg">
@@ -87,12 +91,21 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               </div>
             </div>
 
-            <button
-              onClick={() => onMarketClick(featuredMarket)}
-              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all"
-            >
-              Predire maintenant
-            </button>
+            {featuredMarket.isLive ? (
+              <button
+                onClick={() => onMarketClick(featuredMarket)}
+                className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all"
+              >
+                Predire maintenant
+              </button>
+            ) : (
+              <button
+                onClick={() => onMarketClick(featuredMarket)}
+                className="w-full py-4 rounded-lg bg-white/10 border border-white/20 text-white/80 font-bold text-lg tracking-tight uppercase hover:bg-white/15 transition-all"
+              >
+                Voir les résultats
+              </button>
+            )}
           </div>
         </div>
       )}
