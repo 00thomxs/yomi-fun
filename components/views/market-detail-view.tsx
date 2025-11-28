@@ -23,6 +23,9 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
 
+  // Check if market is resolved (betting disabled)
+  const isResolved = !market.isLive
+
   // Find correct icon from constants
   const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
   const CategoryIcon = categoryDef?.icon || HelpCircle
@@ -98,10 +101,17 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           <div className="flex items-center gap-2 mb-1">
             <CategoryIcon className="w-4 h-4 text-muted-foreground" />
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{categoryDef?.label || market.category}</p>
-            {market.isLive && (
+            {market.isLive ? (
               <>
                 <span className="text-muted-foreground">•</span>
                 <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
+              </>
+            ) : (
+              <>
+                <span className="text-muted-foreground">•</span>
+                <span className="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                  Terminé
+                </span>
               </>
             )}
             <span className="text-muted-foreground">•</span>
@@ -128,6 +138,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           calculatePayout={calculatePayout}
           handlePlaceBet={handlePlaceBet}
           userBalance={userBalance}
+          isResolved={isResolved}
         />
       ) : (
         <MultiMarketContent
@@ -144,6 +155,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           calculatePayout={calculatePayout}
           handlePlaceBet={handlePlaceBet}
           userBalance={userBalance}
+          isResolved={isResolved}
         />
       )}
     </div>
@@ -164,6 +176,7 @@ function BinaryMarketContent({
   calculatePayout,
   handlePlaceBet,
   userBalance,
+  isResolved,
 }: {
   market: BinaryMarket
   timeframe: string
@@ -177,9 +190,18 @@ function BinaryMarketContent({
   calculatePayout: () => number
   handlePlaceBet: () => void
   userBalance: number
+  isResolved: boolean
 }) {
   return (
     <>
+      {/* Resolved Banner */}
+      {isResolved && (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
+          <p className="text-red-400 font-bold text-lg uppercase tracking-wider">🔒 Marché Terminé</p>
+          <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
+        </div>
+      )}
+
       {/* Probability Display */}
       <div className="text-center space-y-2">
         <p className="text-7xl font-bold tracking-tighter text-white font-mono">{market.probability}%</p>
@@ -274,38 +296,40 @@ function BinaryMarketContent({
       </div>
 
       {/* Betting Panel */}
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setBetChoice("YES")}
-            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
-              betChoice === "YES"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
-            }`}
-          >
-            OUI • <span className="font-mono">{market.probability}%</span>
-          </button>
-          <button
-            onClick={() => setBetChoice("NO")}
-            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
-              betChoice === "NO"
-                ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
-            }`}
-          >
-            NON • <span className="font-mono">{100 - market.probability}%</span>
-          </button>
-        </div>
+      {!isResolved && (
+        <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setBetChoice("YES")}
+              className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
+                betChoice === "YES"
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
+                  : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+              }`}
+            >
+              OUI • <span className="font-mono">{market.probability}%</span>
+            </button>
+            <button
+              onClick={() => setBetChoice("NO")}
+              className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
+                betChoice === "NO"
+                  ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
+                  : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+              }`}
+            >
+              NON • <span className="font-mono">{100 - market.probability}%</span>
+            </button>
+          </div>
 
-        <BetAmountInput
-          betAmount={betAmount}
-          setBetAmount={setBetAmount}
-          userBalance={userBalance}
-          calculatePayout={calculatePayout}
-          handlePlaceBet={handlePlaceBet}
-        />
-      </div>
+          <BetAmountInput
+            betAmount={betAmount}
+            setBetAmount={setBetAmount}
+            userBalance={userBalance}
+            calculatePayout={calculatePayout}
+            handlePlaceBet={handlePlaceBet}
+          />
+        </div>
+      )}
     </>
   )
 }
@@ -325,6 +349,7 @@ function MultiMarketContent({
   calculatePayout,
   handlePlaceBet,
   userBalance,
+  isResolved,
 }: {
   market: MultiOutcomeMarket
   timeframe: string
@@ -339,9 +364,18 @@ function MultiMarketContent({
   calculatePayout: () => number
   handlePlaceBet: () => void
   userBalance: number
+  isResolved: boolean
 }) {
   return (
     <>
+      {/* Resolved Banner */}
+      {isResolved && (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
+          <p className="text-red-400 font-bold text-lg uppercase tracking-wider">🔒 Marché Terminé</p>
+          <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
+        </div>
+      )}
+
       {/* Outcomes List */}
       <div className="space-y-3">
         {market.outcomes.map((outcome) => {
@@ -456,22 +490,24 @@ function MultiMarketContent({
       </div>
 
       {/* Betting Panel */}
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
-        <div className="p-3 rounded-lg bg-white/5 border border-border">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Selection</p>
-          <p className="font-bold">
-            <span className={betType === "OUI" ? "text-emerald-400" : "text-rose-400"}>{betType}</span> - {betChoice}
-          </p>
-        </div>
+      {!isResolved && (
+        <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+          <div className="p-3 rounded-lg bg-white/5 border border-border">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Selection</p>
+            <p className="font-bold">
+              <span className={betType === "OUI" ? "text-emerald-400" : "text-rose-400"}>{betType}</span> - {betChoice}
+            </p>
+          </div>
 
-        <BetAmountInput
-          betAmount={betAmount}
-          setBetAmount={setBetAmount}
-          userBalance={userBalance}
-          calculatePayout={calculatePayout}
-          handlePlaceBet={handlePlaceBet}
-        />
-      </div>
+          <BetAmountInput
+            betAmount={betAmount}
+            setBetAmount={setBetAmount}
+            userBalance={userBalance}
+            calculatePayout={calculatePayout}
+            handlePlaceBet={handlePlaceBet}
+          />
+        </div>
+      )}
     </>
   )
 }
