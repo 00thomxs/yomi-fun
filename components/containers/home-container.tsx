@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { HomeView } from "@/components/views/home-view"
 import { useUser } from "@/contexts/user-context"
@@ -14,6 +14,12 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
   const router = useRouter()
   const { placeBet } = useUser()
   const [activeCategory, setActiveCategory] = useState("trending")
+
+  // DEBUG: Log received markets to console
+  useEffect(() => {
+    console.log("HomeContainer received markets:", initialMarkets)
+    console.log("Mapped markets example:", markets[0])
+  }, [initialMarkets])
 
   const handleMarketClick = (market: Market) => {
     router.push(`/market/${market.id}`)
@@ -40,7 +46,8 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
       countdown: m.closes_at ? new Date(m.closes_at).toLocaleDateString() : "Bientôt",
       yesPrice: probability / 100, // Approx price
       noPrice: (100 - probability) / 100,
-      is_featured: m.is_featured // Ensure featured flag is passed
+      is_featured: m.is_featured, // Ensure featured flag is passed
+      is_headline: m.is_headline // Ensure headline flag is passed
     }
   })
 

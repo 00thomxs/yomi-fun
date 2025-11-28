@@ -30,7 +30,11 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
     ? validMarkets.filter((m) => m.is_featured)
     : activeCategory === "all"
       ? validMarkets
-      : validMarkets.filter((m) => m.category && m.category.toLowerCase() === activeCategory.toLowerCase())
+      : validMarkets.filter((m) => {
+          if (!m.category) return false
+          // Normalize both to lower case for comparison
+          return m.category.toLowerCase() === activeCategory.toLowerCase()
+        })
 
   return (
     <div className="space-y-6">
