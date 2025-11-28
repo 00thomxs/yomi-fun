@@ -189,18 +189,24 @@ export async function placeBet(
   
   const probYes = (finalPoolYes / totalPool) * 100
   const probNo = (finalPoolNo / totalPool) * 100
+
+  console.log(`[BET_UPDATE] Market: ${marketId}, New Pools: YES=${finalPoolYes}/NO=${finalPoolNo}, Probs: ${probYes}%/${probNo}%`)
   
-  await supabase
+  const { error: updateYesError } = await supabase
     .from('outcomes')
     .update({ probability: probYes })
     .eq('name', 'OUI')
     .eq('market_id', marketId)
+
+  if (updateYesError) console.error('[BET_ERROR] Update YES prob failed:', updateYesError)
     
-  await supabase
+  const { error: updateNoError } = await supabase
     .from('outcomes')
     .update({ probability: probNo })
     .eq('name', 'NON')
     .eq('market_id', marketId)
+
+  if (updateNoError) console.error('[BET_ERROR] Update NO prob failed:', updateNoError)
 
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/')

@@ -12,7 +12,7 @@ export default async function ResolvePage({ params }: { params: { id: string } }
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   if (profile?.role !== 'admin') redirect('/')
 
-  const { data: market } = await supabase
+  const { data: market, error } = await supabase
     .from('markets')
     .select(`
       *,
@@ -25,7 +25,19 @@ export default async function ResolvePage({ params }: { params: { id: string } }
     .eq('id', params.id)
     .single()
 
-  if (!market) notFound()
+  if (error) {
+    return (
+      <div className="p-8 bg-red-900/20 text-red-200 border border-red-500 rounded">
+        <h2 className="text-xl font-bold">Erreur Supabase (Resolve Page)</h2>
+        <pre className="mt-4 p-4 bg-black/50 rounded overflow-auto">
+          {JSON.stringify(error, null, 2)}
+        </pre>
+        <p className="mt-4 text-sm">ID demandé : {params.id}</p>
+      </div>
+    )
+  }
+
+  if (!market) return <div className="p-8">Marché introuvable (ID: {params.id})</div>
 
   return (
     <div className="container max-w-4xl mx-auto py-10">
