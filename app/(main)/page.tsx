@@ -8,7 +8,7 @@ export default async function HomePage() {
     .from('markets')
     .select(`
       *,
-      outcomes (*)
+      outcomes:outcomes!market_id (*)
     `)
     .order('created_at', { ascending: false })
 

@@ -7,7 +7,7 @@ export default async function DebugMarketsPage() {
     .from('markets')
     .select(`
       *,
-      outcomes (*)
+      outcomes:outcomes!market_id (*)
     `)
 
   return (
