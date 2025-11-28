@@ -103,7 +103,8 @@ export async function placeBet(
 
   if (updateError) {
     // CRITICAL: Should rollback debit here (Refund user)
-    await supabase.from('profiles').increment('balance', amount).eq('id', user.id)
+    // We restore the original balance (profile.balance contains the value BEFORE debit)
+    await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: "Erreur mise à jour marché." }
   }
 
