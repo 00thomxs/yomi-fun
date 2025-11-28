@@ -50,7 +50,8 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
       noPrice: (100 - probability) / 100,
       is_featured: m.is_featured, // Ensure featured flag is passed
       is_headline: m.is_headline, // Ensure headline flag is passed
-      isLive: m.is_live, // Map snake_case from DB to camelCase for UI
+      // Fix: market is only live if DB says is_live AND status is not resolved/cancelled
+      isLive: m.is_live && m.status !== 'resolved', 
       volume: m.volume || 0
     }
   })

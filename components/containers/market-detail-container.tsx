@@ -59,6 +59,7 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
       noPrice: (100 - prob) / 100,
       volatility: "Moyenne", // Mock
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
+      isLive: rawMarket.is_live && rawMarket.status !== 'resolved', // Fix Status
       history24h: generateHistory(prob, 24, 'h'), // Mock Chart
       history7d: generateHistory(prob, 7, 'j'), // Mock Chart
       historyAll: generateHistory(prob, 30, 'j') // Mock Chart
@@ -69,6 +70,7 @@ export function MarketDetailContainer({ market: rawMarket }: MarketDetailContain
       type: 'multi',
       bgImage: rawMarket.image_url || "/placeholder.svg",
       outcomes: rawMarket.outcomes || [],
+      isLive: rawMarket.is_live && rawMarket.status !== 'resolved', // Fix Status
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
       historyData: [] // TODO: Mock multi chart
     } as MultiOutcomeMarket
