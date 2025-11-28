@@ -19,9 +19,9 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
   
   // Determine featured market dynamically
   const featuredMarket = (
-    validMarkets.find((m) => m.is_headline && m.isLive && m.type === 'binary') || 
-    validMarkets.find((m) => m.is_featured && m.isLive && m.type === 'binary') || 
-    validMarkets.find((m) => m.isLive && m.type === 'binary') ||
+    validMarkets.find((m) => m.is_headline && m.type === 'binary') || 
+    validMarkets.find((m) => m.is_featured && m.type === 'binary') || 
+    validMarkets.find((m) => m.type === 'binary') ||
     validMarkets[0]
   ) as BinaryMarket | undefined
 

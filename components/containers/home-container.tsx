@@ -41,13 +41,17 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
     return {
       ...m,
       // Add missing fields required by UI with default values
+      id: m.id,
+      question: m.question,
       bgImage: m.image_url || "/placeholder.svg",
       probability: probability,
       countdown: m.closes_at ? new Date(m.closes_at).toLocaleDateString() : "Bientôt",
       yesPrice: probability / 100, // Approx price
       noPrice: (100 - probability) / 100,
       is_featured: m.is_featured, // Ensure featured flag is passed
-      is_headline: m.is_headline // Ensure headline flag is passed
+      is_headline: m.is_headline, // Ensure headline flag is passed
+      isLive: m.is_live, // Map snake_case from DB to camelCase for UI
+      volume: m.volume || 0
     }
   })
 
