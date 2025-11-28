@@ -32,11 +32,12 @@ export async function resolveMarket(
 
   // 2. Update Market Status
   // We mark it resolved and set the winner
+  // Note: Column is 'is_live' in DB (snake_case), not 'isLive'
   const { error: marketError } = await supabase
     .from('markets')
     .update({
-      isLive: false, // Update the frontend flag
-      status: 'resolved', // Assuming this column exists as per spec
+      is_live: false, // Column name in DB is snake_case
+      status: 'resolved',
       winner_outcome_id: winningOutcomeId
     })
     .eq('id', marketId)
