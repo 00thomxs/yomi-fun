@@ -16,7 +16,7 @@ export default async function ResolvePage({ params }: { params: { id: string } }
     .from('markets')
     .select(`
       *,
-      outcomes (
+      outcomes:outcomes!market_id (
         id,
         name,
         probability
