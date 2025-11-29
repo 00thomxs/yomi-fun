@@ -10,6 +10,7 @@ export type AuthResult = {
 
 export async function signUp(email: string, password: string, username: string): Promise<AuthResult> {
   const supabase = await createClient()
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://yomi-fun.vercel.app' // Fallback to Vercel URL if env not set
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -18,6 +19,7 @@ export async function signUp(email: string, password: string, username: string):
       data: {
         username: username,
       },
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   })
 
