@@ -114,3 +114,30 @@ export async function deleteMarket(formData: FormData): Promise<{ error?: string
   
   return { success: true }
 }
+
+export async function resetPlatform(): Promise<{ error?: string; success?: boolean }> {
+  const supabase = await createClient()
+  
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+    
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  // Call the RPC function
+  const { error } = await supabase.rpc('reset_platform')
+
+  if (error) {
+    console.error("Reset platform error:", error)
+    return { error: `Erreur lors de la réinitialisation: ${error.message}` }
+  }
+
+  revalidatePath('/', 'layout') // Clear full cache
+  return { success: true }
+}
