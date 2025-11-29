@@ -1,15 +1,67 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
+import { createClient } from "@/lib/supabase/client"
+
+type Transaction = {
+  id: string
+  created_at: string
+  market_question: string
+  outcome_name: string
+  amount: number
+  status: 'pending' | 'won' | 'lost'
+  potential_payout: number
+}
 
 export function ProfileView() {
   const { user, profile, userBalance } = useUser()
   const [pnlTimeframe, setPnlTimeframe] = useState<"24H" | "7J" | "30J">("30J")
   const [showSettings, setShowSettings] = useState(false)
+  const [history, setHistory] = useState<Transaction[]>([])
+  const [loadingHistory, setLoadingHistory] = useState(true)
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!user) return
+      const supabase = createClient()
+      
+      const { data, error } = await supabase
+        .from('bets')
+        .select(`
+          id,
+          created_at,
+          amount,
+          status,
+          potential_payout,
+          outcome_id,
+          markets (question),
+          outcomes (name)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (!error && data) {
+        const formattedHistory = data.map((bet: any) => ({
+          id: bet.id,
+          created_at: bet.created_at,
+          market_question: bet.markets?.question || "Marché inconnu",
+          outcome_name: bet.outcomes?.name || "?",
+          amount: bet.amount,
+          status: bet.status,
+          potential_payout: bet.potential_payout
+        }))
+        setHistory(formattedHistory)
+      }
+      setLoadingHistory(false)
+    }
+
+    fetchHistory()
+  }, [user])
 
   // Use profile data if available, otherwise use defaults
   const userStats = {
@@ -40,11 +92,6 @@ export function ProfileView() {
 
   const pnlData =
     pnlTimeframe === "24H" ? generatePnLData(24) : pnlTimeframe === "7J" ? generatePnLData(7) : generatePnLData(30)
-
-  // Mock transaction history (will be replaced with real data from Supabase)
-  const transactionHistory = [
-    { date: "Aucun", event: "Pas encore de paris", status: "—", bet: 0, gains: 0 },
-  ]
 
   const badges = profile?.level && profile.level >= 5 
     ? [{ icon: "⭐", label: `Niveau ${profile.level}` }]
@@ -211,7 +258,11 @@ export function ProfileView() {
         <div className="p-4 border-b border-border">
           <p className="text-sm font-bold tracking-tight uppercase">Historique des paris</p>
         </div>
-        {userStats.totalBets === 0 ? (
+        {loadingHistory ? (
+          <div className="p-8 text-center">
+            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          </div>
+        ) : history.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-muted-foreground">Aucun pari pour le moment</p>
             <p className="text-sm text-muted-foreground mt-1">Place ton premier pari pour commencer !</p>
@@ -219,39 +270,53 @@ export function ProfileView() {
         ) : (
           <>
             <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              <span className="col-span-2">Date</span>
+              <span className="col-span-3">Date</span>
               <span className="col-span-4">Event</span>
               <span className="col-span-2">Status</span>
-              <span className="col-span-2 text-right">Bet</span>
-              <span className="col-span-2 text-right">Gains</span>
+              <span className="col-span-3 text-right">Gain/Perte</span>
             </div>
             <div className="divide-y divide-border">
-              {transactionHistory.map((tx, idx) => (
-                <div key={idx} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
-                  <span className="col-span-2 font-mono text-muted-foreground">{tx.date}</span>
-                  <span className="col-span-4 font-medium truncate">{tx.event}</span>
-                  <span className="col-span-2">
-                    {tx.status !== "—" && (
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold ${
-                          tx.status === "Win" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"
-                        }`}
-                      >
-                        {tx.status === "Win" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                        {tx.status}
-                      </span>
-                    )}
-                  </span>
-                  <span className="col-span-2 text-right font-mono font-bold">
-                    {tx.bet > 0 && <><CurrencySymbol /> {tx.bet.toLocaleString()}</>}
-                  </span>
-                  <span
-                    className={`col-span-2 text-right font-mono font-bold ${tx.gains > 0 ? "text-emerald-400" : "text-rose-400"}`}
-                  >
-                    {tx.gains > 0 ? `+${tx.gains.toLocaleString()}` : tx.bet > 0 ? "0" : ""} {tx.gains > 0 && <CurrencySymbol />}
-                  </span>
-                </div>
-              ))}
+              {history.map((tx, idx) => {
+                const date = new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                const isWin = tx.status === 'won'
+                const isLost = tx.status === 'lost'
+                const isPending = tx.status === 'pending'
+                
+                return (
+                  <div key={tx.id} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
+                    <span className="col-span-3 font-mono text-muted-foreground text-xs flex items-center">{date}</span>
+                    <div className="col-span-4 flex flex-col justify-center">
+                      <span className="font-medium truncate text-xs">{tx.market_question}</span>
+                      <span className="text-[10px] text-muted-foreground">Choix: {tx.outcome_name} • Mise: {tx.amount}</span>
+                    </div>
+                    <span className="col-span-2 flex items-center">
+                      {isWin && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          <ArrowUpRight className="w-3 h-3" />
+                          GAGNÉ
+                        </span>
+                      )}
+                      {isLost && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                          <ArrowDownRight className="w-3 h-3" />
+                          PERDU
+                        </span>
+                      )}
+                      {isPending && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                          <Clock className="w-3 h-3" />
+                          EN COURS
+                        </span>
+                      )}
+                    </span>
+                    <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
+                      isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
+                    }`}>
+                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </>
         )}
