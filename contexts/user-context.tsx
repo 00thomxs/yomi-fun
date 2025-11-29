@@ -133,7 +133,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         streak: 10,
         total_bets: 25,
         total_won: 15000,
-        win_rate: 65,
+        bets_won: 15,
+        win_rate: 60,
         role: 'admin' as const, // Force admin role in mock mode
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
