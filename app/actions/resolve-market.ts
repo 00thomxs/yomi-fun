@@ -86,27 +86,40 @@ export async function resolveMarket(
       // A. Update User Balance and Stats
       const { data: userProfile } = await supabase
         .from('profiles')
-        .select('balance, total_won, win_rate, total_bets')
+        .select('balance, total_won, bets_won, total_bets')
         .eq('id', bet.user_id)
         .single()
       
       if (userProfile) {
-        const newTotalWon = (userProfile.total_won || 0) + payout
-        const newWinRate = userProfile.total_bets > 0 
-          ? Math.round(((userProfile.total_won || 0) + 1) / userProfile.total_bets * 100) 
-          : 100
+        // total_won = Total Amount Won (Zeny)
+        // bets_won = Total Number of Wins
+        const newTotalWonAmount = (userProfile.total_won || 0) + payout
+        const newBetsWonCount = (userProfile.bets_won || 0) + 1
+        
+        // Win Rate = (Wins / Total Bets) * 100
+        // Note: total_bets was already incremented when placing the bet
+        const currentTotalBets = Math.max(userProfile.total_bets, 1)
+        const newWinRate = Math.round((newBetsWonCount / currentTotalBets) * 100)
         
         const { error: profileUpdateError } = await supabase
           .from('profiles')
           .update({
             balance: userProfile.balance + payout,
-            total_won: newTotalWon,
-            win_rate: Math.min(newWinRate, 100) // Cap at 100%
+            total_won: newTotalWonAmount,
+            bets_won: newBetsWonCount,
+            win_rate: Math.min(newWinRate, 100)
           })
           .eq('id', bet.user_id)
         
         if (profileUpdateError) {
-          console.error(`[RESOLVE_ERROR] Profile update failed:`, profileUpdateError)
+          console.error(`[RESOLVE_ERROR] Profile update failed for user ${bet.user_id}:`, profileUpdateError)
+          // Fallback: try to credit balance only if stats update fails
+          await supabase.rpc('increment_balance', {
+            user_id: bet.user_id,
+            amount: payout
+          })
+        } else {
+          console.log(`[RESOLVE] User ${bet.user_id} credited +${payout}, new balance: ${userProfile.balance + payout}`)
         }
       }
 

@@ -31,6 +31,7 @@ type Profile = {
   streak: number
   total_bets: number
   total_won: number
+  bets_won: number
   win_rate: number
   role?: 'user' | 'admin'
 }
