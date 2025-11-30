@@ -151,11 +151,20 @@ export function ProfileView() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Niveau <span className="font-mono text-primary">{userStats.level}</span>
-                  <span className="mx-2">•</span>
-                  <span className="font-mono">{userStats.xp} XP</span>
-                </p>
+                
+                {/* Level & XP Progress */}
+                <div className="mt-2 space-y-1.5 min-w-[200px]">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-muted-foreground">Niveau <span className="text-primary">{userStats.level}</span></span>
+                    <span className="text-muted-foreground"><span className="text-foreground">{userStats.xp % 1000}</span> / 1000 XP</span>
+                  </div>
+                  <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${(userStats.xp % 1000) / 10}%` }}
+                    />
+                  </div>
+                </div>
               </div>
               <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Balance</p>
