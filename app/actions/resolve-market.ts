@@ -114,14 +114,13 @@ export async function resolveMarket(
 
     } else {
       // LOSER
-      // Reset Streak to 0
-      const { error: profileUpdateError } = await supabase
-        .from('profiles')
-        .update({ streak: 0 })
-        .eq('id', bet.user_id)
+      // Update stats via RPC (Reset streak, recalculate Win Rate)
+      const { error: rpcError } = await supabase.rpc('update_loser_stats', {
+        p_user_id: bet.user_id
+      })
       
-      if (profileUpdateError) {
-        console.error(`[RESOLVE_ERROR] Failed to reset streak for loser ${bet.user_id}:`, profileUpdateError)
+      if (rpcError) {
+        console.error(`[RESOLVE_ERROR] RPC update_loser_stats failed for user ${bet.user_id}:`, rpcError)
       }
 
       const { error: betUpdateError } = await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)

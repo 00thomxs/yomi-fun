@@ -84,7 +84,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 <div key={outcome.name} className="p-3 rounded-lg bg-white/5 border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">{outcome.name}</span>
-                    <span className="font-mono font-bold text-lg">{outcome.probability}%</span>
+                    <span className="font-mono font-bold text-lg">{Math.round(outcome.probability)}%</span>
                   </div>
                   {market.isLive ? (
                     <div className="grid grid-cols-2 gap-2">
@@ -95,7 +95,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                         }}
                         className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
                       >
-                        OUI {outcome.probability}%
+                        OUI {Math.round(outcome.probability)}%
                       </button>
                       <button
                         onClick={(e) => {
@@ -104,7 +104,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                         }}
                         className="py-1.5 px-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition-all"
                       >
-                        NON {nonProb}%
+                        NON {Math.round(nonProb)}%
                       </button>
                     </div>
                   ) : (
@@ -134,7 +134,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
 
   // Binary market card
   const binaryMarket = market as BinaryMarket
-  const prob = binaryMarket.probability || 50
+  const prob = Math.round(binaryMarket.probability || 50)
 
   return (
     <div

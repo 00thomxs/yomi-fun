@@ -204,8 +204,8 @@ export function ProfileView() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Won</p>
-                <p className="text-lg font-bold font-mono text-emerald-400">
-                  +{userStats.totalWon} <CurrencySymbol />
+                <p className={`text-lg font-bold font-mono ${(userStats.totalWon || 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {(userStats.totalWon || 0) >= 0 ? "+" : ""}{userStats.totalWon} <CurrencySymbol />
                 </p>
               </div>
             </div>
