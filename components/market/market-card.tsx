@@ -108,8 +108,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       </button>
                     </div>
                   ) : (
-                    <div className="py-2 px-3 rounded-md bg-white/5 border border-white/10 text-center">
-                      <span className="text-xs text-muted-foreground font-medium">Résultat final</span>
+                    <div className={`py-2 px-3 rounded-md border text-center flex items-center justify-center gap-2 ${
+                      // @ts-ignore
+                      outcome.is_winner === true 
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                        : 'bg-white/5 border-white/10 text-muted-foreground'
+                    }`}>
+                      <span className="text-xs font-bold uppercase">
+                        {/* @ts-ignore */}
+                        {outcome.is_winner === true ? "✅ Résultat : VRAI" : "❌ Résultat : FAUX"}
+                      </span>
                     </div>
                   )}
                 </div>

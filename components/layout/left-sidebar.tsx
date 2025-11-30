@@ -99,7 +99,14 @@ export function LeftSidebar({
                   <p className="font-medium truncate">{bet.market}</p>
                   <div className="flex justify-between items-center mt-1">
                     <span className={`font-bold ${bet.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}`}>
-                      {bet.direction === 'NO' ? "NON " : "OUI "}{bet.choice}
+                      {(() => {
+                        // Clean up display for binary markets (OUI OUI -> OUI)
+                        const isBinaryOutcome = bet.choice === "OUI" || bet.choice === "NON"
+                        if (isBinaryOutcome && bet.direction === 'YES') {
+                          return bet.choice
+                        }
+                        return `${bet.direction === 'NO' ? "NON " : "OUI "}${bet.choice}`
+                      })()}
                     </span>
                     <span className="font-mono font-bold text-muted-foreground">
                       <CurrencySymbol /> {bet.amount}

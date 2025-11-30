@@ -413,32 +413,48 @@ function MultiMarketContent({
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => {
-                    setBetChoice(outcome.name)
-                    setBetType("OUI")
-                  }}
-                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
-                    betChoice === outcome.name && betType === "OUI"
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                      : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                  }`}
-                >
-                  OUI • <span className="font-mono">{Math.round(outcome.probability)}%</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setBetChoice(outcome.name)
-                    setBetType("NON")
-                  }}
-                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
-                    betChoice === outcome.name && betType === "NON"
-                      ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
-                      : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
-                  }`}
-                >
-                  NON • <span className="font-mono">{Math.round(nonProb)}%</span>
-                </button>
+                {isResolved ? (
+                  <div className={`col-span-2 py-3 px-4 rounded-lg border text-center flex items-center justify-center gap-2 ${
+                    // @ts-ignore
+                    outcome.is_winner === true 
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                      : 'bg-white/5 border-white/10 text-muted-foreground'
+                  }`}>
+                    <span className="text-sm font-bold uppercase">
+                      {/* @ts-ignore */}
+                      {outcome.is_winner === true ? "✅ Résultat : VRAI" : "❌ Résultat : FAUX"}
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        setBetChoice(outcome.name)
+                        setBetType("OUI")
+                      }}
+                      className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
+                        betChoice === outcome.name && betType === "OUI"
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
+                          : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                      }`}
+                    >
+                      OUI • <span className="font-mono">{Math.round(outcome.probability)}%</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setBetChoice(outcome.name)
+                        setBetType("NON")
+                      }}
+                      className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
+                        betChoice === outcome.name && betType === "NON"
+                          ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
+                          : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
+                      }`}
+                    >
+                      NON • <span className="font-mono">{Math.round(nonProb)}%</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )
