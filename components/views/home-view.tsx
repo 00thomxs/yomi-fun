@@ -80,8 +80,8 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-bold tracking-tight">
-                <span className="text-white font-mono">{featuredMarket.probability || 50}% OUI</span>
-                <span className="text-white/60 font-mono">{100 - (featuredMarket.probability || 50)}% NON</span>
+                <span className="text-white font-mono">{Math.round(featuredMarket.probability || 50)}% OUI</span>
+                <span className="text-white/60 font-mono">{Math.round(100 - (featuredMarket.probability || 50))}% NON</span>
               </div>
               <div className="relative h-2 rounded-full bg-white/10 overflow-hidden">
                 <div
