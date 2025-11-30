@@ -98,8 +98,8 @@ export function LeftSidebar({
                 >
                   <p className="font-medium truncate">{bet.market}</p>
                   <div className="flex justify-between items-center mt-1">
-                    <span className={`font-bold ${bet.choice === "OUI" ? "text-emerald-400" : "text-rose-400"}`}>
-                      {bet.choice}
+                    <span className={`font-bold ${bet.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}`}>
+                      {bet.direction === 'NO' ? "NON " : "OUI "}{bet.choice}
                     </span>
                     <span className="font-mono font-bold text-muted-foreground">
                       <CurrencySymbol /> {bet.amount}

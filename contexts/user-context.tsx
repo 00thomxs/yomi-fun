@@ -90,6 +90,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         outcome_id,
         status,
         potential_payout,
+        direction,
         markets (
           question
         ),
@@ -114,7 +115,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         amount: bet.amount,
         odds: bet.odds_at_bet || 1.0,
         status: bet.status || 'pending',
-        potential_payout: bet.potential_payout
+        potential_payout: bet.potential_payout,
+        direction: bet.direction || 'YES'
       }))
       setActiveBets(formattedBets)
     }

@@ -57,26 +57,36 @@ export async function placeBet(
     return { error: "Outcomes introuvables." }
   }
 
-  // Handle outcome selection (Binary vs Multi)
+  // Handle outcome selection and direction (YES/NO)
+  let direction: 'YES' | 'NO' = 'YES';
   let selectedOutcome;
+
   if (market.type === 'binary') {
     // Binary logic: input is 'YES' or 'NO' mapping to 'OUI' or 'NON' outcome
-    const targetName = outcomeName === 'YES' ? 'OUI' : 'NON'
-    selectedOutcome = marketOutcomes.find(o => o.name === targetName)
-  } else {
-    // Multi logic: input is the outcome name directly
-    // Note: The frontend might send "OUI [Name]" or just "[Name]". 
-    // Let's assume exact name match for now, or cleanup.
-    // Actually frontend sends "OUI [Name]" for multi logic in MarketDetailView.
-    // Let's fix frontend to send just the outcome name or handle it here.
-    // For now, let's look for exact match
-    selectedOutcome = marketOutcomes.find(o => o.name === outcomeName)
-    
-    // Fallback: try to partial match if frontend sends "OUI Name"
-    if (!selectedOutcome) {
-        const cleanName = outcomeName.replace('OUI ', '').replace('NON ', '')
-        selectedOutcome = marketOutcomes.find(o => o.name === cleanName)
+    // Or input can be 'OUI'/'NON' directly
+    if (outcomeName === 'NO' || outcomeName === 'NON') {
+      direction = 'NO';
+      selectedOutcome = marketOutcomes.find(o => o.name === 'NON');
+    } else {
+      direction = 'YES';
+      selectedOutcome = marketOutcomes.find(o => o.name === 'OUI');
     }
+  } else {
+    // Multi logic
+    // Input format expected: "OUI [Name]" or "NON [Name]"
+    // If just "[Name]", assume YES.
+    
+    let cleanName = outcomeName;
+    
+    if (outcomeName.startsWith('NON ')) {
+      direction = 'NO';
+      cleanName = outcomeName.substring(4); // Remove "NON "
+    } else if (outcomeName.startsWith('OUI ')) {
+      direction = 'YES';
+      cleanName = outcomeName.substring(4); // Remove "OUI "
+    }
+    
+    selectedOutcome = marketOutcomes.find(o => o.name === cleanName);
   }
   
   if (!selectedOutcome) {
@@ -106,14 +116,21 @@ export async function placeBet(
   const probability = selectedOutcome.probability / 100
   const safeProb = Math.max(0.01, Math.min(0.99, probability)) // Clamp 1%-99%
   
-  odds = 1 / safeProb
+  if (direction === 'YES') {
+    odds = 1 / safeProb
+  } else {
+    // Betting NO -> Odds = 1 / (1 - Prob)
+    const probNo = 1 - safeProb
+    odds = 1 / Math.max(0.01, probNo)
+  }
+
   if (odds > 100) odds = 100
   if (odds < 1.01) odds = 1.01
   
   potentialPayout = investment * odds
   const currentOdds = odds
 
-  console.log(`[BET_CALC] Choice: ${selectedOutcome.name}, Prob: ${selectedOutcome.probability}%, Odds: ${odds}, Payout: ${potentialPayout}`)
+  console.log(`[BET_CALC] Choice: ${selectedOutcome.name} (${direction}), Prob: ${selectedOutcome.probability}%, Odds: ${odds}, Payout: ${potentialPayout}`)
 
   // 4. TRANSACTION
   
@@ -188,7 +205,8 @@ export async function placeBet(
       amount: amount,
       potential_payout: potentialPayout,
       odds_at_bet: currentOdds,
-      status: 'pending'
+      status: 'pending',
+      direction: direction // 'YES' or 'NO'
     })
 
   if (betError) {

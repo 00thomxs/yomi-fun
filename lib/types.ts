@@ -51,6 +51,7 @@ export type ActiveBet = {
   odds: number
   status: 'pending' | 'won' | 'lost'
   potential_payout?: number
+  direction?: 'YES' | 'NO'
 }
 
 // Chart Data Types

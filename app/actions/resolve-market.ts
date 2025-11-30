@@ -56,7 +56,7 @@ export async function resolveMarket(
   // 3. Fetch all pending bets for this market
   const { data: bets, error: betsError } = await supabase
     .from('bets')
-    .select('id, user_id, outcome_id, amount, potential_payout, status')
+    .select('id, user_id, outcome_id, amount, potential_payout, status, direction')
     .eq('market_id', marketId)
     .eq('status', 'pending')
 
@@ -71,14 +71,21 @@ export async function resolveMarket(
   const errors = []
 
   // 4. Process Payouts
-  // Note: In production, this should be a single SQL Transaction or Postgres Function
-  // to ensure atomicity. Doing it in a loop is risky if the server crashes halfway.
-  // But for MVP/Next.js Action context, we'll do it sequentially or batched.
-
   for (const bet of bets) {
-    console.log(`[RESOLVE] Processing bet ${bet.id}, outcome_id: ${bet.outcome_id}, winning: ${winningOutcomeId}`)
+    console.log(`[RESOLVE] Processing bet ${bet.id}, outcome_id: ${bet.outcome_id}, direction: ${bet.direction}, winning: ${winningOutcomeId}`)
     
-    if (bet.outcome_id === winningOutcomeId) {
+    // Determine if bet is a winner
+    let isWinner = false
+    
+    if (bet.direction === 'NO') {
+      // Bet AGAINST an outcome: Wins if that outcome is NOT the winner
+      isWinner = bet.outcome_id !== winningOutcomeId
+    } else {
+      // Bet FOR an outcome (Default 'YES'): Wins if that outcome IS the winner
+      isWinner = bet.outcome_id === winningOutcomeId
+    }
+    
+    if (isWinner) {
       // WINNER
       const payout = bet.potential_payout // Calculated at bet time
       console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
