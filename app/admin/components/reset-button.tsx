@@ -11,9 +11,13 @@ export function ResetPlatformButton() {
   const [showConfirm, setShowConfirm] = useState(false)
 
   const handleReset = async () => {
+    console.log("Reset button clicked")
     setIsLoading(true)
     try {
+      console.log("Calling resetPlatform action...")
       const result = await resetPlatform()
+      console.log("Reset result:", result)
+      
       if (result.success) {
         toast({
           title: "Plateforme réinitialisée",
@@ -22,7 +26,7 @@ export function ResetPlatformButton() {
         })
         setShowConfirm(false)
         // Force reload to clear client cache
-        window.location.reload()
+        window.location.href = "/"
       } else {
         toast({
           title: "Erreur",
@@ -30,11 +34,11 @@ export function ResetPlatformButton() {
           variant: "destructive",
         })
       }
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      console.error("Reset error:", error)
       toast({
         title: "Erreur critique",
-        description: "Impossible de contacter le serveur",
+        description: error.message || "Impossible de contacter le serveur",
         variant: "destructive",
       })
     } finally {
