@@ -142,6 +142,9 @@ export async function resolveMarket(
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/admin')
 
+  return { success: true, payoutsCount, totalPaid }
+}
+
 export async function resolveMarketMulti(
   marketId: string,
   results: { outcomeId: string; isWinner: boolean }[]
