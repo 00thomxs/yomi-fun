@@ -371,10 +371,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     // REAL BETTING LOGIC via Server Action
     try {
-      // Extract YES/NO from choice string "OUI" / "NON"
-      const outcome = choice.includes("OUI") ? "YES" : "NO"
+      // For Binary, choice is "OUI" or "NON" -> map to YES/NO for consistency if backend expects it?
+      // Actually backend placeBet now handles "YES"/"NO" mapping internally for binary.
+      // And for Multi, it expects the outcome name.
       
-      const result = await placeBetAction(marketId, outcome, amount)
+      // Let's just send the choice string as is.
+      // placeBet signature: (marketId, outcomeName, amount)
+      
+      const result = await placeBetAction(marketId, choice, amount)
       
       if (result.error) {
         toast({

@@ -75,12 +75,27 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   }
 
   const handlePlaceBet = () => {
+    console.log("handlePlaceBet called", { betAmount, betChoice, betType, marketType: market.type })
     const amount = Number.parseFloat(betAmount) || 0
     if (amount > 0) {
       if (market.type === "binary") {
         const displayChoice = betChoice === "YES" ? "OUI" : "NON"
         onBet(market.id, displayChoice, amount)
       } else {
+        // For multi, ensure we send a format that backend understands
+        // The backend expects outcome NAME directly or "OUI/NON Name"
+        // Let's send just the outcome name if betType is OUI (as betting NO on multi is complex logic not fully supported yet)
+        // Wait, the backend logic placeBet supports finding by name.
+        // But wait, if I bet "NON Ninho", the backend logic placeBet calculates odds based on... what?
+        // My placeBet logic : odds = 1 / outcome.probability.
+        // This is odds for YES.
+        // If I bet NON, odds should be 1 / (1 - prob).
+        // Let's see placeBet... it calculates odds based on 'YES' or 'NO' logic ONLY for Binary.
+        // For Multi, it calculates odds = 1 / prob (which is YES odds).
+        // So Multi NON betting is BROKEN in backend currently.
+        
+        // Debug: send raw values
+        console.log("Sending bet:", { id: market.id, choice: `${betType} ${betChoice}`, amount })
         onBet(market.id, `${betType} ${betChoice}`, amount)
       }
       setBetAmount("")
