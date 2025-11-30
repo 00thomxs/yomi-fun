@@ -307,7 +307,7 @@ function BinaryMarketContent({
                   : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
               }`}
             >
-              OUI • <span className="font-mono">{market.probability}%</span>
+              OUI • <span className="font-mono">{Math.round(market.probability)}%</span>
             </button>
             <button
               onClick={() => setBetChoice("NO")}
@@ -317,7 +317,7 @@ function BinaryMarketContent({
                   : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
               }`}
             >
-              NON • <span className="font-mono">{100 - market.probability}%</span>
+              NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
             </button>
           </div>
 
@@ -394,7 +394,7 @@ function MultiMarketContent({
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: outcome.color }} />
                   <span className="font-semibold">{outcome.name}</span>
                 </div>
-                <span className="text-2xl font-bold font-mono">{outcome.probability}%</span>
+                <span className="text-2xl font-bold font-mono">{Math.round(outcome.probability)}%</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -409,7 +409,7 @@ function MultiMarketContent({
                       : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
                   }`}
                 >
-                  OUI • <span className="font-mono">{outcome.probability}%</span>
+                  OUI • <span className="font-mono">{Math.round(outcome.probability)}%</span>
                 </button>
                 <button
                   onClick={() => {
@@ -422,7 +422,7 @@ function MultiMarketContent({
                       : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
                   }`}
                 >
-                  NON • <span className="font-mono">{nonProb}%</span>
+                  NON • <span className="font-mono">{Math.round(nonProb)}%</span>
                 </button>
               </div>
             </div>
