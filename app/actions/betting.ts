@@ -11,7 +11,7 @@ export type BetResult = {
 
 export async function placeBet(
   marketId: string,
-  outcome: 'YES' | 'NO',
+  outcomeName: string,
   amount: number
 ): Promise<BetResult> {
   const supabase = await createClient()
@@ -36,7 +36,7 @@ export async function placeBet(
 
   const { data: market, error: marketError } = await supabase
     .from('markets')
-    .select('pool_yes, pool_no, volume, status, is_live')
+    .select('pool_yes, pool_no, volume, status, is_live, type')
     .eq('id', marketId)
     .single()
 
@@ -47,7 +47,7 @@ export async function placeBet(
     return { error: "Ce marché est fermé aux paris." }
   }
 
-  // 2.2 Fetch outcomes to get the REAL probability
+  // 2.2 Fetch outcomes
   const { data: marketOutcomes } = await supabase
     .from('outcomes')
     .select('id, name, probability')
@@ -57,13 +57,30 @@ export async function placeBet(
     return { error: "Outcomes introuvables." }
   }
 
-  const yesOutcome = marketOutcomes.find(o => o.name === 'OUI')
-  const noOutcome = marketOutcomes.find(o => o.name === 'NON')
+  // Handle outcome selection (Binary vs Multi)
+  let selectedOutcome;
+  if (market.type === 'binary') {
+    // Binary logic: input is 'YES' or 'NO' mapping to 'OUI' or 'NON' outcome
+    const targetName = outcomeName === 'YES' ? 'OUI' : 'NON'
+    selectedOutcome = marketOutcomes.find(o => o.name === targetName)
+  } else {
+    // Multi logic: input is the outcome name directly
+    // Note: The frontend might send "OUI [Name]" or just "[Name]". 
+    // Let's assume exact name match for now, or cleanup.
+    // Actually frontend sends "OUI [Name]" for multi logic in MarketDetailView.
+    // Let's fix frontend to send just the outcome name or handle it here.
+    // For now, let's look for exact match
+    selectedOutcome = marketOutcomes.find(o => o.name === outcomeName)
+    
+    // Fallback: try to partial match if frontend sends "OUI Name"
+    if (!selectedOutcome) {
+        const cleanName = outcomeName.replace('OUI ', '').replace('NON ', '')
+        selectedOutcome = marketOutcomes.find(o => o.name === cleanName)
+    }
+  }
   
-  // Get the outcome ID we need
-  const selectedOutcome = outcome === 'YES' ? yesOutcome : noOutcome
   if (!selectedOutcome) {
-    return { error: "Outcome sélectionné introuvable." }
+    return { error: `Choix invalide: ${outcomeName}` }
   }
 
   // 2.5 Check if already bet
@@ -78,49 +95,32 @@ export async function placeBet(
     return { error: "Vous avez déjà parié sur ce marché." }
   }
 
-  // --- 3. CORE LOGIC: SIMPLIFIED DYNAMIC ODDS ---
-  const poolYes = Number(market.pool_yes) || 100
-  const poolNo = Number(market.pool_no) || 100
-  
-  const probYesBefore = yesOutcome ? yesOutcome.probability / 100 : 0.5
-  const probNoBefore = noOutcome ? noOutcome.probability / 100 : 0.5
-  
+  // --- 3. CORE LOGIC ---
   let odds = 0
   let potentialPayout = 0
-  let newPoolYes = poolYes
-  let newPoolNo = poolNo
-  
-  const fee = amount * 0.02 // 2% fee
+  const fee = amount * 0.02
   const investment = amount - fee
 
-  if (outcome === 'YES') {
-    odds = 1 / probYesBefore
-    if (odds > 100) odds = 100
-    if (odds < 1.01) odds = 1.01
-    potentialPayout = investment * odds
-    newPoolYes = poolYes + investment
-  } else {
-    odds = 1 / probNoBefore
-    if (odds > 100) odds = 100
-    if (odds < 1.01) odds = 1.01
-    potentialPayout = investment * odds
-    newPoolNo = poolNo + investment
-  }
+  // Simplified Odds for all types: 1 / Probability
+  // Use current probability from DB
+  const probability = selectedOutcome.probability / 100
+  const safeProb = Math.max(0.01, Math.min(0.99, probability)) // Clamp 1%-99%
   
-  console.log(`[BET_CALC] Outcome: ${outcome}, Prob: ${outcome === 'YES' ? probYesBefore : probNoBefore}, Odds: ${odds}, Payout: ${potentialPayout}`)
+  odds = 1 / safeProb
+  if (odds > 100) odds = 100
+  if (odds < 1.01) odds = 1.01
   
+  potentialPayout = investment * odds
   const currentOdds = odds
+
+  console.log(`[BET_CALC] Choice: ${selectedOutcome.name}, Prob: ${selectedOutcome.probability}%, Odds: ${odds}, Payout: ${potentialPayout}`)
 
   // 4. TRANSACTION
   
   // A. Debit User & Update Stats (XP, Total Bets, PnL)
   const XP_PER_BET = 10
   const newXp = (profile.xp || 0) + XP_PER_BET
-  // Level update
   const newLevel = Math.floor(newXp / 1000) + 1
-  
-  // Update PnL (total_won tracks net profit)
-  // We subtract the wager amount now. If they win, we add the full payout later.
   const newPnL = (profile.total_won || 0) - amount
 
   const { error: debitError } = await supabase
@@ -136,18 +136,44 @@ export async function placeBet(
 
   if (debitError) return { error: "Erreur lors du débit." }
 
-  // B. Update Market Pools & Volume
+  // B. Update Market Volume
+  // Note: For Multi markets, we don't update pools/probs dynamically yet (MVP limitation)
+  // For Binary, we could keep the pool logic, but let's unify for simplicity first.
+  // Or keep binary pool logic if it works well? Yes, let's keep binary specific logic if possible.
+  
+  let updateData: any = { volume: (market.volume || 0) + amount }
+  
+  if (market.type === 'binary') {
+     // ... (Keep existing pool logic for binary if needed, but simplified here to avoid regression)
+     // Actually, the pool logic was calculating new probs.
+     // If we remove it, probs won't move.
+     // Let's re-add simplified pool logic ONLY for binary
+     const poolYes = Number(market.pool_yes) || 100
+     const poolNo = Number(market.pool_no) || 100
+     let newPoolYes = poolYes
+     let newPoolNo = poolNo
+     
+     if (selectedOutcome.name === 'OUI') newPoolYes += investment
+     else newPoolNo += investment
+     
+     updateData = { ...updateData, pool_yes: newPoolYes, pool_no: newPoolNo }
+     
+     // Update Probs
+     const total = newPoolYes + newPoolNo
+     const probYes = (newPoolYes / total) * 100
+     const probNo = (newPoolNo / total) * 100
+     
+     await supabase.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
+     await supabase.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
+  }
+
   const { error: updateError } = await supabase
     .from('markets')
-    .update({
-      pool_yes: newPoolYes,
-      pool_no: newPoolNo,
-      volume: (market.volume || 0) + amount
-    })
+    .update(updateData)
     .eq('id', marketId)
 
   if (updateError) {
-    // Rollback: restore user balance
+    // Rollback
     await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: "Erreur mise à jour marché." }
   }
@@ -166,30 +192,10 @@ export async function placeBet(
     })
 
   if (betError) {
-    // Rollback: restore user balance and market pools
+    // Rollback hard
     await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
-    await supabase.from('markets').update({ pool_yes: poolYes, pool_no: poolNo, volume: market.volume || 0 }).eq('id', marketId)
     return { error: `Erreur création pari: ${betError.message}` }
   }
-
-  // 5. Update Outcome Probability (Display only)
-  const totalPool = newPoolYes + newPoolNo
-  const probYes = (newPoolYes / totalPool) * 100
-  const probNo = (newPoolNo / totalPool) * 100
-
-  console.log(`[BET_UPDATE] Market: ${marketId}, New Pools: YES=${newPoolYes}/NO=${newPoolNo}, Probs: ${probYes}%/${probNo}%`)
-  
-  await supabase
-    .from('outcomes')
-    .update({ probability: probYes })
-    .eq('name', 'OUI')
-    .eq('market_id', marketId)
-    
-  await supabase
-    .from('outcomes')
-    .update({ probability: probNo })
-    .eq('name', 'NON')
-    .eq('market_id', marketId)
 
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/')
