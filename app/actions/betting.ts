@@ -27,7 +27,7 @@ export async function placeBet(
   // 2. Fetch Market Data & User Balance
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('balance, total_bets, xp, level')
+    .select('balance, total_bets, xp, level, total_won')
     .eq('id', user.id)
     .single()
 
@@ -113,17 +113,22 @@ export async function placeBet(
 
   // 4. TRANSACTION
   
-  // A. Debit User & Update Stats (XP, Total Bets)
+  // A. Debit User & Update Stats (XP, Total Bets, PnL)
   const XP_PER_BET = 10
   const newXp = (profile.xp || 0) + XP_PER_BET
   // Level update
   const newLevel = Math.floor(newXp / 1000) + 1
+  
+  // Update PnL (total_won tracks net profit)
+  // We subtract the wager amount now. If they win, we add the full payout later.
+  const newPnL = (profile.total_won || 0) - amount
 
   const { error: debitError } = await supabase
     .from('profiles')
     .update({ 
       balance: profile.balance - amount, 
       total_bets: (profile.total_bets || 0) + 1,
+      total_won: newPnL,
       xp: newXp,
       level: newLevel
     })

@@ -114,6 +114,16 @@ export async function resolveMarket(
 
     } else {
       // LOSER
+      // Reset Streak to 0
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({ streak: 0 })
+        .eq('id', bet.user_id)
+      
+      if (profileUpdateError) {
+        console.error(`[RESOLVE_ERROR] Failed to reset streak for loser ${bet.user_id}:`, profileUpdateError)
+      }
+
       const { error: betUpdateError } = await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'lost' failed:`, betUpdateError)
