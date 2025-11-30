@@ -88,7 +88,7 @@ export async function resolveMarket(
       
       const { error: rpcError } = await supabase.rpc('update_winner_stats', {
         p_user_id: bet.user_id,
-        p_payout: payout,
+        p_payout: Math.floor(payout), // Ensure integer
         p_xp_gain: XP_PER_WIN
       })
 
