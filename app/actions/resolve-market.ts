@@ -83,61 +83,30 @@ export async function resolveMarket(
       const payout = bet.potential_payout // Calculated at bet time
       console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
 
-      // A. Update User Balance, Stats, XP and Level
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('balance, total_won, bets_won, total_bets, xp, level')
-        .eq('id', bet.user_id)
-        .single()
+      // A. Update User Balance, Stats, XP and Level using secure RPC
+      const XP_PER_WIN = 50
       
-      if (userProfile) {
-        // total_won = Total Amount Won (Zeny)
-        // bets_won = Total Number of Wins
-        const newTotalWonAmount = (userProfile.total_won || 0) + payout
-        const newBetsWonCount = (userProfile.bets_won || 0) + 1
-        
-        // XP & Level Calculation
-        // +50 XP for winning a bet
-        const XP_PER_WIN = 50
-        const newXp = (userProfile.xp || 0) + XP_PER_WIN
-        // Simple level formula: 1 level every 1000 XP
-        const newLevel = Math.floor(newXp / 1000) + 1
-        
-        // Win Rate = (Wins / Total Bets) * 100
-        // Note: total_bets was already incremented when placing the bet
-        const currentTotalBets = Math.max(userProfile.total_bets, 1)
-        const newWinRate = Math.round((newBetsWonCount / currentTotalBets) * 100)
-        
-        const { error: profileUpdateError } = await supabase
-          .from('profiles')
-          .update({
-            balance: userProfile.balance + payout,
-            total_won: newTotalWonAmount,
-            bets_won: newBetsWonCount,
-            win_rate: Math.min(newWinRate, 100),
-            xp: newXp,
-            level: newLevel
-          })
-          .eq('id', bet.user_id)
-        
-        if (profileUpdateError) {
-          console.error(`[RESOLVE_ERROR] Profile update failed for user ${bet.user_id}:`, profileUpdateError)
-          // Fallback: try to credit balance only if stats update fails
-          await supabase.rpc('increment_balance', {
-            user_id: bet.user_id,
-            amount: payout
-          })
-        } else {
-          console.log(`[RESOLVE] User ${bet.user_id} credited +${payout}, XP +${XP_PER_WIN}, new balance: ${userProfile.balance + payout}`)
-        }
+      const { error: rpcError } = await supabase.rpc('update_winner_stats', {
+        p_user_id: bet.user_id,
+        p_payout: payout,
+        p_xp_gain: XP_PER_WIN
+      })
+
+      if (rpcError) {
+        console.error(`[RESOLVE_ERROR] RPC update_winner_stats failed for user ${bet.user_id}:`, rpcError)
+        // Fallback: try basic increment if stats update fails
+        await supabase.rpc('increment_balance', {
+          user_id: bet.user_id,
+          amount: payout
+        })
+      } else {
+        console.log(`[RESOLVE] User ${bet.user_id} stats updated via RPC`)
       }
 
       // B. Update Bet Status
       const { error: betUpdateError } = await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'won' failed:`, betUpdateError)
-      } else {
-        console.log(`[RESOLVE] Bet ${bet.id} status updated to 'won'`)
       }
       
       payoutsCount++
