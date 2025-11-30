@@ -172,15 +172,58 @@ export default function CreateMarketPage() {
           {/* Date & Heure */}
           <div className="space-y-2">
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Date de fin</label>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
               <div className="relative flex-1">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <input 
+                  id="closesAt"
                   name="closesAt"
                   type="datetime-local"
-                  className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none"
+                  className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none text-white scheme-dark"
                   required
                 />
+              </div>
+              {/* Quick Presets */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const date = new Date()
+                    date.setHours(date.getHours() + 24)
+                    const isoString = date.toISOString().slice(0, 16) // Format for datetime-local
+                    const input = document.getElementById('closesAt') as HTMLInputElement
+                    if (input) input.value = isoString
+                  }}
+                  className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+                >
+                  +24h
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const date = new Date()
+                    date.setDate(date.getDate() + 7)
+                    const isoString = date.toISOString().slice(0, 16)
+                    const input = document.getElementById('closesAt') as HTMLInputElement
+                    if (input) input.value = isoString
+                  }}
+                  className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+                >
+                  +7j
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const date = new Date()
+                    date.setDate(date.getDate() + 30)
+                    const isoString = date.toISOString().slice(0, 16)
+                    const input = document.getElementById('closesAt') as HTMLInputElement
+                    if (input) input.value = isoString
+                  }}
+                  className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+                >
+                  +30j
+                </button>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">Le marché sera automatiquement clôturé à cette date.</p>
