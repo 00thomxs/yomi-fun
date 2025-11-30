@@ -27,7 +27,7 @@ export async function placeBet(
   // 2. Fetch Market Data & User Balance
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('balance, total_bets')
+    .select('balance, total_bets, xp, level')
     .eq('id', user.id)
     .single()
 
@@ -113,10 +113,20 @@ export async function placeBet(
 
   // 4. TRANSACTION
   
-  // A. Debit User
+  // A. Debit User & Update Stats (XP, Total Bets)
+  const XP_PER_BET = 10
+  const newXp = (profile.xp || 0) + XP_PER_BET
+  // Level update
+  const newLevel = Math.floor(newXp / 1000) + 1
+
   const { error: debitError } = await supabase
     .from('profiles')
-    .update({ balance: profile.balance - amount, total_bets: (profile.total_bets || 0) + 1 })
+    .update({ 
+      balance: profile.balance - amount, 
+      total_bets: (profile.total_bets || 0) + 1,
+      xp: newXp,
+      level: newLevel
+    })
     .eq('id', user.id)
 
   if (debitError) return { error: "Erreur lors du débit." }

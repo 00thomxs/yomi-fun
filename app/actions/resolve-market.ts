@@ -83,10 +83,10 @@ export async function resolveMarket(
       const payout = bet.potential_payout // Calculated at bet time
       console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
 
-      // A. Update User Balance and Stats
+      // A. Update User Balance, Stats, XP and Level
       const { data: userProfile } = await supabase
         .from('profiles')
-        .select('balance, total_won, bets_won, total_bets')
+        .select('balance, total_won, bets_won, total_bets, xp, level')
         .eq('id', bet.user_id)
         .single()
       
@@ -95,6 +95,13 @@ export async function resolveMarket(
         // bets_won = Total Number of Wins
         const newTotalWonAmount = (userProfile.total_won || 0) + payout
         const newBetsWonCount = (userProfile.bets_won || 0) + 1
+        
+        // XP & Level Calculation
+        // +50 XP for winning a bet
+        const XP_PER_WIN = 50
+        const newXp = (userProfile.xp || 0) + XP_PER_WIN
+        // Simple level formula: 1 level every 1000 XP
+        const newLevel = Math.floor(newXp / 1000) + 1
         
         // Win Rate = (Wins / Total Bets) * 100
         // Note: total_bets was already incremented when placing the bet
@@ -107,7 +114,9 @@ export async function resolveMarket(
             balance: userProfile.balance + payout,
             total_won: newTotalWonAmount,
             bets_won: newBetsWonCount,
-            win_rate: Math.min(newWinRate, 100)
+            win_rate: Math.min(newWinRate, 100),
+            xp: newXp,
+            level: newLevel
           })
           .eq('id', bet.user_id)
         
@@ -119,7 +128,7 @@ export async function resolveMarket(
             amount: payout
           })
         } else {
-          console.log(`[RESOLVE] User ${bet.user_id} credited +${payout}, new balance: ${userProfile.balance + payout}`)
+          console.log(`[RESOLVE] User ${bet.user_id} credited +${payout}, XP +${XP_PER_WIN}, new balance: ${userProfile.balance + payout}`)
         }
       }
 
