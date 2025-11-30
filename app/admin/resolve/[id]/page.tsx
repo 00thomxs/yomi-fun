@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
-import ResolveButton from './resolve-button'
+import { redirect } from 'next/navigation'
+import ResolveForm from './resolve-form' // Updated import
 
 export default async function ResolvePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -29,16 +29,15 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
   if (error) {
     return (
       <div className="p-8 bg-red-900/20 text-red-200 border border-red-500 rounded">
-        <h2 className="text-xl font-bold">Erreur Supabase (Resolve Page)</h2>
+        <h2 className="text-xl font-bold">Erreur Supabase</h2>
         <pre className="mt-4 p-4 bg-black/50 rounded overflow-auto">
           {JSON.stringify(error, null, 2)}
         </pre>
-        <p className="mt-4 text-sm">ID demandé : {id}</p>
       </div>
     )
   }
 
-  if (!market) return <div className="p-8">Marché introuvable (ID: {id})</div>
+  if (!market) return <div className="p-8">Marché introuvable</div>
 
   return (
     <div className="container max-w-4xl mx-auto py-10">
@@ -62,26 +61,15 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <h3 className="text-lg font-semibold mb-4">Choisir le résultat gagnant</h3>
+      <h3 className="text-lg font-semibold mb-4">Définir les résultats</h3>
       <p className="text-yellow-500 mb-6 text-sm bg-yellow-500/10 p-3 rounded border border-yellow-500/20">
-        ⚠️ Attention : Cette action est irréversible. Tous les gains seront immédiatement versés aux gagnants.
+        ⚠️ Définissez le résultat (Vrai ou Faux) pour chaque proposition. Cela calculera les gains pour tous les paris (OUI et NON).
       </p>
 
-      <div className="grid gap-4">
-        {market.outcomes?.map((outcome: any) => (
-          <div key={outcome.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-lg border border-gray-700">
-            <div>
-              <span className="text-xl font-bold">{outcome.name}</span>
-              <span className="ml-4 text-sm text-gray-400">Probabilité finale : {Math.round(outcome.probability)}%</span>
-            </div>
-            <ResolveButton 
-              marketId={market.id} 
-              outcomeId={outcome.id} 
-              outcomeName={outcome.name} 
-            />
-          </div>
-        ))}
-      </div>
+      <ResolveForm 
+        marketId={market.id} 
+        outcomes={market.outcomes} 
+      />
     </div>
   )
 }

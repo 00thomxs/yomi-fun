@@ -142,6 +142,119 @@ export async function resolveMarket(
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/admin')
 
+export async function resolveMarketMulti(
+  marketId: string,
+  results: { outcomeId: string; isWinner: boolean }[]
+): Promise<ResolutionResult> {
+  const supabase = await createClient()
+
+  // 1. Verify Admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    return { error: "Accès refusé" }
+  }
+
+  // 2. Update Outcomes (Set is_winner)
+  // Doing this in a loop or Promise.all
+  // Note: is_winner column MUST exist in outcomes table
+  for (const res of results) {
+    await supabase
+      .from('outcomes')
+      .update({ is_winner: res.isWinner })
+      .eq('id', res.outcomeId)
+  }
+
+  // 3. Update Market Status
+  await supabase
+    .from('markets')
+    .update({
+      is_live: false,
+      status: 'resolved',
+      // winner_outcome_id: null // Not used anymore in multi logic
+    })
+    .eq('id', marketId)
+
+  // 4. Fetch Bets
+  const { data: bets, error: betsError } = await supabase
+    .from('bets')
+    .select('id, user_id, outcome_id, amount, potential_payout, status, direction')
+    .eq('market_id', marketId)
+    .eq('status', 'pending')
+
+  if (betsError || !bets) {
+    return { error: "Erreur récupération paris" }
+  }
+
+  let payoutsCount = 0
+  let totalPaid = 0
+
+  // 5. Process Payouts
+  // Convert results array to Map for fast lookup
+  const resultMap = new Map(results.map(r => [r.outcomeId, r.isWinner]))
+
+  for (const bet of bets) {
+    const isOutcomeWinner = resultMap.get(bet.outcome_id)
+    
+    // Should not happen if all outcomes covered, but safe check
+    if (isOutcomeWinner === undefined) continue;
+
+    let isBetWinner = false
+    
+    if (bet.direction === 'NO') {
+      // Bet AGAINST: Win if outcome is NOT winner
+      isBetWinner = !isOutcomeWinner
+    } else {
+      // Bet FOR (default YES): Win if outcome IS winner
+      isBetWinner = isOutcomeWinner
+    }
+
+    if (isBetWinner) {
+      // WINNER
+      const payout = bet.potential_payout
+      
+      const XP_PER_WIN = 50
+      const { error: rpcError } = await supabase.rpc('update_winner_stats', {
+        p_user_id: bet.user_id,
+        p_payout: Math.floor(payout),
+        p_xp_gain: XP_PER_WIN
+      })
+
+      if (rpcError) {
+        console.error(`[RESOLVE_MULTI] RPC update_winner_stats failed for user ${bet.user_id}:`, rpcError)
+        await supabase.rpc('increment_balance', {
+          user_id: bet.user_id,
+          amount: payout
+        })
+      }
+
+      await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      
+      payoutsCount++
+      totalPaid += payout
+
+    } else {
+      // LOSER
+      const { error: rpcError } = await supabase.rpc('update_loser_stats', {
+        p_user_id: bet.user_id
+      })
+      
+      if (rpcError) console.error(`[RESOLVE_MULTI] RPC update_loser_stats failed:`, rpcError)
+
+      await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+    }
+  }
+
+  revalidatePath(`/market/${marketId}`)
+  revalidatePath('/admin')
+
   return { success: true, payoutsCount, totalPaid }
 }
 
