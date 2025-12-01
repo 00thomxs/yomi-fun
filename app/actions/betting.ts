@@ -62,13 +62,12 @@ export async function placeBet(
   let selectedOutcome;
 
   if (market.type === 'binary') {
-    // Binary logic: input is 'YES' or 'NO' mapping to 'OUI' or 'NON' outcome
-    // Or input can be 'OUI'/'NON' directly
+    // Binary logic: Always bet FOR (YES) the chosen outcome
+    direction = 'YES';
+    
     if (outcomeName === 'NO' || outcomeName === 'NON') {
-      direction = 'NO';
       selectedOutcome = marketOutcomes.find(o => o.name === 'NON');
     } else {
-      direction = 'YES';
       selectedOutcome = marketOutcomes.find(o => o.name === 'OUI');
     }
   } else {
@@ -118,6 +117,15 @@ export async function placeBet(
   
   if (direction === 'YES') {
     odds = 1 / safeProb
+    
+    // Update pools for binary markets
+    if (market.type === 'binary') {
+      if (selectedOutcome.name === 'NON') {
+        newPoolNo = poolNo + investment
+      } else {
+        newPoolYes = poolYes + investment
+      }
+    }
   } else {
     // Betting NO -> Odds = 1 / (1 - Prob)
     const probNo = 1 - safeProb
