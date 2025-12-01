@@ -180,6 +180,24 @@ export async function placeBet(
      
      await supabase.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
      await supabase.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
+  } else {
+     // Multi Market Dynamic Odds Logic (Simplified)
+     // Increase probability of the chosen outcome based on bet amount relative to "virtual liquidity"
+     const LIQUIDITY_FACTOR = 50000; // Adjust to control volatility
+     const probChange = (amount / LIQUIDITY_FACTOR) * 100; // Convert to percentage points
+     
+     let newProb = selectedOutcome.probability;
+     
+     if (direction === 'YES') {
+        newProb += probChange;
+     } else {
+        newProb -= probChange;
+     }
+     
+     // Cap between 1% and 99%
+     newProb = Math.max(1, Math.min(99, newProb));
+     
+     await supabase.from('outcomes').update({ probability: newProb }).eq('id', selectedOutcome.id)
   }
 
   const { error: updateError } = await supabase
