@@ -102,7 +102,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                           e.stopPropagation()
                           onBet(market.id, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
                         }}
-                        className="py-1.5 px-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition-all"
+                        className="py-1.5 px-3 rounded-md bg-rose-500/20 border border-rose-500/50 text-rose-400 text-xs font-bold hover:bg-rose-500/30 transition-all"
                       >
                         NON {Math.round(nonProb)}%
                       </button>
@@ -246,7 +246,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 e.stopPropagation()
                 onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
               }}
-              className="py-3.5 px-4 rounded-lg bg-rose-500/10 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/20 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
+              className="py-3.5 px-4 rounded-lg bg-rose-500/20 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
             >
               NON • <span className="font-mono">{100 - prob}%</span>
             </button>

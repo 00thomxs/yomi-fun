@@ -315,11 +315,11 @@ function BinaryMarketContent({
               onClick={() => setBetChoice("NO")}
               className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
                 betChoice === "NO"
-                  ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
+                  ? "bg-rose-500/30 text-rose-400 border border-rose-500"
                   : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
               }`}
             >
-              NON • <span className="font-mono">{100 - market.probability}%</span>
+              NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
             </button>
           </div>
 
@@ -436,7 +436,7 @@ function MultiMarketContent({
                       }}
                       className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
                         betChoice === outcome.name && betType === "NON"
-                          ? "bg-rose-500/20 text-rose-400 border border-rose-500/50"
+                          ? "bg-rose-500/30 text-rose-400 border border-rose-500"
                           : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
                       }`}
                     >
