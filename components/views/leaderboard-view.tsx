@@ -61,15 +61,22 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   
   const currentUserStats = players.find(p => p.id === user?.id)
 
-  // Season Logic (Simulated Date: 01/12/2025)
-  const TODAY = new Date("2025-12-01") 
-  const SEASON_START = new Date("2025-12-01")
-  const SEASON_END = new Date("2025-12-31")
+  // Dynamic Season Logic (Current Month)
+  const TODAY = new Date()
+  const currentYear = TODAY.getFullYear()
+  const currentMonth = TODAY.getMonth() // 0-11
+
+  const SEASON_START = new Date(currentYear, currentMonth, 1)
+  // Day 0 of next month gets the last day of current month
+  const SEASON_END = new Date(currentYear, currentMonth + 1, 0)
   
   const totalDuration = SEASON_END.getTime() - SEASON_START.getTime()
   const elapsed = TODAY.getTime() - SEASON_START.getTime()
   const daysLeft = Math.ceil((SEASON_END.getTime() - TODAY.getTime()) / (1000 * 60 * 60 * 24))
   const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100))
+  
+  const startLabel = SEASON_START.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+  const endLabel = SEASON_END.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
 
   if (isLoading) {
     return (
@@ -153,8 +160,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             />
           </div>
           <div className="flex justify-between text-xs text-muted-foreground font-mono">
-            <span>01 Dec</span>
-            <span>31 Dec</span>
+            <span>{startLabel}</span>
+            <span>{endLabel}</span>
           </div>
         </div>
       </div>
