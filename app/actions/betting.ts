@@ -105,6 +105,11 @@ export async function placeBet(
   }
 
   // --- 3. CORE LOGIC ---
+  const poolYes = Number(market.pool_yes) || 100
+  const poolNo = Number(market.pool_no) || 100
+  let newPoolYes = poolYes
+  let newPoolNo = poolNo
+
   let odds = 0
   let potentialPayout = 0
   const fee = amount * 0.02
@@ -118,7 +123,7 @@ export async function placeBet(
   if (direction === 'YES') {
     odds = 1 / safeProb
     
-    // Update pools for binary markets
+    // Update pools for binary markets only
     if (market.type === 'binary') {
       if (selectedOutcome.name === 'NON') {
         newPoolNo = poolNo + investment
@@ -161,26 +166,11 @@ export async function placeBet(
 
   if (debitError) return { error: "Erreur lors du débit." }
 
-  // B. Update Market Volume
-  // Note: For Multi markets, we don't update pools/probs dynamically yet (MVP limitation)
-  // For Binary, we could keep the pool logic, but let's unify for simplicity first.
-  // Or keep binary pool logic if it works well? Yes, let's keep binary specific logic if possible.
-  
+  // B. Update Market Volume & Pools
   let updateData: any = { volume: (market.volume || 0) + amount }
   
   if (market.type === 'binary') {
-     // ... (Keep existing pool logic for binary if needed, but simplified here to avoid regression)
-     // Actually, the pool logic was calculating new probs.
-     // If we remove it, probs won't move.
-     // Let's re-add simplified pool logic ONLY for binary
-     const poolYes = Number(market.pool_yes) || 100
-     const poolNo = Number(market.pool_no) || 100
-     let newPoolYes = poolYes
-     let newPoolNo = poolNo
-     
-     if (selectedOutcome.name === 'OUI') newPoolYes += investment
-     else newPoolNo += investment
-     
+     // Update pools using values calculated in CORE LOGIC
      updateData = { ...updateData, pool_yes: newPoolYes, pool_no: newPoolNo }
      
      // Update Probs
