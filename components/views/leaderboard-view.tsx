@@ -61,6 +61,16 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   
   const currentUserStats = players.find(p => p.id === user?.id)
 
+  // Season Logic (Simulated Date: 01/12/2025)
+  const TODAY = new Date("2025-12-01") 
+  const SEASON_START = new Date("2025-12-01")
+  const SEASON_END = new Date("2025-12-31")
+  
+  const totalDuration = SEASON_END.getTime() - SEASON_START.getTime()
+  const elapsed = TODAY.getTime() - SEASON_START.getTime()
+  const daysLeft = Math.ceil((SEASON_END.getTime() - TODAY.getTime()) / (1000 * 60 * 60 * 24))
+  const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100))
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -119,75 +129,105 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </div>
       </div>
 
+      {/* Season Progress */}
+      <div className="rounded-xl bg-white/5 border border-white/20 p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Saison 1</p>
+            <p className="text-2xl font-bold tracking-tight text-white">
+              <span className="font-mono">{daysLeft}</span> jours restants
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Prize Pool</p>
+            <p className="text-lg font-bold text-primary font-mono">
+              1,000,000 <CurrencySymbol />
+            </p>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground font-mono">
+            <span>01 Dec</span>
+            <span>31 Dec</span>
+          </div>
+        </div>
+      </div>
+
       {/* Top 3 Podium */}
       <div className="grid grid-cols-3 gap-4 px-4 items-end min-h-[240px]">
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
-            <div className="w-full rounded-xl bg-card border border-white/30 p-4 flex flex-col items-center gap-3 shadow-[0_0_30px_rgba(255,255,255,0.1)] h-[200px] justify-between">
-              <div className="text-2xl font-bold text-white/60 font-mono">#2</div>
+            <div className="w-full rounded-xl bg-card border border-white/30 p-3 flex flex-col items-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.1)] h-[190px] justify-between">
+              <div className="text-xl font-bold text-white/60 font-mono">#2</div>
               <img
                 src={top2.avatar}
                 alt={top2.username}
-                className="w-14 h-14 rounded-full border-4 border-white/30 ring-4 ring-white/10 object-cover"
+                className="w-12 h-12 rounded-full border-4 border-white/30 ring-4 ring-white/10 object-cover"
               />
-              <div className="text-center w-full">
-                <p className="font-bold tracking-tight text-sm truncate px-2">{top2.username}</p>
-                <p className="text-xs text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+              <div className="text-center w-full overflow-hidden">
+                <p className="font-bold tracking-tight text-xs truncate px-1">{top2.username}</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{top2.winRate}% WR</p>
               </div>
-              <div className="pt-3 border-t border-white/10 w-full text-center">
-                <p className="text-md font-bold text-white font-mono truncate">
-                  +{top2.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3 inline" />
+              <div className="pt-2 border-t border-white/10 w-full text-center">
+                <p className="text-sm font-bold text-white font-mono truncate">
+                  +{top2.totalWon.toLocaleString()} <CurrencySymbol className="w-2.5 h-2.5 inline" />
                 </p>
               </div>
             </div>
-          ) : <div className="h-[200px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[190px] w-full bg-white/5 rounded-xl animate-pulse" />}
         </div>
 
         {/* 1st Place */}
         <div className="flex flex-col items-center w-full z-10">
           {top1 ? (
-            <div className="w-full rounded-xl bg-card border-2 border-amber-500/50 p-5 flex flex-col items-center gap-3 shadow-[0_0_40px_rgba(245,158,11,0.2)] h-[240px] justify-between scale-110 origin-bottom">
-              <Trophy className="w-8 h-8 text-amber-400" />
+            <div className="w-full rounded-xl bg-card border-2 border-amber-500/50 p-4 flex flex-col items-center gap-2 shadow-[0_0_40px_rgba(245,158,11,0.2)] h-[230px] justify-between scale-110 origin-bottom">
+              <Trophy className="w-6 h-6 text-amber-400" />
               <img
                 src={top1.avatar}
                 alt={top1.username}
-                className="w-16 h-16 rounded-full border-4 border-amber-500/50 ring-4 ring-amber-500/20 object-cover"
+                className="w-14 h-14 rounded-full border-4 border-amber-500/50 ring-4 ring-amber-500/20 object-cover"
               />
-              <div className="text-center w-full">
-                <p className="font-bold tracking-tight truncate px-2">{top1.username}</p>
-                <p className="text-xs text-amber-400 font-mono mt-1">{top1.winRate}% WR</p>
+              <div className="text-center w-full overflow-hidden">
+                <p className="font-bold tracking-tight text-sm truncate px-1">{top1.username}</p>
+                <p className="text-[10px] text-amber-400 font-mono mt-0.5">{top1.winRate}% WR</p>
               </div>
-              <div className="pt-3 border-t border-amber-500/20 w-full text-center">
-                <p className="text-lg font-bold text-amber-400 font-mono truncate">
-                  +{top1.totalWon.toLocaleString()} <CurrencySymbol className="w-4 h-4 inline" />
+              <div className="pt-2 border-t border-amber-500/20 w-full text-center">
+                <p className="text-base font-bold text-amber-400 font-mono truncate">
+                  +{top1.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3 inline" />
                 </p>
               </div>
             </div>
-          ) : <div className="h-[240px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[230px] w-full bg-white/5 rounded-xl animate-pulse" />}
         </div>
 
         {/* 3rd Place */}
         <div className="flex flex-col items-center w-full">
           {top3 ? (
-            <div className="w-full rounded-xl bg-card border border-orange-500/30 p-4 flex flex-col items-center gap-3 shadow-[0_0_30px_rgba(249,115,22,0.1)] h-[180px] justify-between">
-              <div className="text-2xl font-bold text-orange-400/60 font-mono">#3</div>
+            <div className="w-full rounded-xl bg-card border border-orange-500/30 p-3 flex flex-col items-center gap-2 shadow-[0_0_30px_rgba(249,115,22,0.1)] h-[170px] justify-between">
+              <div className="text-xl font-bold text-orange-400/60 font-mono">#3</div>
               <img
                 src={top3.avatar}
                 alt={top3.username}
-                className="w-14 h-14 rounded-full border-4 border-orange-500/30 ring-4 ring-orange-500/10 object-cover"
+                className="w-12 h-12 rounded-full border-4 border-orange-500/30 ring-4 ring-orange-500/10 object-cover"
               />
-              <div className="text-center w-full">
-                <p className="font-bold tracking-tight text-sm truncate px-2">{top3.username}</p>
-                <p className="text-xs text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+              <div className="text-center w-full overflow-hidden">
+                <p className="font-bold tracking-tight text-xs truncate px-1">{top3.username}</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{top3.winRate}% WR</p>
               </div>
-              <div className="pt-3 border-t border-orange-500/10 w-full text-center">
-                <p className="text-md font-bold text-orange-400 font-mono truncate">
-                  +{top3.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3 inline" />
+              <div className="pt-2 border-t border-orange-500/10 w-full text-center">
+                <p className="text-sm font-bold text-orange-400 font-mono truncate">
+                  +{top3.totalWon.toLocaleString()} <CurrencySymbol className="w-2.5 h-2.5 inline" />
                 </p>
               </div>
             </div>
-          ) : <div className="h-[180px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[170px] w-full bg-white/5 rounded-xl animate-pulse" />}
         </div>
       </div>
 
