@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION update_winner_stats(
   p_user_id UUID,
   p_payout INTEGER,
+  p_bet_amount INTEGER,
   p_xp_gain INTEGER
 )
 RETURNS void
@@ -32,7 +33,6 @@ BEGIN
   WHERE id = p_user_id;
 
   -- Recalculate Win/Loss counts from bets table
-  -- We count 'won' and 'lost'. Pending bets are ignored for Win Rate.
   SELECT 
     COUNT(*) FILTER (WHERE status = 'won'),
     COUNT(*) FILTER (WHERE status = 'lost')
@@ -42,20 +42,24 @@ BEGIN
   FROM public.bets
   WHERE user_id = p_user_id;
 
-  -- Add current win (not yet in DB status)
+  -- Add current win
   v_real_bets_won := v_real_bets_won + 1;
 
   -- Update values
   v_current_streak := v_current_streak + 1;
-  v_current_pnl := v_current_pnl + p_payout;
+  
+  -- Update PnL (Net Profit = Payout - Initial Bet)
+  -- Note: If Payout < Bet (possible in some parimutuel), PnL decreases.
+  v_current_pnl := v_current_pnl + (p_payout - p_bet_amount);
+  
   v_current_xp := v_current_xp + p_xp_gain;
   v_new_level := FLOOR(v_current_xp / 1000) + 1;
   
-  -- Calculate Win Rate = Won / (Won + Lost)
+  -- Calculate Win Rate
   IF (v_real_bets_won + v_real_bets_lost) > 0 THEN
     v_new_win_rate := ROUND((v_real_bets_won::DECIMAL / (v_real_bets_won + v_real_bets_lost)::DECIMAL) * 100);
   ELSE
-    v_new_win_rate := 0; -- Should not happen as we just added a win
+    v_new_win_rate := 0;
   END IF;
 
   -- Update profile
@@ -72,5 +76,5 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION update_winner_stats(UUID, INTEGER, INTEGER) TO authenticated;
-GRANT EXECUTE ON FUNCTION update_winner_stats(UUID, INTEGER, INTEGER) TO service_role;
+GRANT EXECUTE ON FUNCTION update_winner_stats(UUID, INTEGER, INTEGER, INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION update_winner_stats(UUID, INTEGER, INTEGER, INTEGER) TO service_role;

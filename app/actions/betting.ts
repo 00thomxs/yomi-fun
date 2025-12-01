@@ -134,18 +134,18 @@ export async function placeBet(
 
   // 4. TRANSACTION
   
-  // A. Debit User & Update Stats (XP, Total Bets, PnL)
+  // A. Debit User & Update Stats (XP, Total Bets)
   const XP_PER_BET = 10
   const newXp = (profile.xp || 0) + XP_PER_BET
   const newLevel = Math.floor(newXp / 1000) + 1
-  const newPnL = (profile.total_won || 0) - amount
+  
+  // Note: PnL (total_won) is NOT updated here anymore. It's updated at resolution.
 
   const { error: debitError } = await supabase
     .from('profiles')
     .update({ 
       balance: profile.balance - amount, 
       total_bets: (profile.total_bets || 0) + 1,
-      total_won: newPnL,
       xp: newXp,
       level: newLevel
     })

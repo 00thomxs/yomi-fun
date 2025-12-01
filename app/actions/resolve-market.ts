@@ -95,7 +95,8 @@ export async function resolveMarket(
       
       const { error: rpcError } = await supabase.rpc('update_winner_stats', {
         p_user_id: bet.user_id,
-        p_payout: Math.floor(payout), // Ensure integer
+        p_payout: Math.floor(payout),
+        p_bet_amount: bet.amount, // Add bet amount for PnL
         p_xp_gain: XP_PER_WIN
       })
 
@@ -123,7 +124,8 @@ export async function resolveMarket(
       // LOSER
       // Update stats via RPC (Reset streak, recalculate Win Rate)
       const { error: rpcError } = await supabase.rpc('update_loser_stats', {
-        p_user_id: bet.user_id
+        p_user_id: bet.user_id,
+        p_bet_amount: bet.amount // Add bet amount for PnL
       })
       
       if (rpcError) {
@@ -227,6 +229,7 @@ export async function resolveMarketMulti(
       const { error: rpcError } = await supabase.rpc('update_winner_stats', {
         p_user_id: bet.user_id,
         p_payout: Math.floor(payout),
+        p_bet_amount: bet.amount, // Add bet amount for PnL
         p_xp_gain: XP_PER_WIN
       })
 
@@ -246,7 +249,8 @@ export async function resolveMarketMulti(
     } else {
       // LOSER
       const { error: rpcError } = await supabase.rpc('update_loser_stats', {
-        p_user_id: bet.user_id
+        p_user_id: bet.user_id,
+        p_bet_amount: bet.amount // Add bet amount for PnL
       })
       
       if (rpcError) console.error(`[RESOLVE_MULTI] RPC update_loser_stats failed:`, rpcError)

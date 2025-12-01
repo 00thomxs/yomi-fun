@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import ResolveForm from './resolve-form' // Updated import
+import ResolveForm from './resolve-form'
+import ResolveBinaryForm from './resolve-binary-form'
 
 export default async function ResolvePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -63,13 +64,20 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
 
       <h3 className="text-lg font-semibold mb-4">Définir les résultats</h3>
       <p className="text-yellow-500 mb-6 text-sm bg-yellow-500/10 p-3 rounded border border-yellow-500/20">
-        ⚠️ Définissez le résultat (Vrai ou Faux) pour chaque proposition. Cela calculera les gains pour tous les paris (OUI et NON).
+        ⚠️ Définissez le résultat. Cette action déclenchera le paiement immédiat des gains.
       </p>
 
-      <ResolveForm 
-        marketId={market.id} 
-        outcomes={market.outcomes} 
-      />
+      {market.type === 'binary' ? (
+        <ResolveBinaryForm 
+          marketId={market.id} 
+          outcomes={market.outcomes} 
+        />
+      ) : (
+        <ResolveForm 
+          marketId={market.id} 
+          outcomes={market.outcomes} 
+        />
+      )}
     </div>
   )
 }
