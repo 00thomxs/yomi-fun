@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Clock, HelpCircle } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle, Lock } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
@@ -75,27 +75,12 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   }
 
   const handlePlaceBet = () => {
-    console.log("handlePlaceBet called", { betAmount, betChoice, betType, marketType: market.type })
     const amount = Number.parseFloat(betAmount) || 0
     if (amount > 0) {
       if (market.type === "binary") {
         const displayChoice = betChoice === "YES" ? "OUI" : "NON"
         onBet(market.id, displayChoice, amount)
       } else {
-        // For multi, ensure we send a format that backend understands
-        // The backend expects outcome NAME directly or "OUI/NON Name"
-        // Let's send just the outcome name if betType is OUI (as betting NO on multi is complex logic not fully supported yet)
-        // Wait, the backend logic placeBet supports finding by name.
-        // But wait, if I bet "NON Ninho", the backend logic placeBet calculates odds based on... what?
-        // My placeBet logic : odds = 1 / outcome.probability.
-        // This is odds for YES.
-        // If I bet NON, odds should be 1 / (1 - prob).
-        // Let's see placeBet... it calculates odds based on 'YES' or 'NO' logic ONLY for Binary.
-        // For Multi, it calculates odds = 1 / prob (which is YES odds).
-        // So Multi NON betting is BROKEN in backend currently.
-        
-        // Debug: send raw values
-        console.log("Sending bet:", { id: market.id, choice: `${betType} ${betChoice}`, amount })
         onBet(market.id, `${betType} ${betChoice}`, amount)
       }
       setBetAmount("")
@@ -212,7 +197,9 @@ function BinaryMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider">🔒 Marché Terminé</p>
+          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+            <Lock className="w-4 h-4" /> Marché Terminé
+          </p>
           <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
         </div>
       )}
@@ -322,7 +309,7 @@ function BinaryMarketContent({
                   : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
               }`}
             >
-              OUI • <span className="font-mono">{Math.round(market.probability)}%</span>
+              OUI • <span className="font-mono">{market.probability}%</span>
             </button>
             <button
               onClick={() => setBetChoice("NO")}
@@ -332,7 +319,7 @@ function BinaryMarketContent({
                   : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
               }`}
             >
-              NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
+              NON • <span className="font-mono">{100 - market.probability}%</span>
             </button>
           </div>
 
@@ -386,7 +373,9 @@ function MultiMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider">🔒 Marché Terminé</p>
+          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+            <Lock className="w-4 h-4" /> Marché Terminé
+          </p>
           <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
         </div>
       )}
@@ -422,7 +411,7 @@ function MultiMarketContent({
                   }`}>
                     <span className="text-sm font-bold uppercase">
                       {/* @ts-ignore */}
-                      {outcome.is_winner === true ? "✅ Résultat : VRAI" : "❌ Résultat : FAUX"}
+                      {outcome.is_winner === true ? "Résultat : OUI" : "Résultat : NON"}
                     </span>
                   </div>
                 ) : (

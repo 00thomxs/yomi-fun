@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
@@ -94,7 +94,7 @@ export function ProfileView() {
     pnlTimeframe === "24H" ? generatePnLData(24) : pnlTimeframe === "7J" ? generatePnLData(7) : generatePnLData(30)
 
   const badges = profile?.level && profile.level >= 5 
-    ? [{ icon: "⭐", label: `Niveau ${profile.level}` }]
+    ? [{ icon: <Star className="w-3 h-3 text-yellow-400" />, label: `Niveau ${profile.level}` }]
     : []
 
   return (
@@ -200,7 +200,9 @@ export function ProfileView() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
-                <p className="text-lg font-bold font-mono">🔥 {userStats.currentStreak}</p>
+                <p className="text-lg font-bold font-mono flex items-center gap-1">
+                  <Flame className="w-4 h-4 text-orange-500" /> {userStats.currentStreak}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Won</p>

@@ -116,7 +116,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                     }`}>
                       <span className="text-xs font-bold uppercase">
                         {/* @ts-ignore */}
-                        {outcome.is_winner === true ? "✅ Résultat : VRAI" : "❌ Résultat : FAUX"}
+                        {outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"}
                       </span>
                     </div>
                   )}
