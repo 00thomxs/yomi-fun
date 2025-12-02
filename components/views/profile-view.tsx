@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
+import { EditProfileForm } from "@/components/profile/edit-profile-form"
+import { ChangePasswordForm } from "@/components/profile/change-password-form"
 
 type Transaction = {
   id: string
@@ -21,6 +23,7 @@ export function ProfileView() {
   const { user, profile, userBalance } = useUser()
   const [pnlTimeframe, setPnlTimeframe] = useState<"24H" | "7J" | "30J">("30J")
   const [showSettings, setShowSettings] = useState(false)
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'menu' | 'edit' | 'password'>('menu')
   const [history, setHistory] = useState<Transaction[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
 
@@ -97,47 +100,78 @@ export function ProfileView() {
     ? [{ icon: <Star className="w-3 h-3 text-yellow-400" />, label: `Niveau ${profile.level}` }]
     : []
 
+  const toggleSettings = () => {
+    setShowSettings(!showSettings)
+    setActiveSettingsTab('menu')
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Settings Overlay */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-border bg-white/5">
+              <h3 className="font-bold">Paramètres</h3>
+              <button onClick={toggleSettings} className="p-1 hover:bg-white/10 rounded-full transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {activeSettingsTab === 'menu' && (
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => setActiveSettingsTab('edit')}
+                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <UserCog className="w-5 h-5 text-primary" />
+                      <div className="text-left">
+                        <p className="font-bold text-sm">Modifier le profil</p>
+                        <p className="text-xs text-muted-foreground">Avatar, Pseudo, Notifications</p>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  <button 
+                    onClick={() => setActiveSettingsTab('password')}
+                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Key className="w-5 h-5 text-primary" />
+                      <div className="text-left">
+                        <p className="font-bold text-sm">Sécurité</p>
+                        <p className="text-xs text-muted-foreground">Changer le mot de passe</p>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              )}
+
+              {activeSettingsTab === 'edit' && (
+                <EditProfileForm onClose={toggleSettings} />
+              )}
+
+              {activeSettingsTab === 'password' && (
+                <ChangePasswordForm onClose={toggleSettings} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight uppercase">Profil</h2>
         <button
-          onClick={() => setShowSettings(!showSettings)}
+          onClick={toggleSettings}
           className="p-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all"
         >
           <Settings className="w-5 h-5" />
         </button>
       </div>
-
-      {/* Settings Panel */}
-      {showSettings && (
-        <div className="rounded-xl bg-card border border-border p-6 space-y-4">
-          <h3 className="text-lg font-bold">Paramètres du compte</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-border">
-              <div className="flex items-center gap-3">
-                <Key className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Changer le mot de passe</p>
-                  <p className="text-xs text-muted-foreground">Modifier votre mot de passe</p>
-                </div>
-              </div>
-              <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all">
-                Modifier
-              </button>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
-              <div>
-                <p className="text-sm font-medium text-rose-400">Supprimer le compte</p>
-                <p className="text-xs text-muted-foreground">Cette action est irréversible</p>
-              </div>
-              <button className="px-4 py-2 rounded-lg bg-rose-500/20 text-rose-400 text-sm font-semibold hover:bg-rose-500/30 transition-all">
-                Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Profile Header */}
       <div className="rounded-xl bg-card border border-border p-6">
@@ -317,15 +351,15 @@ export function ProfileView() {
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                           <Clock className="w-3 h-3" />
                           EN COURS
-                      </span>
-                    )}
-                  </span>
+                        </span>
+                      )}
+                    </span>
                     <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
                       isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
                     }`}>
                       {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
-                  </span>
-                </div>
+                    </span>
+                  </div>
                 )
               })}
             </div>
