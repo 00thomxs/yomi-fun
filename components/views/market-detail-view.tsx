@@ -299,38 +299,38 @@ function BinaryMarketContent({
 
       {/* Betting Panel */}
       {!isResolved && (
-        <div className="rounded-xl bg-card border border-border p-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setBetChoice("YES")}
-              className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
-                betChoice === "YES"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                  : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
-              }`}
-            >
-              OUI • <span className="font-mono">{market.probability}%</span>
-            </button>
-            <button
-              onClick={() => setBetChoice("NO")}
-              className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
-                betChoice === "NO"
+      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setBetChoice("YES")}
+            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
+              betChoice === "YES"
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
+                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+            }`}
+          >
+            OUI • <span className="font-mono">{market.probability}%</span>
+          </button>
+          <button
+            onClick={() => setBetChoice("NO")}
+            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all ${
+              betChoice === "NO"
                   ? "bg-rose-500/30 text-rose-400 border border-rose-500"
-                  : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
-              }`}
-            >
+                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+            }`}
+          >
               NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
-            </button>
-          </div>
-
-          <BetAmountInput
-            betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            userBalance={userBalance}
-            calculatePayout={calculatePayout}
-            handlePlaceBet={handlePlaceBet}
-          />
+          </button>
         </div>
+
+        <BetAmountInput
+          betAmount={betAmount}
+          setBetAmount={setBetAmount}
+          userBalance={userBalance}
+          calculatePayout={calculatePayout}
+          handlePlaceBet={handlePlaceBet}
+        />
+      </div>
       )}
     </>
   )
@@ -416,32 +416,32 @@ function MultiMarketContent({
                   </div>
                 ) : (
                   <>
-                    <button
-                      onClick={() => {
-                        setBetChoice(outcome.name)
-                        setBetType("OUI")
-                      }}
-                      className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
-                        betChoice === outcome.name && betType === "OUI"
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                          : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                      }`}
-                    >
+                <button
+                  onClick={() => {
+                    setBetChoice(outcome.name)
+                    setBetType("OUI")
+                  }}
+                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
+                    betChoice === outcome.name && betType === "OUI"
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
+                      : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                  }`}
+                >
                       OUI • <span className="font-mono">{Math.round(outcome.probability)}%</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setBetChoice(outcome.name)
-                        setBetType("NON")
-                      }}
-                      className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
-                        betChoice === outcome.name && betType === "NON"
+                </button>
+                <button
+                  onClick={() => {
+                    setBetChoice(outcome.name)
+                    setBetType("NON")
+                  }}
+                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all ${
+                    betChoice === outcome.name && betType === "NON"
                           ? "bg-rose-500/30 text-rose-400 border border-rose-500"
-                          : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
-                      }`}
-                    >
+                      : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
+                  }`}
+                >
                       NON • <span className="font-mono">{Math.round(nonProb)}%</span>
-                    </button>
+                </button>
                   </>
                 )}
               </div>
@@ -511,22 +511,22 @@ function MultiMarketContent({
 
       {/* Betting Panel */}
       {!isResolved && (
-        <div className="rounded-xl bg-card border border-border p-5 space-y-4">
-          <div className="p-3 rounded-lg bg-white/5 border border-border">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Selection</p>
-            <p className="font-bold">
-              <span className={betType === "OUI" ? "text-emerald-400" : "text-rose-400"}>{betType}</span> - {betChoice}
-            </p>
-          </div>
-
-          <BetAmountInput
-            betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            userBalance={userBalance}
-            calculatePayout={calculatePayout}
-            handlePlaceBet={handlePlaceBet}
-          />
+      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+        <div className="p-3 rounded-lg bg-white/5 border border-border">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Selection</p>
+          <p className="font-bold">
+            <span className={betType === "OUI" ? "text-emerald-400" : "text-rose-400"}>{betType}</span> - {betChoice}
+          </p>
         </div>
+
+        <BetAmountInput
+          betAmount={betAmount}
+          setBetAmount={setBetAmount}
+          userBalance={userBalance}
+          calculatePayout={calculatePayout}
+          handlePlaceBet={handlePlaceBet}
+        />
+      </div>
       )}
     </>
   )

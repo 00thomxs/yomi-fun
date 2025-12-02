@@ -317,15 +317,15 @@ export function ProfileView() {
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                           <Clock className="w-3 h-3" />
                           EN COURS
-                        </span>
-                      )}
-                    </span>
+                      </span>
+                    )}
+                  </span>
                     <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
                       isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
                     }`}>
                       {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
-                    </span>
-                  </div>
+                  </span>
+                </div>
                 )
               })}
             </div>

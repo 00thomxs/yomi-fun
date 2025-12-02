@@ -173,15 +173,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top2 ? (
             <div className="w-full rounded-xl bg-card border border-white/30 p-3 flex flex-col items-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.1)] h-[190px] justify-between">
               <div className="text-xl font-bold text-white/60 font-mono">#2</div>
-              <img
+            <img
                 src={top2.avatar}
                 alt={top2.username}
                 className="w-12 h-12 rounded-full border-4 border-white/30 ring-4 ring-white/10 object-cover"
-              />
+            />
               <div className="text-center w-full overflow-hidden">
                 <p className="font-bold tracking-tight text-xs truncate px-1">{top2.username}</p>
                 <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{top2.winRate}% WR</p>
-              </div>
+            </div>
               <div className="pt-2 border-t border-white/10 w-full text-center">
                 <p className="text-sm font-bold text-white font-mono truncate">
                   +{top2.totalWon.toLocaleString()} <CurrencySymbol className="w-2.5 h-2.5 inline" />
@@ -196,15 +196,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top1 ? (
             <div className="w-full rounded-xl bg-card border-2 border-amber-500/50 p-4 flex flex-col items-center gap-2 shadow-[0_0_40px_rgba(245,158,11,0.2)] h-[230px] justify-between scale-110 origin-bottom">
               <Trophy className="w-6 h-6 text-amber-400" />
-              <img
+            <img
                 src={top1.avatar}
                 alt={top1.username}
                 className="w-14 h-14 rounded-full border-4 border-amber-500/50 ring-4 ring-amber-500/20 object-cover"
-              />
+            />
               <div className="text-center w-full overflow-hidden">
                 <p className="font-bold tracking-tight text-sm truncate px-1">{top1.username}</p>
                 <p className="text-[10px] text-amber-400 font-mono mt-0.5">{top1.winRate}% WR</p>
-              </div>
+            </div>
               <div className="pt-2 border-t border-amber-500/20 w-full text-center">
                 <p className="text-base font-bold text-amber-400 font-mono truncate">
                   +{top1.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3 inline" />
@@ -219,15 +219,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top3 ? (
             <div className="w-full rounded-xl bg-card border border-orange-500/30 p-3 flex flex-col items-center gap-2 shadow-[0_0_30px_rgba(249,115,22,0.1)] h-[170px] justify-between">
               <div className="text-xl font-bold text-orange-400/60 font-mono">#3</div>
-              <img
+            <img
                 src={top3.avatar}
                 alt={top3.username}
                 className="w-12 h-12 rounded-full border-4 border-orange-500/30 ring-4 ring-orange-500/10 object-cover"
-              />
+            />
               <div className="text-center w-full overflow-hidden">
                 <p className="font-bold tracking-tight text-xs truncate px-1">{top3.username}</p>
                 <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{top3.winRate}% WR</p>
-              </div>
+            </div>
               <div className="pt-2 border-t border-orange-500/10 w-full text-center">
                 <p className="text-sm font-bold text-orange-400 font-mono truncate">
                   +{top3.totalWon.toLocaleString()} <CurrencySymbol className="w-2.5 h-2.5 inline" />
@@ -278,15 +278,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       {/* Current User Highlight (if not in view) */}
       {currentUserStats && currentUserStats.rank > 50 && (
         <div className="rounded-xl bg-primary/10 border border-primary/20 overflow-hidden sticky bottom-4 shadow-lg backdrop-blur-md">
-          <div className="grid grid-cols-12 gap-2 px-4 py-4 items-center">
+        <div className="grid grid-cols-12 gap-2 px-4 py-4 items-center">
             <span className="col-span-1 font-mono font-bold text-primary">#{currentUserStats.rank}</span>
             <div className="col-span-5 flex items-center gap-3">
-              <img
+            <img
                 src={currentUserStats.avatar}
                 alt={currentUserStats.username}
                 className="w-8 h-8 rounded-full object-cover"
-              />
-              <div>
+            />
+            <div>
                 <span className="font-bold tracking-tight text-sm">{currentUserStats.username}</span>
                 <span className="ml-2 text-xs text-primary font-semibold uppercase">Vous</span>
               </div>

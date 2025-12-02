@@ -81,31 +81,31 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             {topTwo.map((outcome) => {
               const nonProb = 100 - outcome.probability
               return (
-                <div key={outcome.name} className="p-3 rounded-lg bg-white/5 border border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">{outcome.name}</span>
+              <div key={outcome.name} className="p-3 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">{outcome.name}</span>
                     <span className="font-mono font-bold text-lg">{Math.round(outcome.probability)}%</span>
-                  </div>
+                </div>
                   {market.isLive ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onBet(market.id, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
-                        }}
-                        className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
-                      >
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onBet(market.id, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
+                    }}
+                    className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
+                  >
                         OUI {Math.round(outcome.probability)}%
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onBet(market.id, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
-                        }}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onBet(market.id, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
+                    }}
                         className="py-1.5 px-3 rounded-md bg-rose-500/20 border border-rose-500/50 text-rose-400 text-xs font-bold hover:bg-rose-500/30 transition-all"
-                      >
+                  >
                         NON {Math.round(nonProb)}%
-                      </button>
+                  </button>
                     </div>
                   ) : (
                     <div className={`py-2 px-3 rounded-md border text-center flex items-center justify-center gap-2 ${
@@ -231,26 +231,26 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
 
         {/* Bigger OUI/NON buttons OR Resolved State */}
         {market.isLive ? (
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onBet(market.id, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
-              }}
-              className="py-3.5 px-4 rounded-lg bg-emerald-500/10 border border-emerald-500/50 font-bold tracking-tight hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all text-emerald-400 text-base"
-            >
-              OUI • <span className="font-mono">{prob}%</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
-              }}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onBet(market.id, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
+            }}
+            className="py-3.5 px-4 rounded-lg bg-emerald-500/10 border border-emerald-500/50 font-bold tracking-tight hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all text-emerald-400 text-base"
+          >
+            OUI • <span className="font-mono">{prob}%</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
+            }}
               className="py-3.5 px-4 rounded-lg bg-rose-500/20 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
-            >
-              NON • <span className="font-mono">{100 - prob}%</span>
-            </button>
-          </div>
+          >
+            NON • <span className="font-mono">{100 - prob}%</span>
+          </button>
+        </div>
         ) : (
           <div className="py-3 px-4 rounded-lg bg-white/5 border border-white/10 text-center">
             <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Résultat Final</p>

@@ -92,12 +92,12 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             </div>
 
             {featuredMarket.isLive ? (
-              <button
-                onClick={() => onMarketClick(featuredMarket)}
-                className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all"
-              >
-                Predire maintenant
-              </button>
+            <button
+              onClick={() => onMarketClick(featuredMarket)}
+              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all"
+            >
+              Predire maintenant
+            </button>
             ) : (
               <button
                 onClick={() => onMarketClick(featuredMarket)}
