@@ -38,6 +38,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       }
 
       // 2. Fetch Trending Markets (is_featured = true)
+      // Include resolved markets to show activity history
       const { data: markets } = await supabase
         .from('markets')
         .select(`
@@ -46,8 +47,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             id, name, probability
           )
         `)
-        .eq('status', 'open')
-        .eq('is_live', true)
         .eq('is_featured', true) // Filter by Trending category
         .order('created_at', { ascending: false }) // Newest first
         .limit(3)
