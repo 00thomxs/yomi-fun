@@ -43,7 +43,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         .from('markets')
         .select(`
           *,
-          outcomes (
+          outcomes:outcomes!market_id (
             id, name, probability
           )
         `)
