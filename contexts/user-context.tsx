@@ -34,6 +34,8 @@ type Profile = {
   bets_won: number
   win_rate: number
   role?: 'user' | 'admin'
+  email_notif_win?: boolean
+  email_notif_marketing?: boolean
 }
 
 type UserContextType = {
@@ -139,6 +141,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         bets_won: 15,
         win_rate: 60,
         role: 'admin' as const, // Force admin role in mock mode
+        email_notif_win: true,
+        email_notif_marketing: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }

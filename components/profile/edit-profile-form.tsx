@@ -56,8 +56,8 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
         .update({
           username: username,
           avatar_url: avatarUrl,
-          // email_notif_win: notifWin, // Uncomment when DB migrated
-          // email_notif_marketing: notifMarketing
+          email_notif_win: notifWin,
+          email_notif_marketing: notifMarketing
         })
         .eq('id', user?.id)
 
