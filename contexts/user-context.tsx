@@ -51,6 +51,7 @@ type UserContextType = {
   // Balance
   userBalance: number
   setUserBalance: (balance: number) => void
+  setUser: (user: User) => void // Add setUser to context type
   
   // Bets
   activeBets: ActiveBet[]
@@ -449,6 +450,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         signOut,
         userBalance,
         setUserBalance,
+        setUser, // Expose setUser
         activeBets,
         placeBet,
         clearBets,
