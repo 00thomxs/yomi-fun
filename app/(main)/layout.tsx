@@ -37,12 +37,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         })))
       }
 
-      // 2. Fetch Trending Markets (Top 3 by volume)
-      // We need to fetch outcomes too to display them properly if needed, 
-      // but RightSidebar mostly needs basics.
-      // Ideally we fetch them with outcomes to type them as BinaryMarket/Multi
-      // But for simplified sidebar, we might just mock the type or fetch minimal.
-      
+      // 2. Fetch Trending Markets (is_featured = true)
       const { data: markets } = await supabase
         .from('markets')
         .select(`
@@ -53,7 +48,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         `)
         .eq('status', 'open')
         .eq('is_live', true)
-        .order('volume', { ascending: false })
+        .eq('is_featured', true) // Filter by Trending category
+        .order('created_at', { ascending: false }) // Newest first
         .limit(3)
 
       if (markets) {
