@@ -11,7 +11,10 @@ const supabaseAdmin = createAdminClient(
 )
 
 export type AuthResult = {
-// ...
+  error?: string
+  success?: boolean
+}
+
 export async function deleteAccount(password: string): Promise<AuthResult> {
   const supabase = await createClient()
   
@@ -42,9 +45,6 @@ export async function deleteAccount(password: string): Promise<AuthResult> {
 
   return { success: true }
 }
-  error?: string
-  success?: boolean
-}
 
 export async function signUp(email: string, password: string, username: string): Promise<AuthResult> {
   const supabase = await createClient()
@@ -74,6 +74,9 @@ export async function signIn(email: string, password: string): Promise<AuthResul
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: {
+      // Redirect is handled automatically or can be specified if needed
+    }
   })
 
   if (error) {
@@ -105,4 +108,3 @@ export async function signInWithGoogle(): Promise<{ url?: string; error?: string
 
   return { url: data.url }
 }
-
