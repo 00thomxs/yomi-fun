@@ -4,10 +4,13 @@ import { useState } from "react"
 import { Lock, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+import { useUser } from "@/contexts/user-context"
 
 export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
   const { toast } = useToast()
+  const { user } = useUser() // Need user email for verification
   const [isLoading, setIsLoading] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
@@ -27,6 +30,21 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
     setIsLoading(true)
     const supabase = createClient()
 
+    // 1. Verify current password by re-authenticating
+    if (user?.email) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
+      })
+
+      if (signInError) {
+        toast({ title: "Erreur", description: "Mot de passe actuel incorrect", variant: "destructive" })
+        setIsLoading(false)
+        return
+      }
+    }
+
+    // 2. Update password
     const { error } = await supabase.auth.updateUser({
       password: password
     })
@@ -43,6 +61,20 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Mot de passe actuel</label>
+        <div className="relative">
+          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input 
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all"
+            required
+          />
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Nouveau mot de passe</label>
         <div className="relative">

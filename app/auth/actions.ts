@@ -1,9 +1,47 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 
+// Create a separate admin client for deletion
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 export type AuthResult = {
+// ...
+export async function deleteAccount(password: string): Promise<AuthResult> {
+  const supabase = await createClient()
+  
+  // 1. Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || !user.email) return { error: "Non authentifié" }
+
+  // 2. Verify password by attempting sign in
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: password
+  })
+
+  if (signInError) {
+    return { error: "Mot de passe incorrect" }
+  }
+
+  // 3. Delete user using Admin Client (Service Role)
+  // Standard client cannot delete auth users
+  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+    user.id
+  )
+
+  if (deleteError) {
+    console.error("Delete user error:", deleteError)
+    return { error: "Erreur lors de la suppression du compte" }
+  }
+
+  return { success: true }
+}
   error?: string
   success?: boolean
 }
