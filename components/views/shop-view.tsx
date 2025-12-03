@@ -68,7 +68,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
         if (result.newBalance !== undefined) {
           setUserBalance(result.newBalance)
         }
-        setSelectedItem(null)
+        setSelectedItem(null) // Close modal on success
       }
     } catch (error) {
       console.error(error)
