@@ -11,7 +11,7 @@ import {
   Users, 
   Settings, 
   LogOut,
-  Trophy
+  Trophy,
   ShoppingBag,
   Package,
 } from "lucide-react"
