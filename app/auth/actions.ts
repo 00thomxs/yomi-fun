@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
+import { AuthResult } from '@/lib/types'
 
 // Create a separate admin client for deletion
 // Note: This will fail if env vars are missing, ensure they are set in Vercel
@@ -10,11 +11,6 @@ const supabaseAdmin = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
-
-export type AuthResult = {
-  error?: string
-  success?: boolean
-}
 
 export async function deleteAccount(password: string): Promise<AuthResult> {
   const supabase = await createClient()

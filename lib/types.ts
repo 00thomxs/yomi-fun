@@ -64,3 +64,10 @@ export type MultiOutcomeDataPoint = {
   time: string
   [key: string]: number | string
 }
+
+// Auth Types
+export type AuthResult = {
+  error?: string
+  success?: boolean
+  url?: string
+}
