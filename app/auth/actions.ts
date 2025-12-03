@@ -5,6 +5,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 
 // Create a separate admin client for deletion
+// Note: This will fail if env vars are missing, ensure they are set in Vercel
 const supabaseAdmin = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -33,7 +34,6 @@ export async function deleteAccount(password: string): Promise<AuthResult> {
   }
 
   // 3. Delete user using Admin Client (Service Role)
-  // Standard client cannot delete auth users
   const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
     user.id
   )
@@ -48,7 +48,7 @@ export async function deleteAccount(password: string): Promise<AuthResult> {
 
 export async function signUp(email: string, password: string, username: string): Promise<AuthResult> {
   const supabase = await createClient()
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://yomi-fun.vercel.app' // Fallback to Vercel URL if env not set
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://yomi-fun.vercel.app'
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -74,9 +74,6 @@ export async function signIn(email: string, password: string): Promise<AuthResul
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
-    options: {
-      // Redirect is handled automatically or can be specified if needed
-    }
   })
 
   if (error) {
