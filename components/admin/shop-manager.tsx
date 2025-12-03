@@ -18,7 +18,7 @@ export function AdminShopManager({ items }: { items: ShopItem[] }) {
     name: "",
     description: "",
     price: "",
-    category: "Digital",
+    category: "Gaming",
     image_url: "",
     stock: "-1" // Default infinite
   })
@@ -28,7 +28,7 @@ export function AdminShopManager({ items }: { items: ShopItem[] }) {
       name: "",
       description: "",
       price: "",
-      category: "Digital",
+      category: "Gaming",
       image_url: "",
       stock: "-1"
     })
@@ -156,10 +156,11 @@ export function AdminShopManager({ items }: { items: ShopItem[] }) {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-sm outline-none focus:border-primary/50 appearance-none"
                 >
-                  <option value="Digital">Digital</option>
-                  <option value="High-Tech">High-Tech</option>
-                  <option value="Experiences">Expériences</option>
-                  <option value="Merch">Merch</option>
+                  <option value="Gaming">Gaming</option>
+                  <option value="Cartes Cadeaux">Cartes Cadeaux</option>
+                  <option value="Expériences">Expériences</option>
+                  <option value="Shopping & Réductions">Shopping & Réductions</option>
+                  <option value="Autre">Autre</option>
                 </select>
               </div>
             </div>

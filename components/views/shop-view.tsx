@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ShoppingBag, CreditCard, Smartphone, Sparkles, Heart, Loader2, MapPin } from "lucide-react"
+import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, MapPin, Tag } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
@@ -23,9 +23,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
   const categories = [
     { id: "all", name: "Tout", icon: ShoppingBag },
-    { id: "digital", name: "Digital", icon: CreditCard },
-    { id: "tech", name: "Tech", icon: Smartphone },
-    { id: "experiences", name: "Experiences", icon: Sparkles },
+    { id: "gaming", name: "Gaming", icon: Gamepad2 },
+    { id: "giftcards", name: "Cartes Cadeaux", icon: CreditCard },
+    { id: "experiences", name: "Expériences", icon: Sparkles },
+    { id: "deals", name: "Bons Plans", icon: Tag },
   ]
 
   const filteredItems =
@@ -66,9 +67,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
   const getCategoryIcon = (category: string) => {
     const lowerCat = category?.toLowerCase() || ""
-    if (lowerCat.includes("digital")) return <CreditCard className="w-3 h-3" />
-    if (lowerCat.includes("tech")) return <Smartphone className="w-3 h-3" />
-    if (lowerCat.includes("experience")) return <Heart className="w-3 h-3" />
+    if (lowerCat.includes("gaming")) return <Gamepad2 className="w-3 h-3" />
+    if (lowerCat.includes("carte") || lowerCat.includes("gift")) return <CreditCard className="w-3 h-3" />
+    if (lowerCat.includes("deal") || lowerCat.includes("shopping")) return <Tag className="w-3 h-3" />
+    if (lowerCat.includes("experience")) return <Sparkles className="w-3 h-3" />
     return <ShoppingBag className="w-3 h-3" />
   }
 
