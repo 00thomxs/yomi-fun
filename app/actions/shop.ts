@@ -261,16 +261,18 @@ export async function getOrders(): Promise<ShopOrder[]> {
     .from('shop_items')
     .select('id, name, image_url')
 
-  // Get all profiles for reference
+  // Get all profiles for reference (email is in auth.users, not profiles)
   const { data: profiles } = await supabaseAdmin
     .from('profiles')
-    .select('id, username, email')
+    .select('id, username')
 
   // Map orders with their related data
   const enrichedOrders = orders.map(order => ({
     ...order,
     shop_items: items?.find(i => i.id === order.item_id) || null,
-    profiles: profiles?.find(p => p.id === order.user_id) || null,
+    profiles: profiles?.find(p => p.id === order.user_id) 
+      ? { ...profiles.find(p => p.id === order.user_id), email: order.delivery_info }
+      : null,
   }))
 
   console.log('[getOrders] Found orders:', enrichedOrders.length)
