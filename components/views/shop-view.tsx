@@ -30,7 +30,20 @@ export function ShopView({ initialItems }: ShopViewProps) {
   ]
 
   const filteredItems =
-    selectedCategory === "all" ? initialItems : initialItems.filter((item) => item.category?.toLowerCase().includes(selectedCategory))
+    selectedCategory === "all" 
+      ? initialItems 
+      : initialItems.filter((item) => {
+          const itemCat = item.category?.toLowerCase() || ""
+          const filterCat = selectedCategory.toLowerCase()
+          
+          // Mapping spécial pour les catégories composées
+          if (filterCat === "giftcards") return itemCat.includes("carte") || itemCat.includes("gift")
+          if (filterCat === "deals") return itemCat.includes("bon") || itemCat.includes("deal") || itemCat.includes("shop")
+          if (filterCat === "experiences") return itemCat.includes("exp")
+          
+          // Fallback simple
+          return itemCat.includes(filterCat)
+        })
 
   const handlePurchaseClick = (item: ShopItem) => {
     setSelectedItem(item)
