@@ -233,8 +233,8 @@ export async function getOrders(): Promise<ShopOrder[]> {
     return []
   }
 
-  // Check if user is admin
-  const { data: profile } = await supabase
+  // Check if user is admin (using admin client to bypass RLS)
+  const { data: profile } = await supabaseAdmin
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -245,21 +245,34 @@ export async function getOrders(): Promise<ShopOrder[]> {
     return []
   }
 
-  // Use admin client to bypass RLS and get ALL orders
-  const { data, error } = await supabaseAdmin
+  // Get all orders first (simple query)
+  const { data: orders, error: ordersError } = await supabaseAdmin
     .from('orders')
-    .select(`
-      *,
-      shop_items ( name, image_url ),
-      profiles ( username, email )
-    `)
+    .select('*')
     .order('created_at', { ascending: false })
 
-  if (error) {
-    console.error('[getOrders] Error:', error)
+  if (ordersError || !orders) {
+    console.error('[getOrders] Error fetching orders:', ordersError)
     return []
   }
 
-  console.log('[getOrders] Found orders:', data?.length || 0)
-  return data as unknown as ShopOrder[]
+  // Get all shop items for reference
+  const { data: items } = await supabaseAdmin
+    .from('shop_items')
+    .select('id, name, image_url')
+
+  // Get all profiles for reference
+  const { data: profiles } = await supabaseAdmin
+    .from('profiles')
+    .select('id, username, email')
+
+  // Map orders with their related data
+  const enrichedOrders = orders.map(order => ({
+    ...order,
+    shop_items: items?.find(i => i.id === order.item_id) || null,
+    profiles: profiles?.find(p => p.id === order.user_id) || null,
+  }))
+
+  console.log('[getOrders] Found orders:', enrichedOrders.length)
+  return enrichedOrders as unknown as ShopOrder[]
 }
