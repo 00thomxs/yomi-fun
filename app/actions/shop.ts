@@ -331,3 +331,38 @@ export async function getOrders(): Promise<ShopOrder[]> {
   console.log('[getOrders] Found orders:', enrichedOrders.length)
   return enrichedOrders as unknown as ShopOrder[]
 }
+
+// --- USER ACTIONS ---
+
+export async function getUserOrders(): Promise<ShopOrder[]> {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  // Get user's orders
+  const { data: orders, error } = await supabaseAdmin
+    .from('orders')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error || !orders) {
+    console.error('[getUserOrders] Error:', error)
+    return []
+  }
+
+  // Get shop items for reference
+  const { data: items } = await supabaseAdmin
+    .from('shop_items')
+    .select('id, name, image_url')
+
+  // Map orders with their related data
+  const enrichedOrders = orders.map(order => ({
+    ...order,
+    shop_items: items?.find(i => i.id === order.item_id) || null,
+    profiles: null, // User doesn't need to see other profiles
+  }))
+
+  return enrichedOrders as unknown as ShopOrder[]
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Home, User, ShoppingBag, Trophy, Zap, CheckCircle, XCircle, Clock } from "lucide-react"
+import { Home, User, ShoppingBag, Trophy, Zap, CheckCircle, XCircle, Clock, Package } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { ActiveBet } from "@/lib/types"
@@ -62,6 +62,12 @@ export function LeftSidebar({
             icon={<ShoppingBag className="w-5 h-5" />}
             label="Shop"
             active={activeTab === "shop"}
+          />
+          <SidebarLink
+            href="/orders"
+            icon={<Package className="w-5 h-5" />}
+            label="Mes Commandes"
+            active={activeTab === "orders"}
           />
           <SidebarLink
             href="/profile"

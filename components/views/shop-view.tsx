@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, MapPin, Tag } from "lucide-react"
+import Link from "next/link"
+import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
@@ -89,7 +90,16 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+        <Link 
+          href="/orders"
+          className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
+        >
+          <Package className="w-4 h-4" />
+          Mes Commandes
+        </Link>
+      </div>
 
       {/* Category Filter */}
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -205,18 +215,19 @@ export function ShopView({ initialItems }: ShopViewProps) {
             <form onSubmit={handleConfirmPurchase} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <MapPin className="w-3 h-3" />
-                  Informations de livraison
+                  <Mail className="w-3 h-3" />
+                  Email de réception
                 </label>
-                <textarea
+                <input
+                  type="email"
                   required
                   value={deliveryInfo}
                   onChange={(e) => setDeliveryInfo(e.target.value)}
-                  placeholder="Votre adresse postale complète (ou email pour les biens digitaux)..."
-                  className="w-full h-24 bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 transition-all resize-none"
+                  placeholder="exemple@email.com"
+                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 transition-all"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Ces informations seront transmises à l'équipe pour l'expédition.
+                  L'article sera envoyé à cette adresse email.
                 </p>
               </div>
 
