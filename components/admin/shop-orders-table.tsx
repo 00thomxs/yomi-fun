@@ -54,15 +54,21 @@ export function ShopOrdersTable({ initialOrders }: { initialOrders: ShopOrder[] 
       return orderMonth === selectedMonth
     })
 
-    const totalZeny = monthOrders.reduce((sum, o) => sum + o.price_paid, 0)
-    const uniqueUsers = new Set(monthOrders.map(o => o.user_id)).size
+    // Only count non-cancelled orders for revenue
+    const validOrders = monthOrders.filter(o => o.status !== 'cancelled')
+    const cancelledOrdersList = monthOrders.filter(o => o.status === 'cancelled')
+    
+    const totalZeny = validOrders.reduce((sum, o) => sum + o.price_paid, 0)
+    const refundedZeny = cancelledOrdersList.reduce((sum, o) => sum + o.price_paid, 0)
+    const uniqueUsers = new Set(validOrders.map(o => o.user_id)).size
     const completedOrders = monthOrders.filter(o => o.status === 'completed').length
     const pendingOrders = monthOrders.filter(o => o.status === 'pending').length
-    const cancelledOrders = monthOrders.filter(o => o.status === 'cancelled').length
+    const cancelledOrders = cancelledOrdersList.length
 
     return {
       totalOrders: monthOrders.length,
       totalZeny,
+      refundedZeny,
       uniqueUsers,
       completedOrders,
       pendingOrders,
@@ -305,7 +311,7 @@ export function ShopOrdersTable({ initialOrders }: { initialOrders: ShopOrder[] 
           <Calendar className="w-4 h-4" />
           Récapitulatif - {formatMonthLabel(selectedMonth)}
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-black/20 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
               <ShoppingCart className="w-4 h-4" />
@@ -317,7 +323,7 @@ export function ShopOrdersTable({ initialOrders }: { initialOrders: ShopOrder[] 
           <div className="bg-black/20 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
               <Coins className="w-4 h-4" />
-              <span className="text-xs font-medium">Zeny Dépensés</span>
+              <span className="text-xs font-medium">Revenus</span>
             </div>
             <p className="text-2xl font-bold text-primary flex items-center justify-center gap-1">
               {monthlyStats.totalZeny.toLocaleString()} <CurrencySymbol />
@@ -338,6 +344,16 @@ export function ShopOrdersTable({ initialOrders }: { initialOrders: ShopOrder[] 
               <span className="text-xs font-medium">Livrées</span>
             </div>
             <p className="text-2xl font-bold text-green-500">{monthlyStats.completedOrders}</p>
+          </div>
+
+          <div className="bg-black/20 rounded-lg p-3 text-center">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
+              <XCircle className="w-4 h-4" />
+              <span className="text-xs font-medium">Remboursés</span>
+            </div>
+            <p className="text-2xl font-bold text-rose-500 flex items-center justify-center gap-1">
+              {monthlyStats.refundedZeny.toLocaleString()} <CurrencySymbol />
+            </p>
           </div>
         </div>
       </div>
