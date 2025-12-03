@@ -211,7 +211,41 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'co
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
-  // Use admin client to bypass RLS
+  // Get order details first (to check current status and get refund amount)
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from('orders')
+    .select('user_id, price_paid, status')
+    .eq('id', orderId)
+    .single()
+
+  if (orderError || !order) return { error: "Commande introuvable" }
+
+  // If cancelling an order that wasn't already cancelled, refund the user
+  if (status === 'cancelled' && order.status !== 'cancelled') {
+    // Get user's current balance
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('balance')
+      .eq('id', order.user_id)
+      .single()
+
+    if (profile) {
+      // Refund the user
+      const { error: refundError } = await supabaseAdmin
+        .from('profiles')
+        .update({ balance: profile.balance + order.price_paid })
+        .eq('id', order.user_id)
+
+      if (refundError) {
+        console.error('[updateOrderStatus] Refund error:', refundError)
+        return { error: "Erreur lors du remboursement" }
+      }
+
+      console.log(`[REFUND] User ${order.user_id} refunded ${order.price_paid} Zeny for order ${orderId}`)
+    }
+  }
+
+  // Update order status
   const { error } = await supabaseAdmin
     .from('orders')
     .update({ status })
