@@ -4,22 +4,7 @@ import { useState } from 'react'
 import { ShoppingBag, Package, Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { CurrencySymbol } from '@/components/ui/currency-symbol'
-
-interface ShopOrder {
-  id: string
-  user_id: string
-  item_id: string
-  quantity: number
-  price_paid: number
-  status: 'pending' | 'completed' | 'cancelled'
-  delivery_info: string
-  created_at: string
-  shop_items: {
-    id: string
-    name: string
-    image_url: string
-  } | null
-}
+import { ShopOrder } from '@/lib/types'
 
 interface UserOrdersViewProps {
   initialOrders: ShopOrder[]
