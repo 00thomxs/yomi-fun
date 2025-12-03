@@ -12,12 +12,90 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const { profile, user, setUser } = useUser()
   const { toast } = useToast()
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
+  const [isLoading, setIsLoading] = useState(false)
+  const [username, setUsername] = useState(profile?.username || "")
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url || null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [notifWin, setNotifWin] = useState(profile?.email_notif_win ?? true)
+  const [notifMarketing, setNotifMarketing] = useState(profile?.email_notif_marketing ?? true)
+
   // Delete Account State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletePassword, setDeletePassword] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setAvatarFile(file)
+      const objectUrl = URL.createObjectURL(file)
+      setAvatarPreview(objectUrl)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
+    setIsLoading(true)
+
+    const supabase = createClient()
+    let avatarUrl = profile?.avatar_url
+
+    try {
+      // 1. Upload Avatar if changed
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split('.').pop()
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`
+        const { error: uploadError, data } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, avatarFile, { upsert: true })
+
+        if (uploadError) throw uploadError
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName)
+          
+        avatarUrl = publicUrl
+      }
+
+      // 2. Update Profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          username,
+          avatar_url: avatarUrl,
+          email_notif_win: notifWin,
+          email_notif_marketing: notifMarketing,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id)
+
+      if (updateError) throw updateError
+
+      // 3. Update Context
+      if (profile) {
+        // Refresh logic or optimistic update
+        // ideally we should reload the profile from server or update context fully
+        // simplified update for context user object:
+        setUser({
+          ...user,
+          username,
+          avatar: avatarUrl || user.avatar
+        })
+      }
+
+      toast({ title: "Succès", description: "Profil mis à jour !" })
+      onClose()
+    } catch (error: any) {
+      console.error(error)
+      toast({ title: "Erreur", description: error.message, variant: "destructive" })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleDeleteAccount = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,9 +121,6 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
     }
   }
 
-  // ... existing state ...
-  const [username, setUsername] = useState(profile?.username || "")
-// ...
   if (showDeleteConfirm) {
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
@@ -97,7 +172,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   return (
     <div className="space-y-8">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ... existing form content ... */}
+        
         {/* Avatar Upload */}
         <div className="flex flex-col items-center gap-3">
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
