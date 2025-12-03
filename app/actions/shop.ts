@@ -223,6 +223,25 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'co
   return { success: true }
 }
 
+export async function deleteOrder(orderId: string): Promise<ShopActionResult> {
+  const supabase = await createClient()
+  
+  // Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Unauthorized" }
+
+  // Use admin client to bypass RLS
+  const { error } = await supabaseAdmin
+    .from('orders')
+    .delete()
+    .eq('id', orderId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/orders')
+  return { success: true }
+}
+
 export async function getOrders(): Promise<ShopOrder[]> {
   const supabase = await createClient()
   
