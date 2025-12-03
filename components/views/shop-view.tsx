@@ -1,23 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import { ShoppingBag, CreditCard, Smartphone, Sparkles, Heart } from "lucide-react"
+import { ShoppingBag, CreditCard, Smartphone, Sparkles, Heart, Loader2, MapPin } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import {
-  SHOP_AIRPODS,
-  SHOP_KHALAMITE,
-  SHOP_LOL,
-  SHOP_MACBOOK,
-  SHOP_PSN,
-  SHOP_BONNIE,
-  SHOP_JAPAN,
-  SHOP_NORDVPN,
-} from "@/lib/mock-data"
+import { ShopItem } from "@/lib/types"
+import { purchaseItem } from "@/app/actions/shop"
+import { useUser } from "@/contexts/user-context"
 
-export function ShopView() {
+interface ShopViewProps {
+  initialItems: ShopItem[]
+}
+
+export function ShopView({ initialItems }: ShopViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [isPurchasing, setIsPurchasing] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null)
+  const [deliveryInfo, setDeliveryInfo] = useState("")
+  
   const { toast } = useToast()
+  const { userBalance, setUserBalance } = useUser()
 
   const categories = [
     { id: "all", name: "Tout", icon: ShoppingBag },
@@ -26,100 +28,48 @@ export function ShopView() {
     { id: "experiences", name: "Experiences", icon: Sparkles },
   ]
 
-  const shopItems = [
-    {
-      id: "psn-20",
-      name: "Carte PSN 20EUR",
-      category: "digital",
-      price: 2500,
-      image: SHOP_PSN,
-      badge: null,
-    },
-    {
-      id: "lol-skin",
-      name: "Skin LoL Mystere",
-      category: "digital",
-      price: 1000,
-      image: SHOP_LOL,
-      badge: null,
-    },
-    {
-      id: "nordvpn-1y",
-      name: "NordVPN 1 an",
-      category: "digital",
-      price: 5000,
-      image: SHOP_NORDVPN,
-      badge: "Free",
-    },
-    {
-      id: "airpods-4",
-      name: "AirPods 4",
-      category: "tech",
-      price: 45000,
-      image: SHOP_AIRPODS,
-      badge: null,
-    },
-    {
-      id: "macbook-pro",
-      name: "MacBook Pro",
-      category: "tech",
-      price: 900000,
-      image: SHOP_MACBOOK,
-      badge: null,
-    },
-    {
-      id: "diner-bonnie",
-      name: "Diner avec Bonnie Blue",
-      category: "experiences",
-      price: 250000,
-      image: SHOP_BONNIE,
-      badge: "VIP",
-    },
-    {
-      id: "journee-khalamite",
-      name: "Une journee avec Khalamite",
-      category: "experiences",
-      price: 300000,
-      image: SHOP_KHALAMITE,
-      badge: "VIP",
-    },
-    {
-      id: "semaine-japon",
-      name: "1 semaine au Japon",
-      category: "experiences",
-      price: 1500000,
-      image: SHOP_JAPAN,
-      badge: "Legendary",
-    },
-  ]
-
   const filteredItems =
-    selectedCategory === "all" ? shopItems : shopItems.filter((item) => item.category === selectedCategory)
+    selectedCategory === "all" ? initialItems : initialItems.filter((item) => item.category?.toLowerCase().includes(selectedCategory))
 
-  const handleBuyItem = (item: (typeof shopItems)[0]) => {
-    toast({
-      title: `Achat de ${item.name} (Mockup)`,
-      description: (
-        <span>
-          Prix: <CurrencySymbol /> {item.price.toLocaleString()}
-        </span>
-      ),
-      duration: 3000,
-      variant: "default",
-    })
+  const handlePurchaseClick = (item: ShopItem) => {
+    setSelectedItem(item)
+    setDeliveryInfo("")
+  }
+
+  const handleConfirmPurchase = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedItem) return
+
+    setIsPurchasing(true)
+    try {
+      const result = await purchaseItem(selectedItem.id, deliveryInfo)
+      
+      if (result.error) {
+        toast({ title: "Erreur", description: result.error, variant: "destructive" })
+      } else {
+        toast({ 
+          title: "Commande validée !", 
+          description: `Vous avez acheté ${selectedItem.name}. Vous recevrez bientôt des nouvelles.`
+        })
+        if (result.newBalance !== undefined) {
+          setUserBalance(result.newBalance)
+        }
+        setSelectedItem(null)
+      }
+    } catch (error) {
+      console.error(error)
+      toast({ title: "Erreur", description: "Une erreur est survenue.", variant: "destructive" })
+    } finally {
+      setIsPurchasing(false)
+    }
   }
 
   const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "digital":
-        return <CreditCard className="w-3 h-3" />
-      case "tech":
-        return <Smartphone className="w-3 h-3" />
-      case "experiences":
-        return <Heart className="w-3 h-3" />
-      default:
-        return <ShoppingBag className="w-3 h-3" />
-    }
+    const lowerCat = category?.toLowerCase() || ""
+    if (lowerCat.includes("digital")) return <CreditCard className="w-3 h-3" />
+    if (lowerCat.includes("tech")) return <Smartphone className="w-3 h-3" />
+    if (lowerCat.includes("experience")) return <Heart className="w-3 h-3" />
+    return <ShoppingBag className="w-3 h-3" />
   }
 
   return (
@@ -148,58 +98,115 @@ export function ShopView() {
       </div>
 
       {/* Shop Items Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-            className="relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all group"
-          >
-            {item.badge && (
-              <div
-                className={`absolute top-3 right-3 z-10 px-2 py-1 rounded-md text-xs font-bold tracking-tight uppercase ${
-                  item.badge === "Legendary"
-                    ? "bg-amber-500 text-black"
-                    : item.badge === "VIP"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white/20 text-white"
-                }`}
-              >
-                {item.badge}
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          Aucun article disponible dans cette catégorie pour le moment.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          {filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all group flex flex-col"
+            >
+              <div className="relative aspect-square overflow-hidden bg-black/20">
+                {item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    <ShoppingBag className="w-12 h-12 opacity-20" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
               </div>
-            )}
 
-            <div className="relative aspect-square overflow-hidden">
-              <img
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              <div className="p-4 space-y-3 flex-1 flex flex-col">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+                  {getCategoryIcon(item.category)}
+                  <span>{item.category}</span>
+                </div>
+                <p className="font-semibold text-sm tracking-tight leading-snug flex-1">{item.name}</p>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
+                    <CurrencySymbol className="text-primary" />
+                    <span className="font-mono font-bold">{item.price.toLocaleString()}</span>
+                  </span>
+                </div>
+                <button
+                  onClick={() => handlePurchaseClick(item)}
+                  disabled={isPurchasing}
+                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50"
+                >
+                  Acheter
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Purchase Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md p-6 space-y-6 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4">
+            <div className="space-y-2 text-center">
+              <h3 className="text-xl font-bold">Confirmer l'achat</h3>
+              <p className="text-muted-foreground text-sm">
+                Vous êtes sur le point d'acheter <span className="text-white font-semibold">{selectedItem.name}</span>
+              </p>
             </div>
 
-            <div className="p-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
-                {getCategoryIcon(item.category)}
-                <span>{item.category}</span>
-              </div>
-              <p className="font-semibold text-sm tracking-tight leading-snug">{item.name}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-                  <CurrencySymbol className="text-primary" />
-                  <span className="font-mono font-bold">{item.price.toLocaleString()}</span>
-                </span>
-              </div>
-              <button
-                onClick={() => handleBuyItem(item)}
-                className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all"
-              >
-                Acheter
-              </button>
+            <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-white/10">
+              <span className="text-sm font-medium">Prix total</span>
+              <span className="text-xl font-bold text-primary flex items-center gap-1">
+                {selectedItem.price.toLocaleString()} <CurrencySymbol />
+              </span>
             </div>
+
+            <form onSubmit={handleConfirmPurchase} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <MapPin className="w-3 h-3" />
+                  Informations de livraison
+                </label>
+                <textarea
+                  required
+                  value={deliveryInfo}
+                  onChange={(e) => setDeliveryInfo(e.target.value)}
+                  placeholder="Votre adresse postale complète (ou email pour les biens digitaux)..."
+                  className="w-full h-24 bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 transition-all resize-none"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Ces informations seront transmises à l'équipe pour l'expédition.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedItem(null)}
+                  disabled={isPurchasing}
+                  className="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 font-semibold transition-all"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPurchasing || !deliveryInfo.trim()}
+                  className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isPurchasing && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Confirmer
+                </button>
+              </div>
+            </form>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
-

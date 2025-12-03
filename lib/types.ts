@@ -71,3 +71,27 @@ export type AuthResult = {
   success?: boolean
   url?: string
 }
+
+// Shop Types
+export type ShopItem = {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  image_url: string | null
+  category: string
+  stock: number
+  created_at: string
+}
+
+export type ShopOrder = {
+  id: string
+  user_id: string
+  item_id: string
+  price_paid: number
+  status: 'pending' | 'completed' | 'cancelled'
+  created_at: string
+  delivery_info: string | null
+  shop_items?: ShopItem // Joined data
+  profiles?: { username: string; email: string } // Joined data
+}
