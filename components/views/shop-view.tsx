@@ -196,6 +196,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
               </p>
             )}
 
+            {userBalance < selectedItem.price && (
+              <p className="text-center text-xs text-rose-400 font-bold uppercase tracking-widest">
+                ⚠️ Solde insuffisant ! Il vous manque {(selectedItem.price - userBalance).toLocaleString()} Zeny
+              </p>
+            )}
+
             <form onSubmit={handleConfirmPurchase} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
@@ -225,11 +231,11 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 </button>
                 <button
                   type="submit"
-                  disabled={isPurchasing || !deliveryInfo.trim()}
+                  disabled={isPurchasing || !deliveryInfo.trim() || userBalance < selectedItem.price}
                   className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isPurchasing && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Confirmer
+                  {userBalance < selectedItem.price ? "Solde insuffisant" : "Confirmer"}
                 </button>
               </div>
             </form>

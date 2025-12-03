@@ -1,8 +1,15 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { ShopItem, ShopOrder } from '@/lib/types'
+
+// Admin client to bypass RLS for admin operations
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export type PurchaseResult = {
   success?: boolean
@@ -84,8 +91,8 @@ export async function purchaseItem(itemId: string, deliveryInfo: string): Promis
 
   if (balanceError) return { error: "Erreur lors du paiement." }
 
-  // Create Order
-  const { error: orderError } = await supabase
+  // Create Order (using admin client to bypass RLS)
+  const { error: orderError } = await supabaseAdmin
     .from('orders')
     .insert({
       user_id: user.id,
@@ -96,9 +103,12 @@ export async function purchaseItem(itemId: string, deliveryInfo: string): Promis
     })
 
   if (orderError) {
-    console.error(`CRITICAL: User ${user.id} charged ${item.price} for item ${itemId} but order failed!`)
+    console.error(`CRITICAL ORDER ERROR:`, orderError)
+    console.error(`User ${user.id} charged ${item.price} for item ${itemId} but order failed!`)
     return { error: "Erreur lors de la commande. Contactez le support." }
   }
+
+  console.log(`[ORDER SUCCESS] User ${user.email} bought ${item.name} for ${item.price} Zeny`)
 
   // 4. Send Email Notification (MOCK for MVP)
   // In a real app, we would call Resend or SendGrid here.
@@ -201,7 +211,8 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'co
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Unauthorized" }
 
-  const { error } = await supabase
+  // Use admin client to bypass RLS
+  const { error } = await supabaseAdmin
     .from('orders')
     .update({ status })
     .eq('id', orderId)
@@ -215,10 +226,27 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'co
 export async function getOrders(): Promise<ShopOrder[]> {
   const supabase = await createClient()
   
+  // Verify user is authenticated
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
+  if (!user) {
+    console.log('[getOrders] No user authenticated')
+    return []
+  }
 
-  const { data, error } = await supabase
+  // Check if user is admin
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    console.log('[getOrders] User is not admin:', profile?.role)
+    return []
+  }
+
+  // Use admin client to bypass RLS and get ALL orders
+  const { data, error } = await supabaseAdmin
     .from('orders')
     .select(`
       *,
@@ -228,9 +256,10 @@ export async function getOrders(): Promise<ShopOrder[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error(error)
+    console.error('[getOrders] Error:', error)
     return []
   }
 
+  console.log('[getOrders] Found orders:', data?.length || 0)
   return data as unknown as ShopOrder[]
 }
