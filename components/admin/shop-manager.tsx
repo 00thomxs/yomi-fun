@@ -159,7 +159,7 @@ export function AdminShopManager({ items }: { items: ShopItem[] }) {
                   <option value="Gaming">Gaming</option>
                   <option value="Cartes Cadeaux">Cartes Cadeaux</option>
                   <option value="Expériences">Expériences</option>
-                  <option value="Shopping & Réductions">Shopping & Réductions</option>
+                  <option value="Bons Plans">Bons Plans</option>
                   <option value="Autre">Autre</option>
                 </select>
               </div>
