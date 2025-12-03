@@ -109,6 +109,7 @@ export async function purchaseItem(itemId: string, deliveryInfo: string): Promis
   
   revalidatePath('/shop')
   revalidatePath('/profile')
+  revalidatePath('/admin/orders') // Important: Refresh admin view
 
   return { success: true, newBalance: profile.balance - item.price }
 }

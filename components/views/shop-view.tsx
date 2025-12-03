@@ -132,18 +132,26 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   <span>{item.category}</span>
                 </div>
                 <p className="font-semibold text-sm tracking-tight leading-snug flex-1">{item.name}</p>
-                <div className="flex items-center justify-between pt-2">
-                  <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-                    <CurrencySymbol className="text-primary" />
-                    <span className="font-mono font-bold">{item.price.toLocaleString()}</span>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="font-mono text-primary text-sm font-bold flex items-center gap-1">
+                    {item.price.toLocaleString()} <CurrencySymbol />
+                  </span>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                    item.stock === 0 
+                      ? 'bg-rose-500/10 text-rose-500' 
+                      : item.stock === -1 
+                        ? 'bg-blue-500/10 text-blue-500'
+                        : 'bg-green-500/10 text-green-500'
+                  }`}>
+                    {item.stock === -1 ? 'Infini' : `${item.stock} dispo`}
                   </span>
                 </div>
                 <button
                   onClick={() => handlePurchaseClick(item)}
-                  disabled={isPurchasing}
-                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50"
+                  disabled={isPurchasing || item.stock === 0}
+                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Acheter
+                  {item.stock === 0 ? "Rupture" : "Acheter"}
                 </button>
               </div>
             </div>
@@ -168,6 +176,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 {selectedItem.price.toLocaleString()} <CurrencySymbol />
               </span>
             </div>
+            
+            {selectedItem.stock !== -1 && (
+              <p className="text-center text-xs text-amber-400 font-bold uppercase tracking-widest">
+                Attention : Plus que {selectedItem.stock} exemplaires !
+              </p>
+            )}
 
             <form onSubmit={handleConfirmPurchase} className="space-y-4">
               <div className="space-y-2">
