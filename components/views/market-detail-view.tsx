@@ -150,6 +150,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           handlePlaceBet={handlePlaceBet}
           userBalance={userBalance}
           isResolved={isResolved}
+          yMin={yMin}
+          yMax={yMax}
         />
       ) : (
         <MultiMarketContent
@@ -188,6 +190,8 @@ function BinaryMarketContent({
   handlePlaceBet,
   userBalance,
   isResolved,
+  yMin,
+  yMax,
 }: {
   market: BinaryMarket
   timeframe: string
@@ -202,6 +206,8 @@ function BinaryMarketContent({
   handlePlaceBet: () => void
   userBalance: number
   isResolved: boolean
+  yMin: number
+  yMax: number
 }) {
   return (
     <>
