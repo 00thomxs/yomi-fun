@@ -112,27 +112,72 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       ? realHistory 
       : [{ time: formatTimeLabel(new Date(rawMarket.created_at)), fullDate: new Date(rawMarket.created_at), price: Math.round(prob) }]
 
-    // Filter by timeframe FIRST
-    const filterByTimeframe = (data: typeof baseHistory, hours: number) => {
-      const cutoff = new Date(now.getTime() - hours * 60 * 60 * 1000)
-      const filtered = data.filter(p => p.fullDate >= cutoff)
-      // If filtering removes everything, keep at least the last historical point
-      if (filtered.length === 0 && data.length > 0) {
-        return [data[data.length - 1]]
+    // Helper: Format time label
+    const formatTimeLabel = (date: Date) => {
+      const isToday = date.toDateString() === now.toDateString()
+      if (isToday) {
+        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       }
-      return filtered
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    }
+
+    // STRICT Timeframe Filter
+    // This ensures the chart starts exactly at the timeframe cutoff (1H, 1D, etc.)
+    // even if the last bet was days ago.
+    const filterByTimeframe = (data: typeof baseHistory, hours: number | 'ALL') => {
+      if (hours === 'ALL') return addNowPoint(baseHistory)
+
+      const cutoff = new Date(now.getTime() - hours * 60 * 60 * 1000)
+      
+      // 1. Get points that happened AFTER cutoff
+      const pointsInWindow = data.filter(p => p.fullDate >= cutoff)
+      
+      // 2. Find the state of the market AT the cutoff moment
+      // (It's the value of the last point BEFORE cutoff)
+      let startPoint = null
+      if (pointsInWindow.length < data.length) {
+        // Find last point before cutoff
+        const previousPoint = [...data].reverse().find(p => p.fullDate < cutoff)
+        if (previousPoint) {
+          // Create a synthetic point exactly at cutoff time with the previous price
+          startPoint = {
+            time: formatTimeLabel(cutoff),
+            fullDate: cutoff,
+            price: previousPoint.price
+          }
+        }
+      }
+
+      // 3. Combine: [Synthetic Start] + [Real Points in Window] + [Now]
+      let result = pointsInWindow
+      if (startPoint) {
+        result = [startPoint, ...pointsInWindow]
+      } else if (result.length === 0 && data.length > 0) {
+         // Should catch cases where we have history but nothing recent/before
+         // Fallback to just showing the last known state
+         const last = data[data.length - 1]
+         result = [{
+            time: formatTimeLabel(cutoff),
+            fullDate: cutoff,
+            price: last.price
+         }]
+      }
+      
+      return addNowPoint(result)
     }
 
     // Helper: Add "Now" point to extend the line to current time
     const addNowPoint = (data: typeof baseHistory) => {
       if (data.length === 0) {
-        // No data at all - create start + now
         return [
           { time: formatTimeLabel(new Date(rawMarket.created_at)), fullDate: new Date(rawMarket.created_at), price: Math.round(prob) },
           { time: 'Maintenant', fullDate: now, price: Math.round(prob) }
         ]
       }
       const lastPoint = data[data.length - 1]
+      // Avoid duplicate point if last point is very recent
+      if (now.getTime() - lastPoint.fullDate.getTime() < 1000) return data
+      
       return [
         ...data, 
         { time: 'Maintenant', fullDate: now, price: Math.round(lastPoint.price) }
@@ -149,9 +194,12 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       volatility: "Moyenne",
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
       isLive: rawMarket.is_live && rawMarket.status !== 'resolved', 
-      history24h: addNowPoint(filterByTimeframe(baseHistory, 24)),
-      history7d: addNowPoint(filterByTimeframe(baseHistory, 24 * 7)),
-      historyAll: addNowPoint(baseHistory)
+      history1h: filterByTimeframe(baseHistory, 1),
+      history6h: filterByTimeframe(baseHistory, 6),
+      history24h: filterByTimeframe(baseHistory, 24),
+      history7d: filterByTimeframe(baseHistory, 24 * 7),
+      history30d: filterByTimeframe(baseHistory, 24 * 30),
+      historyAll: filterByTimeframe(baseHistory, 'ALL')
     } as BinaryMarket
   } else {
     // Multi Logic
@@ -174,15 +222,40 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       baseMultiHistory.push(initialPoint)
     }
 
-    // Filter by timeframe FIRST
-    const filterMultiByTimeframe = (data: typeof baseMultiHistory, hours: number) => {
+    // Filter by timeframe for Multi (same logic)
+    const filterMultiByTimeframe = (data: typeof baseMultiHistory, hours: number | 'ALL') => {
+      if (hours === 'ALL') return addMultiNowPoint(baseMultiHistory)
+
       const cutoff = new Date(now.getTime() - hours * 60 * 60 * 1000)
-      const filtered = data.filter(p => p.fullDate >= cutoff)
-      // If filtering removes everything, keep at least the last historical point
-      if (filtered.length === 0 && data.length > 0) {
-        return [data[data.length - 1]]
+      const pointsInWindow = data.filter(p => p.fullDate >= cutoff)
+
+      // Find state at cutoff
+      let startPoint = null
+      if (pointsInWindow.length < data.length) {
+         const previousPoint = [...data].reverse().find(p => p.fullDate < cutoff)
+         if (previousPoint) {
+            // For multi, we need to copy ALL values from the previous point
+            startPoint = {
+              ...previousPoint,
+              time: formatTimeLabel(cutoff),
+              fullDate: cutoff
+            }
+         }
       }
-      return filtered
+
+      let result = pointsInWindow
+      if (startPoint) {
+        result = [startPoint, ...pointsInWindow]
+      } else if (result.length === 0 && data.length > 0) {
+         const last = data[data.length - 1]
+         result = [{
+            ...last,
+            time: formatTimeLabel(cutoff),
+            fullDate: cutoff
+         }]
+      }
+
+      return addMultiNowPoint(result)
     }
 
     // Helper: Add "Now" point to extend lines to current time
@@ -202,6 +275,9 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       }
       
       const lastSnapshot = data[data.length - 1]
+      // Avoid duplicate
+      if (now.getTime() - lastSnapshot.fullDate.getTime() < 1000) return data
+
       const nowPoint: any = { 
         ...lastSnapshot, 
         time: 'Maintenant', 
@@ -219,9 +295,12 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       outcomes: outcomes,
       isLive: rawMarket.is_live && rawMarket.status !== 'resolved', 
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
-      historyData: fullHistory, // Keep for backwards compat
-      history24h: addMultiNowPoint(filterMultiByTimeframe(baseMultiHistory, 24)),
-      history7d: addMultiNowPoint(filterMultiByTimeframe(baseMultiHistory, 24 * 7)),
+      historyData: fullHistory, 
+      history1h: filterMultiByTimeframe(baseMultiHistory, 1),
+      history6h: filterMultiByTimeframe(baseMultiHistory, 6),
+      history24h: filterMultiByTimeframe(baseMultiHistory, 24),
+      history7d: filterMultiByTimeframe(baseMultiHistory, 24 * 7),
+      history30d: filterMultiByTimeframe(baseMultiHistory, 24 * 30),
       historyAll: fullHistory
     } as MultiOutcomeMarket
   }

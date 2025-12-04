@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ArrowLeft, Clock, HelpCircle, Lock } from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 // Mock data no longer needed - using real history from DB
@@ -16,7 +16,7 @@ type MarketDetailViewProps = {
 }
 
 export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketDetailViewProps) {
-  const [timeframe, setTimeframe] = useState<"24H" | "7J" | "TOUT">("24H")
+  const [timeframe, setTimeframe] = useState<"1H" | "6H" | "1J" | "1S" | "1M" | "TOUT">("1H")
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
@@ -31,8 +31,11 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   const getBinaryChartData = () => {
     if (market.type !== "binary") return []
     const binaryMarket = market as BinaryMarket
-    if (timeframe === "24H") return binaryMarket.history24h
-    if (timeframe === "7J") return binaryMarket.history7d
+    if (timeframe === "1H") return binaryMarket.history1h || binaryMarket.history24h
+    if (timeframe === "6H") return binaryMarket.history6h || binaryMarket.history24h
+    if (timeframe === "1J") return binaryMarket.history24h
+    if (timeframe === "1S") return binaryMarket.history7d
+    if (timeframe === "1M") return binaryMarket.history30d || binaryMarket.historyAll
     return binaryMarket.historyAll
   }
 
@@ -40,12 +43,24 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
     if (market.type !== "multi") return []
     const multiMarket = market as MultiOutcomeMarket
     // Use timeframe-filtered history data
-    if (timeframe === "24H") return multiMarket.history24h || multiMarket.historyData || []
-    if (timeframe === "7J") return multiMarket.history7d || multiMarket.historyData || []
+    if (timeframe === "1H") return multiMarket.history1h || multiMarket.history24h || []
+    if (timeframe === "6H") return multiMarket.history6h || multiMarket.history24h || []
+    if (timeframe === "1J") return multiMarket.history24h || multiMarket.historyData || []
+    if (timeframe === "1S") return multiMarket.history7d || multiMarket.historyData || []
+    if (timeframe === "1M") return multiMarket.history30d || multiMarket.historyData || []
     return multiMarket.historyAll || multiMarket.historyData || []
   }
 
   const chartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
+  
+  // Calculate dynamic scale for Binary Charts
+  const prices = chartData.length > 0 ? chartData.map((p: any) => p.price) : [0]
+  const minPrice = Math.min(...prices)
+  const maxPrice = Math.max(...prices)
+  const padding = Math.max(2, (maxPrice - minPrice) * 0.2) // 20% padding
+  const yMin = Math.max(0, Math.floor(minPrice - padding))
+  const yMax = Math.min(100, Math.ceil(maxPrice + padding))
+
   const trend =
     market.type === "binary"
       ? chartData.length > 0 && (chartData[chartData.length - 1] as any).price > (chartData[0] as any).price
@@ -215,12 +230,12 @@ function BinaryMarketContent({
       </div>
 
       {/* Timeframe Selector */}
-      <div className="flex gap-2 justify-center">
-        {(["24H", "7J", "TOUT"] as const).map((tf) => (
+      <div className="flex gap-2 justify-center overflow-x-auto pb-2">
+        {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-            className={`px-5 py-2 rounded-lg font-bold text-sm tracking-tight transition-all font-mono ${
+            className={`px-4 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap ${
               timeframe === tf
                 ? "bg-primary text-primary-foreground"
                 : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
@@ -232,7 +247,12 @@ function BinaryMarketContent({
       </div>
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5">
+      <div className="rounded-xl bg-card border border-border p-5 relative">
+        {/* Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
+          <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
+        </div>
+
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartData}>
             <defs>
@@ -241,22 +261,25 @@ function BinaryMarketContent({
                 <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
               </linearGradient>
             </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
             <XAxis
               dataKey="time"
               stroke="#64748b"
-              style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
+              style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
+              minTickGap={30}
             />
             <YAxis
-              domain={[0, 100]}
+              domain={[yMin, yMax]}
               stroke="#64748b"
-              style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
+              orientation="right"
+              style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              ticks={[0, 25, 50, 75, 100]}
+              tickCount={5}
             />
             <Tooltip
               contentStyle={{
@@ -275,12 +298,13 @@ function BinaryMarketContent({
               formatter={(value: number) => `${Math.round(value)}%`}
             />
             <Area
-              type="linear"
+              type="stepAfter"
               dataKey="price"
               stroke="#ffffff"
-              strokeWidth={1.5}
+              strokeWidth={2}
               fill="url(#chartGradientMonochrome)"
               dot={false}
+              activeDot={{ r: 4, strokeWidth: 0 }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -351,7 +375,7 @@ function MultiMarketContent({
 }: {
   market: MultiOutcomeMarket
   timeframe: string
-  setTimeframe: (tf: "24H" | "7J" | "TOUT") => void
+  setTimeframe: (tf: "1H" | "6H" | "1J" | "1S" | "1M" | "TOUT") => void
   betChoice: string
   setBetChoice: (choice: string) => void
   betType: "OUI" | "NON"
@@ -447,15 +471,20 @@ function MultiMarketContent({
       </div>
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="rounded-xl bg-card border border-border p-5 relative">
+        {/* Watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
+          <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
+        </div>
+
+        <div className="flex items-center justify-between mb-4 relative z-10">
           <p className="text-sm font-bold tracking-tight uppercase">Evolution des cotes</p>
-          <div className="flex gap-2">
-            {(["24H", "7J", "TOUT"] as const).map((tf) => (
+          <div className="flex gap-2 overflow-x-auto pb-2 max-w-[60%]">
+            {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap ${
                   timeframe === tf
                     ? "bg-primary text-primary-foreground"
                     : "bg-white/5 border border-border hover:border-white/20"
@@ -468,22 +497,25 @@ function MultiMarketContent({
         </div>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
             <XAxis
               dataKey="time"
               stroke="#64748b"
-              style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
+              style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
+              minTickGap={30}
             />
             <YAxis
-              domain={[0, 100]}
+              domain={[0, 'auto']} 
+              orientation="right"
               stroke="#64748b"
-              style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
+              style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              ticks={[0, 25, 50, 75, 100]}
+              tickCount={5}
             />
             <Tooltip
               contentStyle={{
@@ -500,6 +532,7 @@ function MultiMarketContent({
                 stroke={outcome.color}
                 strokeWidth={2}
                 dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
               />
             ))}
           </LineChart>

@@ -209,7 +209,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               <YAxis domain={[0, 100]} hide />
               <ReferenceLine y={50} stroke="#ffffff" strokeOpacity={0.1} strokeDasharray="3 3" />
               <Area
-                type="monotone"
+                type="stepAfter"
                 dataKey="price"
                 stroke={prob >= 50 ? "#10b981" : "#f43f5e"}
                 strokeWidth={1.5}

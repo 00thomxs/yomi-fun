@@ -18,8 +18,11 @@ export type BinaryMarket = {
   yesPrice: number
   noPrice: number
   countdown: string
+  history1h?: { time: string; price: number }[]
+  history6h?: { time: string; price: number }[]
   history24h: { time: string; price: number }[]
   history7d: { time: string; price: number }[]
+  history30d?: { time: string; price: number }[]
   historyAll: { time: string; price: number }[]
 }
 
@@ -38,8 +41,11 @@ export type MultiOutcomeMarket = {
   is_headline?: boolean // Added for hero market
   countdown: string
   historyData: { time: string; [key: string]: number | string }[]
+  history1h?: { time: string; [key: string]: number | string | Date }[]
+  history6h?: { time: string; [key: string]: number | string | Date }[]
   history24h?: { time: string; [key: string]: number | string | Date }[]
   history7d?: { time: string; [key: string]: number | string | Date }[]
+  history30d?: { time: string; [key: string]: number | string | Date }[]
   historyAll?: { time: string; [key: string]: number | string | Date }[]
 }
 
