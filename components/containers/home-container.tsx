@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation"
 import { HomeView } from "@/components/views/home-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market } from "@/lib/types"
+import { PricePoint } from "@/app/actions/history"
 
 type HomeContainerProps = {
   initialMarkets: any[] // TODO: Typing
+  marketsHistory?: Record<string, PricePoint[]>
 }
 
-export function HomeContainer({ initialMarkets }: HomeContainerProps) {
+export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeContainerProps) {
   const router = useRouter()
   const { placeBet } = useUser()
   const [activeCategory, setActiveCategory] = useState("trending")
@@ -33,6 +35,29 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
     placeBet(market, choice, amount, odds)
   }
 
+  // Helper: Transform history points to chart data format
+  const processHistoryToChartData = (history: PricePoint[], probability: number, createdAt: string) => {
+    if (!history || history.length === 0) {
+      // No history - create 2 points with current probability
+      return [
+        { time: 'Création', price: probability },
+        { time: 'Maintenant', price: probability }
+      ]
+    }
+    
+    // Map history to chart format
+    const chartData = history.map(p => ({
+      time: new Date(p.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      price: p.probability
+    }))
+    
+    // Always add "Now" point
+    const lastPrice = chartData[chartData.length - 1]?.price || probability
+    chartData.push({ time: 'Maintenant', price: lastPrice })
+    
+    return chartData
+  }
+
   // Transform Supabase data to match Market type if needed
   const markets = initialMarkets.map(m => {
     // Find probability for binary markets (ensure integer)
@@ -41,6 +66,12 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
       const yesOutcome = m.outcomes.find((o: any) => o.name === 'OUI')
       if (yesOutcome) probability = Math.round(yesOutcome.probability)
     }
+
+    // Get real history for this market
+    const history = marketsHistory[m.id] || []
+    const chartData = m.type === 'binary' 
+      ? processHistoryToChartData(history, probability, m.created_at)
+      : []
 
     return {
       ...m,
@@ -56,7 +87,9 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
       is_headline: m.is_headline, // Ensure headline flag is passed
       // Fix: market is only live if DB says is_live AND status is not resolved/cancelled
       isLive: m.is_live && m.status !== 'resolved', 
-      volume: m.volume || 0
+      volume: m.volume || 0,
+      // Real chart data for cards
+      history24h: chartData
     }
   })
 

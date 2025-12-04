@@ -3,7 +3,6 @@
 import { Clock, Users, Activity, HelpCircle } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
-import { generateVolatileChartData } from "@/lib/mock-data"
 import { CATEGORIES } from "@/lib/constants"
 
 type MarketCardProps = {
@@ -17,8 +16,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
   const CategoryIcon = categoryDef?.icon || HelpCircle
 
-  // Generate volatile chart data for binary cards
-  const volatileChartData = market.type === "binary" ? generateVolatileChartData(20, (market as BinaryMarket).probability || 50) : []
+  // Use real history data for chart (passed from container)
+  const chartData = market.type === "binary" 
+    ? (market as BinaryMarket).history24h || [] 
+    : []
 
   if (market.type === "multi") {
     const sortedOutcomes = [...market.outcomes].sort((a, b) => b.probability - a.probability)
@@ -195,10 +196,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
 
         <p className="font-semibold text-base tracking-tight text-balance leading-snug">{market.question}</p>
 
-        {/* Larger volatile chart */}
+        {/* Real history chart */}
         <div className="flex-1 min-h-[100px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={volatileChartData}>
+            <AreaChart data={chartData}>
               <defs>
                 <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0.3} />
