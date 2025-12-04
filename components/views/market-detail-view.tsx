@@ -191,7 +191,7 @@ function BinaryMarketContent({
 }: {
   market: BinaryMarket
   timeframe: string
-  setTimeframe: (tf: "24H" | "7J" | "TOUT") => void
+  setTimeframe: (tf: "1H" | "6H" | "1J" | "1S" | "1M" | "TOUT") => void
   betChoice: string
   setBetChoice: (choice: string) => void
   betAmount: string
