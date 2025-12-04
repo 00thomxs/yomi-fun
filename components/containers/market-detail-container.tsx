@@ -68,16 +68,30 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     const chartData: any[] = []
     const currentValues = new Map<string, number>()
 
-    // Initialize currentValues with initial probabilities from outcomes (as fallback)
-    outcomes.forEach(o => currentValues.set(o.name, o.probability))
+    // Pre-scan history to find the FIRST known value for each outcome
+    // This sets the baseline to the oldest known state, instead of the current (future) state.
+    const firstValues = new Map<string, number>()
+    sortedPoints.forEach(p => {
+        const name = indexToName.get(p.outcomeIndex)
+        if (name && !firstValues.has(name)) {
+            firstValues.set(name, p.probability)
+        }
+    })
+    
+    // Initialize currentValues with these FIRST known values
+    outcomes.forEach(o => {
+        if (firstValues.has(o.name)) {
+            currentValues.set(o.name, firstValues.get(o.name)!)
+        } else {
+            // If an outcome never appears in history, fallback to 0
+            currentValues.set(o.name, 0) 
+        }
+    })
 
     // 3. Walk through history
     sortedPoints.forEach(point => {
       const outcomeName = indexToName.get(point.outcomeIndex)
       if (outcomeName) {
-        // Update the value for this outcome (convert back to percentage if needed, but history is already 0-100 based on my previous code?)
-        // Wait, in history action I did: probability: row.probability * 100
-        // So point.probability is 0-100.
         currentValues.set(outcomeName, point.probability)
         
         // Create a snapshot
