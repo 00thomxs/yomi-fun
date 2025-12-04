@@ -103,6 +103,10 @@ export function ProfileView() {
   const yAxisMin = Math.min(minPnL, -10000)
   const yAxisMax = Math.max(maxPnL, 10000)
 
+  // Dynamic gradient color based on current PnL
+  const isPositivePnL = currentPnL >= 0
+  const pnlColor = isPositivePnL ? "#10b981" : "#f43f5e" // Green or Red
+
   // Use profile data if available, otherwise use defaults
   const userStats = {
     totalBets: profile?.total_bets ?? 0,
@@ -298,9 +302,13 @@ export function ProfileView() {
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart data={chartData}>
             <defs>
-              <linearGradient id="pnlGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="pnlGradientPositive" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
                 <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="pnlGradientNegative" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#666" }} axisLine={false} tickLine={false} />
@@ -320,7 +328,14 @@ export function ProfileView() {
               }}
               formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
             />
-            <Area type="monotone" dataKey="pnl" stroke="#10b981" strokeWidth={2} dot={false} fill="url(#pnlGradient)" />
+            <Area 
+              type="monotone" 
+              dataKey="pnl" 
+              stroke={pnlColor} 
+              strokeWidth={2} 
+              dot={false} 
+              fill={isPositivePnL ? "url(#pnlGradientPositive)" : "url(#pnlGradientNegative)"} 
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

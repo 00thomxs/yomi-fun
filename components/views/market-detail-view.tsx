@@ -16,9 +16,7 @@ type MarketDetailViewProps = {
 }
 
 export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketDetailViewProps) {
-  const [timeframe, setTimeframe] = useState<"1H" | "4H" | "1J" | "24H" | "7J" | "TOUT">(
-    market.type === "multi" ? "1H" : "24H",
-  )
+  const [timeframe, setTimeframe] = useState<"24H" | "7J" | "TOUT">("24H")
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
@@ -41,8 +39,10 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   const getMultiChartData = () => {
     if (market.type !== "multi") return []
     const multiMarket = market as MultiOutcomeMarket
-    // Use real history data from container
-    return multiMarket.historyData || []
+    // Use timeframe-filtered history data
+    if (timeframe === "24H") return multiMarket.history24h || multiMarket.historyData || []
+    if (timeframe === "7J") return multiMarket.history7d || multiMarket.historyData || []
+    return multiMarket.historyAll || multiMarket.historyData || []
   }
 
   const chartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
@@ -451,7 +451,7 @@ function MultiMarketContent({
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-bold tracking-tight uppercase">Evolution des cotes</p>
           <div className="flex gap-2">
-            {(["1H", "4H", "1J"] as const).map((tf) => (
+            {(["24H", "7J", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
@@ -504,6 +504,21 @@ function MultiMarketContent({
             ))}
           </LineChart>
         </ResponsiveContainer>
+        
+        {/* Legend */}
+        <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-border">
+          {market.outcomes.slice(0, 4).map((outcome) => (
+            <div key={outcome.name} className="flex items-center gap-2">
+              <div 
+                className="w-3 h-3 rounded-full" 
+                style={{ backgroundColor: outcome.color }}
+              />
+              <span className="text-xs font-medium text-muted-foreground">
+                {outcome.name} <span className="font-mono text-white">{Math.round(outcome.probability)}%</span>
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Betting Panel */}

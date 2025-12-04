@@ -36,26 +36,39 @@ export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeConta
   }
 
   // Helper: Transform history points to chart data format
+  const now = new Date()
+  
   const processHistoryToChartData = (history: PricePoint[], probability: number, createdAt: string) => {
+    const createdDate = new Date(createdAt)
+    
     if (!history || history.length === 0) {
       // No history - create 2 points with current probability
       return [
-        { time: 'Création', price: probability },
-        { time: 'Maintenant', price: probability }
+        { time: formatLabel(createdDate), price: probability },
+        { time: 'Now', price: probability }
       ]
     }
     
     // Map history to chart format
     const chartData = history.map(p => ({
-      time: new Date(p.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      time: formatLabel(new Date(p.date)),
       price: p.probability
     }))
     
-    // Always add "Now" point
+    // Always add "Now" point to extend line to current time
     const lastPrice = chartData[chartData.length - 1]?.price || probability
-    chartData.push({ time: 'Maintenant', price: lastPrice })
+    chartData.push({ time: 'Now', price: lastPrice })
     
     return chartData
+  }
+  
+  // Simple label format for mini-charts
+  const formatLabel = (date: Date) => {
+    const isToday = date.toDateString() === now.toDateString()
+    if (isToday) {
+      return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    }
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   }
 
   // Transform Supabase data to match Market type if needed

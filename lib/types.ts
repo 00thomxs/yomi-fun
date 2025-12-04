@@ -38,6 +38,9 @@ export type MultiOutcomeMarket = {
   is_headline?: boolean // Added for hero market
   countdown: string
   historyData: { time: string; [key: string]: number | string }[]
+  history24h?: { time: string; [key: string]: number | string | Date }[]
+  history7d?: { time: string; [key: string]: number | string | Date }[]
+  historyAll?: { time: string; [key: string]: number | string | Date }[]
 }
 
 export type Market = BinaryMarket | MultiOutcomeMarket
