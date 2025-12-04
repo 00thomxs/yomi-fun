@@ -1,7 +1,13 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export type CreateMarketState = {
   message?: string
@@ -90,6 +96,29 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
     return { error: `Erreur création réponses: ${outcomesError.message}` }
   }
 
+  // 3. Insert Initial Price History
+  if (type === 'binary') {
+    const oui = outcomesData.find((o: any) => o.name === 'OUI')
+    const non = outcomesData.find((o: any) => o.name === 'NON')
+    if (oui && non) {
+      await supabaseAdmin.from('market_prices_history').insert([
+        { market_id: market.id, outcome_index: 1, probability: oui.probability / 100 },
+        { market_id: market.id, outcome_index: 0, probability: non.probability / 100 }
+      ])
+    }
+  } else {
+    // Multi: Sort by name to match betting.ts logic for consistent indexing
+    const sortedOutcomes = [...outcomesData].sort((a: any, b: any) => a.name.localeCompare(b.name))
+    
+    const historyData = sortedOutcomes.map((o: any, index: number) => ({
+      market_id: market.id,
+      outcome_index: index,
+      probability: o.probability / 100
+    }))
+    
+    await supabaseAdmin.from('market_prices_history').insert(historyData)
+  }
+
   revalidatePath('/admin')
   revalidatePath('/')
   
@@ -137,6 +166,11 @@ export async function resetPlatform(): Promise<{ error?: string; success?: boole
     console.error("Reset platform error:", error)
     return { error: `Erreur lors de la réinitialisation: ${error.message}` }
   }
+
+  // Clear History Tables (not covered by RPC yet)
+  // Using neq constraint to match all rows is a Supabase trick for "delete all"
+  await supabaseAdmin.from('market_prices_history').delete().neq('market_id', '00000000-0000-0000-0000-000000000000') // Using market_id as filter target
+  await supabaseAdmin.from('user_pnl_history').delete().neq('user_id', '00000000-0000-0000-0000-000000000000')
 
   revalidatePath('/', 'layout') // Clear full cache
   return { success: true }

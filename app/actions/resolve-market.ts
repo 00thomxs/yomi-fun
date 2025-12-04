@@ -92,9 +92,16 @@ export async function resolveMarket(
       isWinner = bet.outcome_id === winningOutcomeId
     }
 
-    // Get current PnL (total_won) for history
-    const { data: userProfile } = await supabaseAdmin.from('profiles').select('total_won').eq('id', bet.user_id).single()
-    const currentPnL = userProfile?.total_won || 0
+    // Get current PnL from HISTORY (most robust way)
+    const { data: lastHistory } = await supabaseAdmin
+      .from('user_pnl_history')
+      .select('pnl_value')
+      .eq('user_id', bet.user_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    const currentPnL = lastHistory?.pnl_value || 0
     
     if (isWinner) {
       // WINNER
@@ -254,9 +261,16 @@ export async function resolveMarketMulti(
       isBetWinner = isOutcomeWinner
     }
 
-    // Get current PnL (total_won) for history
-    const { data: userProfile } = await supabaseAdmin.from('profiles').select('total_won').eq('id', bet.user_id).single()
-    const currentPnL = userProfile?.total_won || 0
+    // Get current PnL from HISTORY
+    const { data: lastHistory } = await supabaseAdmin
+      .from('user_pnl_history')
+      .select('pnl_value')
+      .eq('user_id', bet.user_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    const currentPnL = lastHistory?.pnl_value || 0
 
     if (isBetWinner) {
       // WINNER
