@@ -38,6 +38,50 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     }))
   }
 
+  // Process real history for Multi Markets (Forward Fill strategy)
+  const processMultiHistory = (points: PricePoint[], outcomes: any[]) => {
+    if (!points || points.length === 0) return []
+
+    // 1. Sort by date
+    const sortedPoints = [...points].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+    // 2. Map outcomeIndex to outcome Name
+    const indexToName = new Map<number, string>()
+    outcomes.forEach((o, idx) => indexToName.set(idx, o.name))
+
+    const chartData: any[] = []
+    const currentValues = new Map<string, number>()
+
+    // Initialize currentValues with initial probabilities from outcomes (as fallback)
+    outcomes.forEach(o => currentValues.set(o.name, o.probability))
+
+    // 3. Walk through history
+    sortedPoints.forEach(point => {
+      const outcomeName = indexToName.get(point.outcomeIndex)
+      if (outcomeName) {
+        // Update the value for this outcome (convert back to percentage if needed, but history is already 0-100 based on my previous code?)
+        // Wait, in history action I did: probability: row.probability * 100
+        // So point.probability is 0-100.
+        currentValues.set(outcomeName, point.probability)
+        
+        // Create a snapshot
+        const snapshot: any = {
+          time: new Date(point.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+          fullDate: new Date(point.date),
+        }
+        
+        // Add all current values to snapshot
+        currentValues.forEach((val, key) => {
+          snapshot[key] = val
+        })
+        
+        chartData.push(snapshot)
+      }
+    })
+
+    return chartData
+  }
+
   // Transform to UI Model
   let market: Market
 
@@ -50,7 +94,7 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     const chartData = realHistory.length > 0 
       ? realHistory 
       : [{ time: 'Maintenant', fullDate: new Date(), price: prob }]
-
+    
     market = {
       ...rawMarket,
       type: 'binary',
@@ -67,14 +111,21 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       historyAll: chartData
     } as BinaryMarket
   } else {
+    // Multi Logic
+    const outcomes = rawMarket.outcomes || []
+    // Sort outcomes by name to match the indexing logic in createMarket/placeBet
+    const sortedOutcomes = [...outcomes].sort((a: any, b: any) => a.name.localeCompare(b.name))
+    
+    const multiHistory = processMultiHistory(history, sortedOutcomes)
+
     market = {
       ...rawMarket,
       type: 'multi',
       bgImage: rawMarket.image_url || "/placeholder.svg",
-      outcomes: rawMarket.outcomes || [],
+      outcomes: outcomes,
       isLive: rawMarket.is_live && rawMarket.status !== 'resolved', 
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
-      historyData: [] // TODO: Handle multi history visualization later
+      historyData: multiHistory.length > 0 ? multiHistory : []
     } as MultiOutcomeMarket
   }
 

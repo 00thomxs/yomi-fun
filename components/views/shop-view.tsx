@@ -106,13 +106,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
     if (lowerCat.includes("carte") || lowerCat.includes("gift")) return <CreditCard className="w-3 h-3" />
     if (lowerCat.includes("deal") || lowerCat.includes("shopping")) return <Tag className="w-3 h-3" />
     if (lowerCat.includes("experience")) return <Sparkles className="w-3 h-3" />
-    return <ShoppingBag className="w-3 h-3" />
+        return <ShoppingBag className="w-3 h-3" />
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
         <div className="flex items-center gap-3">
           <Link 
             href="/shop/buy-zeny"
@@ -158,32 +158,32 @@ export function ShopView({ initialItems }: ShopViewProps) {
           Aucun article disponible dans cette catégorie pour le moment.
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        {filteredItems.map((item) => (
+          <div
+            key={item.id}
               className="relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all group flex flex-col"
             >
               <div className="relative aspect-square overflow-hidden bg-black/20">
                 {item.image_url ? (
-                  <img
+              <img
                     src={item.image_url}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                alt={item.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                     <ShoppingBag className="w-12 h-12 opacity-20" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+            </div>
 
               <div className="p-4 space-y-3 flex-1 flex flex-col">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
-                  {getCategoryIcon(item.category)}
-                  <span>{item.category}</span>
-                </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+                {getCategoryIcon(item.category)}
+                <span>{item.category}</span>
+              </div>
                 <p className="font-semibold text-sm tracking-tight leading-snug flex-1">{item.name}</p>
                 <div className="mt-2 flex items-center justify-between">
                   <span className="font-mono text-primary text-sm font-bold flex items-center gap-1">
@@ -197,19 +197,19 @@ export function ShopView({ initialItems }: ShopViewProps) {
                         : 'bg-green-500/10 text-green-500'
                   }`}>
                     {item.stock === -1 ? 'Infini' : `${item.stock} dispo`}
-                  </span>
-                </div>
-                <button
+                </span>
+              </div>
+              <button
                   onClick={() => handlePurchaseClick(item)}
                   disabled={isPurchasing || item.stock === 0}
                   className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+              >
                   {item.stock === 0 ? "Rupture" : "Acheter"}
-                </button>
-              </div>
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
       )}
 
       {/* Purchase Modal */}

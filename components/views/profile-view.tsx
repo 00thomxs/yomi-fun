@@ -28,7 +28,7 @@ export function ProfileView() {
   const [history, setHistory] = useState<Transaction[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
   const [pnlHistory, setPnlHistory] = useState<PnlPoint[]>([])
-  
+
   useEffect(() => {
     const loadData = async () => {
       if (!user) return

@@ -116,7 +116,7 @@ export async function purchaseItem(itemId: string, deliveryInfo: string): Promis
   console.log(`[EMAIL_MOCK] TO: ${user.email}`)
   console.log(`[EMAIL_MOCK] SUBJECT: Confirmation de votre commande YOMI : ${item.name}`)
   console.log(`[EMAIL_MOCK] BODY: Merci pour votre achat ! Votre code/cadeau sera envoyé à cette adresse sous 24h.`)
-  
+
   revalidatePath('/shop')
   revalidatePath('/profile')
   revalidatePath('/admin/orders') // Important: Refresh admin view

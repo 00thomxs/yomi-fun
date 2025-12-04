@@ -20,7 +20,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [notifWin, setNotifWin] = useState(profile?.email_notif_win ?? true)
   const [notifMarketing, setNotifMarketing] = useState(profile?.email_notif_marketing ?? true)
-
+  
   // Delete Account State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletePassword, setDeletePassword] = useState("")
