@@ -250,17 +250,10 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     // Helper: Add "Now" point to extend lines to current time
     const addMultiNowPoint = (data: typeof baseMultiHistory) => {
       if (data.length === 0) {
-        // No data - create initial + now from current probabilities
-        const initialPoint: any = { 
-          time: formatTimeLabel(new Date(rawMarket.created_at)), 
-          fullDate: new Date(rawMarket.created_at) 
-        }
-        const nowPoint: any = { time: 'Maintenant', fullDate: now }
-        outcomes.forEach((o: any) => {
-          initialPoint[o.name] = Math.round(o.probability)
-          nowPoint[o.name] = Math.round(o.probability)
-        })
-        return [initialPoint, nowPoint]
+        // No data found for this timeframe.
+        // Do NOT invent data from current probabilities projected to the past.
+        // Return empty to show "No data" or just a flat line if we decide to handle it differently later.
+        return []
       }
       
       const lastSnapshot = data[data.length - 1]
