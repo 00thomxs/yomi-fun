@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
 import { EditProfileForm } from "@/components/profile/edit-profile-form"
 import { ChangePasswordForm } from "@/components/profile/change-password-form"
+import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 
 type Transaction = {
   id: string
@@ -26,13 +27,15 @@ export function ProfileView() {
   const [activeSettingsTab, setActiveSettingsTab] = useState<'menu' | 'edit' | 'password'>('menu')
   const [history, setHistory] = useState<Transaction[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
-
+  const [pnlHistory, setPnlHistory] = useState<PnlPoint[]>([])
+  
   useEffect(() => {
-    const fetchHistory = async () => {
+    const loadData = async () => {
       if (!user) return
-      const supabase = createClient()
       
-      const { data, error } = await supabase
+      // 1. Fetch Bets History
+      const supabase = createClient()
+      const { data: betsData } = await supabase
         .from('bets')
         .select(`
           id,
@@ -48,8 +51,8 @@ export function ProfileView() {
         .order('created_at', { ascending: false })
         .limit(50)
 
-      if (!error && data) {
-        const formattedHistory = data.map((bet: any) => ({
+      if (betsData) {
+        const formattedHistory = betsData.map((bet: any) => ({
           id: bet.id,
           created_at: bet.created_at,
           market_question: bet.markets?.question || "Marché inconnu",
@@ -61,10 +64,28 @@ export function ProfileView() {
         setHistory(formattedHistory)
       }
       setLoadingHistory(false)
+
+      // 2. Fetch PnL History
+      const pnlData = await getUserPnLHistory(user.id)
+      setPnlHistory(pnlData)
     }
 
-    fetchHistory()
+    loadData()
   }, [user])
+
+  // Prepare Chart Data
+  const chartData = pnlHistory.length > 0 
+    ? pnlHistory.map(p => ({
+        day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+        fullDate: new Date(p.date),
+        pnl: p.value
+      }))
+    : [{ day: 'Start', fullDate: new Date(), pnl: 0 }]
+
+  // Use real PnL from history (last point)
+  const currentPnL = pnlHistory.length > 0 
+    ? pnlHistory[pnlHistory.length - 1].value 
+    : 0
 
   // Use profile data if available, otherwise use defaults
   const userStats = {
@@ -73,28 +94,12 @@ export function ProfileView() {
     totalWon: profile?.total_won ?? 0,
     currentStreak: profile?.streak ?? 0,
     avgBetSize: profile?.total_bets ? Math.round(userBalance / Math.max(profile.total_bets, 1)) : 0,
-    bestWin: 0, // Not tracked yet
-    totalPnL: (profile?.total_won ?? 0) - (userBalance - 10000), // Approximate P&L
-    rank: 1, // TODO: Calculate from leaderboard
+    bestWin: 0, 
+    totalPnL: currentPnL, // REAL PnL
+    rank: 1, 
     xp: profile?.xp ?? 0,
     level: profile?.level ?? 1,
   }
-
-  const generatePnLData = (days: number) => {
-    const data = []
-    let pnl = 0
-    for (let i = 0; i <= days; i++) {
-      const change = (Math.random() - 0.4) * 2000
-      pnl += change
-      pnl = Math.max(-5000, pnl)
-      if (i === days) pnl = userStats.totalPnL
-      data.push({ day: `${i}`, pnl: Math.round(pnl) })
-    }
-    return data
-  }
-
-  const pnlData =
-    pnlTimeframe === "24H" ? generatePnLData(24) : pnlTimeframe === "7J" ? generatePnLData(7) : generatePnLData(30)
 
   const badges = profile?.level && profile.level >= 5 
     ? [{ icon: <Star className="w-3 h-3 text-yellow-400" />, label: `Niveau ${profile.level}` }]
@@ -239,9 +244,9 @@ export function ProfileView() {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Won</p>
-                <p className={`text-lg font-bold font-mono ${(userStats.totalWon || 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {(userStats.totalWon || 0) >= 0 ? "+" : ""}{userStats.totalWon} <CurrencySymbol />
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Bénéfice Net</p>
+                <p className={`text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
                 </p>
               </div>
             </div>
@@ -275,7 +280,7 @@ export function ProfileView() {
           </div>
         </div>
         <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={pnlData}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="pnlGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />

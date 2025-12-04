@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { MarketDetailContainer } from "@/components/containers/market-detail-container"
 import { notFound } from "next/navigation"
+import { getMarketHistory } from "@/app/actions/history"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -23,5 +24,7 @@ export default async function MarketPage({ params }: Props) {
     notFound()
   }
 
-  return <MarketDetailContainer market={market} />
+  const history = await getMarketHistory(id)
+
+  return <MarketDetailContainer market={market} history={history} />
 }
