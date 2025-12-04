@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package } from "lucide-react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package, CheckCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
@@ -21,6 +22,30 @@ export function ShopView({ initialItems }: ShopViewProps) {
   
   const { toast } = useToast()
   const { userBalance, setUserBalance } = useUser()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Check for successful payment on mount
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      const amount = searchParams.get("amount")
+      
+      toast({
+        title: "Paiement réussi ! 🎉",
+        description: (
+          <div className="flex items-center gap-2 mt-1">
+            <CheckCircle className="w-4 h-4 text-green-500" />
+            <span>Votre compte a été crédité de <span className="font-bold text-primary">{Number(amount).toLocaleString()} Zeny</span>.</span>
+          </div>
+        ),
+        className: "border-green-500/50 bg-green-500/10",
+        duration: 5000,
+      })
+
+      // Clean URL
+      router.replace("/shop")
+    }
+  }, [searchParams, toast, router])
 
   const categories = [
     { id: "all", name: "Tout", icon: ShoppingBag },
