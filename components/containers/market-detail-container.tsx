@@ -201,50 +201,48 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     // Get base history (without "Now" point)
     let baseMultiHistory = processMultiHistory(history, sortedOutcomes)
 
-    // If no history, create initial point from current outcome data
+    // If no history, create initial point ONLY if it's a brand new market (created < 1 min ago)
+    // Otherwise we risk projecting current prices into the past.
     if (baseMultiHistory.length === 0 && outcomes.length > 0) {
-      const initialPoint: any = { 
-        time: formatTimeLabel(new Date(rawMarket.created_at)), 
-        fullDate: new Date(rawMarket.created_at) 
-      }
-      outcomes.forEach((o: any) => {
-        initialPoint[o.name] = Math.round(o.probability)
-      })
-      baseMultiHistory.push(initialPoint)
+       const isNew = new Date().getTime() - new Date(rawMarket.created_at).getTime() < 60000
+       if (isNew) {
+          const initialPoint: any = { 
+            time: formatTimeLabel(new Date(rawMarket.created_at)), 
+            fullDate: new Date(rawMarket.created_at) 
+          }
+          outcomes.forEach((o: any) => {
+            initialPoint[o.name] = Math.round(o.probability)
+          })
+          baseMultiHistory.push(initialPoint)
+       }
     }
 
-    // Filter by timeframe for Multi (same logic)
+    // Filter by timeframe for Multi
     const filterMultiByTimeframe = (data: typeof baseMultiHistory, hours: number | 'ALL') => {
       if (hours === 'ALL') return addMultiNowPoint(baseMultiHistory)
 
       const cutoff = new Date(now.getTime() - hours * 60 * 60 * 1000)
       const pointsInWindow = data.filter(p => p.fullDate >= cutoff)
 
-      // Find state at cutoff
+      // Find state at cutoff (look backwards in time)
       let startPoint = null
-      if (pointsInWindow.length < data.length) {
-         const previousPoint = [...data].reverse().find(p => p.fullDate < cutoff)
-         if (previousPoint) {
-            // For multi, we need to copy ALL values from the previous point
-            startPoint = {
-              ...previousPoint,
-              time: formatTimeLabel(cutoff),
-              fullDate: cutoff
-            }
-         }
+      const previousPoint = [...data].reverse().find(p => p.fullDate < cutoff)
+         
+      if (previousPoint) {
+        // For multi, we need to copy ALL values from the previous point
+        startPoint = {
+          ...previousPoint,
+          time: formatTimeLabel(cutoff),
+          fullDate: cutoff
+        }
       }
 
       let result = pointsInWindow
       if (startPoint) {
         result = [startPoint, ...pointsInWindow]
-      } else if (result.length === 0 && data.length > 0) {
-         const last = data[data.length - 1]
-         result = [{
-            ...last,
-            time: formatTimeLabel(cutoff),
-            fullDate: cutoff
-         }]
       }
+      // If no points in window and no previous point, we simply have NO data for this timeframe.
+      // We do NOT fallback to the last known point because that would project future/current prices into the past.
 
       return addMultiNowPoint(result)
     }
