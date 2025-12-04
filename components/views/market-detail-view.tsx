@@ -394,6 +394,14 @@ function MultiMarketContent({
   userBalance: number
   isResolved: boolean
 }) {
+  // Calculate dynamic Y max for Multi
+  const allProbs = [
+    ...market.outcomes.map(o => o.probability),
+    ...chartData.flatMap(d => market.outcomes.map(o => Number(d[o.name]) || 0))
+  ]
+  const maxProb = Math.max(...allProbs, 40) // Minimum 40% scale to avoid too much zoom
+  const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
+
   return (
     <>
       {/* Resolved Banner */}
@@ -514,7 +522,7 @@ function MultiMarketContent({
               minTickGap={30}
             />
             <YAxis
-              domain={[0, 'auto']} 
+              domain={[0, multiYMax]} 
               orientation="right"
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
