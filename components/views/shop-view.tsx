@@ -44,8 +44,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
         duration: 5000,
       })
 
-      // Clean URL
-      router.replace("/shop")
+      // Clean URL after a short delay to ensure toast is seen
+      setTimeout(() => {
+        router.replace("/shop")
+      }, 1000)
     }
   }, [searchParams, toast, router])
 
