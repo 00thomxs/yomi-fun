@@ -91,10 +91,19 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     
     // Use real history or fallback to current price point
     const realHistory = processHistory(history, 1) // 1 = OUI
-    const chartData = realHistory.length > 0 
+    let chartData = realHistory.length > 0 
       ? realHistory 
-      : [{ time: 'Maintenant', fullDate: new Date(), price: prob }]
-    
+      : [{ time: 'Création', fullDate: new Date(rawMarket.created_at), price: prob }]
+
+    // ALWAYS add "Now" point to draw a line (a chart needs at least 2 points!)
+    if (chartData.length > 0) {
+      const lastPoint = chartData[chartData.length - 1]
+      chartData = [
+        ...chartData, 
+        { time: 'Maintenant', fullDate: new Date(), price: lastPoint.price }
+      ]
+    }
+
     market = {
       ...rawMarket,
       type: 'binary',
@@ -117,6 +126,27 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     const sortedOutcomes = [...outcomes].sort((a: any, b: any) => a.name.localeCompare(b.name))
     
     const multiHistory = processMultiHistory(history, sortedOutcomes)
+
+    // ALWAYS add "Now" point for Multi (chart needs at least 2 points!)
+    if (multiHistory.length > 0) {
+      const lastSnapshot = multiHistory[multiHistory.length - 1]
+      multiHistory.push({
+        ...lastSnapshot,
+        time: 'Maintenant',
+        fullDate: new Date()
+      })
+    } else if (outcomes.length > 0) {
+      // No history yet, create initial + now points from current outcome data
+      const initialPoint: any = { time: 'Création', fullDate: new Date(rawMarket.created_at) }
+      const nowPoint: any = { time: 'Maintenant', fullDate: new Date() }
+      
+      outcomes.forEach((o: any) => {
+        initialPoint[o.name] = o.probability
+        nowPoint[o.name] = o.probability
+      })
+      
+      multiHistory.push(initialPoint, nowPoint)
+    }
 
     market = {
       ...rawMarket,

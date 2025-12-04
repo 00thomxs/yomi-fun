@@ -5,7 +5,7 @@ import { ArrowLeft, Clock, HelpCircle, Lock } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
-import { generateMultiOutcomeData, TIME_LABELS_1H, TIME_LABELS_4H, TIME_LABELS_1J } from "@/lib/mock-data"
+// Mock data no longer needed - using real history from DB
 import { CATEGORIES } from "@/lib/constants"
 
 type MarketDetailViewProps = {
@@ -41,12 +41,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
   const getMultiChartData = () => {
     if (market.type !== "multi") return []
     const multiMarket = market as MultiOutcomeMarket
-    const labels = timeframe === "1H" ? TIME_LABELS_1H : timeframe === "4H" ? TIME_LABELS_4H : TIME_LABELS_1J
-    return generateMultiOutcomeData(
-      labels.length,
-      multiMarket.outcomes.map((o) => ({ name: o.name, probability: o.probability })),
-      labels,
-    )
+    // Use real history data from container
+    return multiMarket.historyData || []
   }
 
   const chartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
@@ -481,12 +477,13 @@ function MultiMarketContent({
               tickLine={false}
             />
             <YAxis
-              domain={[0, 50]}
+              domain={[0, 100]}
               stroke="#64748b"
               style={{ fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
+              ticks={[0, 25, 50, 75, 100]}
             />
             <Tooltip
               contentStyle={{
