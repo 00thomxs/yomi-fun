@@ -76,12 +76,12 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
     return { error: `Erreur création marché: ${marketError.message}` }
   }
 
-  // 2. Insert Outcomes
+  // 2. Insert Outcomes (ensure integer probabilities)
   const outcomesData = outcomes.map((o: any) => ({
     market_id: market.id,
     name: o.name,
     color: o.color,
-    probability: parseFloat(o.probability),
+    probability: Math.round(parseFloat(o.probability)),
     is_winner: null
   }))
 

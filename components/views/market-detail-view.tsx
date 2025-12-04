@@ -58,15 +58,15 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
     if (market.type === "binary") {
       const binaryMarket = market as BinaryMarket
       const odds = betChoice === "YES" ? binaryMarket.yesPrice : binaryMarket.noPrice
-      return Math.round((amount / odds) * 100) / 100
+      return Math.round(amount / odds) // Integer only
     } else {
       const multiMarket = market as MultiOutcomeMarket
       const outcome = multiMarket.outcomes.find((o) => o.name === betChoice)
       if (outcome) {
         const prob = betType === "OUI" ? outcome.probability : 100 - outcome.probability
-        return Math.round((amount / (prob / 100)) * 100) / 100
+        return Math.round(amount / (prob / 100)) // Integer only
       }
-      return amount
+      return Math.round(amount)
     }
   }
 
@@ -202,7 +202,7 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="text-center space-y-2">
-        <p className="text-7xl font-bold tracking-tighter text-white font-mono">{market.probability}%</p>
+        <p className="text-7xl font-bold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
         <p className="text-sm font-medium text-muted-foreground tracking-tight uppercase">
           {market.probability >= 85
             ? "Quasi Certain"
@@ -272,7 +272,7 @@ function BinaryMarketContent({
                 fontWeight: "bold",
                 fontFamily: "ui-monospace, monospace",
               }}
-              formatter={(value: number) => `${value.toFixed(1)}%`}
+              formatter={(value: number) => `${Math.round(value)}%`}
             />
             <Area
               type="linear"
@@ -288,7 +288,7 @@ function BinaryMarketContent({
         <div className="flex justify-end items-center gap-2 mt-2">
           <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
           <p className="text-sm font-bold text-white font-mono tracking-tight">
-            {chartData[chartData.length - 1]?.price?.toFixed(1)}%
+            {Math.round(chartData[chartData.length - 1]?.price || 0)}%
           </p>
         </div>
       </div>
@@ -305,7 +305,7 @@ function BinaryMarketContent({
                 : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
             }`}
           >
-            OUI • <span className="font-mono">{market.probability}%</span>
+            OUI • <span className="font-mono">{Math.round(market.probability)}%</span>
           </button>
           <button
             onClick={() => setBetChoice("NO")}

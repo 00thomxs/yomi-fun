@@ -35,11 +35,11 @@ export function HomeContainer({ initialMarkets }: HomeContainerProps) {
 
   // Transform Supabase data to match Market type if needed
   const markets = initialMarkets.map(m => {
-    // Find probability for binary markets
+    // Find probability for binary markets (ensure integer)
     let probability = 50
     if (m.type === 'binary' && m.outcomes && m.outcomes.length > 0) {
       const yesOutcome = m.outcomes.find((o: any) => o.name === 'OUI')
-      if (yesOutcome) probability = yesOutcome.probability
+      if (yesOutcome) probability = Math.round(yesOutcome.probability)
     }
 
     return {

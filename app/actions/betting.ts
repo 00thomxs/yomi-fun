@@ -147,10 +147,10 @@ export async function placeBet(
   if (odds > 100) odds = 100
   if (odds < 1.01) odds = 1.01
   
-  potentialPayout = investment * odds
-  const currentOdds = odds
+  potentialPayout = Math.round(investment * odds) // Ensure integer
+  const currentOdds = Math.round(odds * 100) / 100 // Keep 2 decimals for odds display only
 
-  console.log(`[BET_CALC] Choice: ${selectedOutcome.name} (${direction}), Prob: ${selectedOutcome.probability}%, Odds: ${odds}, Payout: ${potentialPayout}`)
+  console.log(`[BET_CALC] Choice: ${selectedOutcome.name} (${direction}), Prob: ${selectedOutcome.probability}%, Odds: ${currentOdds}, Payout: ${potentialPayout}`)
 
   // 4. TRANSACTION
   
@@ -180,10 +180,10 @@ export async function placeBet(
      // Update pools using values calculated in CORE LOGIC
      updateData = { ...updateData, pool_yes: newPoolYes, pool_no: newPoolNo }
      
-     // Update Probs
+     // Update Probs (ensure integers)
      const total = newPoolYes + newPoolNo
-     const probYes = (newPoolYes / total) * 100
-     const probNo = (newPoolNo / total) * 100
+     const probYes = Math.round((newPoolYes / total) * 100)
+     const probNo = Math.round((newPoolNo / total) * 100)
      
      await supabase.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
      await supabase.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
@@ -191,8 +191,8 @@ export async function placeBet(
      // HISTORY: Insert price history for Binary
      // 0 = NON, 1 = OUI
      await supabaseAdmin.from('market_prices_history').insert([
-       { market_id: marketId, outcome_index: 1, probability: probYes / 100 }, // OUI
-       { market_id: marketId, outcome_index: 0, probability: probNo / 100 }   // NON
+       { market_id: marketId, outcome_index: 1, probability: probYes / 100 }, // OUI (stored as decimal 0-1)
+       { market_id: marketId, outcome_index: 0, probability: probNo / 100 }   // NON (stored as decimal 0-1)
      ])
 
   } else {
@@ -209,8 +209,8 @@ export async function placeBet(
         newProb -= probChange;
      }
      
-     // Cap between 1% and 99%
-     newProb = Math.max(1, Math.min(99, newProb));
+     // Cap between 1% and 99% (ensure integer)
+     newProb = Math.round(Math.max(1, Math.min(99, newProb)));
      
      await supabase.from('outcomes').update({ probability: newProb }).eq('id', selectedOutcome.id)
 
@@ -223,7 +223,7 @@ export async function placeBet(
         await supabaseAdmin.from('market_prices_history').insert({
           market_id: marketId,
           outcome_index: outcomeIndex,
-          probability: newProb / 100
+          probability: newProb / 100 // Stored as decimal 0-1
         })
      }
   }

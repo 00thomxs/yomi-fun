@@ -73,19 +73,35 @@ export function ProfileView() {
     loadData()
   }, [user])
 
-  // Prepare Chart Data
-  const chartData = pnlHistory.length > 0 
-    ? pnlHistory.map(p => ({
+  // Prepare Chart Data with timeframe filtering
+  const now = new Date()
+  const getTimeframeCutoff = () => {
+    if (pnlTimeframe === "24H") return new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    if (pnlTimeframe === "7J") return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) // 30J
+  }
+
+  const filteredPnlHistory = pnlHistory.filter(p => new Date(p.date) >= getTimeframeCutoff())
+  
+  const chartData = filteredPnlHistory.length > 0 
+    ? filteredPnlHistory.map(p => ({
         day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
         fullDate: new Date(p.date),
-        pnl: p.value
+        pnl: Math.round(p.value) // Ensure integer
       }))
-    : [{ day: 'Start', fullDate: new Date(), pnl: 0 }]
+    : [{ day: 'Début', fullDate: new Date(), pnl: 0 }, { day: 'Maintenant', fullDate: new Date(), pnl: 0 }]
 
   // Use real PnL from history (last point)
   const currentPnL = pnlHistory.length > 0 
-    ? pnlHistory[pnlHistory.length - 1].value 
+    ? Math.round(pnlHistory[pnlHistory.length - 1].value)
     : 0
+
+  // Calculate dynamic YAxis domain (min -10000, max +10000, but expands if needed)
+  const pnlValues = chartData.map(d => d.pnl)
+  const minPnL = Math.min(...pnlValues, 0)
+  const maxPnL = Math.max(...pnlValues, 0)
+  const yAxisMin = Math.min(minPnL, -10000)
+  const yAxisMax = Math.max(maxPnL, 10000)
 
   // Use profile data if available, otherwise use defaults
   const userStats = {
@@ -288,7 +304,13 @@ export function ProfileView() {
               </linearGradient>
             </defs>
             <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#666" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#666" }} axisLine={false} tickLine={false} />
+            <YAxis 
+              domain={[yAxisMin, yAxisMax]} 
+              tick={{ fontSize: 10, fill: "#666" }} 
+              axisLine={false} 
+              tickLine={false}
+              tickFormatter={(value) => `${Math.round(value / 1000)}k`}
+            />
             <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
             <Tooltip
               contentStyle={{
@@ -296,7 +318,7 @@ export function ProfileView() {
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: "8px",
               }}
-              formatter={(value: number) => [`${value.toLocaleString()} Ƶ`, "P&L"]}
+              formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
             />
             <Area type="monotone" dataKey="pnl" stroke="#10b981" strokeWidth={2} dot={false} fill="url(#pnlGradient)" />
           </AreaChart>

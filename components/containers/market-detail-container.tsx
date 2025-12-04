@@ -30,11 +30,11 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
     
     if (filtered.length === 0) return []
 
-    // Map to Chart Data
+    // Map to Chart Data (ensure integers)
     return filtered.map(p => ({
       time: new Date(p.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
       fullDate: new Date(p.date), 
-      price: p.probability
+      price: Math.round(p.probability)
     }))
   }
 
@@ -70,9 +70,9 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
           fullDate: new Date(point.date),
         }
         
-        // Add all current values to snapshot
+        // Add all current values to snapshot (ensure integers)
         currentValues.forEach((val, key) => {
-          snapshot[key] = val
+          snapshot[key] = Math.round(val)
         })
         
         chartData.push(snapshot)
@@ -100,23 +100,34 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       const lastPoint = chartData[chartData.length - 1]
       chartData = [
         ...chartData, 
-        { time: 'Maintenant', fullDate: new Date(), price: lastPoint.price }
+        { time: 'Maintenant', fullDate: new Date(), price: Math.round(lastPoint.price) }
       ]
+    }
+
+    // Filter by timeframe
+    const now = new Date()
+    const filterByTimeframe = (data: typeof chartData, hours: number) => {
+      const cutoff = new Date(now.getTime() - hours * 60 * 60 * 1000)
+      const filtered = data.filter(p => p.fullDate >= cutoff)
+      // Always include at least the last point + now if filtering removes everything
+      if (filtered.length < 2 && data.length >= 2) {
+        return [data[data.length - 2], data[data.length - 1]]
+      }
+      return filtered
     }
 
     market = {
       ...rawMarket,
       type: 'binary',
-      probability: prob,
+      probability: Math.round(prob),
       bgImage: rawMarket.image_url || "/placeholder.svg",
       yesPrice: prob / 100,
       noPrice: (100 - prob) / 100,
       volatility: "Moyenne",
       countdown: new Date(rawMarket.closes_at).toLocaleDateString(),
       isLive: rawMarket.is_live && rawMarket.status !== 'resolved', 
-      // Use same data for all timeframes for MVP (simplification)
-      history24h: chartData,
-      history7d: chartData,
+      history24h: filterByTimeframe(chartData, 24),
+      history7d: filterByTimeframe(chartData, 24 * 7),
       historyAll: chartData
     } as BinaryMarket
   } else {
@@ -141,8 +152,8 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       const nowPoint: any = { time: 'Maintenant', fullDate: new Date() }
       
       outcomes.forEach((o: any) => {
-        initialPoint[o.name] = o.probability
-        nowPoint[o.name] = o.probability
+        initialPoint[o.name] = Math.round(o.probability)
+        nowPoint[o.name] = Math.round(o.probability)
       })
       
       multiHistory.push(initialPoint, nowPoint)
