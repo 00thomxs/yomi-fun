@@ -95,7 +95,7 @@ export function BuyZenyView() {
           Recharge tes <span className="text-primary">Zeny</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
-          Achète des Zeny pour parier sur tes sujets préférés et grimper dans le classement.
+          Achète des Zeny pour parier sur tes events préférés et grimper dans le classement.
           Plus le pack est gros, plus le bonus est important !
         </p>
       </div>

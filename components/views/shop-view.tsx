@@ -27,7 +27,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
   // Check for successful payment on mount
   useEffect(() => {
-    if (searchParams.get("success") === "true") {
+    const success = searchParams.get("success")
+    console.log("ShopView mounted. Success param:", success)
+
+    if (success === "true") {
       const amount = searchParams.get("amount")
       
       toast({
