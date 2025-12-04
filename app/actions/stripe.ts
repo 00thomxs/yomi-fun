@@ -28,9 +28,8 @@ export async function createStripeCheckoutSession(packId: string) {
     }
 
     // 3. Get Origin (for redirect URLs)
-    // headers() is async in newer Next.js versions but currently sync in 14? 
-    // Safe way: use a fixed URL in production or try to infer
-    const headersList = headers()
+    // headers() is async in newer Next.js versions
+    const headersList = await headers()
     const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
     // 4. Create Checkout Session
