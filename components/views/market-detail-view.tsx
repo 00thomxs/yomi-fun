@@ -351,7 +351,7 @@ function MultiMarketContent({
 }: {
   market: MultiOutcomeMarket
   timeframe: string
-  setTimeframe: (tf: "1H" | "4H" | "1J") => void
+  setTimeframe: (tf: "24H" | "7J" | "TOUT") => void
   betChoice: string
   setBetChoice: (choice: string) => void
   betType: "OUI" | "NON"
