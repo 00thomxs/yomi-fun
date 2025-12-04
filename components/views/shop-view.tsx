@@ -92,13 +92,22 @@ export function ShopView({ initialItems }: ShopViewProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
-        <Link 
-          href="/orders"
-          className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
-        >
-          <Package className="w-4 h-4" />
-          Mes Commandes
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/shop/buy-zeny"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+          >
+            <CreditCard className="w-4 h-4" />
+            Acheter des Zeny
+          </Link>
+          <Link 
+            href="/orders"
+            className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
+          >
+            <Package className="w-4 h-4" />
+            Mes Commandes
+          </Link>
+        </div>
       </div>
 
       {/* Category Filter */}
