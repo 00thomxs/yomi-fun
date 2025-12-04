@@ -1,7 +1,14 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+
+// Init Admin Client for Price History insertion (bypassing RLS)
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export type BetResult = {
   success?: boolean
@@ -180,6 +187,14 @@ export async function placeBet(
      
      await supabase.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
      await supabase.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
+
+     // HISTORY: Insert price history for Binary
+     // 0 = NON, 1 = OUI
+     await supabaseAdmin.from('market_prices_history').insert([
+       { market_id: marketId, outcome_index: 1, probability: probYes / 100 }, // OUI
+       { market_id: marketId, outcome_index: 0, probability: probNo / 100 }   // NON
+     ])
+
   } else {
      // Multi Market Dynamic Odds Logic (Simplified)
      // Increase probability of the chosen outcome based on bet amount relative to "virtual liquidity"
@@ -198,6 +213,19 @@ export async function placeBet(
      newProb = Math.max(1, Math.min(99, newProb));
      
      await supabase.from('outcomes').update({ probability: newProb }).eq('id', selectedOutcome.id)
+
+     // HISTORY: Insert price history for Multi
+     // Find index based on sorted list to keep consistency
+     const sortedOutcomes = [...marketOutcomes].sort((a, b) => a.name.localeCompare(b.name))
+     const outcomeIndex = sortedOutcomes.findIndex(o => o.id === selectedOutcome.id)
+     
+     if (outcomeIndex !== -1) {
+        await supabaseAdmin.from('market_prices_history').insert({
+          market_id: marketId,
+          outcome_index: outcomeIndex,
+          probability: newProb / 100
+        })
+     }
   }
 
   const { error: updateError } = await supabase

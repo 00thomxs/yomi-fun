@@ -1,7 +1,14 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+
+// Init Admin Client
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export type ResolutionResult = {
   success?: boolean
@@ -84,11 +91,26 @@ export async function resolveMarket(
       // Bet FOR an outcome (Default 'YES'): Wins if that outcome IS the winner
       isWinner = bet.outcome_id === winningOutcomeId
     }
+
+    // Get current PnL (total_won) for history
+    const { data: userProfile } = await supabaseAdmin.from('profiles').select('total_won').eq('id', bet.user_id).single()
+    const currentPnL = userProfile?.total_won || 0
     
     if (isWinner) {
       // WINNER
       const payout = bet.potential_payout // Calculated at bet time
-      console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}`)
+      const profit = payout - bet.amount
+      const newPnL = currentPnL + profit
+
+      console.log(`[RESOLVE] Bet ${bet.id} is a WINNER, payout: ${payout}, profit: ${profit}`)
+
+      // Insert PnL History
+      await supabaseAdmin.from('user_pnl_history').insert({
+        user_id: bet.user_id,
+        pnl_value: newPnL,
+        change_amount: profit,
+        bet_id: bet.id
+      })
 
       // A. Update User Balance, Stats, XP and Level using secure RPC
       const XP_PER_WIN = 50
@@ -122,6 +144,17 @@ export async function resolveMarket(
 
     } else {
       // LOSER
+      const profit = -bet.amount
+      const newPnL = currentPnL + profit
+
+      // Insert PnL History
+      await supabaseAdmin.from('user_pnl_history').insert({
+        user_id: bet.user_id,
+        pnl_value: newPnL,
+        change_amount: profit,
+        bet_id: bet.id
+      })
+
       // Update stats via RPC (Reset streak, recalculate Win Rate)
       const { error: rpcError } = await supabase.rpc('update_loser_stats', {
         p_user_id: bet.user_id,
@@ -221,9 +254,23 @@ export async function resolveMarketMulti(
       isBetWinner = isOutcomeWinner
     }
 
+    // Get current PnL (total_won) for history
+    const { data: userProfile } = await supabaseAdmin.from('profiles').select('total_won').eq('id', bet.user_id).single()
+    const currentPnL = userProfile?.total_won || 0
+
     if (isBetWinner) {
       // WINNER
       const payout = bet.potential_payout
+      const profit = payout - bet.amount
+      const newPnL = currentPnL + profit
+
+      // Insert PnL History
+      await supabaseAdmin.from('user_pnl_history').insert({
+        user_id: bet.user_id,
+        pnl_value: newPnL,
+        change_amount: profit,
+        bet_id: bet.id
+      })
       
       const XP_PER_WIN = 50
       const { error: rpcError } = await supabase.rpc('update_winner_stats', {
@@ -248,6 +295,17 @@ export async function resolveMarketMulti(
 
     } else {
       // LOSER
+      const profit = -bet.amount
+      const newPnL = currentPnL + profit
+
+      // Insert PnL History
+      await supabaseAdmin.from('user_pnl_history').insert({
+        user_id: bet.user_id,
+        pnl_value: newPnL,
+        change_amount: profit,
+        bet_id: bet.id
+      })
+
       const { error: rpcError } = await supabase.rpc('update_loser_stats', {
         p_user_id: bet.user_id,
         p_bet_amount: bet.amount // Add bet amount for PnL
