@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package, CheckCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
 import { purchaseItem } from "@/app/actions/shop"
@@ -20,7 +20,6 @@ export function ShopView({ initialItems }: ShopViewProps) {
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null)
   const [deliveryInfo, setDeliveryInfo] = useState("")
   
-  const { toast } = useToast()
   const { userBalance, setUserBalance } = useUser()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -33,14 +32,8 @@ export function ShopView({ initialItems }: ShopViewProps) {
     if (success === "true") {
       const amount = searchParams.get("amount")
       
-      toast({
-        title: "Paiement réussi ! 🎉",
-        description: (
-          <div className="flex items-center gap-2 mt-1 text-green-500">
-            <CheckCircle className="w-4 h-4" />
-            <span className="text-foreground">Votre compte a été crédité de <span className="font-bold text-primary">{Number(amount).toLocaleString()} Zeny</span>.</span>
-          </div>
-        ),
+      toast.success("Paiement réussi ! 🎉", {
+        description: `Votre compte a été crédité de ${Number(amount).toLocaleString()} Zeny.`,
         duration: 5000,
       })
 
@@ -49,7 +42,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
         router.replace("/shop")
       }, 1000)
     }
-  }, [searchParams, toast, router])
+  }, [searchParams, router])
 
   const categories = [
     { id: "all", name: "Tout", icon: ShoppingBag },
@@ -89,10 +82,9 @@ export function ShopView({ initialItems }: ShopViewProps) {
       const result = await purchaseItem(selectedItem.id, deliveryInfo)
       
       if (result.error) {
-        toast({ title: "Erreur", description: result.error, variant: "destructive" })
+        toast.error("Erreur", { description: result.error })
       } else {
-        toast({ 
-          title: "Commande validée !", 
+        toast.success("Commande validée !", {
           description: `Vous avez acheté ${selectedItem.name}. Vous recevrez bientôt des nouvelles.`
         })
         if (result.newBalance !== undefined) {
@@ -102,7 +94,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
       }
     } catch (error) {
       console.error(error)
-      toast({ title: "Erreur", description: "Une erreur est survenue.", variant: "destructive" })
+      toast.error("Erreur", { description: "Une erreur est survenue." })
     } finally {
       setIsPurchasing(false)
     }

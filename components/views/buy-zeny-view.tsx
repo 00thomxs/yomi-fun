@@ -4,12 +4,11 @@ import { useState } from 'react'
 import { Check, Zap, Sparkles, Crown, Star } from 'lucide-react'
 import { ZENY_PACKS } from '@/lib/constants'
 import { CurrencySymbol } from '@/components/ui/currency-symbol'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { createStripeCheckoutSession } from '@/app/actions/stripe'
 
 export function BuyZenyView() {
   const [loadingId, setLoadingId] = useState<string | null>(null)
-  const { toast } = useToast()
 
   const handleBuy = async (packId: string) => {
     setLoadingId(packId)
@@ -17,10 +16,8 @@ export function BuyZenyView() {
       const { url, error } = await createStripeCheckoutSession(packId)
       
       if (error) {
-        toast({
-          title: "Erreur",
+        toast.error("Erreur", {
           description: error,
-          variant: "destructive"
         })
         return
       }
@@ -30,10 +27,8 @@ export function BuyZenyView() {
       }
     } catch (error) {
       console.error(error)
-      toast({
-        title: "Erreur",
+      toast.error("Erreur", {
         description: "Une erreur est survenue lors de la connexion à Stripe.",
-        variant: "destructive"
       })
     } finally {
       setLoadingId(null)
