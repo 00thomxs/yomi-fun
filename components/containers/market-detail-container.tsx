@@ -112,15 +112,6 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       ? realHistory 
       : [{ time: formatTimeLabel(new Date(rawMarket.created_at)), fullDate: new Date(rawMarket.created_at), price: Math.round(prob) }]
 
-    // Helper: Format time label
-    const formatTimeLabel = (date: Date) => {
-      const isToday = date.toDateString() === now.toDateString()
-      if (isToday) {
-        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-      }
-      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-    }
-
     // STRICT Timeframe Filter
     // This ensures the chart starts exactly at the timeframe cutoff (1H, 1D, etc.)
     // even if the last bet was days ago.
