@@ -1,7 +1,7 @@
 "use client"
 
 import { Clock, Users, Activity, HelpCircle } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer } from "recharts"
+import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -206,6 +206,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <stop offset="100%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0} />
                 </linearGradient>
               </defs>
+              <YAxis domain={[0, 100]} hide />
+              <ReferenceLine y={50} stroke="#ffffff" strokeOpacity={0.1} strokeDasharray="3 3" />
               <Area
                 type="monotone"
                 dataKey="price"
