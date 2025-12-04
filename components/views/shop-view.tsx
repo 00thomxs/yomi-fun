@@ -33,12 +33,11 @@ export function ShopView({ initialItems }: ShopViewProps) {
       toast({
         title: "Paiement réussi ! 🎉",
         description: (
-          <div className="flex items-center gap-2 mt-1">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>Votre compte a été crédité de <span className="font-bold text-primary">{Number(amount).toLocaleString()} Zeny</span>.</span>
+          <div className="flex items-center gap-2 mt-1 text-green-500">
+            <CheckCircle className="w-4 h-4" />
+            <span className="text-foreground">Votre compte a été crédité de <span className="font-bold text-primary">{Number(amount).toLocaleString()} Zeny</span>.</span>
           </div>
         ),
-        className: "border-green-500/50 bg-green-500/10",
         duration: 5000,
       })
 
