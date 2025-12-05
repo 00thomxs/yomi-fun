@@ -140,9 +140,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
       {/* Season Banner */}
       {hasSeason && (
-        <div className="space-y-8">
+        <div className="space-y-6 flex flex-col items-center">
           {/* Rewards Card - Golden Border Style */}
-          <div className="rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden">
+          <div className="w-full max-w-[95%] rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-lg">
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <Trophy className="w-32 h-32 rotate-12 text-amber-500" />
             </div>
@@ -191,7 +191,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           </div>
 
           {/* Progress & Status Bar */}
-          <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden mb-12">
+          <div className="w-full max-w-[90%] rounded-xl border border-border bg-card p-6 relative overflow-hidden shadow-md mb-12">
             {/* Background glow */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
             
@@ -227,9 +227,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       )}
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-4 pb-8">
+      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-4 pb-4 max-w-5xl mx-auto">
         {/* 2nd Place */}
-        <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full mb-8">
           {top2 ? (
             <div className="w-full rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center gap-3 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
