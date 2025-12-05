@@ -19,6 +19,8 @@ export type SeasonSettings = {
   zeny_rewards: number[]
   is_active: boolean
   rewards_distributed: boolean
+  created_at?: string
+  updated_at?: string
 }
 
 export async function getSeasonSettings(): Promise<SeasonSettings | null> {
