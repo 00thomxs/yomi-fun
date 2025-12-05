@@ -549,7 +549,7 @@ function BinaryMarketContent({
                 )}
               />
             )}
-            {/* User bet markers - positioned above the chart point */}
+            {/* User bet markers - positioned above or below the chart point */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
@@ -557,8 +557,12 @@ function BinaryMarketContent({
                 y={marker.price}
                 r={12}
                 shape={(props: any) => {
-                  const offsetY = -35 // Position above the point
+                  // If point is near top (cy < 50), position avatar BELOW, otherwise ABOVE
+                  const isNearTop = props.cy < 50
+                  const offsetY = isNearTop ? 35 : -35
                   const avatarY = props.cy + offsetY
+                  const lineEndY = isNearTop ? avatarY - 14 : avatarY + 14
+                  
                   return (
                     <g className="user-bet-marker cursor-pointer">
                       {/* Vertical line connecting avatar to chart point */}
@@ -566,7 +570,7 @@ function BinaryMarketContent({
                         x1={props.cx} 
                         y1={props.cy} 
                         x2={props.cx} 
-                        y2={avatarY + 14}
+                        y2={lineEndY}
                         stroke="#fbbf24" 
                         strokeWidth={2} 
                         strokeDasharray="3 2"
@@ -992,9 +996,13 @@ function MultiMarketContent({
                 y={marker.price}
                 r={12}
                 shape={(props: any) => {
-                  const offsetY = -30 // Position above the point
+                  // If point is near top (cy < 40), position avatar BELOW, otherwise ABOVE
+                  const isNearTop = props.cy < 40
+                  const offsetY = isNearTop ? 30 : -30
                   const avatarY = props.cy + offsetY
+                  const lineEndY = isNearTop ? avatarY - 12 : avatarY + 12
                   const markerColor = marker.color
+                  
                   return (
                     <g className="user-bet-marker cursor-pointer">
                       {/* Vertical line connecting avatar to chart point */}
@@ -1002,7 +1010,7 @@ function MultiMarketContent({
                         x1={props.cx} 
                         y1={props.cy} 
                         x2={props.cx} 
-                        y2={avatarY + 12}
+                        y2={lineEndY}
                         stroke={markerColor} 
                         strokeWidth={2} 
                         strokeDasharray="3 2"
