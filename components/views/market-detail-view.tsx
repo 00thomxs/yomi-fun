@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Download, Maximize2, X } from "lucide-react"
+import { useState, useMemo, useRef, useEffect } from "react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
-import domtoimage from "dom-to-image-more"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -430,9 +429,8 @@ function BinaryMarketContent({
 }) {
   const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at, stableNow)
   
-  // Fullscreen and Export states
+  // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const chartRef = useRef<HTMLDivElement>(null)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -444,75 +442,6 @@ function BinaryMarketContent({
   
   // Generate clean Y ticks
   const yTicks = getCleanYTicks(yMin, yMax)
-  
-  // State for export (to show logo only during export)
-  const [isExporting, setIsExporting] = useState(false)
-  
-  // Export chart as PNG using dom-to-image-more
-  const exportChart = useCallback(async () => {
-    if (!chartRef.current) {
-      console.error('Chart ref not found')
-      alert('Erreur: Impossible de trouver le graphique')
-      return
-    }
-    
-    try {
-      // Show the logo before export
-      setIsExporting(true)
-      
-      // Clear any text selection
-      window.getSelection()?.removeAllRanges()
-      
-      // Remove focus from any element
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur()
-      }
-      
-      // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Use toPng for cleaner output
-      const dataUrl = await domtoimage.toPng(chartRef.current, {
-        bgcolor: '#0f172a',
-        quality: 1,
-        scale: 2,
-        style: {
-          'outline': 'none',
-          'box-shadow': 'none',
-          'border': '1px solid rgba(255,255,255,0.1)',
-        },
-        filter: (node: Node) => {
-          // Filter out any selection-related elements
-          if (node instanceof Element) {
-            const tagName = node.tagName?.toLowerCase()
-            // Keep all elements except problematic ones
-            return tagName !== 'style'
-          }
-          return true
-        }
-      })
-      
-      // Download
-      const link = document.createElement('a')
-      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-      
-      link.href = dataUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(link)
-        setIsExporting(false)
-      }, 100)
-      
-    } catch (error) {
-      console.error('Export failed:', error)
-      alert('Erreur lors de l\'export: ' + (error as Error).message)
-      setIsExporting(false)
-    }
-  }, [market.question])
 
   // Process user bets to get chart markers
   const userBetMarkers = useMemo(() => {
@@ -585,22 +514,13 @@ function BinaryMarketContent({
           </button>
         ))}
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={exportChart}
-            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
-            title="Télécharger PNG"
-          >
-            <Download className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setIsFullscreen(true)}
-            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
-            title="Plein écran"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={() => setIsFullscreen(true)}
+          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+          title="Plein écran"
+        >
+          <Maximize2 className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Fullscreen Modal */}
@@ -611,37 +531,18 @@ function BinaryMarketContent({
               <h3 className="font-bold text-lg">{market.question}</h3>
               <p className="text-sm text-muted-foreground">{Math.round(market.probability)}% • {timeframe}</p>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={exportChart}
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-all"
-              >
-                <Download className="w-4 h-4" /> Télécharger
-              </button>
-              <button
-                onClick={() => setIsFullscreen(false)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
           <div className="flex-1 p-6 flex items-center justify-center">
-            <div ref={chartRef} className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
-              {/* Watermark for export */}
+            <div className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
+              {/* Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
                 <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
-              </div>
-              <div className="absolute top-4 right-4">
-                <div className="flex items-baseline">
-                  <span 
-                    className="text-primary font-black text-lg tracking-tight"
-                    style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
-                  >
-                    YOMI
-                  </span>
-                  <span className="font-mono text-sm text-foreground/80 ml-0.5">.fun</span>
-                </div>
               </div>
               <ResponsiveContainer width="100%" height={500}>
                 <AreaChart data={chartDataWithTs}>
@@ -707,22 +608,10 @@ function BinaryMarketContent({
       )}
 
       {/* Chart */}
-      <div ref={chartRef} className="rounded-xl bg-card border border-border p-5 relative">
+      <div className="rounded-xl bg-card border border-border p-5 relative">
         {/* Watermark center (always visible but very subtle) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
           <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
-        </div>
-        {/* Logo for export ONLY (hidden normally, visible during export) */}
-        <div className={`absolute top-3 right-3 pointer-events-none select-none z-10 transition-opacity ${isExporting ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="flex items-baseline">
-            <span 
-              className="text-primary font-black text-base tracking-tight"
-              style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
-            >
-              YOMI
-            </span>
-            <span className="font-mono text-xs text-foreground/80 ml-0.5">.fun</span>
-          </div>
         </div>
 
         <ResponsiveContainer width="100%" height={240}>
@@ -865,7 +754,7 @@ function BinaryMarketContent({
                             stroke={themeRed}
                             strokeWidth={1}
                             opacity={0.9}
-                          />
+            />
                           <text
                             x={23}
                             y={11}
@@ -987,10 +876,8 @@ function MultiMarketContent({
     new Set(market.outcomes.slice(0, 4).map(o => o.name))
   )
   
-  // Fullscreen and Export states
+  // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-  const chartRef = useRef<HTMLDivElement>(null)
 
   const toggleOutcome = (name: string) => {
     setVisibleOutcomes(prev => {
@@ -1004,72 +891,6 @@ function MultiMarketContent({
       return next
     })
   }
-  
-  // Export chart as PNG using dom-to-image-more
-  const exportChart = useCallback(async () => {
-    if (!chartRef.current) {
-      console.error('Chart ref not found')
-      alert('Erreur: Impossible de trouver le graphique')
-      return
-    }
-    
-    try {
-      // Show the logo before export
-      setIsExporting(true)
-      
-      // Clear any text selection
-      window.getSelection()?.removeAllRanges()
-      
-      // Remove focus from any element
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur()
-      }
-      
-      // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Use toPng for cleaner output
-      const dataUrl = await domtoimage.toPng(chartRef.current, {
-        bgcolor: '#0f172a',
-        quality: 1,
-        scale: 2,
-        style: {
-          'outline': 'none',
-          'box-shadow': 'none',
-          'border': '1px solid rgba(255,255,255,0.1)',
-        },
-        filter: (node: Node) => {
-          // Filter out any selection-related elements
-          if (node instanceof Element) {
-            const tagName = node.tagName?.toLowerCase()
-            // Keep all elements except problematic ones
-            return tagName !== 'style'
-          }
-          return true
-        }
-      })
-      
-      // Download
-      const link = document.createElement('a')
-      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-      
-      link.href = dataUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(link)
-        setIsExporting(false)
-      }, 100)
-      
-    } catch (error) {
-      console.error('Export failed:', error)
-      alert('Erreur lors de l\'export: ' + (error as Error).message)
-      setIsExporting(false)
-    }
-  }, [market.question])
 
   // Calculate dynamic Y max for Multi (only for visible outcomes)
   const visibleOutcomeNames = Array.from(visibleOutcomes)
@@ -1215,22 +1036,10 @@ function MultiMarketContent({
       </div>
 
       {/* Chart */}
-      <div ref={chartRef} className="rounded-xl bg-card border border-border p-5 relative">
+      <div className="rounded-xl bg-card border border-border p-5 relative">
         {/* Watermark center (always visible but very subtle) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
           <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
-        </div>
-        {/* Logo for export ONLY (hidden normally, visible during export) */}
-        <div className={`absolute top-3 right-3 pointer-events-none select-none z-10 transition-opacity ${isExporting ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="flex items-baseline">
-            <span 
-              className="text-primary font-black text-base tracking-tight"
-              style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
-            >
-              YOMI
-            </span>
-            <span className="font-mono text-xs text-foreground/80 ml-0.5">.fun</span>
-          </div>
         </div>
 
         <div className="flex items-center justify-between mb-4 relative z-10">
@@ -1251,22 +1060,13 @@ function MultiMarketContent({
               </button>
             ))}
           </div>
-            <div className="flex gap-1">
-              <button
-                onClick={exportChart}
-                className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
-                title="Télécharger PNG"
-              >
-                <Download className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setIsFullscreen(true)}
-                className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
-                title="Plein écran"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </button>
-        </div>
+            <button
+              onClick={() => setIsFullscreen(true)}
+              className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+              title="Plein écran"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
         
@@ -1278,37 +1078,18 @@ function MultiMarketContent({
                 <h3 className="font-bold text-lg">{market.question}</h3>
                 <p className="text-sm text-muted-foreground">{market.outcomes.length} outcomes • {timeframe}</p>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={exportChart}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-all"
-                >
-                  <Download className="w-4 h-4" /> Télécharger
-                </button>
-                <button
-                  onClick={() => setIsFullscreen(false)}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
             <div className="flex-1 p-6 flex items-center justify-center">
-              <div ref={chartRef} className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
+              <div className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
                 {/* Watermark */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
                   <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <div className="flex items-baseline">
-                    <span 
-                      className="text-primary font-black text-lg tracking-tight"
-                      style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
-                    >
-                      YOMI
-                    </span>
-                    <span className="font-mono text-sm text-foreground/80 ml-0.5">.fun</span>
-                  </div>
                 </div>
                 <ResponsiveContainer width="100%" height={500}>
                   <LineChart data={chartDataWithTs}>

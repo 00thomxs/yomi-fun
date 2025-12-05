@@ -208,7 +208,7 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
         { time: 'Maintenant', fullDate: now, price: Math.round(lastPoint.price) }
       ]
     }
-
+    
     market = {
       ...rawMarket,
       type: 'binary',
