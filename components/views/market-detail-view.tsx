@@ -549,90 +549,86 @@ function BinaryMarketContent({
                 )}
               />
             )}
-            {/* User bet markers - smart positioning based on price */}
+            {/* User bet markers - smart positioning relative to point */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
                 x={marker.ts}
                 y={marker.price}
-                r={0} // Invisible dot, we draw custom shape
+                r={0}
                 shape={(props: any) => {
-                  // Smart positioning: 
-                  // If price > 50%, put avatar at bottom (y=85%)
-                  // If price <= 50%, put avatar at top (y=15%)
-                  // This ensures NO overlap with the curve
+                  // Smart positioning: relative to the point
+                  // If price > 50%, put avatar BELOW the point (add to Y)
+                  // If price <= 50%, put avatar ABOVE the point (subtract from Y)
                   const isHighPrice = marker.price > 50
+                  const offset = 35 // Distance from point - closer as requested
+                  const avatarY = isHighPrice ? props.cy + offset : props.cy - offset
                   
-                  // Calculate Y position in pixels (approximate based on chart height 240px)
-                  // props.cy is the y-coordinate of the point on the curve
-                  const chartHeight = 240
-                  const avatarY = isHighPrice ? chartHeight - 40 : 40
-                  
-                  // Theme Red color (matches site theme)
-                  const themeRed = "#ff4d4d"
+                  // Theme Red color (Red-500 for neon/dark red look)
+                  const themeRed = "#ef4444"
                   const themeBg = "#1a1a1a"
                   
                   return (
-                    <g className="user-bet-marker group">
-                      {/* Full vertical line across the chart */}
+                    <g className="user-bet-marker">
+                      {/* Vertical line connecting avatar to chart point - dashed & subtle */}
                       <line 
                         x1={props.cx} 
-                        y1={20} 
+                        y1={props.cy} 
                         x2={props.cx} 
-                        y2={chartHeight - 20}
+                        y2={avatarY}
                         stroke={themeRed} 
                         strokeWidth={1} 
                         strokeDasharray="2 2"
-                        opacity={0.3}
+                        opacity={0.4}
                       />
                       
                       {/* The point on the curve */}
-                      <circle cx={props.cx} cy={props.cy} r={4} fill={themeBg} stroke={themeRed} strokeWidth={2} />
+                      <circle cx={props.cx} cy={props.cy} r={3.5} fill={themeBg} stroke={themeRed} strokeWidth={2} />
                       
-                      {/* Avatar Container */}
-                      <g style={{ transform: `translateY(0px)` }} className="transition-transform duration-200 hover:scale-110 origin-center">
+                      {/* Avatar Container - NO hover scaling to prevent jitter */}
+                      <g>
                         {/* Glow */}
-                        <circle cx={props.cx} cy={avatarY} r={16} fill={themeRed} opacity={0.15} />
+                        <circle cx={props.cx} cy={avatarY} r={15} fill={themeRed} opacity={0.2} />
                         
                         {/* Avatar Border */}
-                        <circle cx={props.cx} cy={avatarY} r={13} fill={themeBg} stroke={themeRed} strokeWidth={1.5} />
+                        <circle cx={props.cx} cy={avatarY} r={12} fill={themeBg} stroke={themeRed} strokeWidth={1.5} />
                         
                         {/* Avatar Image */}
                         {userAvatar ? (
                           <>
                             <defs>
                               <clipPath id={`avatar-clip-${idx}`}>
-                                <circle cx={props.cx} cy={avatarY} r={11} />
+                                <circle cx={props.cx} cy={avatarY} r={10} />
                               </clipPath>
                             </defs>
                             <image
                               href={userAvatar}
-                              x={props.cx - 11}
-                              y={avatarY - 11}
-                              width={22}
-                              height={22}
+                              x={props.cx - 10}
+                              y={avatarY - 10}
+                              width={20}
+                              height={20}
                               clipPath={`url(#avatar-clip-${idx})`}
                               preserveAspectRatio="xMidYMid slice"
                             />
                           </>
                         ) : (
-                          <text x={props.cx} y={avatarY + 4} textAnchor="middle" fontSize="10">💰</text>
+                          <text x={props.cx} y={avatarY + 3.5} textAnchor="middle" fontSize="10">💰</text>
                         )}
 
                         {/* Bet Amount Label (pill shape) */}
-                        <g transform={`translate(${props.cx + 18}, ${avatarY - 9})`}>
+                        <g transform={`translate(${props.cx + 16}, ${avatarY - 8})`}>
                           <rect
-                            width={50}
-                            height={18}
-                            rx={9}
+                            width={46}
+                            height={16}
+                            rx={4}
                             fill={themeBg}
                             stroke={themeRed}
                             strokeWidth={1}
                             opacity={0.9}
                           />
                           <text
-                            x={25}
-                            y={12}
+                            x={23}
+                            y={11}
                             textAnchor="middle"
                             fontSize="9"
                             fontWeight="bold"
@@ -997,7 +993,7 @@ function MultiMarketContent({
                 )}
               />
             ))}
-            {/* User bet markers - smart positioning */}
+            {/* User bet markers - smart positioning relative to point */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
@@ -1007,31 +1003,31 @@ function MultiMarketContent({
                 shape={(props: any) => {
                   // Smart positioning logic
                   const isHighPrice = marker.price > 50
-                  const chartHeight = 200 // Multi chart is slightly shorter
-                  const avatarY = isHighPrice ? chartHeight - 30 : 30
+                  const offset = 35 // Distance from point
+                  const avatarY = isHighPrice ? props.cy + offset : props.cy - offset
                   
                   const markerColor = marker.color
                   const themeBg = "#1a1a1a"
                   
                   return (
-                    <g className="user-bet-marker group">
-                      {/* Full vertical line */}
+                    <g className="user-bet-marker">
+                      {/* Connection line from point to avatar */}
                       <line 
                         x1={props.cx} 
-                        y1={10} 
+                        y1={props.cy} 
                         x2={props.cx} 
-                        y2={chartHeight - 10}
+                        y2={avatarY}
                         stroke={markerColor} 
                         strokeWidth={1} 
                         strokeDasharray="2 2"
-                        opacity={0.3}
+                        opacity={0.4}
                       />
                       
                       {/* Point on curve */}
                       <circle cx={props.cx} cy={props.cy} r={3} fill={themeBg} stroke={markerColor} strokeWidth={2} />
                       
                       {/* Avatar Container */}
-                      <g className="transition-transform duration-200 hover:scale-110 origin-center">
+                      <g>
                         {/* Glow */}
                         <circle cx={props.cx} cy={avatarY} r={14} fill={markerColor} opacity={0.15} />
                         
