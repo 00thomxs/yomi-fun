@@ -691,7 +691,16 @@ function MultiMarketContent({
                 backgroundColor: "rgba(15, 23, 42, 0.95)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: "8px",
+                backdropFilter: "blur(12px)",
               }}
+              labelStyle={{ color: "#94a3b8", fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
+              itemStyle={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                fontFamily: "ui-monospace, monospace",
+              }}
+              formatter={(value: number) => [`${Math.round(value)}%`]}
+              labelFormatter={(label) => new Date(label).toLocaleString()}
             />
             {market.outcomes.slice(0, 4).map((outcome) => (
               <ReferenceDot
