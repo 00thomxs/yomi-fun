@@ -167,10 +167,13 @@ export async function resetPlatform(): Promise<{ error?: string; success?: boole
     return { error: `Erreur lors de la réinitialisation: ${error.message}` }
   }
 
-  // Clear History Tables (not covered by RPC yet)
+  // Clear History Tables & Orders
   // Using neq constraint to match all rows is a Supabase trick for "delete all"
-  await supabaseAdmin.from('market_prices_history').delete().neq('market_id', '00000000-0000-0000-0000-000000000000') // Using market_id as filter target
+  await supabaseAdmin.from('market_prices_history').delete().neq('market_id', '00000000-0000-0000-0000-000000000000') 
   await supabaseAdmin.from('user_pnl_history').delete().neq('user_id', '00000000-0000-0000-0000-000000000000')
+  
+  // Reset Orders (purchases) but KEEP Shop Items
+  await supabaseAdmin.from('orders').delete().neq('id', '00000000-0000-0000-0000-000000000000')
 
   revalidatePath('/', 'layout') // Clear full cache
   return { success: true }

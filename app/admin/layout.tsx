@@ -56,8 +56,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Créer un Marché", href: "/admin/create", icon: PlusCircle },
     { name: "Commandes", href: "/admin/orders", icon: Package },
     { name: "Shop Items", href: "/admin/shop", icon: ShoppingBag },
-    { name: "Utilisateurs", href: "/admin/users", icon: Users },
-    { name: "Résolutions", href: "/admin/resolve", icon: Trophy },
     { name: "Paramètres", href: "/admin/settings", icon: Settings },
     { name: "🔧 Debug", href: "/admin/debug", icon: Bug },
   ]
