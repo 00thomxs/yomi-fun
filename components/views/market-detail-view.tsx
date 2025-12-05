@@ -460,7 +460,7 @@ function BinaryMarketContent({
       // Show the logo before export
       setIsExporting(true)
       
-      // Clear any text selection that might appear in the export
+      // Clear any text selection
       window.getSelection()?.removeAllRanges()
       
       // Remove focus from any element
@@ -469,24 +469,34 @@ function BinaryMarketContent({
       }
       
       // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise(resolve => setTimeout(resolve, 300))
       
-      // Use dom-to-image-more which handles modern CSS better
-      const blob = await domtoimage.toBlob(chartRef.current, {
+      // Use toPng for cleaner output
+      const dataUrl = await domtoimage.toPng(chartRef.current, {
         bgcolor: '#0f172a',
         quality: 1,
         scale: 2,
         style: {
-          'user-select': 'none',
+          'outline': 'none',
+          'box-shadow': 'none',
+          'border': '1px solid rgba(255,255,255,0.1)',
+        },
+        filter: (node: Node) => {
+          // Filter out any selection-related elements
+          if (node instanceof Element) {
+            const tagName = node.tagName?.toLowerCase()
+            // Keep all elements except problematic ones
+            return tagName !== 'style'
+          }
+          return true
         }
       })
       
-      // Download the blob
-      const url = URL.createObjectURL(blob)
+      // Download
       const link = document.createElement('a')
       const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
       
-      link.href = url
+      link.href = dataUrl
       link.download = fileName
       document.body.appendChild(link)
       link.click()
@@ -494,7 +504,6 @@ function BinaryMarketContent({
       // Cleanup
       setTimeout(() => {
         document.body.removeChild(link)
-        URL.revokeObjectURL(url)
         setIsExporting(false)
       }, 100)
       
@@ -1008,7 +1017,7 @@ function MultiMarketContent({
       // Show the logo before export
       setIsExporting(true)
       
-      // Clear any text selection that might appear in the export
+      // Clear any text selection
       window.getSelection()?.removeAllRanges()
       
       // Remove focus from any element
@@ -1017,24 +1026,34 @@ function MultiMarketContent({
       }
       
       // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise(resolve => setTimeout(resolve, 300))
       
-      // Use dom-to-image-more which handles modern CSS better
-      const blob = await domtoimage.toBlob(chartRef.current, {
+      // Use toPng for cleaner output
+      const dataUrl = await domtoimage.toPng(chartRef.current, {
         bgcolor: '#0f172a',
         quality: 1,
         scale: 2,
         style: {
-          'user-select': 'none',
+          'outline': 'none',
+          'box-shadow': 'none',
+          'border': '1px solid rgba(255,255,255,0.1)',
+        },
+        filter: (node: Node) => {
+          // Filter out any selection-related elements
+          if (node instanceof Element) {
+            const tagName = node.tagName?.toLowerCase()
+            // Keep all elements except problematic ones
+            return tagName !== 'style'
+          }
+          return true
         }
       })
       
-      // Download the blob
-      const url = URL.createObjectURL(blob)
+      // Download
       const link = document.createElement('a')
       const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
       
-      link.href = url
+      link.href = dataUrl
       link.download = fileName
       document.body.appendChild(link)
       link.click()
@@ -1042,7 +1061,6 @@ function MultiMarketContent({
       // Cleanup
       setTimeout(() => {
         document.body.removeChild(link)
-        URL.revokeObjectURL(url)
         setIsExporting(false)
       }, 100)
       
