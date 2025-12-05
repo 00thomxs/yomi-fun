@@ -55,23 +55,26 @@ export async function updateSeasonSettings(formData: FormData) {
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
   const id = formData.get('id') as string
-  const cash_prize = parseInt(formData.get('cash_prize') as string)
+  const cash_prize = parseInt(formData.get('cash_prize') as string) || 0
   const season_end = formData.get('season_end') as string
-  const top1_prize = formData.get('top1_prize') as string
-  const top2_prize = formData.get('top2_prize') as string
-  const top3_prize = formData.get('top3_prize') as string
+  const top1_prize = formData.get('top1_prize') as string || 'Non défini'
+  const top2_prize = formData.get('top2_prize') as string || 'Non défini'
+  const top3_prize = formData.get('top3_prize') as string || 'Non défini'
   
-  const zeny_rewards = []
+  const zeny_rewards: number[] = []
   for (let i = 1; i <= 10; i++) {
     const val = formData.get(`zeny_rank_${i}`)
     zeny_rewards.push(val ? parseInt(val as string) : 0)
   }
 
-  const { error } = await supabase
+  console.log('Updating season settings:', { id, cash_prize, season_end, top1_prize, top2_prize, top3_prize, zeny_rewards })
+
+  // Use supabaseAdmin to bypass RLS
+  const { data, error } = await supabaseAdmin
     .from('season_settings')
     .update({
       cash_prize,
-      season_end,
+      season_end: new Date(season_end).toISOString(),
       top1_prize,
       top2_prize,
       top3_prize,
@@ -79,10 +82,14 @@ export async function updateSeasonSettings(formData: FormData) {
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
+    .select()
 
   if (error) {
+    console.error('Update error:', error)
     return { error: `Erreur mise à jour: ${error.message}` }
   }
+
+  console.log('Update result:', data)
 
   revalidatePath('/admin/settings')
   revalidatePath('/leaderboard')
