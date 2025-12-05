@@ -191,7 +191,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           </div>
 
           {/* Progress & Status Bar */}
-          <div className="w-full max-w-[90%] rounded-xl border border-border bg-card p-4 relative overflow-hidden shadow-md mb-12">
+          <div className="w-full max-w-[90%] rounded-xl border border-border bg-card p-4 relative overflow-hidden shadow-md mb-6">
             {/* Background glow */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
             
@@ -205,7 +205,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Cash Prize</p>
                 <p className="text-xl font-black text-primary flex items-center justify-end gap-1">
-                  {(seasonSettings?.cash_prize || 0).toLocaleString()} <CurrencySymbol className="w-4 h-4" />
+                  <CurrencySymbol className="w-4 h-4 mb-0.5" />{(seasonSettings?.cash_prize || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -227,7 +227,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       )}
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-4 pb-4 max-w-5xl mx-auto">
+      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-2 pb-2 max-w-5xl mx-auto">
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
@@ -253,11 +253,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="w-full pt-3 border-t border-white/5 text-center relative z-10">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
                 <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-rose-400'}`}>
-                  {top2.totalWon >= 0 ? '+' : ''}{top2.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3" />
+                  {top2.totalWon >= 0 ? '+' : ''}<CurrencySymbol className="w-3 h-3 mb-0.5" />{Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-bold text-white border border-white/10">
-                    +{getZenyReward(2).toLocaleString()} <CurrencySymbol className="w-2 h-2" />
+                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(2).toLocaleString()}
                   </span>
                 )}
               </div>
@@ -292,11 +292,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="w-full pt-3 border-t border-amber-500/20 text-center relative z-10">
                 <p className="text-xs text-amber-500/60 uppercase tracking-wider mb-1">PNL</p>
                 <p className={`text-2xl font-black font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
-                  {top1.totalWon >= 0 ? '+' : ''}{top1.totalWon.toLocaleString()} <CurrencySymbol className="w-4 h-4" />
+                  {top1.totalWon >= 0 ? '+' : ''}<CurrencySymbol className="w-4 h-4 mb-0.5" />{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                    +{getZenyReward(1).toLocaleString()} <CurrencySymbol className="w-2 h-2" />
+                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(1).toLocaleString()}
                   </span>
                 )}
               </div>
@@ -329,11 +329,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
                 <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
-                  {top3.totalWon >= 0 ? '+' : ''}{top3.totalWon.toLocaleString()} <CurrencySymbol className="w-3 h-3" />
+                  {top3.totalWon >= 0 ? '+' : ''}<CurrencySymbol className="w-3 h-3 mb-0.5" />{Math.abs(top3.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[10px] font-bold text-orange-400 border border-orange-500/20">
-                    +{getZenyReward(3).toLocaleString()} <CurrencySymbol className="w-2 h-2" />
+                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(3).toLocaleString()}
                   </span>
                 )}
               </div>
@@ -343,7 +343,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       </div>
 
       {/* Leaderboard Table */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden mt-8">
+      <div className="rounded-xl bg-card border border-border overflow-hidden mt-4">
         <div className="grid grid-cols-12 gap-2 px-4 py-4 bg-black/20 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
           <span className="col-span-1">Rank</span>
           <span className="col-span-5">Joueur</span>
@@ -372,7 +372,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     </span>
                     {hasSeason && reward > 0 && (
                       <span className="text-[9px] font-bold text-primary flex items-center gap-0.5">
-                        +{reward.toLocaleString()} <CurrencySymbol className="w-2 h-2" />
+                        +<CurrencySymbol className="w-2 h-2" />{reward.toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -384,7 +384,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   player.totalWon >= 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                   {player.totalWon >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {Math.abs(player.totalWon).toLocaleString()} <CurrencySymbol className="w-3 h-3" />
+                  <CurrencySymbol className="w-3 h-3 mb-0.5" />{Math.abs(player.totalWon).toLocaleString()}
                 </span>
               </div>
             )
