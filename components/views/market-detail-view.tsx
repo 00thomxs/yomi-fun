@@ -982,7 +982,7 @@ function MultiMarketContent({
               key={outcome.name}
               className={`p-4 rounded-xl border transition-all ${
                 betChoice === outcome.name
-                  ? "bg-white/10 border-white/30"
+                  ? "bg-white/5 border-white/30 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                   : "bg-white/5 border-border hover:border-white/20"
               }`}
             >
@@ -999,8 +999,8 @@ function MultiMarketContent({
                   <div className={`col-span-2 py-3 px-4 rounded-lg border text-center flex items-center justify-center gap-2 ${
                     // @ts-ignore
                     outcome.is_winner === true 
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                      : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' 
+                      : 'bg-rose-500/5 border-rose-500/30 text-rose-400'
                   }`}>
                     <span className="text-sm font-bold uppercase">
                       {/* @ts-ignore */}
