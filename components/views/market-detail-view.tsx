@@ -549,7 +549,7 @@ function BinaryMarketContent({
                 )}
               />
             )}
-            {/* User bet markers - positioned above or below the chart point */}
+            {/* User bet markers - floating above chart, not on the curve */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
@@ -557,45 +557,29 @@ function BinaryMarketContent({
                 y={marker.price}
                 r={12}
                 shape={(props: any) => {
-                  // If point is near top (cy < 50), position avatar BELOW, otherwise ABOVE
-                  const isNearTop = props.cy < 50
-                  const offsetY = isNearTop ? 35 : -35
-                  const avatarY = props.cy + offsetY
-                  const lineEndY = isNearTop ? avatarY - 14 : avatarY + 14
+                  // Always position at the TOP of the chart area (fixed Y position)
+                  const avatarY = 25
                   
                   return (
-                    <g className="user-bet-marker cursor-pointer">
-                      {/* Vertical line connecting avatar to chart point */}
-                      <line 
-                        x1={props.cx} 
-                        y1={props.cy} 
-                        x2={props.cx} 
-                        y2={lineEndY}
-                        stroke="#fbbf24" 
-                        strokeWidth={2} 
-                        strokeDasharray="3 2"
-                        opacity={0.6}
-                      />
-                      {/* Small dot on the chart line */}
-                      <circle cx={props.cx} cy={props.cy} r={5} fill="#fbbf24" stroke="#1e293b" strokeWidth={2} />
-                      {/* Glow effect for avatar */}
-                      <circle cx={props.cx} cy={avatarY} r={18} fill="#fbbf24" opacity={0.15} />
-                      {/* Avatar container */}
-                      <circle cx={props.cx} cy={avatarY} r={14} fill="#0f172a" stroke="#fbbf24" strokeWidth={2} />
+                    <g className="user-bet-marker">
+                      {/* Avatar glow effect */}
+                      <circle cx={props.cx} cy={avatarY} r={16} fill="#ef4444" opacity={0.2} />
+                      {/* Avatar container - red theme */}
+                      <circle cx={props.cx} cy={avatarY} r={13} fill="#1c1917" stroke="#ef4444" strokeWidth={2} />
                       {/* Avatar or fallback */}
                       {userAvatar ? (
                         <>
                           <defs>
                             <clipPath id={`avatar-clip-${idx}`}>
-                              <circle cx={props.cx} cy={avatarY} r={12} />
+                              <circle cx={props.cx} cy={avatarY} r={11} />
                             </clipPath>
                           </defs>
                           <image
                             href={userAvatar}
-                            x={props.cx - 12}
-                            y={avatarY - 12}
-                            width={24}
-                            height={24}
+                            x={props.cx - 11}
+                            y={avatarY - 11}
+                            width={22}
+                            height={22}
                             clipPath={`url(#avatar-clip-${idx})`}
                             preserveAspectRatio="xMidYMid slice"
                           />
@@ -603,34 +587,33 @@ function BinaryMarketContent({
                       ) : (
                         <text
                           x={props.cx}
-                          y={avatarY + 5}
+                          y={avatarY + 4}
                           textAnchor="middle"
-                          fontSize="14"
-                          fill="#fbbf24"
+                          fontSize="12"
+                          fill="#ef4444"
                         >
                           💰
                         </text>
                       )}
-                      {/* Bet amount label */}
+                      {/* Bet amount label - red theme */}
                       <rect
-                        x={props.cx + 18}
-                        y={avatarY - 10}
-                        width={55}
-                        height={20}
+                        x={props.cx + 16}
+                        y={avatarY - 9}
+                        width={50}
+                        height={18}
                         rx={4}
-                        fill="#0f172a"
-                        stroke="#fbbf24"
+                        fill="#1c1917"
+                        stroke="#ef4444"
                         strokeWidth={1}
-                        opacity={0.95}
                       />
                       <text
-                        x={props.cx + 45}
+                        x={props.cx + 41}
                         y={avatarY + 4}
                         textAnchor="middle"
-                        fontSize="10"
+                        fontSize="9"
                         fontWeight="bold"
                         fontFamily="ui-monospace, monospace"
-                        fill="#fbbf24"
+                        fill="#ef4444"
                       >
                         {marker.amount} Z
                       </text>
@@ -988,7 +971,7 @@ function MultiMarketContent({
                 )}
               />
             ))}
-            {/* User bet markers - only for visible outcomes */}
+            {/* User bet markers - floating at top, using outcome color */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
@@ -996,46 +979,30 @@ function MultiMarketContent({
                 y={marker.price}
                 r={12}
                 shape={(props: any) => {
-                  // If point is near top (cy < 40), position avatar BELOW, otherwise ABOVE
-                  const isNearTop = props.cy < 40
-                  const offsetY = isNearTop ? 30 : -30
-                  const avatarY = props.cy + offsetY
-                  const lineEndY = isNearTop ? avatarY - 12 : avatarY + 12
+                  // Always position at the TOP of the chart area
+                  const avatarY = 20
                   const markerColor = marker.color
                   
                   return (
-                    <g className="user-bet-marker cursor-pointer">
-                      {/* Vertical line connecting avatar to chart point */}
-                      <line 
-                        x1={props.cx} 
-                        y1={props.cy} 
-                        x2={props.cx} 
-                        y2={lineEndY}
-                        stroke={markerColor} 
-                        strokeWidth={2} 
-                        strokeDasharray="3 2"
-                        opacity={0.6}
-                      />
-                      {/* Small dot on the chart line */}
-                      <circle cx={props.cx} cy={props.cy} r={4} fill={markerColor} stroke="#1e293b" strokeWidth={2} />
-                      {/* Glow effect for avatar */}
-                      <circle cx={props.cx} cy={avatarY} r={16} fill={markerColor} opacity={0.15} />
+                    <g className="user-bet-marker">
+                      {/* Avatar glow effect */}
+                      <circle cx={props.cx} cy={avatarY} r={14} fill={markerColor} opacity={0.2} />
                       {/* Avatar container */}
-                      <circle cx={props.cx} cy={avatarY} r={12} fill="#0f172a" stroke={markerColor} strokeWidth={2} />
+                      <circle cx={props.cx} cy={avatarY} r={11} fill="#1c1917" stroke={markerColor} strokeWidth={2} />
                       {/* Avatar or fallback */}
                       {userAvatar ? (
                         <>
                           <defs>
                             <clipPath id={`multi-avatar-clip-${idx}`}>
-                              <circle cx={props.cx} cy={avatarY} r={10} />
+                              <circle cx={props.cx} cy={avatarY} r={9} />
                             </clipPath>
                           </defs>
                           <image
                             href={userAvatar}
-                            x={props.cx - 10}
-                            y={avatarY - 10}
-                            width={20}
-                            height={20}
+                            x={props.cx - 9}
+                            y={avatarY - 9}
+                            width={18}
+                            height={18}
                             clipPath={`url(#multi-avatar-clip-${idx})`}
                             preserveAspectRatio="xMidYMid slice"
                           />
@@ -1043,9 +1010,9 @@ function MultiMarketContent({
                       ) : (
                         <text
                           x={props.cx}
-                          y={avatarY + 4}
+                          y={avatarY + 3}
                           textAnchor="middle"
-                          fontSize="12"
+                          fontSize="10"
                           fill={markerColor}
                         >
                           💰
