@@ -7,7 +7,7 @@ import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
-import html2canvas from "html2canvas"
+import domtoimage from "dom-to-image-more"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -448,10 +448,8 @@ function BinaryMarketContent({
   // State for export (to show logo only during export)
   const [isExporting, setIsExporting] = useState(false)
   
-  // Export chart as PNG
+  // Export chart as PNG using dom-to-image-more
   const exportChart = useCallback(async () => {
-    console.log('Export started, chartRef:', chartRef.current)
-    
     if (!chartRef.current) {
       console.error('Chart ref not found')
       alert('Erreur: Impossible de trouver le graphique')
@@ -465,49 +463,29 @@ function BinaryMarketContent({
       // Wait for the DOM to update
       await new Promise(resolve => setTimeout(resolve, 200))
       
-      console.log('Starting html2canvas...')
-      
-      const canvas = await html2canvas(chartRef.current, {
-        backgroundColor: '#0f172a',
+      // Use dom-to-image-more which handles modern CSS better
+      const blob = await domtoimage.toBlob(chartRef.current, {
+        bgcolor: '#0f172a',
+        quality: 1,
         scale: 2,
-        useCORS: true,
-        logging: true, // Enable logging for debugging
-        allowTaint: true,
       })
       
-      console.log('Canvas created:', canvas.width, 'x', canvas.height)
+      // Download the blob
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
       
-      // Use toBlob for better browser compatibility
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          console.error('Failed to create blob')
-          alert('Erreur: Impossible de créer l\'image')
-          setIsExporting(false)
-          return
-        }
-        
-        console.log('Blob created:', blob.size, 'bytes')
-        
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-        
-        link.href = url
-        link.download = fileName
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        
-        console.log('Clicking download link...')
-        link.click()
-        
-        // Cleanup
-        setTimeout(() => {
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-          setIsExporting(false)
-          console.log('Export complete!')
-        }, 100)
-      }, 'image/png')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+        setIsExporting(false)
+      }, 100)
       
     } catch (error) {
       console.error('Export failed:', error)
@@ -1007,10 +985,8 @@ function MultiMarketContent({
     })
   }
   
-  // Export chart as PNG
+  // Export chart as PNG using dom-to-image-more
   const exportChart = useCallback(async () => {
-    console.log('Export started (multi), chartRef:', chartRef.current)
-    
     if (!chartRef.current) {
       console.error('Chart ref not found')
       alert('Erreur: Impossible de trouver le graphique')
@@ -1024,52 +1000,32 @@ function MultiMarketContent({
       // Wait for the DOM to update
       await new Promise(resolve => setTimeout(resolve, 200))
       
-      console.log('Starting html2canvas (multi)...')
-      
-      const canvas = await html2canvas(chartRef.current, {
-        backgroundColor: '#0f172a',
+      // Use dom-to-image-more which handles modern CSS better
+      const blob = await domtoimage.toBlob(chartRef.current, {
+        bgcolor: '#0f172a',
+        quality: 1,
         scale: 2,
-        useCORS: true,
-        logging: true,
-        allowTaint: true,
       })
       
-      console.log('Canvas created (multi):', canvas.width, 'x', canvas.height)
+      // Download the blob
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
       
-      // Use toBlob for better browser compatibility
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          console.error('Failed to create blob')
-          alert('Erreur: Impossible de créer l\'image')
-          setIsExporting(false)
-          return
-        }
-        
-        console.log('Blob created (multi):', blob.size, 'bytes')
-        
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-        
-        link.href = url
-        link.download = fileName
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        
-        console.log('Clicking download link (multi)...')
-        link.click()
-        
-        // Cleanup
-        setTimeout(() => {
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-          setIsExporting(false)
-          console.log('Export complete (multi)!')
-        }, 100)
-      }, 'image/png')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+        setIsExporting(false)
+      }, 100)
       
     } catch (error) {
-      console.error('Export failed (multi):', error)
+      console.error('Export failed:', error)
       alert('Erreur lors de l\'export: ' + (error as Error).message)
       setIsExporting(false)
     }
