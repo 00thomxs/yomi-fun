@@ -582,8 +582,10 @@ function BinaryMarketContent({
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
                 <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
               </div>
-              <div className="absolute top-4 right-4 opacity-50">
-                <span className="text-xs font-bold tracking-tight">YOMI.fun</span>
+              <div className="absolute top-4 right-4">
+                <span className="text-sm font-black tracking-tight">
+                  <span className="text-red-500">YOMI</span><span className="text-white">.fun</span>
+                </span>
               </div>
               <ResponsiveContainer width="100%" height={500}>
                 <AreaChart data={chartDataWithTs}>
@@ -649,10 +651,16 @@ function BinaryMarketContent({
       )}
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5 relative">
-        {/* Watermark */}
+      <div ref={chartRef} className="rounded-xl bg-card border border-border p-5 relative">
+        {/* Watermark center */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
           <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
+        </div>
+        {/* Logo for export (top right, colored) */}
+        <div className="absolute top-3 right-3 pointer-events-none select-none z-10">
+          <span className="text-xs font-black tracking-tight">
+            <span className="text-red-500">YOMI</span><span className="text-white">.fun</span>
+          </span>
         </div>
 
         <ResponsiveContainer width="100%" height={240}>
@@ -1097,10 +1105,16 @@ function MultiMarketContent({
       </div>
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5 relative">
-        {/* Watermark */}
+      <div ref={chartRef} className="rounded-xl bg-card border border-border p-5 relative">
+        {/* Watermark center */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
           <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
+        </div>
+        {/* Logo for export (top right, colored) */}
+        <div className="absolute top-3 right-3 pointer-events-none select-none z-10">
+          <span className="text-xs font-black tracking-tight">
+            <span className="text-red-500">YOMI</span><span className="text-white">.fun</span>
+          </span>
         </div>
 
         <div className="flex items-center justify-between mb-4 relative z-10">
@@ -1169,8 +1183,10 @@ function MultiMarketContent({
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
                   <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
                 </div>
-                <div className="absolute top-4 right-4 opacity-50">
-                  <span className="text-xs font-bold tracking-tight">YOMI.fun</span>
+                <div className="absolute top-4 right-4">
+                  <span className="text-sm font-black tracking-tight">
+                    <span className="text-red-500">YOMI</span><span className="text-white">.fun</span>
+                  </span>
                 </div>
                 <ResponsiveContainer width="100%" height={500}>
                   <LineChart data={chartDataWithTs}>
