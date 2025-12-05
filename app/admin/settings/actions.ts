@@ -104,17 +104,48 @@ export async function startSeason() {
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
-  const { error } = await supabase
+  // First check if settings row exists
+  const { data: existing } = await supabaseAdmin
     .from('season_settings')
-    .update({
-      is_active: true,
-      rewards_distributed: false,
-      updated_at: new Date().toISOString()
-    })
+    .select('id')
     .eq('id', '00000000-0000-0000-0000-000000000001')
+    .single()
 
-  if (error) {
-    return { error: `Erreur démarrage saison: ${error.message}` }
+  if (!existing) {
+    // Create the row if it doesn't exist
+    const { error: insertError } = await supabaseAdmin
+      .from('season_settings')
+      .insert({
+        id: '00000000-0000-0000-0000-000000000001',
+        cash_prize: 10000,
+        season_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        top1_prize: 'Non défini',
+        top2_prize: 'Non défini',
+        top3_prize: 'Non défini',
+        zeny_rewards: [10000, 7500, 5000, 3000, 2000, 1500, 1000, 750, 500, 250],
+        is_active: true,
+        rewards_distributed: false
+      })
+
+    if (insertError) {
+      console.error('Insert error:', insertError)
+      return { error: `Erreur création settings: ${insertError.message}` }
+    }
+  } else {
+    // Update existing row
+    const { error: updateError } = await supabaseAdmin
+      .from('season_settings')
+      .update({
+        is_active: true,
+        rewards_distributed: false,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', '00000000-0000-0000-0000-000000000001')
+
+    if (updateError) {
+      console.error('Update error:', updateError)
+      return { error: `Erreur démarrage saison: ${updateError.message}` }
+    }
   }
 
   revalidatePath('/admin/settings')

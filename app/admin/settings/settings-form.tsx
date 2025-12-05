@@ -39,16 +39,20 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const handleStartSeason = async () => {
     setIsStarting(true)
     try {
+      console.log('Starting season...')
       const result = await startSeason()
+      console.log('Start season result:', result)
+      
       if (result.success) {
-        toast.success(result.message)
+        toast.success(result.message || "Saison démarrée !")
         // Force full page reload to get fresh server data
-        window.location.reload()
+        setTimeout(() => window.location.reload(), 500)
       } else {
-        toast.error(result.error)
+        toast.error(result.error || "Erreur inconnue")
       }
     } catch (error) {
-      toast.error("Erreur lors du démarrage")
+      console.error('Start season error:', error)
+      toast.error("Erreur lors du démarrage: " + String(error))
     } finally {
       setIsStarting(false)
     }
