@@ -271,11 +271,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             <div className="w-full h-[300px] rounded-xl bg-black border border-amber-500/50 p-5 flex flex-col items-center justify-between relative overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.15)] group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50" />
               
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 blur-2xl rounded-full" />
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 blur-2xl rounded-full" />
               
               <Trophy className="w-8 h-8 text-amber-400 relative z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               
-              <div className="relative">
+              <div className="relative mt-2">
                 <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
               <img
                 src={top1.avatar}

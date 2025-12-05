@@ -113,7 +113,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       // @ts-ignore
                       outcome.is_winner === true 
                         ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                        : 'bg-white/5 border-white/10 text-muted-foreground'
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                     }`}>
                       <span className="text-xs font-bold uppercase">
                         {/* @ts-ignore */}

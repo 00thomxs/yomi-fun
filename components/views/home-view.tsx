@@ -71,7 +71,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               </div>
             ) : (
               <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-tight uppercase">
-                🔒 Terminé
+                Terminé
               </div>
             )}
             <h2 className="text-3xl font-bold tracking-tight text-balance leading-tight text-shadow-lg">
