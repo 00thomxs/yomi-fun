@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo, useRef, useEffect } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User } from "lucide-react"
+import { useState, useMemo, useRef, useEffect, useCallback } from "react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Download, Maximize2, X } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
+import html2canvas from "html2canvas"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -428,6 +429,10 @@ function BinaryMarketContent({
   stableNow: number
 }) {
   const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at, stableNow)
+  
+  // Fullscreen and Export states
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const chartRef = useRef<HTMLDivElement>(null)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -439,6 +444,25 @@ function BinaryMarketContent({
   
   // Generate clean Y ticks
   const yTicks = getCleanYTicks(yMin, yMax)
+  
+  // Export chart as PNG
+  const exportChart = useCallback(async () => {
+    if (!chartRef.current) return
+    
+    try {
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: '#0f172a',
+        scale: 2, // Higher resolution
+      })
+      
+      const link = document.createElement('a')
+      link.download = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (error) {
+      console.error('Export failed:', error)
+    }
+  }, [market.question])
 
   // Process user bets to get chart markers
   const userBetMarkers = useMemo(() => {
@@ -494,22 +518,135 @@ function BinaryMarketContent({
         </p>
       </div>
 
-      {/* Timeframe Selector */}
-      <div className="flex gap-2 justify-center overflow-x-auto pb-2">
-        {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
+      {/* Timeframe Selector + Chart Actions */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setTimeframe(tf)}
+              className={`px-4 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap ${
+                timeframe === tf
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
+              }`}
+            >
+              {tf}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
           <button
-            key={tf}
-            onClick={() => setTimeframe(tf)}
-            className={`px-4 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap ${
-              timeframe === tf
-                ? "bg-primary text-primary-foreground"
-                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
-            }`}
+            onClick={exportChart}
+            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+            title="Télécharger PNG"
           >
-            {tf}
+            <Download className="w-4 h-4" />
           </button>
-        ))}
+          <button
+            onClick={() => setIsFullscreen(true)}
+            className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+            title="Plein écran"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-200">
+          <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div>
+              <h3 className="font-bold text-lg">{market.question}</h3>
+              <p className="text-sm text-muted-foreground">{Math.round(market.probability)}% • {timeframe}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={exportChart}
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-all"
+              >
+                <Download className="w-4 h-4" /> Télécharger
+              </button>
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 p-6 flex items-center justify-center">
+            <div ref={chartRef} className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
+              {/* Watermark for export */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
+                <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
+              </div>
+              <div className="absolute top-4 right-4 opacity-50">
+                <span className="text-xs font-bold tracking-tight">YOMI.fun</span>
+              </div>
+              <ResponsiveContainer width="100%" height={500}>
+                <AreaChart data={chartDataWithTs}>
+                  <defs>
+                    <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                  <XAxis
+                    dataKey="ts"
+                    type="number"
+                    scale="time"
+                    domain={domain}
+                    ticks={ticks.length > 0 ? ticks : [domain[0], domain[1]]}
+                    tickFormatter={formatTick}
+                    stroke="#64748b"
+                    style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
+                    tick={{ fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[yMin, yMax]}
+                    ticks={yTicks}
+                    stroke="#64748b"
+                    orientation="right"
+                    style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
+                    tick={{ fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.95)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "8px",
+                    }}
+                    formatter={(value: number) => [`${Math.round(value)}%`, "Probabilité"]}
+                    labelFormatter={(label) => new Date(label).toLocaleString()}
+                  />
+                  <ReferenceLine y={50} stroke="#334155" strokeDasharray="3 3" />
+                  <Area
+                    type="linear"
+                    dataKey="price"
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                    fill="url(#chartGradientFullscreen)"
+                    dot={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-border">
+                <span className="text-sm text-muted-foreground">
+                  {new Date(domain[0]).toLocaleDateString('fr-FR')} - {new Date(domain[1]).toLocaleDateString('fr-FR')}
+                </span>
+                <span className="text-lg font-bold font-mono">{Math.round(market.probability)}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chart */}
       <div className="rounded-xl bg-card border border-border p-5 relative">
@@ -779,6 +916,10 @@ function MultiMarketContent({
   const [visibleOutcomes, setVisibleOutcomes] = useState<Set<string>>(
     new Set(market.outcomes.slice(0, 4).map(o => o.name))
   )
+  
+  // Fullscreen and Export states
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const chartRef = useRef<HTMLDivElement>(null)
 
   const toggleOutcome = (name: string) => {
     setVisibleOutcomes(prev => {
@@ -792,6 +933,25 @@ function MultiMarketContent({
       return next
     })
   }
+  
+  // Export chart as PNG
+  const exportChart = useCallback(async () => {
+    if (!chartRef.current) return
+    
+    try {
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: '#0f172a',
+        scale: 2,
+      })
+      
+      const link = document.createElement('a')
+      link.download = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (error) {
+      console.error('Export failed:', error)
+    }
+  }, [market.question])
 
   // Calculate dynamic Y max for Multi (only for visible outcomes)
   const visibleOutcomeNames = Array.from(visibleOutcomes)
@@ -945,22 +1105,141 @@ function MultiMarketContent({
 
         <div className="flex items-center justify-between mb-4 relative z-10">
           <p className="text-sm font-bold tracking-tight uppercase">Evolution des cotes</p>
-          <div className="flex gap-2 overflow-x-auto pb-2 max-w-[60%]">
-            {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
+          <div className="flex items-center gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
+                <button
+                  key={tf}
+                  onClick={() => setTimeframe(tf)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap ${
+                    timeframe === tf
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-white/5 border border-border hover:border-white/20"
+                  }`}
+                >
+                  {tf}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1">
               <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap ${
-                  timeframe === tf
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-white/5 border border-border hover:border-white/20"
-                }`}
+                onClick={exportChart}
+                className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+                title="Télécharger PNG"
               >
-                {tf}
+                <Download className="w-3.5 h-3.5" />
               </button>
-            ))}
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all"
+                title="Plein écran"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
+        
+        {/* Fullscreen Modal for Multi */}
+        {isFullscreen && (
+          <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div>
+                <h3 className="font-bold text-lg">{market.question}</h3>
+                <p className="text-sm text-muted-foreground">{market.outcomes.length} outcomes • {timeframe}</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={exportChart}
+                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-all"
+                >
+                  <Download className="w-4 h-4" /> Télécharger
+                </button>
+                <button
+                  onClick={() => setIsFullscreen(false)}
+                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 p-6 flex items-center justify-center">
+              <div ref={chartRef} className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
+                {/* Watermark */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
+                  <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
+                </div>
+                <div className="absolute top-4 right-4 opacity-50">
+                  <span className="text-xs font-bold tracking-tight">YOMI.fun</span>
+                </div>
+                <ResponsiveContainer width="100%" height={500}>
+                  <LineChart data={chartDataWithTs}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                    <XAxis
+                      dataKey="ts"
+                      type="number"
+                      scale="time"
+                      domain={domain}
+                      ticks={ticks.length > 0 ? ticks : [domain[0], domain[1]]}
+                      tickFormatter={formatTick}
+                      stroke="#64748b"
+                      style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
+                      tick={{ fill: "#64748b" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      domain={[0, multiYMax]}
+                      ticks={multiYTicks}
+                      orientation="right"
+                      stroke="#64748b"
+                      style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
+                      tick={{ fill: "#64748b" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        borderRadius: "8px",
+                      }}
+                      labelFormatter={(label) => new Date(label).toLocaleString()}
+                    />
+                    {market.outcomes.slice(0, 4).filter(o => visibleOutcomes.has(o.name)).map((outcome) => (
+                      <Line
+                        key={outcome.name}
+                        type="linear"
+                        dataKey={outcome.name}
+                        stroke={outcome.color}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+                {/* Legend */}
+                <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border">
+                  {market.outcomes.slice(0, 4).map((outcome) => (
+                    <button
+                      key={outcome.name}
+                      onClick={() => toggleOutcome(outcome.name)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                        visibleOutcomes.has(outcome.name)
+                          ? 'bg-white/10 border border-white/20'
+                          : 'bg-white/5 border border-transparent opacity-50'
+                      }`}
+                    >
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: outcome.color }} />
+                      <span className="text-sm font-medium">{outcome.name}</span>
+                      <span className="font-mono text-sm">{Math.round(outcome.probability)}%</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartDataWithTs}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />

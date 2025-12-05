@@ -451,18 +451,18 @@ export function ProfileView() {
             </div>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={chartData}>
-              <defs>
+            <defs>
                 <linearGradient id="pnlGradientPositive" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+              </linearGradient>
                 <linearGradient id="pnlGradientNegative" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
                   <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
                 </linearGradient>
-              </defs>
+            </defs>
             <XAxis 
               dataKey="ts" 
               type="number"
@@ -488,13 +488,13 @@ export function ProfileView() {
                   return `${Math.round(value)}`
                 }}
               />
-              <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "rgba(15, 23, 42, 0.95)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "8px",
-                }}
+            <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "8px",
+              }}
                 formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
                 labelFormatter={(label) => new Date(label).toLocaleString('fr-FR', {
                   day: 'numeric',
@@ -502,7 +502,7 @@ export function ProfileView() {
                   hour: '2-digit',
                   minute: '2-digit'
                 })}
-              />
+            />
               <Area 
                 type="monotone" 
                 dataKey="pnl" 
@@ -511,8 +511,8 @@ export function ProfileView() {
                 dot={false} 
                 fill={isPositivePnL ? "url(#pnlGradientPositive)" : "url(#pnlGradientNegative)"} 
               />
-            </AreaChart>
-          </ResponsiveContainer>
+          </AreaChart>
+        </ResponsiveContainer>
         )}
       </div>
 
