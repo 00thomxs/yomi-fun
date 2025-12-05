@@ -140,51 +140,58 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
       {/* Season Banner */}
       {hasSeason && (
-        <div className="space-y-6">
-          {/* Rewards Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* 1st Place Card */}
-            <div className="md:col-span-1 relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-lg shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                  🥇
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-amber-500">1ère Place</p>
-                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top1_prize}</p>
-                </div>
-              </div>
+        <div className="space-y-8">
+          {/* Rewards Card - Golden Border Style */}
+          <div className="rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Trophy className="w-32 h-32 rotate-12 text-amber-500" />
             </div>
-
-            {/* 2nd Place Card */}
-            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg">
-                  🥈
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400">2ème Place</p>
-                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top2_prize}</p>
-                </div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-6">
+                <Gift className="w-5 h-5 text-amber-400" />
+                <h3 className="text-sm font-bold tracking-widest uppercase text-amber-400">Récompenses Saison</h3>
               </div>
-            </div>
 
-            {/* 3rd Place Card */}
-            <div className="relative overflow-hidden rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-transparent p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-lg">
-                  🥉
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 1st Place */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                    🥇
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-amber-400">1ère Place</p>
+                    <p className="text-lg font-black text-white leading-tight">{seasonSettings?.top1_prize}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-orange-500">3ème Place</p>
-                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top3_prize}</p>
+
+                {/* 2nd Place */}
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-lg shrink-0">
+                    🥈
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-white/60">2ème Place</p>
+                    <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top2_prize}</p>
+                  </div>
+                </div>
+
+                {/* 3rd Place */}
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg shrink-0">
+                    🥉
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-orange-500/80">3ème Place</p>
+                    <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top3_prize}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Progress & Status Bar */}
-          <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden">
+          <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden mb-12">
             {/* Background glow */}
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
             
@@ -196,9 +203,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Prize Pool</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Cash Prize</p>
                 <p className="text-2xl font-black text-primary flex items-center justify-end gap-1">
-                  {(seasonSettings?.cash_prize || 0).toLocaleString()} <span className="text-lg">Z</span>
+                  {(seasonSettings?.cash_prize || 0).toLocaleString()} <CurrencySymbol className="w-5 h-5" />
                 </p>
               </div>
             </div>
@@ -220,7 +227,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       )}
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-8">
+      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-4 pb-8">
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
