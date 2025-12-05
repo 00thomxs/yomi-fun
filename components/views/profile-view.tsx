@@ -133,12 +133,9 @@ export function ProfileView() {
     const firstTs = chartData[0].ts // This is our artificial 0 point
     const lastTs = Math.max(chartData[chartData.length - 1].ts, now.getTime())
     
-    // No left padding (start exactly at 0)
-    // Small right padding (2%)
-    const range = lastTs - firstTs
-    const paddingRight = Math.max(range * 0.02, 60 * 60 * 1000) 
+    // No padding (start at 0, end at Now)
     const domainStart = firstTs
-    const domainEnd = lastTs + paddingRight
+    const domainEnd = lastTs
     const totalRange = domainEnd - domainStart
 
     // Generate regular ticks based on timeframe
