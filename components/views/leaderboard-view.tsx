@@ -23,7 +23,7 @@ type Player = {
 }
 
 export function LeaderboardView({ onBack }: LeaderboardViewProps) {
-  const { user, refreshUser } = useUser()
+  const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [seasonSettings, setSeasonSettings] = useState<SeasonSettings | null>(null)
@@ -45,8 +45,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             // Refresh settings after distribution
             const newSettings = await getSeasonSettings()
             setSeasonSettings(newSettings)
-            // Refresh user balance
-            refreshUser?.()
+            // Page will need to be refreshed to see new balance
+            window.location.reload()
           }
         }
       } catch (e) {
