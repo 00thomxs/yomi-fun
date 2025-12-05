@@ -32,7 +32,8 @@ export default async function MarketPage({ params }: Props) {
 
   const history = await getMarketHistory(id)
   const userBets = await getUserMarketBets(id)
-  const topWinners = market.resolved ? await getMarketTopWinners(id) : []
+  // Always fetch - the function handles the resolved check internally
+  const topWinners = await getMarketTopWinners(id)
 
   return <MarketDetailContainer market={market} history={history} userBets={userBets} topWinners={topWinners} />
 }

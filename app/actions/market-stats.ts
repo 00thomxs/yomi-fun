@@ -18,14 +18,19 @@ export type MarketWinner = {
 
 export async function getMarketTopWinners(marketId: string): Promise<MarketWinner[]> {
   // 1. Fetch market to check resolution (using admin to bypass RLS)
-  const { data: market } = await supabaseAdmin
+  const { data: market, error: marketError } = await supabaseAdmin
     .from('markets')
-    .select('resolved')
+    .select('resolved, status, is_live')
     .eq('id', marketId)
     .single()
 
-  if (!market?.resolved) {
-    console.log('[TopWinners] Market not resolved:', marketId, market)
+  console.log('[TopWinners] Market data:', marketId, market, marketError)
+
+  // Check if market is resolved (could be boolean `resolved` or string `status`)
+  const isResolved = market?.resolved === true || market?.status === 'resolved' || market?.is_live === false
+  
+  if (!isResolved) {
+    console.log('[TopWinners] Market not resolved')
     return []
   }
 

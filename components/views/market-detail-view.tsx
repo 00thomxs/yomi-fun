@@ -387,8 +387,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
         />
       )}
 
-      {/* Top Winners - Only shown for resolved markets */}
-      {isResolved && topWinners && topWinners.length > 0 && (
+      {/* Top Winners - Only shown when there are winners */}
+      {topWinners && topWinners.length > 0 && (
         <TopWinners winners={topWinners} />
       )}
     </div>
