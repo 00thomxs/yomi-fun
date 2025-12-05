@@ -983,7 +983,7 @@ function MultiMarketContent({
               className={`p-4 rounded-xl border transition-all ${
                 betChoice === outcome.name
                   ? "bg-white/10 border-white/30"
-                  : "bg-card border-border hover:border-white/20"
+                  : "bg-white/5 border-border hover:border-white/20"
               }`}
             >
               <div className="flex items-center justify-between mb-3">
