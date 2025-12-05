@@ -389,13 +389,14 @@ function BinaryMarketContent({
               type="number"
               scale="time"
               domain={domain}
-              ticks={ticks}
+              ticks={ticks.length > 0 ? ticks : [domain[0], domain[1]]}
               tickFormatter={formatTick}
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
+              minTickGap={30}
             />
             <YAxis
               domain={[yMin, yMax]}
@@ -648,13 +649,14 @@ function MultiMarketContent({
               type="number"
               scale="time"
               domain={domain}
-              ticks={ticks}
+              ticks={ticks.length > 0 ? ticks : [domain[0], domain[1]]}
               tickFormatter={formatTick}
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
+              minTickGap={30}
             />
             <YAxis
               domain={[0, multiYMax]} 
