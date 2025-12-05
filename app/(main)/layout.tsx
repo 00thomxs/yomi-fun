@@ -81,7 +81,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   // Determine active tab from pathname
   const getActiveTab = () => {
     if (pathname === "/") return "home"
-    if (pathname === "/shop") return "shop"
+    if (pathname === "/shop" || pathname === "/shop/buy-zeny") return "shop"
+    if (pathname === "/orders") return "orders"
     if (pathname === "/profile") return "profile"
     if (pathname === "/leaderboard") return "leaderboard"
     if (pathname.startsWith("/market/")) return "home"

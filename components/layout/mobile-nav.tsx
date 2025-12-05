@@ -39,7 +39,7 @@ export function MobileNav({ activeTab, showLeaderboard }: MobileNavProps) {
         <NavLink
           href="/"
           icon={<Home className="w-5 h-5" />}
-          label="Home"
+          label="Accueil"
           active={activeTab === "home" && !showLeaderboard}
         />
         <NavLink

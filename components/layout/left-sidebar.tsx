@@ -54,8 +54,20 @@ export function LeftSidebar({
           <SidebarLink
             href="/"
             icon={<Home className="w-5 h-5" />}
-            label="Home"
+            label="Accueil"
             active={activeTab === "home" && !showLeaderboard}
+          />
+          <SidebarLink
+            href="/leaderboard"
+            icon={<Trophy className="w-5 h-5" />}
+            label="Classement"
+            active={showLeaderboard || activeTab === "leaderboard"}
+          />
+          <SidebarLink
+            href="/profile"
+            icon={<User className="w-5 h-5" />}
+            label="Profil"
+            active={activeTab === "profile"}
           />
           <SidebarLink
             href="/shop"
@@ -68,18 +80,6 @@ export function LeftSidebar({
             icon={<Package className="w-5 h-5" />}
             label="Mes Commandes"
             active={activeTab === "orders"}
-          />
-          <SidebarLink
-            href="/profile"
-            icon={<User className="w-5 h-5" />}
-            label="Profil"
-            active={activeTab === "profile"}
-          />
-          <SidebarLink
-            href="/leaderboard"
-            icon={<Trophy className="w-5 h-5" />}
-            label="Classement"
-            active={showLeaderboard}
           />
         </nav>
 
