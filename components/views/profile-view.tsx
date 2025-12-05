@@ -86,50 +86,77 @@ export function ProfileView() {
     ? pnlHistory 
     : pnlHistory.filter(p => new Date(p.date) >= getTimeframeCutoff())
   
-  const chartData = filteredPnlHistory.length > 0 
-    ? filteredPnlHistory.map(p => ({
-        day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
-        fullDate: new Date(p.date),
-        ts: new Date(p.date).getTime(),
-        pnl: Math.round(p.value) // Ensure integer
-      }))
-    : [{ day: 'Début', fullDate: now, ts: now.getTime(), pnl: 0 }]
+  // Chart data starts from FIRST BET - empty if no bets
+  const chartData = filteredPnlHistory.map(p => ({
+    day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+    fullDate: new Date(p.date),
+    ts: new Date(p.date).getTime(),
+    pnl: Math.round(p.value) // Ensure integer
+  }))
 
-  // Calculate time domain and ticks for X axis based on timeframe
-  const getDuration = () => {
-    if (pnlTimeframe === "1J") return 24 * 60 * 60 * 1000
-    if (pnlTimeframe === "1S") return 7 * 24 * 60 * 60 * 1000
-    if (pnlTimeframe === "1M") return 30 * 24 * 60 * 60 * 1000
-    // TOUT: use actual data range or default to 30 days if no data
-    if (chartData.length > 1) {
-      const firstTs = chartData[0].ts
-      const lastTs = chartData[chartData.length - 1].ts
-      return lastTs - firstTs + 24 * 60 * 60 * 1000 // Add padding
+  // Calculate time domain and ticks for X axis
+  // Domain starts from FIRST BET, not before
+  const getAxisConfig = () => {
+    if (chartData.length === 0) {
+      // No data - return default config (won't be displayed anyway)
+      return { domain: [now.getTime() - 24 * 60 * 60 * 1000, now.getTime()], ticks: [], format: {} as Intl.DateTimeFormatOptions }
     }
-    return 30 * 24 * 60 * 60 * 1000
+
+    const firstTs = chartData[0].ts
+    const lastTs = Math.max(chartData[chartData.length - 1].ts, now.getTime())
+    
+    // Small padding (2%) on each side
+    const range = lastTs - firstTs
+    const padding = Math.max(range * 0.02, 60 * 60 * 1000) // At least 1 hour padding
+    const domainStart = firstTs - padding
+    const domainEnd = lastTs + padding
+    const totalRange = domainEnd - domainStart
+
+    // Generate regular ticks based on timeframe
+    let tickInterval: number
+    let format: Intl.DateTimeFormatOptions
+
+    if (pnlTimeframe === "1J" || totalRange <= 24 * 60 * 60 * 1000) {
+      // 1 day or less: tick every 4 hours
+      tickInterval = 4 * 60 * 60 * 1000
+      format = { hour: '2-digit', minute: '2-digit' }
+    } else if (pnlTimeframe === "1S" || totalRange <= 7 * 24 * 60 * 60 * 1000) {
+      // 1 week or less: tick every day
+      tickInterval = 24 * 60 * 60 * 1000
+      format = { weekday: 'short', day: 'numeric' }
+    } else if (pnlTimeframe === "1M" || totalRange <= 30 * 24 * 60 * 60 * 1000) {
+      // 1 month or less: tick every 5 days
+      tickInterval = 5 * 24 * 60 * 60 * 1000
+      format = { day: 'numeric', month: 'short' }
+    } else {
+      // More than a month: tick every week
+      tickInterval = 7 * 24 * 60 * 60 * 1000
+      format = { day: 'numeric', month: 'short' }
+    }
+
+    // Generate ticks at regular intervals
+    const ticks: number[] = []
+    let tick = Math.ceil(domainStart / tickInterval) * tickInterval // Start at next round interval
+    while (tick <= domainEnd) {
+      ticks.push(tick)
+      tick += tickInterval
+    }
+
+    // Limit to ~6 ticks max for readability
+    while (ticks.length > 6) {
+      const newTicks: number[] = []
+      for (let i = 0; i < ticks.length; i += 2) {
+        newTicks.push(ticks[i])
+      }
+      ticks.length = 0
+      ticks.push(...newTicks)
+    }
+
+    return { domain: [domainStart, domainEnd], ticks, format }
   }
-  
-  const duration = getDuration()
-  const timeStart = pnlTimeframe === "TOUT" && chartData.length > 1 
-    ? chartData[0].ts - duration * 0.05  // Small padding before first point
-    : now.getTime() - duration
-  const timeEnd = now.getTime()
-  const timeDomain = [timeStart, timeEnd]
-  
-  // Generate 5 evenly spaced ticks
-  const actualDuration = timeEnd - timeStart
-  const timeTicks = [
-    timeStart,
-    timeStart + actualDuration * 0.25,
-    timeStart + actualDuration * 0.5,
-    timeStart + actualDuration * 0.75,
-    timeEnd
-  ]
-  
-  const timeFormat: Intl.DateTimeFormatOptions = pnlTimeframe === "1J" 
-    ? { hour: '2-digit', minute: '2-digit' }
-    : { day: 'numeric', month: 'short' }
-  const formatPnlTick = (ts: number) => new Date(ts).toLocaleString('fr-FR', timeFormat)
+
+  const axisConfig = getAxisConfig()
+  const formatPnlTick = (ts: number) => new Date(ts).toLocaleString('fr-FR', axisConfig.format)
 
   // Use real PnL from history (last point in filtered data)
   const currentPnL = chartData.length > 0 
@@ -141,7 +168,7 @@ export function ProfileView() {
   // - Always includes 0 as reference
   // - Minimum range of 1000 to avoid over-zooming
   // - 20% padding above/below data
-  const pnlValues = chartData.map(d => d.pnl)
+  const pnlValues = chartData.length > 0 ? chartData.map(d => d.pnl) : [0]
   const dataMin = Math.min(...pnlValues)
   const dataMax = Math.max(...pnlValues)
   
@@ -157,11 +184,11 @@ export function ProfileView() {
   const effectiveRange = Math.max(dataRange, minRange)
   
   // Add 20% padding
-  const padding = effectiveRange * 0.2
+  const yPadding = effectiveRange * 0.2
   
   // Final Y-axis bounds (always include 0)
-  const yAxisMin = Math.min(rangeMin - padding, -Math.abs(padding))
-  const yAxisMax = Math.max(rangeMax + padding, Math.abs(padding))
+  const yAxisMin = Math.min(rangeMin - yPadding, -Math.abs(yPadding))
+  const yAxisMax = Math.max(rangeMax + yPadding, Math.abs(yPadding))
 
   // Dynamic gradient color based on current PnL
   const isPositivePnL = currentPnL >= 0
@@ -359,61 +386,70 @@ export function ProfileView() {
             ))}
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="pnlGradientPositive" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="pnlGradientNegative" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis 
-              dataKey="ts" 
-              type="number"
-              scale="time"
-              domain={timeDomain}
-              ticks={timeTicks}
-              tickFormatter={formatPnlTick}
-              tick={{ fontSize: 10, fill: "#666" }} 
-              axisLine={false} 
-              tickLine={false} 
-            />
-            <YAxis 
-              domain={[yAxisMin, yAxisMax]} 
-              tick={{ fontSize: 10, fill: "#666" }} 
-              axisLine={false} 
-              tickLine={false}
-              tickFormatter={(value) => {
-                const absValue = Math.abs(value)
-                if (absValue >= 1000) {
-                  return `${Math.round(value / 1000)}k`
-                }
-                return `${Math.round(value)}`
-              }}
-            />
-            <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(15, 23, 42, 0.95)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: "8px",
-              }}
-              formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="pnl" 
-              stroke={pnlColor} 
-              strokeWidth={2} 
-              dot={false} 
-              fill={isPositivePnL ? "url(#pnlGradientPositive)" : "url(#pnlGradientNegative)"} 
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {chartData.length === 0 ? (
+          <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+            <div className="text-center">
+              <p className="text-sm">Aucun pari terminé</p>
+              <p className="text-xs mt-1">Le graphique apparaîtra après ton premier pari résolu</p>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="pnlGradientPositive" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="pnlGradientNegative" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="ts" 
+                type="number"
+                scale="time"
+                domain={axisConfig.domain}
+                ticks={axisConfig.ticks}
+                tickFormatter={formatPnlTick}
+                tick={{ fontSize: 10, fill: "#666" }} 
+                axisLine={false} 
+                tickLine={false} 
+              />
+              <YAxis 
+                domain={[yAxisMin, yAxisMax]} 
+                tick={{ fontSize: 10, fill: "#666" }} 
+                axisLine={false} 
+                tickLine={false}
+                tickFormatter={(value) => {
+                  const absValue = Math.abs(value)
+                  if (absValue >= 1000) {
+                    return `${Math.round(value / 1000)}k`
+                  }
+                  return `${Math.round(value)}`
+                }}
+              />
+              <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                }}
+                formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="pnl" 
+                stroke={pnlColor} 
+                strokeWidth={2} 
+                dot={false} 
+                fill={isPositivePnL ? "url(#pnlGradientPositive)" : "url(#pnlGradientNegative)"} 
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Transaction History */}
