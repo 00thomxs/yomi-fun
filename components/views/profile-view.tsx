@@ -87,29 +87,44 @@ export function ProfileView() {
     : pnlHistory.filter(p => new Date(p.date) >= getTimeframeCutoff())
   
   // Chart data starts from FIRST BET - empty if no bets
-  const chartData = filteredPnlHistory.map(p => ({
+  let chartData = filteredPnlHistory.map(p => ({
     day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
     fullDate: new Date(p.date),
     ts: new Date(p.date).getTime(),
     pnl: Math.round(p.value) // Ensure integer
   }))
 
+  // Add artificial starting point at 0 just before the first bet
+  // This anchors the chart to 0 visually
+  if (chartData.length > 0) {
+    const firstPoint = chartData[0]
+    const startTs = firstPoint.ts - 1000 * 60 * 60 // 1 hour before first bet
+    const startPoint = {
+      day: new Date(startTs).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+      fullDate: new Date(startTs),
+      ts: startTs,
+      pnl: 0
+    }
+    chartData = [startPoint, ...chartData]
+  }
+
   // Calculate time domain and ticks for X axis
-  // Domain starts from FIRST BET, not before
+  // Domain starts from our artificial start point (0)
   const getAxisConfig = () => {
     if (chartData.length === 0) {
       // No data - return default config (won't be displayed anyway)
       return { domain: [now.getTime() - 24 * 60 * 60 * 1000, now.getTime()], ticks: [], format: {} as Intl.DateTimeFormatOptions }
     }
 
-    const firstTs = chartData[0].ts
+    const firstTs = chartData[0].ts // This is our artificial 0 point
     const lastTs = Math.max(chartData[chartData.length - 1].ts, now.getTime())
     
-    // Small padding (2%) on each side
+    // No left padding (start exactly at 0)
+    // Small right padding (2%)
     const range = lastTs - firstTs
-    const padding = Math.max(range * 0.02, 60 * 60 * 1000) // At least 1 hour padding
-    const domainStart = firstTs - padding
-    const domainEnd = lastTs + padding
+    const paddingRight = Math.max(range * 0.02, 60 * 60 * 1000) 
+    const domainStart = firstTs
+    const domainEnd = lastTs + paddingRight
     const totalRange = domainEnd - domainStart
 
     // Generate regular ticks based on timeframe
