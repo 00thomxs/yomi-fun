@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useMemo, useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
 import { MarketDetailView } from "@/components/views/market-detail-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
@@ -17,28 +17,26 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
   const router = useRouter()
   const { placeBet, userBalance, user } = useUser()
   const lastBalanceRef = useRef<number>(userBalance)
+  
+  // STABLE timestamp using useRef - set once on mount, NEVER changes
+  // This is crucial to prevent chart shifting on re-renders
+  const nowRef = useRef<Date>(new Date())
+  const now = nowRef.current
 
   // Refresh page when user balance changes (indicates a bet was placed)
   // This triggers a server-side re-fetch of userBets
   useEffect(() => {
     if (lastBalanceRef.current !== userBalance) {
       lastBalanceRef.current = userBalance
-      // Small delay to let the server action complete
+      // Longer delay to ensure server has processed the bet
       const timeout = setTimeout(() => {
+        // Update the timestamp for fresh data
+        nowRef.current = new Date()
         router.refresh()
-      }, 500)
+      }, 1000)
       return () => clearTimeout(timeout)
     }
   }, [userBalance, router])
-
-  // STABLE timestamp - rounded to nearest minute to prevent chart shifting
-  // Using useMemo ensures it stays consistent across re-renders
-  const now = useMemo(() => {
-    const d = new Date()
-    // Round to nearest minute for stability
-    d.setSeconds(0, 0)
-    return d
-  }, [])
 
   const handleBack = () => {
     router.back()

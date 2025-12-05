@@ -197,17 +197,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <p className="font-semibold text-base tracking-tight text-balance leading-snug">{market.question}</p>
 
         {/* Real history chart */}
-        <div className="flex-1 min-h-[100px] relative">
-          {/* Probability badge - positioned outside chart to avoid clipping */}
-          {chartData.length > 0 && (
-            <div className="absolute top-0 right-0 z-10 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-md border border-white/20">
-              <span className="text-xs font-mono font-bold text-white">
-                {Math.round(chartData[chartData.length - 1].price)}%
-              </span>
-            </div>
-          )}
+        <div className="flex-1 min-h-[100px] relative overflow-visible">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 15, right: 35, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
@@ -226,8 +218,21 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   strokeWidth={2}
                   shape={(props: any) => (
                     <g>
+                      {/* Pulsing glow */}
                       <circle cx={props.cx} cy={props.cy} r={8} fill="#ffffff" className="animate-pulse opacity-30" />
-                      <circle cx={props.cx} cy={props.cy} r={3} fill="#ffffff" />
+                      {/* Solid dot */}
+                      <circle cx={props.cx} cy={props.cy} r={4} fill="#ffffff" />
+                      {/* Percentage label next to dot */}
+                      <text
+                        x={props.cx + 12}
+                        y={props.cy + 4}
+                        fontSize="11"
+                        fontWeight="bold"
+                        fontFamily="ui-monospace, monospace"
+                        fill="#ffffff"
+                      >
+                        {Math.round(chartData[chartData.length - 1].price)}%
+                      </text>
                     </g>
                   )}
                 />
