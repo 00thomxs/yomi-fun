@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -12,8 +12,9 @@ import Image from "next/image"
 // Chart starts from market creation date (not before)
 type TickFormatType = 'time' | 'day' | 'month'
 
-const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string) => {
-  const now = new Date().getTime()
+// NOW RECEIVES stableNow as parameter to prevent shifting
+const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string, stableNow?: number) => {
+  const now = stableNow || Date.now()
   const createdAt = marketCreatedAt ? new Date(marketCreatedAt).getTime() : now - 24 * 3600 * 1000
   
   let duration = 24 * 3600 * 1000
@@ -130,6 +131,11 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
+
+  // STABLE timestamp - set once on mount, never changes
+  // This prevents chart from shifting on every re-render
+  const stableNowRef = useRef<number>(Date.now())
+  const stableNow = stableNowRef.current
 
   // Check if market is resolved (betting disabled)
   const isResolved = !market.isLive
@@ -290,6 +296,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           yMax={yMax}
           userBets={userBets}
           userAvatar={userAvatar}
+          stableNow={stableNow}
         />
       ) : (
         <MultiMarketContent
@@ -309,6 +316,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           isResolved={isResolved}
           userBets={userBets}
           userAvatar={userAvatar}
+          stableNow={stableNow}
         />
       )}
     </div>
@@ -333,7 +341,8 @@ function BinaryMarketContent({
   yMin,
   yMax,
   userBets = [],
-  userAvatar
+  userAvatar,
+  stableNow
 }: {
   market: BinaryMarket
   timeframe: string
@@ -352,8 +361,9 @@ function BinaryMarketContent({
   yMax: number
   userBets?: any[]
   userAvatar?: string
+  stableNow: number
 }) {
-  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at)
+  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at, stableNow)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -628,7 +638,8 @@ function MultiMarketContent({
   userBalance,
   isResolved,
   userBets = [],
-  userAvatar
+  userAvatar,
+  stableNow
 }: {
   market: MultiOutcomeMarket
   timeframe: string
@@ -646,6 +657,7 @@ function MultiMarketContent({
   isResolved: boolean
   userBets?: any[]
   userAvatar?: string
+  stableNow: number
 }) {
   // Track which outcomes are visible (for interactive legend)
   const [visibleOutcomes, setVisibleOutcomes] = useState<Set<string>>(
@@ -674,8 +686,8 @@ function MultiMarketContent({
   const maxProb = Math.max(...allProbs, 40) // Minimum 40% scale to avoid too much zoom
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
 
-  // Get axis params for timeframe
-  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at)
+  // Get axis params for timeframe (using stableNow to prevent shifting)
+  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at, stableNow)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
