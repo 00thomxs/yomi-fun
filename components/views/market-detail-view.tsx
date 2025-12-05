@@ -327,6 +327,11 @@ function BinaryMarketContent({
 
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
 
+  // Determine color based on current probability (Green if > 50%, Red if <= 50%)
+  const isPositive = market.probability > 50
+  const chartColor = isPositive ? "#10b981" : "#f43f5e" // Emerald-500 or Rose-500
+  const gradientId = isPositive ? "chartGradientGreen" : "chartGradientRed"
+
   return (
     <>
       {/* Resolved Banner */}
@@ -341,7 +346,9 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="text-center space-y-2">
-        <p className="text-7xl font-bold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
+        <p className={`text-7xl font-bold tracking-tighter font-mono ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
+          {Math.round(market.probability)}%
+        </p>
         <p className="text-sm font-medium text-muted-foreground tracking-tight uppercase">
           {market.probability >= 85
             ? "Quasi Certain"
@@ -380,9 +387,13 @@ function BinaryMarketContent({
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartDataWithTs}>
             <defs>
-              <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
+              <linearGradient id="chartGradientGreen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="chartGradientRed" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
@@ -424,23 +435,26 @@ function BinaryMarketContent({
                 fontWeight: "bold",
                 fontFamily: "ui-monospace, monospace",
               }}
-              formatter={(value: number) => `${Math.round(value)}%`}
+              formatter={(value: number) => [`${Math.round(value)}%`, "Probabilité"]}
+              labelFormatter={(label) => new Date(label).toLocaleString()}
             />
+            <ReferenceLine y={50} stroke="#334155" strokeDasharray="3 3" />
             <Area
-              type="stepAfter"
+              type="linear"
               dataKey="price"
-              stroke="#ffffff"
-              strokeWidth={2}
-              fill="url(#chartGradientMonochrome)"
+              stroke={chartColor}
+              strokeWidth={3}
+              fill={`url(#${gradientId})`}
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 4, strokeWidth: 0, fill: "#ffffff" }}
+              animationDuration={500}
             />
           </AreaChart>
         </ResponsiveContainer>
 
         <div className="flex justify-end items-center gap-2 mt-2">
-          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
-          <p className="text-sm font-bold text-white font-mono tracking-tight">
+          <div className={`w-2 h-2 rounded-full ${isPositive ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
+          <p className={`text-sm font-bold font-mono tracking-tight ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
             {Math.round(chartData[chartData.length - 1]?.price || 0)}%
           </p>
         </div>
