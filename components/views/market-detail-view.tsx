@@ -409,9 +409,13 @@ function BinaryMarketContent({
 
   // Process user bets to get chart markers
   const userBetMarkers = useMemo(() => {
+    // Debug log
+    console.log('[DEBUG] userBets received:', userBets?.length || 0, userBets)
+    console.log('[DEBUG] domain:', domain)
+    
     if (!userBets || userBets.length === 0) return []
     
-    return userBets.map(bet => {
+    const markers = userBets.map(bet => {
       const betTs = new Date(bet.created_at).getTime()
       // Find the closest chart point to this bet timestamp
       let closestPoint = chartDataWithTs[0]
@@ -425,13 +429,19 @@ function BinaryMarketContent({
         }
       }
       
+      console.log('[DEBUG] bet marker:', { betTs, domain0: domain[0], domain1: domain[1], inRange: betTs >= domain[0] && betTs <= domain[1] })
+      
       return {
         ts: betTs,
         price: closestPoint?.price || 50,
         amount: bet.amount,
         outcomeName: bet.outcomes?.name || 'N/A'
       }
-    }).filter(marker => marker.ts >= domain[0] && marker.ts <= domain[1]) // Only show markers in current timeframe
+    })
+    
+    // Don't filter by domain for now - show all markers
+    console.log('[DEBUG] markers created:', markers.length)
+    return markers
   }, [userBets, chartDataWithTs, domain])
 
   return (
