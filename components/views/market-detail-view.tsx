@@ -17,75 +17,77 @@ const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string)
   const createdAt = marketCreatedAt ? new Date(marketCreatedAt).getTime() : now - 24 * 3600 * 1000
   
   let duration = 24 * 3600 * 1000
-  let tickInterval: number
-  let formatType: TickFormatType = 'time'
-
-  if (timeframe === '1H') {
-    duration = 3600 * 1000
-    tickInterval = 15 * 60 * 1000 // Every 15 min
-    formatType = 'time'
-  } else if (timeframe === '6H') {
-    duration = 6 * 3600 * 1000
-    tickInterval = 60 * 60 * 1000 // Every hour
-    formatType = 'time'
-  } else if (timeframe === '1J' || timeframe === '24H') {
-    duration = 24 * 3600 * 1000
-    tickInterval = 4 * 60 * 60 * 1000 // Every 4 hours
-    formatType = 'time'
-  } else if (timeframe === '1S' || timeframe === '7J') {
-    duration = 7 * 24 * 3600 * 1000
-    tickInterval = 24 * 60 * 60 * 1000 // Every day
-    formatType = 'day' // ONLY day + month, NO time
-  } else if (timeframe === '1M' || timeframe === '30J') {
-    duration = 30 * 24 * 3600 * 1000
-    tickInterval = 5 * 24 * 60 * 60 * 1000 // Every 5 days
-    formatType = 'day' // ONLY day + month, NO time
-  } else if (timeframe === 'TOUT') {
-    // TOUT = from market creation to now
-    duration = now - createdAt + 3600 * 1000 // Add 1h padding
-    // Choose interval based on actual duration
-    if (duration <= 24 * 3600 * 1000) {
-      tickInterval = 4 * 60 * 60 * 1000
-      formatType = 'time'
-    } else if (duration <= 7 * 24 * 3600 * 1000) {
-      tickInterval = 24 * 60 * 60 * 1000
-      formatType = 'day'
-    } else if (duration <= 30 * 24 * 3600 * 1000) {
-      tickInterval = 5 * 24 * 60 * 60 * 1000
-      formatType = 'day'
-    } else if (duration <= 365 * 24 * 3600 * 1000) {
-      tickInterval = 7 * 24 * 60 * 60 * 1000 // Weekly
-      formatType = 'day'
-    } else {
-      tickInterval = 30 * 24 * 60 * 60 * 1000 // Monthly for very long events
-      formatType = 'month'
-    }
-  } else {
-    tickInterval = 4 * 60 * 60 * 1000 // Default: 4 hours
-  }
+  
+  if (timeframe === '1H') duration = 3600 * 1000
+  else if (timeframe === '6H') duration = 6 * 3600 * 1000
+  else if (timeframe === '1J' || timeframe === '24H') duration = 24 * 3600 * 1000
+  else if (timeframe === '1S' || timeframe === '7J') duration = 7 * 24 * 3600 * 1000
+  else if (timeframe === '1M' || timeframe === '30J') duration = 30 * 24 * 3600 * 1000
+  else if (timeframe === 'TOUT') duration = now - createdAt + 3600 * 1000
 
   // Domain starts from market creation OR (now - duration), whichever is LATER
-  // This ensures we never show time before the market existed
   const theoreticalStart = now - duration
   const start = Math.max(theoreticalStart, createdAt)
   const domain = [start, now]
+  const realDuration = now - start
+
+  // Determine tick interval based on REAL duration
+  let tickInterval: number
+  let formatType: TickFormatType = 'time'
+
+  if (realDuration <= 24 * 3600 * 1000) {
+    // Less than 24h -> Time format
+    formatType = 'time'
+    if (realDuration <= 3600 * 1000) tickInterval = 15 * 60 * 1000 // 15 min
+    else if (realDuration <= 6 * 3600 * 1000) tickInterval = 60 * 60 * 1000 // 1h
+    else tickInterval = 4 * 60 * 60 * 1000 // 4h
+  } else if (realDuration <= 30 * 24 * 3600 * 1000) {
+    // Less than 1 month -> Day format
+    formatType = 'day'
+    if (realDuration <= 7 * 24 * 3600 * 1000) tickInterval = 24 * 60 * 60 * 1000 // 1 day
+    else tickInterval = 5 * 24 * 60 * 60 * 1000 // 5 days
+  } else {
+    // More than 1 month -> Day or Month format
+    if (realDuration <= 365 * 24 * 3600 * 1000) {
+      formatType = 'day'
+      tickInterval = 7 * 24 * 60 * 60 * 1000 // Weekly
+    } else {
+      formatType = 'month'
+      tickInterval = 30 * 24 * 60 * 60 * 1000 // Monthly
+    }
+  }
 
   // Generate regular ticks at round intervals (only within domain)
   const ticks: number[] = []
   let tick = Math.ceil(start / tickInterval) * tickInterval // Start at next round interval
+  
+  // Always add start point if gap to first tick is large
+  if (tick - start > tickInterval * 0.2) {
+    ticks.push(start)
+  }
+
   while (tick <= now) {
-    if (tick >= start) { // Only add ticks within the domain
+    if (tick >= start) { 
       ticks.push(tick)
     }
     tick += tickInterval
+  }
+  
+  // Always add end point if gap to last tick is large
+  if (now - (ticks[ticks.length - 1] || start) > tickInterval * 0.2) {
+    ticks.push(now)
   }
 
   // Limit to ~6 ticks max for readability
   while (ticks.length > 6) {
     const newTicks: number[] = []
-    for (let i = 0; i < ticks.length; i += 2) {
+    // Keep first, take every 2nd, keep last
+    newTicks.push(ticks[0])
+    for (let i = 1; i < ticks.length - 1; i += 2) {
       newTicks.push(ticks[i])
     }
+    if (ticks.length > 1) newTicks.push(ticks[ticks.length - 1])
+    
     ticks.length = 0
     ticks.push(...newTicks)
   }
