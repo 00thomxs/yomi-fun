@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock } from "lucide-react"
+import { useState, useMemo } from "react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
-// Mock data no longer needed - using real history from DB
 import { CATEGORIES } from "@/lib/constants"
+import Image from "next/image"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -121,9 +121,11 @@ type MarketDetailViewProps = {
   onBack: () => void
   onBet: (market: string, choice: string, amount: number, odds?: number) => void
   userBalance: number
+  userBets?: any[]
+  userAvatar?: string
 }
 
-export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketDetailViewProps) {
+export function MarketDetailView({ market, onBack, onBet, userBalance, userBets = [], userAvatar }: MarketDetailViewProps) {
   const [timeframe, setTimeframe] = useState<"1H" | "6H" | "1J" | "1S" | "1M" | "TOUT">("1H")
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
@@ -161,13 +163,39 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
 
   const chartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
   
-  // Calculate dynamic scale for Binary Charts
-  const prices = chartData.length > 0 ? chartData.map((p: any) => p.price) : [0]
+  // Calculate SMART dynamic scale for Binary Charts
+  // Goals: 1) Show context (not too zoomed), 2) Highlight volatility, 3) Always make sense
+  const prices = chartData.length > 0 ? chartData.map((p: any) => p.price) : [50]
   const minPrice = Math.min(...prices)
   const maxPrice = Math.max(...prices)
-  const padding = Math.max(2, (maxPrice - minPrice) * 0.2) // 20% padding
-  const yMin = Math.max(0, Math.floor(minPrice - padding))
-  const yMax = Math.min(100, Math.ceil(maxPrice + padding))
+  const priceRange = maxPrice - minPrice
+  
+  // Ensure minimum visible range of 20% for context
+  const minVisibleRange = 20
+  const effectiveRange = Math.max(priceRange, minVisibleRange)
+  
+  // Add 15% padding on each side
+  const padding = Math.max(5, effectiveRange * 0.15)
+  
+  // Calculate bounds, centered on data if range is small
+  let yMin: number, yMax: number
+  if (priceRange < minVisibleRange) {
+    // Small volatility: center the view on the data
+    const center = (minPrice + maxPrice) / 2
+    yMin = Math.max(0, Math.floor(center - effectiveRange / 2 - padding))
+    yMax = Math.min(100, Math.ceil(center + effectiveRange / 2 + padding))
+  } else {
+    // Normal volatility: use actual data bounds with padding
+    yMin = Math.max(0, Math.floor(minPrice - padding))
+    yMax = Math.min(100, Math.ceil(maxPrice + padding))
+  }
+  
+  // Ensure we don't have a weird tiny range
+  if (yMax - yMin < 15) {
+    const mid = (yMin + yMax) / 2
+    yMin = Math.max(0, Math.floor(mid - 10))
+    yMax = Math.min(100, Math.ceil(mid + 10))
+  }
 
   const trend =
     market.type === "binary"
@@ -260,6 +288,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           isResolved={isResolved}
           yMin={yMin}
           yMax={yMax}
+          userBets={userBets}
+          userAvatar={userAvatar}
         />
       ) : (
         <MultiMarketContent
@@ -277,6 +307,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance }: MarketD
           handlePlaceBet={handlePlaceBet}
           userBalance={userBalance}
           isResolved={isResolved}
+          userBets={userBets}
+          userAvatar={userAvatar}
         />
       )}
     </div>
@@ -300,6 +332,8 @@ function BinaryMarketContent({
   isResolved,
   yMin,
   yMax,
+  userBets = [],
+  userAvatar
 }: {
   market: BinaryMarket
   timeframe: string
@@ -316,6 +350,8 @@ function BinaryMarketContent({
   isResolved: boolean
   yMin: number
   yMax: number
+  userBets?: any[]
+  userAvatar?: string
 }) {
   const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at)
 
@@ -326,6 +362,33 @@ function BinaryMarketContent({
   }))
 
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
+
+  // Process user bets to get chart markers
+  const userBetMarkers = useMemo(() => {
+    if (!userBets || userBets.length === 0) return []
+    
+    return userBets.map(bet => {
+      const betTs = new Date(bet.created_at).getTime()
+      // Find the closest chart point to this bet timestamp
+      let closestPoint = chartDataWithTs[0]
+      let minDiff = Infinity
+      
+      for (const point of chartDataWithTs) {
+        const diff = Math.abs(point.ts - betTs)
+        if (diff < minDiff) {
+          minDiff = diff
+          closestPoint = point
+        }
+      }
+      
+      return {
+        ts: betTs,
+        price: closestPoint?.price || 50,
+        amount: bet.amount,
+        outcomeName: bet.outcomes?.name || 'N/A'
+      }
+    }).filter(marker => marker.ts >= domain[0] && marker.ts <= domain[1]) // Only show markers in current timeframe
+  }, [userBets, chartDataWithTs, domain])
 
   return (
     <>
@@ -441,6 +504,53 @@ function BinaryMarketContent({
                 )}
               />
             )}
+            {/* User bet markers */}
+            {userBetMarkers.map((marker, idx) => (
+              <ReferenceDot
+                key={`user-bet-${idx}`}
+                x={marker.ts}
+                y={marker.price}
+                r={12}
+                shape={(props: any) => (
+                  <g>
+                    {/* Glow effect */}
+                    <circle cx={props.cx} cy={props.cy} r={16} fill="#fbbf24" opacity={0.2} />
+                    {/* Border ring */}
+                    <circle cx={props.cx} cy={props.cy} r={12} fill="#1e293b" stroke="#fbbf24" strokeWidth={2} />
+                    {/* Avatar or fallback */}
+                    {userAvatar ? (
+                      <>
+                        <defs>
+                          <clipPath id={`avatar-clip-${idx}`}>
+                            <circle cx={props.cx} cy={props.cy} r={10} />
+                          </clipPath>
+                        </defs>
+                        <image
+                          href={userAvatar}
+                          x={props.cx - 10}
+                          y={props.cy - 10}
+                          width={20}
+                          height={20}
+                          clipPath={`url(#avatar-clip-${idx})`}
+                          preserveAspectRatio="xMidYMid slice"
+                        />
+                      </>
+                    ) : (
+                      <text
+                        x={props.cx}
+                        y={props.cy + 4}
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill="#fbbf24"
+                        fontWeight="bold"
+                      >
+                        💰
+                      </text>
+                    )}
+                  </g>
+                )}
+              />
+            ))}
             <Area
               type="linear"
               dataKey="price"
@@ -517,6 +627,8 @@ function MultiMarketContent({
   handlePlaceBet,
   userBalance,
   isResolved,
+  userBets = [],
+  userAvatar
 }: {
   market: MultiOutcomeMarket
   timeframe: string
@@ -532,11 +644,32 @@ function MultiMarketContent({
   handlePlaceBet: () => void
   userBalance: number
   isResolved: boolean
+  userBets?: any[]
+  userAvatar?: string
 }) {
-  // Calculate dynamic Y max for Multi
+  // Track which outcomes are visible (for interactive legend)
+  const [visibleOutcomes, setVisibleOutcomes] = useState<Set<string>>(
+    new Set(market.outcomes.slice(0, 4).map(o => o.name))
+  )
+
+  const toggleOutcome = (name: string) => {
+    setVisibleOutcomes(prev => {
+      const next = new Set(prev)
+      if (next.has(name)) {
+        // Don't allow hiding all - keep at least 1
+        if (next.size > 1) next.delete(name)
+      } else {
+        next.add(name)
+      }
+      return next
+    })
+  }
+
+  // Calculate dynamic Y max for Multi (only for visible outcomes)
+  const visibleOutcomeNames = Array.from(visibleOutcomes)
   const allProbs = [
-    ...market.outcomes.map(o => o.probability),
-    ...chartData.flatMap(d => market.outcomes.map(o => Number(d[o.name]) || 0))
+    ...market.outcomes.filter(o => visibleOutcomes.has(o.name)).map(o => o.probability),
+    ...chartData.flatMap(d => visibleOutcomeNames.map(name => Number(d[name]) || 0))
   ]
   const maxProb = Math.max(...allProbs, 40) // Minimum 40% scale to avoid too much zoom
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
@@ -551,6 +684,37 @@ function MultiMarketContent({
   }))
 
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
+
+  // Process user bets to get chart markers (for multi)
+  const userBetMarkers = useMemo(() => {
+    if (!userBets || userBets.length === 0) return []
+    
+    return userBets.map(bet => {
+      const betTs = new Date(bet.created_at).getTime()
+      // Find the closest chart point to this bet timestamp
+      let closestPoint = chartDataWithTs[0]
+      let minDiff = Infinity
+      
+      for (const point of chartDataWithTs) {
+        const diff = Math.abs(point.ts - betTs)
+        if (diff < minDiff) {
+          minDiff = diff
+          closestPoint = point
+        }
+      }
+      
+      // Get the outcome that was bet on
+      const outcomeName = bet.outcomes?.name || 'N/A'
+      const outcomeY = closestPoint?.[outcomeName] || 50
+      
+      return {
+        ts: betTs,
+        price: outcomeY,
+        amount: bet.amount,
+        outcomeName
+      }
+    }).filter(marker => marker.ts >= domain[0] && marker.ts <= domain[1]) // Only show markers in current timeframe
+  }, [userBets, chartDataWithTs, domain])
 
   return (
     <>
@@ -712,7 +876,8 @@ function MultiMarketContent({
                 return null
               }}
             />
-            {market.outcomes.slice(0, 4).map((outcome) => (
+            {/* Pulsing dots for visible outcomes */}
+            {market.outcomes.slice(0, 4).filter(o => visibleOutcomes.has(o.name)).map((outcome) => (
               <ReferenceDot
                 key={`dot-${outcome.name}`}
                 x={chartDataWithTs.length > 0 ? chartDataWithTs[chartDataWithTs.length - 1].ts : 0}
@@ -726,33 +891,105 @@ function MultiMarketContent({
                 )}
               />
             ))}
-              {market.outcomes.slice(0, 4).map((outcome) => (
-                <Line
-                  key={outcome.name}
-                  type="linear"
-                  dataKey={outcome.name}
-                  stroke={outcome.color}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, strokeWidth: 0 }}
-                />
-              ))}
+            {/* User bet markers */}
+            {userBetMarkers.map((marker, idx) => (
+              <ReferenceDot
+                key={`user-bet-${idx}`}
+                x={marker.ts}
+                y={marker.price}
+                r={12}
+                shape={(props: any) => (
+                  <g>
+                    {/* Glow effect */}
+                    <circle cx={props.cx} cy={props.cy} r={16} fill="#fbbf24" opacity={0.2} />
+                    {/* Border ring */}
+                    <circle cx={props.cx} cy={props.cy} r={12} fill="#1e293b" stroke="#fbbf24" strokeWidth={2} />
+                    {/* Avatar or fallback */}
+                    {userAvatar ? (
+                      <>
+                        <defs>
+                          <clipPath id={`multi-avatar-clip-${idx}`}>
+                            <circle cx={props.cx} cy={props.cy} r={10} />
+                          </clipPath>
+                        </defs>
+                        <image
+                          href={userAvatar}
+                          x={props.cx - 10}
+                          y={props.cy - 10}
+                          width={20}
+                          height={20}
+                          clipPath={`url(#multi-avatar-clip-${idx})`}
+                          preserveAspectRatio="xMidYMid slice"
+                        />
+                      </>
+                    ) : (
+                      <text
+                        x={props.cx}
+                        y={props.cy + 4}
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill="#fbbf24"
+                        fontWeight="bold"
+                      >
+                        💰
+                      </text>
+                    )}
+                  </g>
+                )}
+              />
+            ))}
+            {/* Lines for visible outcomes only */}
+            {market.outcomes.slice(0, 4).filter(o => visibleOutcomes.has(o.name)).map((outcome) => (
+              <Line
+                key={outcome.name}
+                type="linear"
+                dataKey={outcome.name}
+                stroke={outcome.color}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
         
-        {/* Legend */}
-        <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-border">
-          {market.outcomes.slice(0, 4).map((outcome) => (
-            <div key={outcome.name} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: outcome.color }}
-              />
-              <span className="text-xs font-medium text-muted-foreground">
-                {outcome.name} <span className="font-mono text-white">{Math.round(outcome.probability)}%</span>
-              </span>
-            </div>
-          ))}
+        {/* Interactive Legend */}
+        <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border">
+          {market.outcomes.slice(0, 4).map((outcome) => {
+            const isVisible = visibleOutcomes.has(outcome.name)
+            return (
+              <button
+                key={outcome.name}
+                onClick={() => toggleOutcome(outcome.name)}
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all ${
+                  isVisible 
+                    ? 'bg-white/10 border border-white/20' 
+                    : 'bg-white/5 border border-transparent opacity-50'
+                }`}
+              >
+                <div 
+                  className="w-3 h-3 rounded-full transition-opacity" 
+                  style={{ 
+                    backgroundColor: outcome.color,
+                    opacity: isVisible ? 1 : 0.3
+                  }}
+                />
+                <span className={`text-xs font-medium transition-colors ${
+                  isVisible ? 'text-white' : 'text-muted-foreground'
+                }`}>
+                  {outcome.name}
+                </span>
+                <span className={`text-xs font-mono ${isVisible ? 'text-white' : 'text-muted-foreground'}`}>
+                  {Math.round(outcome.probability)}%
+                </span>
+                {isVisible ? (
+                  <Eye className="w-3 h-3 text-muted-foreground" />
+                ) : (
+                  <EyeOff className="w-3 h-3 text-muted-foreground" />
+                )}
+              </button>
+            )
+          })}
         </div>
       </div>
 
