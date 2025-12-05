@@ -689,11 +689,14 @@ function MultiMarketContent({
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
+                  // Sort payload by probability descending
+                  const sortedPayload = [...payload].sort((a: any, b: any) => Number(b.value) - Number(a.value))
+                  
                   return (
                     <div className="bg-slate-900/95 border border-white/10 rounded-lg p-3 backdrop-blur-md shadow-xl">
                       <p className="text-[10px] text-slate-400 font-mono mb-2">{new Date(label).toLocaleString()}</p>
                       <div className="space-y-1">
-                        {payload.map((entry: any) => (
+                        {sortedPayload.map((entry: any) => (
                           <div key={entry.name} className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
