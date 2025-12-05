@@ -460,6 +460,14 @@ function BinaryMarketContent({
       // Show the logo before export
       setIsExporting(true)
       
+      // Clear any text selection that might appear in the export
+      window.getSelection()?.removeAllRanges()
+      
+      // Remove focus from any element
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+      
       // Wait for the DOM to update
       await new Promise(resolve => setTimeout(resolve, 200))
       
@@ -468,6 +476,9 @@ function BinaryMarketContent({
         bgcolor: '#0f172a',
         quality: 1,
         scale: 2,
+        style: {
+          'user-select': 'none',
+        }
       })
       
       // Download the blob
@@ -997,6 +1008,14 @@ function MultiMarketContent({
       // Show the logo before export
       setIsExporting(true)
       
+      // Clear any text selection that might appear in the export
+      window.getSelection()?.removeAllRanges()
+      
+      // Remove focus from any element
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+      
       // Wait for the DOM to update
       await new Promise(resolve => setTimeout(resolve, 200))
       
@@ -1005,6 +1024,9 @@ function MultiMarketContent({
         bgcolor: '#0f172a',
         quality: 1,
         scale: 2,
+        style: {
+          'user-select': 'none',
+        }
       })
       
       // Download the blob
