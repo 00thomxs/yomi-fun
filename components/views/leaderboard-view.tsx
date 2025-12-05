@@ -184,23 +184,47 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </div>
 
                 {/* 2nd Place */}
-                <div className="flex flex-col gap-1 p-3 rounded-lg bg-black/30 border border-white/20">
+                <div className="flex flex-col gap-2 p-4 rounded-lg bg-black/30 border border-white/20">
                   <div className="flex justify-between items-start">
-                    <span className="text-lg">🥈</span>
+                    <span className="text-2xl">🥈</span>
                     <span className="text-xs font-bold text-white/60">#2</span>
                   </div>
-                  <p className="font-bold text-sm truncate">{seasonSettings?.top2_prize}</p>
-                  <p className="text-xs text-primary font-mono">+{getZenyReward(2).toLocaleString()} Z</p>
+                  <p className="font-bold text-sm truncate">{seasonSettings?.top2_prize || 'Prix physique'}</p>
+                  <div className="pt-2 border-t border-white/10">
+                    <p className="text-lg font-mono font-bold text-primary">
+                      +{getZenyReward(2).toLocaleString()} Z
+                    </p>
+                  </div>
                 </div>
 
                 {/* 3rd Place */}
-                <div className="flex flex-col gap-1 p-3 rounded-lg bg-black/30 border border-orange-500/30">
+                <div className="flex flex-col gap-2 p-4 rounded-lg bg-black/30 border border-orange-500/30">
                   <div className="flex justify-between items-start">
-                    <span className="text-lg">🥉</span>
+                    <span className="text-2xl">🥉</span>
                     <span className="text-xs font-bold text-orange-400">#3</span>
                   </div>
-                  <p className="font-bold text-sm truncate">{seasonSettings?.top3_prize}</p>
-                  <p className="text-xs text-primary font-mono">+{getZenyReward(3).toLocaleString()} Z</p>
+                  <p className="font-bold text-sm truncate">{seasonSettings?.top3_prize || 'Prix physique'}</p>
+                  <div className="pt-2 border-t border-orange-500/10">
+                    <p className="text-lg font-mono font-bold text-orange-400">
+                      +{getZenyReward(3).toLocaleString()} Z
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ranks 4-10 Rewards Summary */}
+              <div className="mt-4 p-3 rounded-lg bg-black/20 border border-white/5">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Bonus Zeny (Top 4-10)</p>
+                <div className="flex flex-wrap gap-2">
+                  {[4, 5, 6, 7, 8, 9, 10].map(rank => {
+                    const reward = getZenyReward(rank)
+                    if (reward <= 0) return null
+                    return (
+                      <span key={rank} className="px-2 py-1 rounded bg-white/5 text-xs font-mono">
+                        #{rank}: <span className="text-primary font-bold">+{reward.toLocaleString()}</span>
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
             </div>
