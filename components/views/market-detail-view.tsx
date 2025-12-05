@@ -549,51 +549,90 @@ function BinaryMarketContent({
                 )}
               />
             )}
-            {/* User bet markers */}
+            {/* User bet markers - positioned above the chart point */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
                 x={marker.ts}
                 y={marker.price}
                 r={12}
-                shape={(props: any) => (
-                  <g>
-                    {/* Glow effect */}
-                    <circle cx={props.cx} cy={props.cy} r={16} fill="#fbbf24" opacity={0.2} />
-                    {/* Border ring */}
-                    <circle cx={props.cx} cy={props.cy} r={12} fill="#1e293b" stroke="#fbbf24" strokeWidth={2} />
-                    {/* Avatar or fallback */}
-                    {userAvatar ? (
-                      <>
-                        <defs>
-                          <clipPath id={`avatar-clip-${idx}`}>
-                            <circle cx={props.cx} cy={props.cy} r={10} />
-                          </clipPath>
-                        </defs>
-                        <image
-                          href={userAvatar}
-                          x={props.cx - 10}
-                          y={props.cy - 10}
-                          width={20}
-                          height={20}
-                          clipPath={`url(#avatar-clip-${idx})`}
-                          preserveAspectRatio="xMidYMid slice"
-                        />
-                      </>
-                    ) : (
+                shape={(props: any) => {
+                  const offsetY = -35 // Position above the point
+                  const avatarY = props.cy + offsetY
+                  return (
+                    <g className="user-bet-marker cursor-pointer">
+                      {/* Vertical line connecting avatar to chart point */}
+                      <line 
+                        x1={props.cx} 
+                        y1={props.cy} 
+                        x2={props.cx} 
+                        y2={avatarY + 14}
+                        stroke="#fbbf24" 
+                        strokeWidth={2} 
+                        strokeDasharray="3 2"
+                        opacity={0.6}
+                      />
+                      {/* Small dot on the chart line */}
+                      <circle cx={props.cx} cy={props.cy} r={5} fill="#fbbf24" stroke="#1e293b" strokeWidth={2} />
+                      {/* Glow effect for avatar */}
+                      <circle cx={props.cx} cy={avatarY} r={18} fill="#fbbf24" opacity={0.15} />
+                      {/* Avatar container */}
+                      <circle cx={props.cx} cy={avatarY} r={14} fill="#0f172a" stroke="#fbbf24" strokeWidth={2} />
+                      {/* Avatar or fallback */}
+                      {userAvatar ? (
+                        <>
+                          <defs>
+                            <clipPath id={`avatar-clip-${idx}`}>
+                              <circle cx={props.cx} cy={avatarY} r={12} />
+                            </clipPath>
+                          </defs>
+                          <image
+                            href={userAvatar}
+                            x={props.cx - 12}
+                            y={avatarY - 12}
+                            width={24}
+                            height={24}
+                            clipPath={`url(#avatar-clip-${idx})`}
+                            preserveAspectRatio="xMidYMid slice"
+                          />
+                        </>
+                      ) : (
+                        <text
+                          x={props.cx}
+                          y={avatarY + 5}
+                          textAnchor="middle"
+                          fontSize="14"
+                          fill="#fbbf24"
+                        >
+                          💰
+                        </text>
+                      )}
+                      {/* Bet amount label */}
+                      <rect
+                        x={props.cx + 18}
+                        y={avatarY - 10}
+                        width={55}
+                        height={20}
+                        rx={4}
+                        fill="#0f172a"
+                        stroke="#fbbf24"
+                        strokeWidth={1}
+                        opacity={0.95}
+                      />
                       <text
-                        x={props.cx}
-                        y={props.cy + 4}
+                        x={props.cx + 45}
+                        y={avatarY + 4}
                         textAnchor="middle"
                         fontSize="10"
-                        fill="#fbbf24"
                         fontWeight="bold"
+                        fontFamily="ui-monospace, monospace"
+                        fill="#fbbf24"
                       >
-                        💰
+                        {marker.amount} Z
                       </text>
-                    )}
-                  </g>
-                )}
+                    </g>
+                  )
+                }}
               />
             ))}
             <Area

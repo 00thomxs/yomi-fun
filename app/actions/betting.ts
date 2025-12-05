@@ -269,26 +269,10 @@ export async function getUserMarketBets(marketId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  if (!user) {
-    console.log('[getUserMarketBets] No user authenticated')
-    return []
-  }
+  if (!user) return []
 
-  console.log('[getUserMarketBets] Fetching bets for user:', user.id, 'market:', marketId)
-
-  // First check: how many total bets does this user have?
-  const { data: allUserBets, error: allError } = await supabaseAdmin
-    .from('bets')
-    .select('id, market_id')
-    .eq('user_id', user.id)
-  
-  console.log('[getUserMarketBets] User total bets:', allUserBets?.length || 0, 'Error:', allError?.message || 'none')
-  if (allUserBets && allUserBets.length > 0) {
-    console.log('[getUserMarketBets] User bet market_ids:', allUserBets.map(b => b.market_id))
-  }
-
-  // Now get bets for this specific market
-  const { data: bets, error } = await supabaseAdmin
+  // Use admin client to bypass RLS issues
+  const { data: bets } = await supabaseAdmin
     .from('bets')
     .select(`
       id,
@@ -301,8 +285,6 @@ export async function getUserMarketBets(marketId: string) {
     .eq('user_id', user.id)
     .eq('market_id', marketId)
     .order('created_at', { ascending: true })
-
-  console.log('[getUserMarketBets] Bets for this market:', bets?.length || 0, 'Error:', error?.message || 'none')
 
   return bets || []
 }
