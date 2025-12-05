@@ -549,74 +549,100 @@ function BinaryMarketContent({
                 )}
               />
             )}
-            {/* User bet markers - floating above chart, not on the curve */}
+            {/* User bet markers - smart positioning based on price */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
                 x={marker.ts}
                 y={marker.price}
-                r={12}
+                r={0} // Invisible dot, we draw custom shape
                 shape={(props: any) => {
-                  // Always position at the TOP of the chart area (fixed Y position)
-                  const avatarY = 25
+                  // Smart positioning: 
+                  // If price > 50%, put avatar at bottom (y=85%)
+                  // If price <= 50%, put avatar at top (y=15%)
+                  // This ensures NO overlap with the curve
+                  const isHighPrice = marker.price > 50
+                  
+                  // Calculate Y position in pixels (approximate based on chart height 240px)
+                  // props.cy is the y-coordinate of the point on the curve
+                  const chartHeight = 240
+                  const avatarY = isHighPrice ? chartHeight - 40 : 40
+                  
+                  // Theme Red color (matches site theme)
+                  const themeRed = "#ff4d4d"
+                  const themeBg = "#1a1a1a"
                   
                   return (
-                    <g className="user-bet-marker">
-                      {/* Avatar glow effect */}
-                      <circle cx={props.cx} cy={avatarY} r={16} fill="#ef4444" opacity={0.2} />
-                      {/* Avatar container - red theme */}
-                      <circle cx={props.cx} cy={avatarY} r={13} fill="#1c1917" stroke="#ef4444" strokeWidth={2} />
-                      {/* Avatar or fallback */}
-                      {userAvatar ? (
-                        <>
-                          <defs>
-                            <clipPath id={`avatar-clip-${idx}`}>
-                              <circle cx={props.cx} cy={avatarY} r={11} />
-                            </clipPath>
-                          </defs>
-                          <image
-                            href={userAvatar}
-                            x={props.cx - 11}
-                            y={avatarY - 11}
-                            width={22}
-                            height={22}
-                            clipPath={`url(#avatar-clip-${idx})`}
-                            preserveAspectRatio="xMidYMid slice"
-                          />
-                        </>
-                      ) : (
-                        <text
-                          x={props.cx}
-                          y={avatarY + 4}
-                          textAnchor="middle"
-                          fontSize="12"
-                          fill="#ef4444"
-                        >
-                          💰
-                        </text>
-                      )}
-                      {/* Bet amount label - red theme */}
-                      <rect
-                        x={props.cx + 16}
-                        y={avatarY - 9}
-                        width={50}
-                        height={18}
-                        rx={4}
-                        fill="#1c1917"
-                        stroke="#ef4444"
-                        strokeWidth={1}
+                    <g className="user-bet-marker group">
+                      {/* Full vertical line across the chart */}
+                      <line 
+                        x1={props.cx} 
+                        y1={20} 
+                        x2={props.cx} 
+                        y2={chartHeight - 20}
+                        stroke={themeRed} 
+                        strokeWidth={1} 
+                        strokeDasharray="2 2"
+                        opacity={0.3}
                       />
-                      <text
-                        x={props.cx + 41}
-                        y={avatarY + 4}
-                        textAnchor="middle"
-                        fontSize="9"
-                        fontWeight="bold"
-                        fontFamily="ui-monospace, monospace"
-                        fill="#ef4444"
-                      >
-                        {marker.amount} Z
-                      </text>
+                      
+                      {/* The point on the curve */}
+                      <circle cx={props.cx} cy={props.cy} r={4} fill={themeBg} stroke={themeRed} strokeWidth={2} />
+                      
+                      {/* Avatar Container */}
+                      <g style={{ transform: `translateY(0px)` }} className="transition-transform duration-200 hover:scale-110 origin-center">
+                        {/* Glow */}
+                        <circle cx={props.cx} cy={avatarY} r={16} fill={themeRed} opacity={0.15} />
+                        
+                        {/* Avatar Border */}
+                        <circle cx={props.cx} cy={avatarY} r={13} fill={themeBg} stroke={themeRed} strokeWidth={1.5} />
+                        
+                        {/* Avatar Image */}
+                        {userAvatar ? (
+                          <>
+                            <defs>
+                              <clipPath id={`avatar-clip-${idx}`}>
+                                <circle cx={props.cx} cy={avatarY} r={11} />
+                              </clipPath>
+                            </defs>
+                            <image
+                              href={userAvatar}
+                              x={props.cx - 11}
+                              y={avatarY - 11}
+                              width={22}
+                              height={22}
+                              clipPath={`url(#avatar-clip-${idx})`}
+                              preserveAspectRatio="xMidYMid slice"
+                            />
+                          </>
+                        ) : (
+                          <text x={props.cx} y={avatarY + 4} textAnchor="middle" fontSize="10">💰</text>
+                        )}
+
+                        {/* Bet Amount Label (pill shape) */}
+                        <g transform={`translate(${props.cx + 18}, ${avatarY - 9})`}>
+                          <rect
+                            width={50}
+                            height={18}
+                            rx={9}
+                            fill={themeBg}
+                            stroke={themeRed}
+                            strokeWidth={1}
+                            opacity={0.9}
+                          />
+                          <text
+                            x={25}
+                            y={12}
+                            textAnchor="middle"
+                            fontSize="9"
+                            fontWeight="bold"
+                            fontFamily="ui-monospace, monospace"
+                            fill={themeRed}
+                          >
+                            {marker.amount} Z
+                          </text>
+                        </g>
+                      </g>
                     </g>
                   )
                 }}
@@ -971,53 +997,69 @@ function MultiMarketContent({
                 )}
               />
             ))}
-            {/* User bet markers - floating at top, using outcome color */}
+            {/* User bet markers - smart positioning */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
                 x={marker.ts}
                 y={marker.price}
-                r={12}
+                r={0}
                 shape={(props: any) => {
-                  // Always position at the TOP of the chart area
-                  const avatarY = 20
+                  // Smart positioning logic
+                  const isHighPrice = marker.price > 50
+                  const chartHeight = 200 // Multi chart is slightly shorter
+                  const avatarY = isHighPrice ? chartHeight - 30 : 30
+                  
                   const markerColor = marker.color
+                  const themeBg = "#1a1a1a"
                   
                   return (
-                    <g className="user-bet-marker">
-                      {/* Avatar glow effect */}
-                      <circle cx={props.cx} cy={avatarY} r={14} fill={markerColor} opacity={0.2} />
-                      {/* Avatar container */}
-                      <circle cx={props.cx} cy={avatarY} r={11} fill="#1c1917" stroke={markerColor} strokeWidth={2} />
-                      {/* Avatar or fallback */}
-                      {userAvatar ? (
-                        <>
-                          <defs>
-                            <clipPath id={`multi-avatar-clip-${idx}`}>
-                              <circle cx={props.cx} cy={avatarY} r={9} />
-                            </clipPath>
-                          </defs>
-                          <image
-                            href={userAvatar}
-                            x={props.cx - 9}
-                            y={avatarY - 9}
-                            width={18}
-                            height={18}
-                            clipPath={`url(#multi-avatar-clip-${idx})`}
-                            preserveAspectRatio="xMidYMid slice"
-                          />
-                        </>
-                      ) : (
-                        <text
-                          x={props.cx}
-                          y={avatarY + 3}
-                          textAnchor="middle"
-                          fontSize="10"
-                          fill={markerColor}
-                        >
-                          💰
-                        </text>
-                      )}
+                    <g className="user-bet-marker group">
+                      {/* Full vertical line */}
+                      <line 
+                        x1={props.cx} 
+                        y1={10} 
+                        x2={props.cx} 
+                        y2={chartHeight - 10}
+                        stroke={markerColor} 
+                        strokeWidth={1} 
+                        strokeDasharray="2 2"
+                        opacity={0.3}
+                      />
+                      
+                      {/* Point on curve */}
+                      <circle cx={props.cx} cy={props.cy} r={3} fill={themeBg} stroke={markerColor} strokeWidth={2} />
+                      
+                      {/* Avatar Container */}
+                      <g className="transition-transform duration-200 hover:scale-110 origin-center">
+                        {/* Glow */}
+                        <circle cx={props.cx} cy={avatarY} r={14} fill={markerColor} opacity={0.15} />
+                        
+                        {/* Border */}
+                        <circle cx={props.cx} cy={avatarY} r={11} fill={themeBg} stroke={markerColor} strokeWidth={1.5} />
+                        
+                        {/* Image */}
+                        {userAvatar ? (
+                          <>
+                            <defs>
+                              <clipPath id={`multi-avatar-clip-${idx}`}>
+                                <circle cx={props.cx} cy={avatarY} r={9} />
+                              </clipPath>
+                            </defs>
+                            <image
+                              href={userAvatar}
+                              x={props.cx - 9}
+                              y={avatarY - 9}
+                              width={18}
+                              height={18}
+                              clipPath={`url(#multi-avatar-clip-${idx})`}
+                              preserveAspectRatio="xMidYMid slice"
+                            />
+                          </>
+                        ) : (
+                          <text x={props.cx} y={avatarY + 3} textAnchor="middle" fontSize="9" fill={markerColor}>💰</text>
+                        )}
+                      </g>
                     </g>
                   )
                 }}
