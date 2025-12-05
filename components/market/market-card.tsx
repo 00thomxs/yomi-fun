@@ -238,7 +238,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 </ReferenceDot>
               )}
               <Area
-                type="stepAfter"
+                type="linear"
                 dataKey="price"
                 stroke="#ffffff"
                 strokeWidth={1.5}

@@ -442,7 +442,7 @@ function BinaryMarketContent({
               />
             )}
             <Area
-              type="stepAfter"
+              type="linear"
               dataKey="price"
               stroke="#ffffff"
               strokeWidth={2}
@@ -710,7 +710,7 @@ function MultiMarketContent({
               {market.outcomes.slice(0, 4).map((outcome) => (
                 <Line
                   key={outcome.name}
-                  type="stepAfter"
+                  type="linear"
                   dataKey={outcome.name}
                   stroke={outcome.color}
                   strokeWidth={2}
