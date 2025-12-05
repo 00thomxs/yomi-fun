@@ -132,7 +132,7 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
             <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20">
               <p className="text-sm text-amber-400/70">Gains</p>
               <p className="text-3xl font-black text-amber-400 font-mono flex items-center justify-center gap-1">
-                +<CurrencySymbol className="w-6 h-6" />{data.winnings.toLocaleString()}
+                +{data.winnings.toLocaleString()}<CurrencySymbol className="w-6 h-6" />
               </p>
             </div>
           )}

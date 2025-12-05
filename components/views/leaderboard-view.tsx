@@ -205,7 +205,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Cash Prize</p>
                 <p className="text-xl font-black text-primary flex items-center justify-end gap-1">
-                  <CurrencySymbol className="w-4 h-4 mb-0.5" />{(seasonSettings?.cash_prize || 0).toLocaleString()}
+                  {(seasonSettings?.cash_prize || 0).toLocaleString()}<CurrencySymbol className="w-4 h-4" />
                 </p>
               </div>
             </div>
@@ -257,7 +257,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-bold text-white border border-white/10">
-                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(2).toLocaleString()}
+                    +{getZenyReward(2).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
@@ -298,7 +298,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(1).toLocaleString()}
+                    +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
@@ -335,7 +335,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
                   <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[10px] font-bold text-orange-400 border border-orange-500/20">
-                    +<CurrencySymbol className="w-2 h-2 mb-0.5" />{getZenyReward(3).toLocaleString()}
+                    +{getZenyReward(3).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
@@ -374,7 +374,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     </span>
                     {hasSeason && reward > 0 && (
                       <span className="text-[9px] font-bold text-primary flex items-center gap-0.5">
-                        +<CurrencySymbol className="w-2 h-2" />{reward.toLocaleString()}
+                        +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                     )}
                   </div>

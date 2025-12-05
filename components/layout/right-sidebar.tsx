@@ -78,8 +78,8 @@ export function RightSidebar({
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
               <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Balance</p>
-              <p className="text-2xl font-bold tracking-tight">
-                <CurrencySymbol className="text-primary" /> <span className="font-mono">{userBalance.toLocaleString()}</span>
+              <p className="text-2xl font-bold tracking-tight flex items-center gap-1">
+                <span className="font-mono">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
               </p>
             </div>
             <div className="p-3 rounded-lg bg-white/5 border border-border">

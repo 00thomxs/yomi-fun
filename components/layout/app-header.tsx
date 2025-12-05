@@ -31,9 +31,8 @@ export function AppHeader() {
             {/* Wallet - only show when authenticated */}
             {isAuthenticated && (
               <div className="px-4 py-2.5 rounded-lg bg-card border border-border">
-                <span className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                  <CurrencySymbol className="text-primary" />
-                  <span className="font-mono font-bold">{userBalance.toLocaleString()}</span>
+                <span className="flex items-center gap-1 text-sm font-semibold tracking-tight">
+                  <span className="font-mono font-bold">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
                 </span>
               </div>
             )}

@@ -114,8 +114,8 @@ export function LeftSidebar({
                         return `${bet.direction === 'NO' ? "NON " : "OUI "}${bet.choice}`
                       })()}
                     </span>
-                    <span className="font-mono font-bold text-muted-foreground">
-                      <CurrencySymbol /> {bet.amount}
+                    <span className="font-mono font-bold text-muted-foreground flex items-center gap-0.5">
+                      {bet.amount}<CurrencySymbol />
                     </span>
                   </div>
                   {/* Status Badge */}
