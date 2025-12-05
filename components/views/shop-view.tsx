@@ -9,6 +9,7 @@ import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
 import { purchaseItem } from "@/app/actions/shop"
 import { useUser } from "@/contexts/user-context"
+import { SuccessPopup } from "@/components/ui/success-popup"
 
 interface ShopViewProps {
   initialItems: ShopItem[]
@@ -19,6 +20,8 @@ export function ShopView({ initialItems }: ShopViewProps) {
   const [isPurchasing, setIsPurchasing] = useState(false)
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null)
   const [deliveryInfo, setDeliveryInfo] = useState("")
+  const [showPurchasePopup, setShowPurchasePopup] = useState(false)
+  const [purchasedItemName, setPurchasedItemName] = useState("")
   
   const { userBalance, setUserBalance } = useUser()
   const searchParams = useSearchParams()
@@ -84,13 +87,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
       if (result.error) {
         toast.error("Erreur", { description: result.error })
       } else {
-        toast.success("Commande validée !", {
-          description: `Vous avez acheté ${selectedItem.name}. Vous recevrez bientôt des nouvelles.`
-        })
         if (result.newBalance !== undefined) {
           setUserBalance(result.newBalance)
         }
-        setSelectedItem(null) // Close modal on success
+        // Store item name and show popup
+        setPurchasedItemName(selectedItem.name)
+        setSelectedItem(null) // Close purchase modal
+        setShowPurchasePopup(true) // Show success popup
       }
     } catch (error) {
       console.error(error)
@@ -283,6 +286,14 @@ export function ShopView({ initialItems }: ShopViewProps) {
           </div>
         </div>
       )}
+
+      {/* Purchase Success Popup */}
+      <SuccessPopup
+        type="purchase"
+        isOpen={showPurchasePopup}
+        onClose={() => setShowPurchasePopup(false)}
+        data={{ itemName: purchasedItemName }}
+      />
     </div>
   )
 }

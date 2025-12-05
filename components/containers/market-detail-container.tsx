@@ -1,12 +1,13 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { MarketDetailView } from "@/components/views/market-detail-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
 import { MarketWinner } from "@/app/actions/market-stats"
+import { SuccessPopup } from "@/components/ui/success-popup"
 
 type MarketDetailContainerProps = {
   market: any // Raw Supabase data
@@ -19,11 +20,37 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
   const router = useRouter()
   const { placeBet, userBalance, user } = useUser()
   const lastBalanceRef = useRef<number>(userBalance)
+  const [showWinPopup, setShowWinPopup] = useState(false)
+  const [winAmount, setWinAmount] = useState(0)
   
   // STABLE timestamp using useRef - set once on mount, NEVER changes
   // This is crucial to prevent chart shifting on re-renders
   const nowRef = useRef<Date>(new Date())
   const now = nowRef.current
+
+  // Check if user has won on this market and show popup (only once per market)
+  useEffect(() => {
+    if (!rawMarket.resolved_at || userBets.length === 0) return
+    
+    const storageKey = `win-popup-shown-${rawMarket.id}`
+    const alreadyShown = sessionStorage.getItem(storageKey)
+    
+    if (alreadyShown) return
+    
+    // Calculate total winnings on this market
+    const wonBets = userBets.filter((bet: any) => bet.status === 'won')
+    if (wonBets.length === 0) return
+    
+    const totalWinnings = wonBets.reduce((sum: number, bet: any) => {
+      return sum + (bet.potential_payout - bet.amount) // Net profit
+    }, 0)
+    
+    if (totalWinnings > 0) {
+      setWinAmount(Math.round(totalWinnings))
+      setShowWinPopup(true)
+      sessionStorage.setItem(storageKey, 'true')
+    }
+  }, [rawMarket.id, rawMarket.resolved_at, userBets])
 
   // Refresh page when user balance changes (indicates a bet was placed)
   // This triggers a server-side re-fetch of userBets
@@ -324,14 +351,24 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
   }
 
   return (
-    <MarketDetailView
-      market={market}
-      onBack={handleBack}
-      onBet={handleBet}
-      userBalance={userBalance}
-      userBets={userBets}
-      userAvatar={user?.avatar}
-      topWinners={topWinners}
-    />
+    <>
+      <MarketDetailView
+        market={market}
+        onBack={handleBack}
+        onBet={handleBet}
+        userBalance={userBalance}
+        userBets={userBets}
+        userAvatar={user?.avatar}
+        topWinners={topWinners}
+      />
+      
+      {/* Bet Won Success Popup */}
+      <SuccessPopup
+        type="bet-won"
+        isOpen={showWinPopup}
+        onClose={() => setShowWinPopup(false)}
+        data={{ winnings: winAmount }}
+      />
+    </>
   )
 }

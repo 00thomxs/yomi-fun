@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@/contexts/user-context"
 import { deleteAccount } from "@/app/auth/actions"
 import { useRouter } from "next/navigation"
+import { SuccessPopup } from "@/components/ui/success-popup"
 
 export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const { profile, user, setUser } = useUser()
@@ -20,6 +21,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [notifWin, setNotifWin] = useState(profile?.email_notif_win ?? true)
   const [notifMarketing, setNotifMarketing] = useState(profile?.email_notif_marketing ?? true)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   
   // Delete Account State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -87,8 +89,8 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
         })
       }
 
-      toast({ title: "Succès", description: "Profil mis à jour !" })
-      onClose()
+      // Show success popup instead of toast
+      setShowSuccessPopup(true)
     } catch (error: any) {
       console.error(error)
       toast({ title: "Erreur", description: error.message, variant: "destructive" })
@@ -263,6 +265,16 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
           Supprimer le compte
         </button>
       </div>
+
+      {/* Profile Update Success Popup */}
+      <SuccessPopup
+        type="profile"
+        isOpen={showSuccessPopup}
+        onClose={() => {
+          setShowSuccessPopup(false)
+          onClose() // Close the edit form after popup closes
+        }}
+      />
     </div>
   )
 }
