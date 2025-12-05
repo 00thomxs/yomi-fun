@@ -81,22 +81,28 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   // Season Logic
   const hasSeason = seasonSettings?.is_active === true
   const seasonEnd = seasonSettings ? new Date(seasonSettings.season_end) : new Date()
-  const seasonStart = seasonSettings ? new Date(seasonSettings.created_at || Date.now()) : new Date()
+  // Use updated_at as season start (it's set when season is started)
+  const seasonStart = seasonSettings?.updated_at ? new Date(seasonSettings.updated_at) : new Date()
   const now = new Date()
   
-  // Calculate progress correctly
-  const totalDuration = seasonEnd.getTime() - seasonStart.getTime()
+  // Calculate time remaining
+  const timeLeftMs = Math.max(0, seasonEnd.getTime() - now.getTime())
+  const minutesLeft = Math.floor(timeLeftMs / (1000 * 60))
+  const hoursLeftTotal = Math.floor(timeLeftMs / (1000 * 60 * 60))
+  const daysLeftTotal = Math.floor(timeLeftMs / (1000 * 60 * 60 * 24))
+  
+  // Calculate progress correctly (from season start to season end)
+  const totalDuration = Math.max(1, seasonEnd.getTime() - seasonStart.getTime())
   const elapsed = now.getTime() - seasonStart.getTime()
   const progressRaw = (elapsed / totalDuration) * 100
   const progress = Math.min(100, Math.max(0, progressRaw))
   
-  const daysLeft = Math.max(0, Math.ceil((seasonEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-  const hoursLeft = Math.max(0, Math.ceil((seasonEnd.getTime() - now.getTime()) / (1000 * 60 * 60)))
-  
   const getCountdown = () => {
-    if (daysLeft > 0) return `${daysLeft} jour${daysLeft > 1 ? 's' : ''}`
-    if (hoursLeft > 0) return `${hoursLeft} heure${hoursLeft > 1 ? 's' : ''}`
-    return "Terminée"
+    if (timeLeftMs <= 0) return "Terminée"
+    if (daysLeftTotal > 0) return `${daysLeftTotal} jour${daysLeftTotal > 1 ? 's' : ''}`
+    if (hoursLeftTotal > 0) return `${hoursLeftTotal} heure${hoursLeftTotal > 1 ? 's' : ''}`
+    if (minutesLeft > 0) return `${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}`
+    return "< 1 minute"
   }
 
   // Zeny Rewards - Rank 1 gets ONLY cash_prize, others get zeny_rewards[rank-1]

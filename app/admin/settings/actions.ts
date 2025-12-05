@@ -282,21 +282,37 @@ export async function endSeason() {
 export async function checkAndDistributeRewards(): Promise<{ distributed: boolean; message?: string }> {
   const supabase = await createClient()
 
-  const { data: settings } = await supabase
+  const { data: settings, error } = await supabase
     .from('season_settings')
     .select('*')
     .single()
 
-  if (!settings) return { distributed: false }
+  if (error || !settings) {
+    console.log('[AutoEnd] No settings found or error:', error)
+    return { distributed: false }
+  }
+
+  console.log('[AutoEnd] Checking season:', {
+    is_active: settings.is_active,
+    rewards_distributed: settings.rewards_distributed,
+    season_end: settings.season_end,
+    now: new Date().toISOString()
+  })
 
   // If season is active and end date has passed, auto-end it
   if (settings.is_active && !settings.rewards_distributed) {
     const now = new Date()
     const seasonEnd = new Date(settings.season_end)
 
-    if (now >= seasonEnd) {
+    console.log('[AutoEnd] Time comparison:', {
+      now: now.getTime(),
+      seasonEnd: seasonEnd.getTime(),
+      hasEnded: now.getTime() >= seasonEnd.getTime()
+    })
+
+    if (now.getTime() >= seasonEnd.getTime()) {
+      console.log('[AutoEnd] Season has ended! Distributing rewards...')
       // Season has ended naturally, distribute rewards
-      // We need to use admin client for this
       const result = await endSeasonInternal(settings)
       return { distributed: true, message: result.message }
     }
