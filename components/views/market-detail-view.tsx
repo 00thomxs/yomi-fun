@@ -450,8 +450,11 @@ function BinaryMarketContent({
   
   // Export chart as PNG
   const exportChart = useCallback(async () => {
+    console.log('Export started, chartRef:', chartRef.current)
+    
     if (!chartRef.current) {
       console.error('Chart ref not found')
+      alert('Erreur: Impossible de trouver le graphique')
       return
     }
     
@@ -460,28 +463,55 @@ function BinaryMarketContent({
       setIsExporting(true)
       
       // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      console.log('Starting html2canvas...')
       
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#0f172a',
         scale: 2,
         useCORS: true,
-        logging: false,
+        logging: true, // Enable logging for debugging
+        allowTaint: true,
       })
       
-      // Create download link
-      const link = document.createElement('a')
-      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-      link.download = fileName
-      link.href = canvas.toDataURL('image/png')
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      console.log('Canvas created:', canvas.width, 'x', canvas.height)
       
-      // Hide the logo after export
-      setIsExporting(false)
+      // Use toBlob for better browser compatibility
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error('Failed to create blob')
+          alert('Erreur: Impossible de créer l\'image')
+          setIsExporting(false)
+          return
+        }
+        
+        console.log('Blob created:', blob.size, 'bytes')
+        
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
+        
+        link.href = url
+        link.download = fileName
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        
+        console.log('Clicking download link...')
+        link.click()
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+          setIsExporting(false)
+          console.log('Export complete!')
+        }, 100)
+      }, 'image/png')
+      
     } catch (error) {
       console.error('Export failed:', error)
+      alert('Erreur lors de l\'export: ' + (error as Error).message)
       setIsExporting(false)
     }
   }, [market.question])
@@ -544,18 +574,18 @@ function BinaryMarketContent({
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-2 overflow-x-auto pb-2">
           {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
+          <button
+            key={tf}
+            onClick={() => setTimeframe(tf)}
               className={`px-4 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap ${
-                timeframe === tf
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
-              }`}
-            >
-              {tf}
-            </button>
-          ))}
+              timeframe === tf
+                ? "bg-primary text-primary-foreground"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
+            }`}
+          >
+            {tf}
+          </button>
+        ))}
         </div>
         <div className="flex gap-2">
           <button
@@ -979,8 +1009,11 @@ function MultiMarketContent({
   
   // Export chart as PNG
   const exportChart = useCallback(async () => {
+    console.log('Export started (multi), chartRef:', chartRef.current)
+    
     if (!chartRef.current) {
       console.error('Chart ref not found')
+      alert('Erreur: Impossible de trouver le graphique')
       return
     }
     
@@ -989,28 +1022,55 @@ function MultiMarketContent({
       setIsExporting(true)
       
       // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      console.log('Starting html2canvas (multi)...')
       
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#0f172a',
         scale: 2,
         useCORS: true,
-        logging: false,
+        logging: true,
+        allowTaint: true,
       })
       
-      // Create download link
-      const link = document.createElement('a')
-      const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
-      link.download = fileName
-      link.href = canvas.toDataURL('image/png')
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      console.log('Canvas created (multi):', canvas.width, 'x', canvas.height)
       
-      // Hide the logo after export
-      setIsExporting(false)
+      // Use toBlob for better browser compatibility
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error('Failed to create blob')
+          alert('Erreur: Impossible de créer l\'image')
+          setIsExporting(false)
+          return
+        }
+        
+        console.log('Blob created (multi):', blob.size, 'bytes')
+        
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const fileName = `yomi-${market.question.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`
+        
+        link.href = url
+        link.download = fileName
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        
+        console.log('Clicking download link (multi)...')
+        link.click()
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+          setIsExporting(false)
+          console.log('Export complete (multi)!')
+        }, 100)
+      }, 'image/png')
+      
     } catch (error) {
-      console.error('Export failed:', error)
+      console.error('Export failed (multi):', error)
+      alert('Erreur lors de l\'export: ' + (error as Error).message)
       setIsExporting(false)
     }
   }, [market.question])
@@ -1182,19 +1242,19 @@ function MultiMarketContent({
           <div className="flex items-center gap-2">
             <div className="flex gap-2 overflow-x-auto pb-2">
               {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
-                <button
-                  key={tf}
-                  onClick={() => setTimeframe(tf)}
+              <button
+                key={tf}
+                onClick={() => setTimeframe(tf)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap ${
-                    timeframe === tf
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white/5 border border-border hover:border-white/20"
-                  }`}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
+                  timeframe === tf
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-white/5 border border-border hover:border-white/20"
+                }`}
+              >
+                {tf}
+              </button>
+            ))}
+          </div>
             <div className="flex gap-1">
               <button
                 onClick={exportChart}
@@ -1210,7 +1270,7 @@ function MultiMarketContent({
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
-            </div>
+        </div>
           </div>
         </div>
         
@@ -1257,35 +1317,35 @@ function MultiMarketContent({
                 <ResponsiveContainer width="100%" height={500}>
                   <LineChart data={chartDataWithTs}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
-                    <XAxis
+            <XAxis
                       dataKey="ts"
                       type="number"
                       scale="time"
                       domain={domain}
                       ticks={ticks.length > 0 ? ticks : [domain[0], domain[1]]}
                       tickFormatter={formatTick}
-                      stroke="#64748b"
+              stroke="#64748b"
                       style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
-                      tick={{ fill: "#64748b" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
+              tick={{ fill: "#64748b" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
                       domain={[0, multiYMax]}
                       ticks={multiYTicks}
                       orientation="right"
-                      stroke="#64748b"
+              stroke="#64748b"
                       style={{ fontSize: "12px", fontFamily: "ui-monospace, monospace" }}
-                      tick={{ fill: "#64748b" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "rgba(15, 23, 42, 0.95)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        borderRadius: "8px",
-                      }}
+              tick={{ fill: "#64748b" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "8px",
+              }}
                       labelFormatter={(label) => new Date(label).toLocaleString()}
                     />
                     {market.outcomes.slice(0, 4).filter(o => visibleOutcomes.has(o.name)).map((outcome) => (
@@ -1302,7 +1362,7 @@ function MultiMarketContent({
                 </ResponsiveContainer>
                 {/* Legend */}
                 <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border">
-                  {market.outcomes.slice(0, 4).map((outcome) => (
+            {market.outcomes.slice(0, 4).map((outcome) => (
                     <button
                       key={outcome.name}
                       onClick={() => toggleOutcome(outcome.name)}
