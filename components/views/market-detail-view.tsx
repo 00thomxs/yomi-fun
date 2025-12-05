@@ -10,50 +10,55 @@ import { CATEGORIES } from "@/lib/constants"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
+type TickFormatType = 'time' | 'day' | 'month'
+
 const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string) => {
   const now = new Date().getTime()
   const createdAt = marketCreatedAt ? new Date(marketCreatedAt).getTime() : now - 24 * 3600 * 1000
   
   let duration = 24 * 3600 * 1000
   let tickInterval: number
-  let format: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+  let formatType: TickFormatType = 'time'
 
   if (timeframe === '1H') {
     duration = 3600 * 1000
     tickInterval = 15 * 60 * 1000 // Every 15 min
-    format = { hour: '2-digit', minute: '2-digit' }
+    formatType = 'time'
   } else if (timeframe === '6H') {
     duration = 6 * 3600 * 1000
     tickInterval = 60 * 60 * 1000 // Every hour
-    format = { hour: '2-digit', minute: '2-digit' }
+    formatType = 'time'
   } else if (timeframe === '1J' || timeframe === '24H') {
     duration = 24 * 3600 * 1000
     tickInterval = 4 * 60 * 60 * 1000 // Every 4 hours
-    format = { hour: '2-digit', minute: '2-digit' }
+    formatType = 'time'
   } else if (timeframe === '1S' || timeframe === '7J') {
     duration = 7 * 24 * 3600 * 1000
     tickInterval = 24 * 60 * 60 * 1000 // Every day
-    format = { day: 'numeric', month: 'short' }
+    formatType = 'day' // ONLY day + month, NO time
   } else if (timeframe === '1M' || timeframe === '30J') {
     duration = 30 * 24 * 3600 * 1000
     tickInterval = 5 * 24 * 60 * 60 * 1000 // Every 5 days
-    format = { day: 'numeric', month: 'short' }
+    formatType = 'day' // ONLY day + month, NO time
   } else if (timeframe === 'TOUT') {
     // TOUT = from market creation to now
     duration = now - createdAt + 3600 * 1000 // Add 1h padding
     // Choose interval based on actual duration
     if (duration <= 24 * 3600 * 1000) {
       tickInterval = 4 * 60 * 60 * 1000
-      format = { hour: '2-digit', minute: '2-digit' }
+      formatType = 'time'
     } else if (duration <= 7 * 24 * 3600 * 1000) {
       tickInterval = 24 * 60 * 60 * 1000
-      format = { day: 'numeric', month: 'short' }
+      formatType = 'day'
     } else if (duration <= 30 * 24 * 3600 * 1000) {
       tickInterval = 5 * 24 * 60 * 60 * 1000
-      format = { day: 'numeric', month: 'short' }
-    } else {
+      formatType = 'day'
+    } else if (duration <= 365 * 24 * 3600 * 1000) {
       tickInterval = 7 * 24 * 60 * 60 * 1000 // Weekly
-      format = { day: 'numeric', month: 'short' }
+      formatType = 'day'
+    } else {
+      tickInterval = 30 * 24 * 60 * 60 * 1000 // Monthly for very long events
+      formatType = 'month'
     }
   } else {
     tickInterval = 4 * 60 * 60 * 1000 // Default: 4 hours
@@ -85,7 +90,28 @@ const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string)
     ticks.push(...newTicks)
   }
 
-  return { domain, ticks, format }
+  return { domain, ticks, formatType }
+}
+
+// Explicit tick formatter - clean output without weird locale issues
+const formatTickLabel = (ts: number, formatType: TickFormatType): string => {
+  const date = new Date(ts)
+  
+  if (formatType === 'time') {
+    // HH:mm format
+    const hours = date.getHours().toString().padStart(2, '0')
+    const mins = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${mins}`
+  } else if (formatType === 'day') {
+    // "5 déc." format - day + short month, NO time
+    const day = date.getDate()
+    const months = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+    return `${day} ${months[date.getMonth()]}`
+  } else {
+    // "déc. 2024" for very long events
+    const months = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+    return `${months[date.getMonth()]} ${date.getFullYear()}`
+  }
 }
 
 type MarketDetailViewProps = {
@@ -289,7 +315,7 @@ function BinaryMarketContent({
   yMin: number
   yMax: number
 }) {
-  const { domain, ticks, format } = getAxisParams(timeframe, chartData, market.created_at)
+  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -297,10 +323,7 @@ function BinaryMarketContent({
     ts: d.fullDate instanceof Date ? d.fullDate.getTime() : new Date(d.fullDate).getTime()
   }))
 
-  const formatTick = (ts: number) => {
-    const date = new Date(ts)
-    return date.toLocaleString('fr-FR', format)
-  }
+  const formatTick = (ts: number) => formatTickLabel(ts, formatType)
 
   return (
     <>
@@ -500,7 +523,7 @@ function MultiMarketContent({
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
 
   // Get axis params for timeframe
-  const { domain, ticks, format } = getAxisParams(timeframe, chartData, market.created_at)
+  const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -508,10 +531,7 @@ function MultiMarketContent({
     ts: d.fullDate instanceof Date ? d.fullDate.getTime() : new Date(d.fullDate).getTime()
   }))
 
-  const formatTick = (ts: number) => {
-    const date = new Date(ts)
-    return date.toLocaleString('fr-FR', format)
-  }
+  const formatTick = (ts: number) => formatTickLabel(ts, formatType)
 
   return (
     <>
