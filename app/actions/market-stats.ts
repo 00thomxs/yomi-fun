@@ -1,6 +1,12 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+const supabaseAdmin = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export type MarketWinner = {
   userId: string
@@ -11,35 +17,39 @@ export type MarketWinner = {
 }
 
 export async function getMarketTopWinners(marketId: string): Promise<MarketWinner[]> {
-  const supabase = await createClient()
-
-  // 1. Fetch market to check resolution
-  const { data: market } = await supabase
+  // 1. Fetch market to check resolution (using admin to bypass RLS)
+  const { data: market } = await supabaseAdmin
     .from('markets')
     .select('resolved')
     .eq('id', marketId)
     .single()
 
-  if (!market?.resolved) return []
+  if (!market?.resolved) {
+    console.log('[TopWinners] Market not resolved:', marketId, market)
+    return []
+  }
 
-  // 2. Fetch all bets for this market with user profiles
-  const { data: bets } = await supabase
+  // 2. Fetch all bets for this market
+  const { data: bets, error: betsError } = await supabaseAdmin
     .from('bets')
-    .select(`
-      amount,
-      potential_payout,
-      status,
-      user_id,
-      profiles:profiles!user_id (
-        username,
-        avatar_url
-      )
-    `)
+    .select('amount, potential_payout, status, user_id')
     .eq('market_id', marketId)
 
-  if (!bets) return []
+  if (betsError || !bets || bets.length === 0) {
+    console.log('[TopWinners] No bets found:', marketId, betsError)
+    return []
+  }
 
-  // 3. Calculate PNL per user
+  // 3. Fetch profiles separately for the users who bet
+  const userIds = [...new Set(bets.map(b => b.user_id))]
+  const { data: profiles } = await supabaseAdmin
+    .from('profiles')
+    .select('id, username, avatar_url')
+    .in('id', userIds)
+
+  const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+
+  // 4. Calculate PNL per user
   const userProfits = new Map<string, { 
     username: string, 
     avatar: string, 
@@ -48,12 +58,11 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
 
   bets.forEach(bet => {
     if (!userProfits.has(bet.user_id)) {
-      const profile: any = bet.profiles
-      const userData = Array.isArray(profile) ? profile[0] : profile
+      const profile = profileMap.get(bet.user_id)
       
       userProfits.set(bet.user_id, {
-        username: userData?.username || 'Anonyme',
-        avatar: userData?.avatar_url || '/images/avatar.jpg',
+        username: profile?.username || 'Anonyme',
+        avatar: profile?.avatar_url || '/images/avatar.jpg',
         profit: 0
       })
     }
@@ -69,7 +78,9 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
     }
   })
 
-  // 4. Transform, filter positive profits, sort, and take top 3
+  console.log('[TopWinners] Calculated profits:', Array.from(userProfits.entries()))
+
+  // 5. Transform, filter positive profits, sort, and take top 3
   const winners: MarketWinner[] = Array.from(userProfits.entries())
     .map(([userId, data]) => ({
       userId,
@@ -83,6 +94,7 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
     .slice(0, 3)
     .map((w, index) => ({ ...w, rank: index + 1 }))
 
+  console.log('[TopWinners] Final winners:', winners)
   return winners
 }
 
