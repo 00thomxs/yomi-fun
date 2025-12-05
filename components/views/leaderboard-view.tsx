@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame } from "lucide-react"
+import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
@@ -83,10 +83,21 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const seasonEnd = seasonSettings ? new Date(seasonSettings.season_end) : new Date()
   const seasonStart = seasonSettings ? new Date(seasonSettings.created_at || Date.now()) : new Date()
   const now = new Date()
+  
+  // Calculate progress correctly
   const totalDuration = seasonEnd.getTime() - seasonStart.getTime()
   const elapsed = now.getTime() - seasonStart.getTime()
-  const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100))
+  const progressRaw = (elapsed / totalDuration) * 100
+  const progress = Math.min(100, Math.max(0, progressRaw))
+  
   const daysLeft = Math.max(0, Math.ceil((seasonEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+  const hoursLeft = Math.max(0, Math.ceil((seasonEnd.getTime() - now.getTime()) / (1000 * 60 * 60)))
+  
+  const getCountdown = () => {
+    if (daysLeft > 0) return `${daysLeft} jour${daysLeft > 1 ? 's' : ''}`
+    if (hoursLeft > 0) return `${hoursLeft} heure${hoursLeft > 1 ? 's' : ''}`
+    return "Terminée"
+  }
 
   // Zeny Rewards - Rank 1 gets ONLY cash_prize, others get zeny_rewards[rank-1]
   const getZenyReward = (rank: number) => {
@@ -106,7 +117,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
@@ -117,141 +128,223 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </button>
         <div>
           <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
-          <p className="text-xs text-muted-foreground">
-            {hasSeason ? "Saison en cours" : "Classement Global"}
-          </p>
+          {hasSeason ? (
+            <p className="text-xs text-primary font-medium flex items-center gap-1">
+              <Trophy className="w-3 h-3" /> Saison en cours
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">Classement Global</p>
+          )}
         </div>
       </div>
 
-      {/* Season Progress Bar */}
+      {/* Season Banner */}
       {hasSeason && (
-        <div className="rounded-xl bg-card border border-border p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold">Saison Active</span>
+        <div className="space-y-6">
+          {/* Rewards Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 1st Place Card */}
+            <div className="md:col-span-1 relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-lg shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                  🥇
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-amber-500">1ère Place</p>
+                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top1_prize}</p>
+                </div>
+              </div>
             </div>
-            <span className="text-xs text-muted-foreground">
-              {daysLeft > 0 ? `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}` : 'Dernières heures !'}
-            </span>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="relative h-3 bg-white/5 rounded-full overflow-hidden">
-            <div 
-              className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary/80 to-primary rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-            {/* Cash Prize at the end */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10">
-              <div className="px-2 py-1 rounded-full bg-amber-500 text-black text-[10px] font-bold whitespace-nowrap shadow-lg">
-                {(seasonSettings?.cash_prize || 0).toLocaleString()} Z
+
+            {/* 2nd Place Card */}
+            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg">
+                  🥈
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400">2ème Place</p>
+                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top2_prize}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3rd Place Card */}
+            <div className="relative overflow-hidden rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-transparent p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-lg">
+                  🥉
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-orange-500">3ème Place</p>
+                  <p className="mt-1 text-sm font-bold text-white">{seasonSettings?.top3_prize}</p>
+                </div>
               </div>
             </div>
           </div>
-          
-          {/* Physical Prizes */}
-          <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-            <span><span className="text-amber-400 font-bold">1er</span> {seasonSettings?.top1_prize}</span>
-            <span className="text-white/20">|</span>
-            <span><span className="text-white/60 font-bold">2e</span> {seasonSettings?.top2_prize}</span>
-            <span className="text-white/20">|</span>
-            <span><span className="text-orange-400/60 font-bold">3e</span> {seasonSettings?.top3_prize}</span>
+
+          {/* Progress & Status Bar */}
+          <div className="rounded-xl border border-border bg-card p-6 relative overflow-hidden">
+            {/* Background glow */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex items-end justify-between mb-4 relative z-10">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Saison en cours</p>
+                <p className="text-3xl font-black text-white flex items-baseline gap-2">
+                  {getCountdown()} <span className="text-lg font-normal text-muted-foreground">restants</span>
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Prize Pool</p>
+                <p className="text-2xl font-black text-primary flex items-center justify-end gap-1">
+                  {(seasonSettings?.cash_prize || 0).toLocaleString()} <span className="text-lg">Z</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
+              <div 
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-primary transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            
+            <div className="flex justify-between mt-2 text-[10px] font-mono text-muted-foreground uppercase">
+              <span>Début</span>
+              <span>Fin</span>
+            </div>
           </div>
         </div>
       )}
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-3 items-end">
+      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-8">
         {/* 2nd Place */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-full">
           {top2 ? (
-            <div className="w-full rounded-xl bg-card border border-white/10 p-3 flex flex-col items-center gap-2">
-              <span className="text-lg font-bold text-white/40 font-mono">2</span>
-              <img
-                src={top2.avatar}
-                alt={top2.username}
-                className="w-14 h-14 rounded-full border-2 border-white/20 object-cover"
-              />
-              <div className="text-center w-full">
-                <p className="font-bold text-sm truncate">{top2.username}</p>
-                <p className="text-[10px] text-muted-foreground font-mono">{top2.winRate}% WR</p>
+            <div className="w-full rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center gap-3 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <span className="text-2xl font-black text-white/20 absolute top-2 left-3">#2</span>
+              
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
+                <img
+                  src={top2.avatar}
+                  alt={top2.username}
+                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-white/20 object-cover relative z-10"
+                />
               </div>
-              <div className="w-full pt-2 border-t border-white/5 text-center">
-                <p className={`text-sm font-bold font-mono ${top2.totalWon >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {top2.totalWon >= 0 ? '+' : ''}{top2.totalWon.toLocaleString()} Z
+              
+              <div className="text-center w-full relative z-10">
+                <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+              </div>
+              
+              <div className="w-full pt-3 border-t border-white/5 text-center relative z-10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total Z</p>
+                <p className={`text-lg font-black font-mono ${top2.totalWon >= 0 ? 'text-white' : 'text-rose-400'}`}>
+                  {Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
-                  <p className="text-[10px] text-primary mt-1">+{getZenyReward(2).toLocaleString()} Z</p>
-                )}
-              </div>
-            </div>
-          ) : <div className="h-40 w-full bg-white/5 rounded-xl animate-pulse" />}
-        </div>
-
-        {/* 1st Place */}
-        <div className="flex flex-col items-center -mt-4">
-          {top1 ? (
-            <div className="w-full rounded-xl bg-card border-2 border-amber-500/30 p-4 flex flex-col items-center gap-2 shadow-[0_0_30px_rgba(245,158,11,0.15)]">
-              <Trophy className="w-5 h-5 text-amber-400" />
-              <img
-                src={top1.avatar}
-                alt={top1.username}
-                className="w-16 h-16 rounded-full border-2 border-amber-500/50 object-cover"
-              />
-              <div className="text-center w-full">
-                <p className="font-bold text-sm truncate">{top1.username}</p>
-                <p className="text-[10px] text-amber-400/80 font-mono">{top1.winRate}% WR</p>
-              </div>
-              <div className="w-full pt-2 border-t border-amber-500/20 text-center">
-                <p className={`text-base font-bold font-mono ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
-                  {top1.totalWon >= 0 ? '+' : ''}{top1.totalWon.toLocaleString()} Z
-                </p>
-                {hasSeason && getZenyReward(1) > 0 && (
-                  <p className="text-[10px] text-amber-400 mt-1 font-bold">+{getZenyReward(1).toLocaleString()} Z</p>
+                  <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-bold text-white border border-white/10">
+                    +{getZenyReward(2).toLocaleString()} Z
+                  </span>
                 )}
               </div>
             </div>
           ) : <div className="h-48 w-full bg-white/5 rounded-xl animate-pulse" />}
         </div>
 
-        {/* 3rd Place */}
-        <div className="flex flex-col items-center">
-          {top3 ? (
-            <div className="w-full rounded-xl bg-card border border-orange-500/20 p-3 flex flex-col items-center gap-2">
-              <span className="text-lg font-bold text-orange-400/40 font-mono">3</span>
-              <img
-                src={top3.avatar}
-                alt={top3.username}
-                className="w-14 h-14 rounded-full border-2 border-orange-500/20 object-cover"
-              />
-              <div className="text-center w-full">
-                <p className="font-bold text-sm truncate">{top3.username}</p>
-                <p className="text-[10px] text-muted-foreground font-mono">{top3.winRate}% WR</p>
+        {/* 1st Place */}
+        <div className="flex flex-col items-center w-full -mt-8 z-10">
+          {top1 ? (
+            <div className="w-full rounded-xl bg-black border border-amber-500/50 p-5 flex flex-col items-center gap-4 relative overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.15)] scale-110 origin-bottom group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50" />
+              
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-20 h-20 bg-amber-500/20 blur-2xl rounded-full" />
+              
+              <Trophy className="w-8 h-8 text-amber-400 relative z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+              
+              <div className="relative">
+                <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
+                <img
+                  src={top1.avatar}
+                  alt={top1.username}
+                  className="w-20 h-20 rounded-full border-4 border-amber-500/30 ring-2 ring-amber-500/50 object-cover relative z-10"
+                />
               </div>
-              <div className="w-full pt-2 border-t border-orange-500/10 text-center">
-                <p className={`text-sm font-bold font-mono ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
-                  {top3.totalWon >= 0 ? '+' : ''}{top3.totalWon.toLocaleString()} Z
+              
+              <div className="text-center w-full relative z-10">
+                <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
+                <p className="text-xs text-amber-500/80 font-mono mt-1 font-bold">{top1.winRate}% WR</p>
+              </div>
+              
+              <div className="w-full pt-3 border-t border-amber-500/20 text-center relative z-10">
+                <p className="text-xs text-amber-500/60 uppercase tracking-wider mb-1">Total Z</p>
+                <p className={`text-2xl font-black font-mono ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
+                  {Math.abs(top1.totalWon).toLocaleString()}
                 </p>
-                {hasSeason && getZenyReward(3) > 0 && (
-                  <p className="text-[10px] text-primary mt-1">+{getZenyReward(3).toLocaleString()} Z</p>
+                {hasSeason && getZenyReward(1) > 0 && (
+                  <span className="inline-block mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                    +{getZenyReward(1).toLocaleString()} Z
+                  </span>
                 )}
               </div>
             </div>
-          ) : <div className="h-36 w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-64 w-full bg-white/5 rounded-xl animate-pulse" />}
+        </div>
+
+        {/* 3rd Place */}
+        <div className="flex flex-col items-center w-full">
+          {top3 ? (
+            <div className="w-full rounded-xl bg-card border border-orange-500/20 p-4 flex flex-col items-center gap-3 relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <span className="text-2xl font-black text-orange-500/20 absolute top-2 left-3">#3</span>
+              
+              <div className="relative">
+                <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
+                <img
+                  src={top3.avatar}
+                  alt={top3.username}
+                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-orange-500/20 object-cover relative z-10"
+                />
+              </div>
+              
+              <div className="text-center w-full relative z-10">
+                <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+              </div>
+              
+              <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total Z</p>
+                <p className={`text-lg font-black font-mono ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
+                  {Math.abs(top3.totalWon).toLocaleString()}
+                </p>
+                {hasSeason && getZenyReward(3) > 0 && (
+                  <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[10px] font-bold text-orange-400 border border-orange-500/20">
+                    +{getZenyReward(3).toLocaleString()} Z
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : <div className="h-48 w-full bg-white/5 rounded-xl animate-pulse" />}
         </div>
       </div>
 
       {/* Leaderboard Table */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
-        <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-          <span className="col-span-1">#</span>
+      <div className="rounded-xl bg-card border border-border overflow-hidden mt-8">
+        <div className="grid grid-cols-12 gap-2 px-4 py-4 bg-black/20 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+          <span className="col-span-1">Rank</span>
           <span className="col-span-4">Joueur</span>
-          <span className="col-span-2 text-center">WR</span>
-          <span className="col-span-3 text-right">Gains</span>
-          <span className="col-span-2 text-right">Reward</span>
+          <span className="col-span-2 text-center">Total Z</span>
+          <span className="col-span-2 text-center">Win Rate</span>
+          <span className="col-span-3 text-right">P&L (Total)</span>
         </div>
-        <div className="divide-y divide-border/50">
+        <div className="divide-y divide-border/40">
           {rest.map((player, idx) => {
             const actualRank = idx + 4
             const reward = getZenyReward(actualRank)
@@ -260,41 +353,40 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             return (
               <div
                 key={player.id}
-                className={`grid grid-cols-12 gap-2 px-4 py-2.5 items-center transition-colors ${
-                  isMe ? "bg-primary/10" : idx % 2 === 1 ? "bg-white/[0.02]" : ""
+                className={`grid grid-cols-12 gap-2 px-4 py-3 items-center transition-all hover:bg-white/[0.02] ${
+                  isMe ? "bg-primary/5 border-l-2 border-primary" : ""
                 }`}
               >
-                <span className="col-span-1 font-mono text-xs text-muted-foreground">{actualRank}</span>
-                <div className="col-span-4 flex items-center gap-2 min-w-0">
-                  <img src={player.avatar} alt={player.username} className="w-7 h-7 rounded-full shrink-0 object-cover" />
-                  <span className={`font-medium text-sm truncate ${isMe ? "text-primary" : ""}`}>
-                    {player.username}
-                  </span>
+                <span className="col-span-1 font-mono text-sm font-bold text-muted-foreground">#{actualRank}</span>
+                <div className="col-span-4 flex items-center gap-3 min-w-0">
+                  <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
+                  <div className="flex flex-col min-w-0">
+                    <span className={`font-bold text-sm truncate ${isMe ? "text-primary" : "text-foreground"}`}>
+                      {player.username}
+                    </span>
+                    {hasSeason && reward > 0 && (
+                      <span className="text-[9px] font-bold text-primary">+{reward.toLocaleString()} Z</span>
+                    )}
+                  </div>
                 </div>
-                <span className="col-span-2 text-center text-xs text-muted-foreground font-mono">
+                <span className="col-span-2 text-center font-mono text-sm font-bold">
+                  {player.balance.toLocaleString()}
+                </span>
+                <span className="col-span-2 text-center text-xs font-mono font-medium text-muted-foreground">
                   {player.winRate}%
                 </span>
-                <span className={`col-span-3 text-right font-mono text-sm font-medium flex items-center justify-end gap-1 ${
+                <span className={`col-span-3 text-right font-mono text-sm font-bold flex items-center justify-end gap-1 ${
                   player.totalWon >= 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                   {player.totalWon >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                   {Math.abs(player.totalWon).toLocaleString()}
                 </span>
-                <span className="col-span-2 text-right">
-                  {hasSeason && reward > 0 ? (
-                    <span className="text-primary text-[10px] font-mono font-bold">
-                      +{reward.toLocaleString()}
-                    </span>
-                  ) : (
-                    <span className="text-white/20">-</span>
-                  )}
-                </span>
               </div>
             )
           })}
           {players.length <= 3 && (
-            <div className="p-6 text-center text-sm text-muted-foreground">
-              Pas encore assez de joueurs
+            <div className="p-8 text-center text-sm text-muted-foreground italic">
+              Le classement se remplit...
             </div>
           )}
         </div>
