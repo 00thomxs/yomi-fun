@@ -48,11 +48,12 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
 
   bets.forEach(bet => {
     if (!userProfits.has(bet.user_id)) {
-      // @ts-ignore
-      const profile = bet.profiles
+      const profile: any = bet.profiles
+      const userData = Array.isArray(profile) ? profile[0] : profile
+      
       userProfits.set(bet.user_id, {
-        username: profile?.username || 'Anonyme',
-        avatar: profile?.avatar_url || '/images/avatar.jpg',
+        username: userData?.username || 'Anonyme',
+        avatar: userData?.avatar_url || '/images/avatar.jpg',
         profit: 0
       })
     }
