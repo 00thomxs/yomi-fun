@@ -638,7 +638,7 @@ function BinaryMarketContent({
                 <div className="flex items-baseline">
                   <span 
                     className="text-primary font-black text-lg tracking-tight"
-                    style={{ filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.6))" }}
+                    style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
                   >
                     YOMI
                   </span>
@@ -649,8 +649,8 @@ function BinaryMarketContent({
                 <AreaChart data={chartDataWithTs}>
                   <defs>
                     <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#dc2626" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
@@ -719,7 +719,7 @@ function BinaryMarketContent({
           <div className="flex items-baseline">
             <span 
               className="text-primary font-black text-base tracking-tight"
-              style={{ filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.6))" }}
+              style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
             >
               YOMI
             </span>
@@ -731,8 +731,8 @@ function BinaryMarketContent({
           <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
+                <stop offset="0%" stopColor="#dc2626" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
@@ -1229,7 +1229,7 @@ function MultiMarketContent({
           <div className="flex items-baseline">
             <span 
               className="text-primary font-black text-base tracking-tight"
-              style={{ filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.6))" }}
+              style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
             >
               YOMI
             </span>
@@ -1307,7 +1307,7 @@ function MultiMarketContent({
                   <div className="flex items-baseline">
                     <span 
                       className="text-primary font-black text-lg tracking-tight"
-                      style={{ filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.6))" }}
+                      style={{ filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))" }}
                     >
                       YOMI
                     </span>
