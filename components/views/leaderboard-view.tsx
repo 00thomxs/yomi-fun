@@ -149,17 +149,17 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-6">
-                <Gift className="w-5 h-5 text-amber-400" />
+                  <Gift className="w-5 h-5 text-amber-400" />
                 <h3 className="text-sm font-bold tracking-widest uppercase text-amber-400">Récompenses Saison</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* 1st Place */}
-                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
-                    🥇
-                  </div>
-                  <div>
+                      🥇
+                    </div>
+                    <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-amber-400">1ère Place</p>
                     <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top1_prize}</p>
                   </div>
@@ -238,11 +238,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="relative mt-4">
                 <div className="absolute inset-0 bg-white/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
-                <img
-                  src={top2.avatar}
-                  alt={top2.username}
+              <img
+                src={top2.avatar}
+                alt={top2.username}
                   className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-white/20 object-cover relative z-10"
-                />
+              />
               </div>
               
               <div className="text-center w-full relative z-10">
@@ -277,11 +277,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="relative">
                 <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
-                <img
-                  src={top1.avatar}
-                  alt={top1.username}
+              <img
+                src={top1.avatar}
+                alt={top1.username}
                   className="w-20 h-20 rounded-full border-4 border-amber-500/30 ring-2 ring-amber-500/50 object-cover relative z-10"
-                />
+              />
               </div>
               
               <div className="text-center w-full relative z-10">
@@ -314,11 +314,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="relative mt-2">
                 <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
-                <img
-                  src={top3.avatar}
-                  alt={top3.username}
+              <img
+                src={top3.avatar}
+                alt={top3.username}
                   className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-orange-500/20 object-cover relative z-10"
-                />
+              />
               </div>
               
               <div className="text-center w-full relative z-10">
@@ -373,7 +373,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     {hasSeason && reward > 0 && (
                       <span className="text-[9px] font-bold text-primary flex items-center gap-0.5">
                         +<CurrencySymbol className="w-2 h-2" />{reward.toLocaleString()}
-                      </span>
+                  </span>
                     )}
                   </div>
                 </div>

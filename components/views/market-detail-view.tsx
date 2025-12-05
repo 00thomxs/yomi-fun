@@ -7,6 +7,8 @@ import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
+import type { MarketWinner } from "@/app/actions/market-stats"
+import { TopWinners } from "@/components/market/top-winners"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -150,9 +152,10 @@ type MarketDetailViewProps = {
   userBalance: number
   userBets?: any[]
   userAvatar?: string
+  topWinners?: MarketWinner[]
 }
 
-export function MarketDetailView({ market, onBack, onBet, userBalance, userBets = [], userAvatar }: MarketDetailViewProps) {
+export function MarketDetailView({ market, onBack, onBet, userBalance, userBets = [], userAvatar, topWinners = [] }: MarketDetailViewProps) {
   const [timeframe, setTimeframe] = useState<"1H" | "6H" | "1J" | "1S" | "1M" | "TOUT">("1H")
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
@@ -382,6 +385,11 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           userAvatar={userAvatar}
           stableNow={currentNow}
         />
+      )}
+
+      {/* Top Winners - Only shown for resolved markets */}
+      {isResolved && topWinners && topWinners.length > 0 && (
+        <TopWinners winners={topWinners} />
       )}
     </div>
   )
@@ -1067,7 +1075,7 @@ function MultiMarketContent({
             >
               <Maximize2 className="w-3.5 h-3.5" />
             </button>
-          </div>
+        </div>
         </div>
         
         {/* Fullscreen Modal for Multi */}
