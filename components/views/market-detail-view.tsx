@@ -772,35 +772,42 @@ function MultiMarketContent({
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
 
   // Process user bets to get chart markers (for multi)
+  // Only show markers for VISIBLE outcomes (from legend)
   const userBetMarkers = useMemo(() => {
     if (!userBets || userBets.length === 0) return []
     
-    return userBets.map(bet => {
-      const betTs = new Date(bet.created_at).getTime()
-      // Find the closest chart point to this bet timestamp
-      let closestPoint = chartDataWithTs[0]
-      let minDiff = Infinity
-      
-      for (const point of chartDataWithTs) {
-        const diff = Math.abs(point.ts - betTs)
-        if (diff < minDiff) {
-          minDiff = diff
-          closestPoint = point
+    return userBets
+      .map(bet => {
+        const betTs = new Date(bet.created_at).getTime()
+        // Find the closest chart point to this bet timestamp
+        let closestPoint = chartDataWithTs[0]
+        let minDiff = Infinity
+        
+        for (const point of chartDataWithTs) {
+          const diff = Math.abs(point.ts - betTs)
+          if (diff < minDiff) {
+            minDiff = diff
+            closestPoint = point
+          }
         }
-      }
-      
-      // Get the outcome that was bet on
-      const outcomeName = bet.outcomes?.name || 'N/A'
-      const outcomeY = closestPoint?.[outcomeName] || 50
-      
-      return {
-        ts: betTs,
-        price: outcomeY,
-        amount: bet.amount,
-        outcomeName
-      }
-    }).filter(marker => marker.ts >= domain[0] && marker.ts <= domain[1]) // Only show markers in current timeframe
-  }, [userBets, chartDataWithTs, domain])
+        
+        // Get the outcome that was bet on
+        const outcomeName = bet.outcomes?.name || 'N/A'
+        const outcomeY = closestPoint?.[outcomeName] || 50
+        // Get the color of this outcome
+        const outcomeColor = market.outcomes.find(o => o.name === outcomeName)?.color || '#fbbf24'
+        
+        return {
+          ts: betTs,
+          price: outcomeY,
+          amount: bet.amount,
+          outcomeName,
+          color: outcomeColor
+        }
+      })
+      // FILTER: Only show markers for outcomes that are currently visible in the legend
+      .filter(marker => visibleOutcomes.has(marker.outcomeName))
+  }, [userBets, chartDataWithTs, visibleOutcomes, market.outcomes])
 
   return (
     <>
@@ -977,51 +984,68 @@ function MultiMarketContent({
                 )}
               />
             ))}
-            {/* User bet markers */}
+            {/* User bet markers - only for visible outcomes */}
             {userBetMarkers.map((marker, idx) => (
               <ReferenceDot
                 key={`user-bet-${idx}`}
                 x={marker.ts}
                 y={marker.price}
                 r={12}
-                shape={(props: any) => (
-                  <g>
-                    {/* Glow effect */}
-                    <circle cx={props.cx} cy={props.cy} r={16} fill="#fbbf24" opacity={0.2} />
-                    {/* Border ring */}
-                    <circle cx={props.cx} cy={props.cy} r={12} fill="#1e293b" stroke="#fbbf24" strokeWidth={2} />
-                    {/* Avatar or fallback */}
-                    {userAvatar ? (
-                      <>
-                        <defs>
-                          <clipPath id={`multi-avatar-clip-${idx}`}>
-                            <circle cx={props.cx} cy={props.cy} r={10} />
-                          </clipPath>
-                        </defs>
-                        <image
-                          href={userAvatar}
-                          x={props.cx - 10}
-                          y={props.cy - 10}
-                          width={20}
-                          height={20}
-                          clipPath={`url(#multi-avatar-clip-${idx})`}
-                          preserveAspectRatio="xMidYMid slice"
-                        />
-                      </>
-                    ) : (
-                      <text
-                        x={props.cx}
-                        y={props.cy + 4}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fill="#fbbf24"
-                        fontWeight="bold"
-                      >
-                        💰
-                      </text>
-                    )}
-                  </g>
-                )}
+                shape={(props: any) => {
+                  const offsetY = -30 // Position above the point
+                  const avatarY = props.cy + offsetY
+                  const markerColor = marker.color
+                  return (
+                    <g className="user-bet-marker cursor-pointer">
+                      {/* Vertical line connecting avatar to chart point */}
+                      <line 
+                        x1={props.cx} 
+                        y1={props.cy} 
+                        x2={props.cx} 
+                        y2={avatarY + 12}
+                        stroke={markerColor} 
+                        strokeWidth={2} 
+                        strokeDasharray="3 2"
+                        opacity={0.6}
+                      />
+                      {/* Small dot on the chart line */}
+                      <circle cx={props.cx} cy={props.cy} r={4} fill={markerColor} stroke="#1e293b" strokeWidth={2} />
+                      {/* Glow effect for avatar */}
+                      <circle cx={props.cx} cy={avatarY} r={16} fill={markerColor} opacity={0.15} />
+                      {/* Avatar container */}
+                      <circle cx={props.cx} cy={avatarY} r={12} fill="#0f172a" stroke={markerColor} strokeWidth={2} />
+                      {/* Avatar or fallback */}
+                      {userAvatar ? (
+                        <>
+                          <defs>
+                            <clipPath id={`multi-avatar-clip-${idx}`}>
+                              <circle cx={props.cx} cy={avatarY} r={10} />
+                            </clipPath>
+                          </defs>
+                          <image
+                            href={userAvatar}
+                            x={props.cx - 10}
+                            y={avatarY - 10}
+                            width={20}
+                            height={20}
+                            clipPath={`url(#multi-avatar-clip-${idx})`}
+                            preserveAspectRatio="xMidYMid slice"
+                          />
+                        </>
+                      ) : (
+                        <text
+                          x={props.cx}
+                          y={avatarY + 4}
+                          textAnchor="middle"
+                          fontSize="12"
+                          fill={markerColor}
+                        >
+                          💰
+                        </text>
+                      )}
+                    </g>
+                  )
+                }}
               />
             ))}
             {/* Lines for visible outcomes only */}
