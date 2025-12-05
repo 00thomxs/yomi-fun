@@ -22,7 +22,7 @@ type Transaction = {
 
 export function ProfileView() {
   const { user, profile, userBalance } = useUser()
-  const [pnlTimeframe, setPnlTimeframe] = useState<"24H" | "7J" | "30J">("30J")
+  const [pnlTimeframe, setPnlTimeframe] = useState<"1J" | "1S" | "1M" | "TOUT">("TOUT")
   const [showSettings, setShowSettings] = useState(false)
   const [activeSettingsTab, setActiveSettingsTab] = useState<'menu' | 'edit' | 'password'>('menu')
   const [history, setHistory] = useState<Transaction[]>([])
@@ -76,32 +76,92 @@ export function ProfileView() {
   // Prepare Chart Data with timeframe filtering
   const now = new Date()
   const getTimeframeCutoff = () => {
-    if (pnlTimeframe === "24H") return new Date(now.getTime() - 24 * 60 * 60 * 1000)
-    if (pnlTimeframe === "7J") return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) // 30J
+    if (pnlTimeframe === "1J") return new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    if (pnlTimeframe === "1S") return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    if (pnlTimeframe === "1M") return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    return new Date(0) // TOUT - depuis le début
   }
 
-  const filteredPnlHistory = pnlHistory.filter(p => new Date(p.date) >= getTimeframeCutoff())
+  const filteredPnlHistory = pnlTimeframe === "TOUT" 
+    ? pnlHistory 
+    : pnlHistory.filter(p => new Date(p.date) >= getTimeframeCutoff())
   
   const chartData = filteredPnlHistory.length > 0 
     ? filteredPnlHistory.map(p => ({
         day: new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
         fullDate: new Date(p.date),
+        ts: new Date(p.date).getTime(),
         pnl: Math.round(p.value) // Ensure integer
       }))
-    : [{ day: 'Début', fullDate: new Date(), pnl: 0 }, { day: 'Maintenant', fullDate: new Date(), pnl: 0 }]
+    : [{ day: 'Début', fullDate: now, ts: now.getTime(), pnl: 0 }]
 
-  // Use real PnL from history (last point)
-  const currentPnL = pnlHistory.length > 0 
-    ? Math.round(pnlHistory[pnlHistory.length - 1].value)
+  // Calculate time domain and ticks for X axis based on timeframe
+  const getDuration = () => {
+    if (pnlTimeframe === "1J") return 24 * 60 * 60 * 1000
+    if (pnlTimeframe === "1S") return 7 * 24 * 60 * 60 * 1000
+    if (pnlTimeframe === "1M") return 30 * 24 * 60 * 60 * 1000
+    // TOUT: use actual data range or default to 30 days if no data
+    if (chartData.length > 1) {
+      const firstTs = chartData[0].ts
+      const lastTs = chartData[chartData.length - 1].ts
+      return lastTs - firstTs + 24 * 60 * 60 * 1000 // Add padding
+    }
+    return 30 * 24 * 60 * 60 * 1000
+  }
+  
+  const duration = getDuration()
+  const timeStart = pnlTimeframe === "TOUT" && chartData.length > 1 
+    ? chartData[0].ts - duration * 0.05  // Small padding before first point
+    : now.getTime() - duration
+  const timeEnd = now.getTime()
+  const timeDomain = [timeStart, timeEnd]
+  
+  // Generate 5 evenly spaced ticks
+  const actualDuration = timeEnd - timeStart
+  const timeTicks = [
+    timeStart,
+    timeStart + actualDuration * 0.25,
+    timeStart + actualDuration * 0.5,
+    timeStart + actualDuration * 0.75,
+    timeEnd
+  ]
+  
+  const timeFormat: Intl.DateTimeFormatOptions = pnlTimeframe === "1J" 
+    ? { hour: '2-digit', minute: '2-digit' }
+    : { day: 'numeric', month: 'short' }
+  const formatPnlTick = (ts: number) => new Date(ts).toLocaleString('fr-FR', timeFormat)
+
+  // Use real PnL from history (last point in filtered data)
+  const currentPnL = chartData.length > 0 
+    ? chartData[chartData.length - 1].pnl
     : 0
 
-  // Calculate dynamic YAxis domain (min -10000, max +10000, but expands if needed)
+  // Calculate dynamic YAxis domain with smart padding
+  // - Adapts to data range in current timeframe
+  // - Always includes 0 as reference
+  // - Minimum range of 1000 to avoid over-zooming
+  // - 20% padding above/below data
   const pnlValues = chartData.map(d => d.pnl)
-  const minPnL = Math.min(...pnlValues, 0)
-  const maxPnL = Math.max(...pnlValues, 0)
-  const yAxisMin = Math.min(minPnL, -10000)
-  const yAxisMax = Math.max(maxPnL, 10000)
+  const dataMin = Math.min(...pnlValues)
+  const dataMax = Math.max(...pnlValues)
+  
+  // Ensure 0 is always in range
+  const rangeMin = Math.min(dataMin, 0)
+  const rangeMax = Math.max(dataMax, 0)
+  
+  // Calculate data range
+  const dataRange = rangeMax - rangeMin
+  
+  // Minimum range to prevent over-zooming (at least 1000 Zeny visible)
+  const minRange = 1000
+  const effectiveRange = Math.max(dataRange, minRange)
+  
+  // Add 20% padding
+  const padding = effectiveRange * 0.2
+  
+  // Final Y-axis bounds (always include 0)
+  const yAxisMin = Math.min(rangeMin - padding, -Math.abs(padding))
+  const yAxisMax = Math.max(rangeMax + padding, Math.abs(padding))
 
   // Dynamic gradient color based on current PnL
   const isPositivePnL = currentPnL >= 0
@@ -280,15 +340,15 @@ export function ProfileView() {
           <div>
             <p className="text-sm font-bold tracking-tight uppercase">Profit & Loss</p>
             <p className="text-xs text-muted-foreground">
-              Performance {pnlTimeframe === "24H" ? "24 heures" : pnlTimeframe === "7J" ? "7 jours" : "30 jours"}
+              Performance {pnlTimeframe === "1J" ? "24 heures" : pnlTimeframe === "1S" ? "7 jours" : pnlTimeframe === "1M" ? "30 jours" : "totale"}
             </p>
           </div>
-          <div className="flex gap-2">
-            {(["24H", "7J", "30J"] as const).map((tf) => (
+          <div className="flex gap-1">
+            {(["1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono transition-all ${
                   pnlTimeframe === tf
                     ? "bg-primary text-primary-foreground"
                     : "bg-white/5 border border-border hover:border-white/20"
@@ -311,13 +371,29 @@ export function ProfileView() {
                 <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#666" }} axisLine={false} tickLine={false} />
+            <XAxis 
+              dataKey="ts" 
+              type="number"
+              scale="time"
+              domain={timeDomain}
+              ticks={timeTicks}
+              tickFormatter={formatPnlTick}
+              tick={{ fontSize: 10, fill: "#666" }} 
+              axisLine={false} 
+              tickLine={false} 
+            />
             <YAxis 
               domain={[yAxisMin, yAxisMax]} 
               tick={{ fontSize: 10, fill: "#666" }} 
               axisLine={false} 
               tickLine={false}
-              tickFormatter={(value) => `${Math.round(value / 1000)}k`}
+              tickFormatter={(value) => {
+                const absValue = Math.abs(value)
+                if (absValue >= 1000) {
+                  return `${Math.round(value / 1000)}k`
+                }
+                return `${Math.round(value)}`
+              }}
             />
             <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
             <Tooltip
