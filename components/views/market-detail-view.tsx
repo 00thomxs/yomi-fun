@@ -687,20 +687,27 @@ function MultiMarketContent({
               tickCount={5}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(15, 23, 42, 0.95)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: "8px",
-                backdropFilter: "blur(12px)",
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="bg-slate-900/95 border border-white/10 rounded-lg p-3 backdrop-blur-md shadow-xl">
+                      <p className="text-[10px] text-slate-400 font-mono mb-2">{new Date(label).toLocaleString()}</p>
+                      <div className="space-y-1">
+                        {payload.map((entry: any) => (
+                          <div key={entry.name} className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                              <span className="text-xs font-medium text-slate-200">{entry.name}</span>
+                            </div>
+                            <span className="text-xs font-bold font-mono text-white">{Math.round(Number(entry.value))}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                }
+                return null
               }}
-              labelStyle={{ color: "#94a3b8", fontSize: "11px", fontFamily: "ui-monospace, monospace" }}
-              itemStyle={{
-                fontSize: "12px",
-                fontWeight: "bold",
-                fontFamily: "ui-monospace, monospace",
-              }}
-              formatter={(value: number) => [`${Math.round(value)}%`]}
-              labelFormatter={(label) => new Date(label).toLocaleString()}
             />
             {market.outcomes.slice(0, 4).map((outcome) => (
               <ReferenceDot
