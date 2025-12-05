@@ -106,6 +106,18 @@ export function ProfileView() {
       pnl: 0
     }
     chartData = [startPoint, ...chartData]
+
+    // Add 'Now' point to extend the line to current time
+    const lastPoint = chartData[chartData.length - 1]
+    if (now.getTime() - lastPoint.ts > 1000) {
+      const nowPoint = {
+        day: now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+        fullDate: now,
+        ts: now.getTime(),
+        pnl: lastPoint.pnl
+      }
+      chartData.push(nowPoint)
+    }
   }
 
   // Calculate time domain and ticks for X axis
@@ -487,6 +499,12 @@ export function ProfileView() {
                   borderRadius: "8px",
                 }}
                 formatter={(value: number) => [`${Math.round(value).toLocaleString()} Ƶ`, "P&L"]}
+                labelFormatter={(label) => new Date(label).toLocaleString('fr-FR', {
+                  day: 'numeric',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
               />
               <Area 
                 type="monotone" 
