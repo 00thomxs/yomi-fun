@@ -1,12 +1,11 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useMemo, useState, useEffect, useRef } from "react"
+import { useMemo, useRef, useEffect } from "react"
 import { MarketDetailView } from "@/components/views/market-detail-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
-import { getUserMarketBets } from "@/app/actions/betting"
 
 type MarketDetailContainerProps = {
   market: any // Raw Supabase data
@@ -14,26 +13,23 @@ type MarketDetailContainerProps = {
   userBets?: any[]
 }
 
-export function MarketDetailContainer({ market: rawMarket, history, userBets: initialUserBets = [] }: MarketDetailContainerProps) {
+export function MarketDetailContainer({ market: rawMarket, history, userBets = [] }: MarketDetailContainerProps) {
   const router = useRouter()
   const { placeBet, userBalance, user } = useUser()
+  const lastBalanceRef = useRef<number>(userBalance)
 
-  // Track user bets with state so we can refresh after betting
-  const [userBets, setUserBets] = useState(initialUserBets)
-  const lastBetRef = useRef<number>(0)
-
-  // Refresh user bets when user balance changes (indicates a bet was placed)
+  // Refresh page when user balance changes (indicates a bet was placed)
+  // This triggers a server-side re-fetch of userBets
   useEffect(() => {
-    const refreshBets = async () => {
-      // Only refresh if user exists and balance changed
-      if (user && userBalance !== lastBetRef.current) {
-        lastBetRef.current = userBalance
-        const freshBets = await getUserMarketBets(rawMarket.id)
-        setUserBets(freshBets)
-      }
+    if (lastBalanceRef.current !== userBalance) {
+      lastBalanceRef.current = userBalance
+      // Small delay to let the server action complete
+      const timeout = setTimeout(() => {
+        router.refresh()
+      }, 500)
+      return () => clearTimeout(timeout)
     }
-    refreshBets()
-  }, [userBalance, user, rawMarket.id])
+  }, [userBalance, router])
 
   // STABLE timestamp - rounded to nearest minute to prevent chart shifting
   // Using useMemo ensures it stays consistent across re-renders
