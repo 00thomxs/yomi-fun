@@ -70,16 +70,18 @@ export async function updateSeasonSettings(formData: FormData) {
   console.log('Updating season settings:', { id, cash_prize, season_end, top1_prize, top2_prize, top3_prize, zeny_rewards })
 
   // Use supabaseAdmin to bypass RLS
+  // season_end is already in ISO format from the client (with correct timezone)
+  // NOTE: Don't update 'updated_at' here - it's used to track season START time!
   const { data, error } = await supabaseAdmin
     .from('season_settings')
     .update({
       cash_prize,
-      season_end: new Date(season_end).toISOString(),
+      season_end: season_end, // Already ISO format from client
       top1_prize,
       top2_prize,
       top3_prize,
-      zeny_rewards,
-      updated_at: new Date().toISOString()
+      zeny_rewards
+      // Don't touch updated_at - it marks when the season started
     })
     .eq('id', id)
     .select()

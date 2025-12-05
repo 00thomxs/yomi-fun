@@ -19,9 +19,17 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true)
     try {
-      // Combine date and time
-      const combinedDateTime = `${selectedDate}T${selectedTime}`
-      formData.set('season_end', combinedDateTime)
+      // Combine date and time, then convert to ISO with timezone info
+      // The browser creates the Date in LOCAL timezone, then toISOString() converts to UTC
+      const localDate = new Date(`${selectedDate}T${selectedTime}:00`)
+      const isoDateTime = localDate.toISOString()
+      formData.set('season_end', isoDateTime)
+      
+      console.log('Submitting season_end:', {
+        input: `${selectedDate}T${selectedTime}`,
+        localDate: localDate.toString(),
+        isoDateTime: isoDateTime
+      })
       
       const result = await updateSeasonSettings(formData)
       if (result.success) {
