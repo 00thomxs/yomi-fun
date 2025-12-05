@@ -6,14 +6,16 @@ import { MarketDetailView } from "@/components/views/market-detail-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
+import { MarketWinner } from "@/app/actions/market-stats"
 
 type MarketDetailContainerProps = {
   market: any // Raw Supabase data
   history: PricePoint[]
   userBets?: any[]
+  topWinners?: MarketWinner[]
 }
 
-export function MarketDetailContainer({ market: rawMarket, history, userBets = [] }: MarketDetailContainerProps) {
+export function MarketDetailContainer({ market: rawMarket, history, userBets = [], topWinners = [] }: MarketDetailContainerProps) {
   const router = useRouter()
   const { placeBet, userBalance, user } = useUser()
   const lastBalanceRef = useRef<number>(userBalance)
@@ -329,6 +331,7 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
       userBalance={userBalance}
       userBets={userBets}
       userAvatar={user?.avatar}
+      topWinners={topWinners}
     />
   )
 }
