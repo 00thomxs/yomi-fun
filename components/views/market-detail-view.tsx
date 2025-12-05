@@ -8,6 +8,84 @@ import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 // Mock data no longer needed - using real history from DB
 import { CATEGORIES } from "@/lib/constants"
 
+// Helper to generate X Axis domain and REGULAR ticks
+const getAxisParams = (timeframe: string, data: any[]) => {
+  const now = new Date().getTime()
+  let duration = 24 * 3600 * 1000
+  let tickInterval: number
+  let format: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+
+  if (timeframe === '1H') {
+    duration = 3600 * 1000
+    tickInterval = 15 * 60 * 1000 // Every 15 min
+    format = { hour: '2-digit', minute: '2-digit' }
+  } else if (timeframe === '6H') {
+    duration = 6 * 3600 * 1000
+    tickInterval = 60 * 60 * 1000 // Every hour
+    format = { hour: '2-digit', minute: '2-digit' }
+  } else if (timeframe === '1J' || timeframe === '24H') {
+    duration = 24 * 3600 * 1000
+    tickInterval = 4 * 60 * 60 * 1000 // Every 4 hours
+    format = { hour: '2-digit', minute: '2-digit' }
+  } else if (timeframe === '1S' || timeframe === '7J') {
+    duration = 7 * 24 * 3600 * 1000
+    tickInterval = 24 * 60 * 60 * 1000 // Every day
+    format = { weekday: 'short', day: 'numeric' }
+  } else if (timeframe === '1M' || timeframe === '30J') {
+    duration = 30 * 24 * 3600 * 1000
+    tickInterval = 5 * 24 * 60 * 60 * 1000 // Every 5 days
+    format = { day: 'numeric', month: 'short' }
+  } else if (timeframe === 'TOUT') {
+    // Calculate duration from data
+    if (data.length > 0) {
+      const times = data.map((d: any) => new Date(d.fullDate).getTime()).filter((t: number) => !isNaN(t))
+      const minTime = Math.min(...times)
+      if (isFinite(minTime)) {
+        duration = now - minTime + 3600 * 1000 // Add 1h padding
+      }
+    }
+    // Choose interval based on actual duration
+    if (duration <= 24 * 3600 * 1000) {
+      tickInterval = 4 * 60 * 60 * 1000
+      format = { hour: '2-digit', minute: '2-digit' }
+    } else if (duration <= 7 * 24 * 3600 * 1000) {
+      tickInterval = 24 * 60 * 60 * 1000
+      format = { weekday: 'short', day: 'numeric' }
+    } else if (duration <= 30 * 24 * 3600 * 1000) {
+      tickInterval = 5 * 24 * 60 * 60 * 1000
+      format = { day: 'numeric', month: 'short' }
+    } else {
+      tickInterval = 7 * 24 * 60 * 60 * 1000 // Weekly
+      format = { day: 'numeric', month: 'short' }
+    }
+  } else {
+    tickInterval = 4 * 60 * 60 * 1000 // Default: 4 hours
+  }
+
+  const start = now - duration
+  const domain = [start, now]
+
+  // Generate regular ticks at round intervals
+  const ticks: number[] = []
+  let tick = Math.ceil(start / tickInterval) * tickInterval // Start at next round interval
+  while (tick <= now) {
+    ticks.push(tick)
+    tick += tickInterval
+  }
+
+  // Limit to ~6 ticks max for readability
+  while (ticks.length > 6) {
+    const newTicks: number[] = []
+    for (let i = 0; i < ticks.length; i += 2) {
+      newTicks.push(ticks[i])
+    }
+    ticks.length = 0
+    ticks.push(...newTicks)
+  }
+
+  return { domain, ticks, format }
+}
+
 type MarketDetailViewProps = {
   market: Market
   onBack: () => void
@@ -209,6 +287,19 @@ function BinaryMarketContent({
   yMin: number
   yMax: number
 }) {
+  const { domain, ticks, format } = getAxisParams(timeframe, chartData)
+
+  // Transform data to have numeric timestamp for proper X axis scaling
+  const chartDataWithTs = chartData.map((d: any) => ({
+    ...d,
+    ts: d.fullDate instanceof Date ? d.fullDate.getTime() : new Date(d.fullDate).getTime()
+  }))
+
+  const formatTick = (ts: number) => {
+    const date = new Date(ts)
+    return date.toLocaleTimeString('fr-FR', format)
+  }
+
   return (
     <>
       {/* Resolved Banner */}
@@ -260,7 +351,7 @@ function BinaryMarketContent({
         </div>
 
         <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={chartData}>
+          <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
@@ -269,13 +360,17 @@ function BinaryMarketContent({
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
             <XAxis
-              dataKey="time"
+              dataKey="ts"
+              type="number"
+              scale="time"
+              domain={domain}
+              ticks={ticks}
+              tickFormatter={formatTick}
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              minTickGap={30}
             />
             <YAxis
               domain={[yMin, yMax]}
@@ -402,6 +497,20 @@ function MultiMarketContent({
   const maxProb = Math.max(...allProbs, 40) // Minimum 40% scale to avoid too much zoom
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
 
+  // Get axis params for timeframe
+  const { domain, ticks, format } = getAxisParams(timeframe, chartData)
+
+  // Transform data to have numeric timestamp for proper X axis scaling
+  const chartDataWithTs = chartData.map((d: any) => ({
+    ...d,
+    ts: d.fullDate instanceof Date ? d.fullDate.getTime() : new Date(d.fullDate).getTime()
+  }))
+
+  const formatTick = (ts: number) => {
+    const date = new Date(ts)
+    return date.toLocaleTimeString('fr-FR', format)
+  }
+
   return (
     <>
       {/* Resolved Banner */}
@@ -510,16 +619,20 @@ function MultiMarketContent({
           </div>
         </div>
         <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={chartData}>
+          <LineChart data={chartDataWithTs}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
             <XAxis
-              dataKey="time"
+              dataKey="ts"
+              type="number"
+              scale="time"
+              domain={domain}
+              ticks={ticks}
+              tickFormatter={formatTick}
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              minTickGap={30}
             />
             <YAxis
               domain={[0, multiYMax]} 
