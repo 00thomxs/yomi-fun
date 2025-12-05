@@ -1,7 +1,7 @@
 "use client"
 
 import { Clock, Users, Activity, HelpCircle } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine } from "recharts"
+import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot, Label } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -202,16 +202,45 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0.3} />
-                  <stop offset="100%" stopColor={prob >= 50 ? "#10b981" : "#f43f5e"} stopOpacity={0} />
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <YAxis domain={[0, 100]} hide />
               <ReferenceLine y={50} stroke="#ffffff" strokeOpacity={0.1} strokeDasharray="3 3" />
+              {chartData.length > 0 && (
+                <ReferenceDot
+                  x={chartData.length - 1}
+                  y={chartData[chartData.length - 1].price}
+                  r={3}
+                  fill="#ffffff"
+                  stroke="#ffffff"
+                  strokeWidth={2}
+                  shape={(props: any) => (
+                    <g>
+                      <circle cx={props.cx} cy={props.cy} r={8} fill="#ffffff" className="animate-pulse opacity-30" />
+                      <circle cx={props.cx} cy={props.cy} r={3} fill="#ffffff" />
+                    </g>
+                  )}
+                >
+                  <Label
+                    value={`${Math.round(chartData[chartData.length - 1].price)}%`}
+                    position="right"
+                    offset={10}
+                    style={{
+                      fill: "#ffffff",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      fontFamily: "ui-monospace, monospace",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.5)"
+                    }}
+                  />
+                </ReferenceDot>
+              )}
               <Area
-                type="stepAfter"
+                type="linear"
                 dataKey="price"
-                stroke={prob >= 50 ? "#10b981" : "#f43f5e"}
+                stroke="#ffffff"
                 strokeWidth={1.5}
                 fill={`url(#gradient-${market.id})`}
                 dot={false}

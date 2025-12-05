@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ArrowLeft, Clock, HelpCircle, Lock } from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 // Mock data no longer needed - using real history from DB
@@ -327,11 +327,6 @@ function BinaryMarketContent({
 
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
 
-  // Determine color based on current probability (Green if > 50%, Red if <= 50%)
-  const isPositive = market.probability > 50
-  const chartColor = isPositive ? "#10b981" : "#f43f5e" // Emerald-500 or Rose-500
-  const gradientId = isPositive ? "chartGradientGreen" : "chartGradientRed"
-
   return (
     <>
       {/* Resolved Banner */}
@@ -346,9 +341,7 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="text-center space-y-2">
-        <p className={`text-7xl font-bold tracking-tighter font-mono ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-          {Math.round(market.probability)}%
-        </p>
+        <p className="text-7xl font-bold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
         <p className="text-sm font-medium text-muted-foreground tracking-tight uppercase">
           {market.probability >= 85
             ? "Quasi Certain"
@@ -387,13 +380,9 @@ function BinaryMarketContent({
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartDataWithTs}>
             <defs>
-              <linearGradient id="chartGradientGreen" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="chartGradientRed" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+              <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="oklch(0.5 0.22 25)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
@@ -439,12 +428,25 @@ function BinaryMarketContent({
               labelFormatter={(label) => new Date(label).toLocaleString()}
             />
             <ReferenceLine y={50} stroke="#334155" strokeDasharray="3 3" />
+            {chartDataWithTs.length > 0 && (
+              <ReferenceDot
+                x={chartDataWithTs[chartDataWithTs.length - 1].ts}
+                y={chartDataWithTs[chartDataWithTs.length - 1].price}
+                r={4}
+                shape={(props: any) => (
+                  <g>
+                    <circle cx={props.cx} cy={props.cy} r={8} fill="#ffffff" className="animate-pulse opacity-30" />
+                    <circle cx={props.cx} cy={props.cy} r={4} fill="#ffffff" />
+                  </g>
+                )}
+              />
+            )}
             <Area
               type="linear"
               dataKey="price"
-              stroke={chartColor}
-              strokeWidth={3}
-              fill={`url(#${gradientId})`}
+              stroke="#ffffff"
+              strokeWidth={2}
+              fill="url(#chartGradientMonochrome)"
               dot={false}
               activeDot={{ r: 4, strokeWidth: 0, fill: "#ffffff" }}
               animationDuration={500}
@@ -453,8 +455,8 @@ function BinaryMarketContent({
         </ResponsiveContainer>
 
         <div className="flex justify-end items-center gap-2 mt-2">
-          <div className={`w-2 h-2 rounded-full ${isPositive ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
-          <p className={`text-sm font-bold font-mono tracking-tight ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
+          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
+          <p className="text-sm font-bold text-white font-mono tracking-tight">
             {Math.round(chartData[chartData.length - 1]?.price || 0)}%
           </p>
         </div>
@@ -692,16 +694,30 @@ function MultiMarketContent({
               }}
             />
             {market.outcomes.slice(0, 4).map((outcome) => (
-              <Line
-                key={outcome.name}
-                type="monotone"
-                dataKey={outcome.name}
-                stroke={outcome.color}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, strokeWidth: 0 }}
+              <ReferenceDot
+                key={`dot-${outcome.name}`}
+                x={chartDataWithTs.length > 0 ? chartDataWithTs[chartDataWithTs.length - 1].ts : 0}
+                y={chartDataWithTs.length > 0 ? Number(chartDataWithTs[chartDataWithTs.length - 1][outcome.name] || 0) : 0}
+                r={4}
+                shape={(props: any) => (
+                  <g>
+                    <circle cx={props.cx} cy={props.cy} r={8} fill={outcome.color} className="animate-pulse opacity-30" />
+                    <circle cx={props.cx} cy={props.cy} r={4} fill={outcome.color} stroke="#fff" strokeWidth={1} />
+                  </g>
+                )}
               />
             ))}
+            {market.outcomes.slice(0, 4).map((outcome) => (
+                <Line
+                  key={outcome.name}
+                  type="linear"
+                  dataKey={outcome.name}
+                  stroke={outcome.color}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, strokeWidth: 0 }}
+                />
+              ))}
           </LineChart>
         </ResponsiveContainer>
         
