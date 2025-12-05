@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -131,11 +131,23 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
   const [betType, setBetType] = useState<"OUI" | "NON">("OUI")
+  
+  // Current time state - updates periodically to extend chart
+  const [currentNow, setCurrentNow] = useState<number>(Date.now())
+  
+  // Update currentNow every 10 seconds to extend chart in real-time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentNow(Date.now())
+    }, 10000) // 10 seconds
+    return () => clearInterval(interval)
+  }, [])
 
-  // STABLE timestamp - set once on mount, never changes
-  // This prevents chart from shifting on every re-render
-  const stableNowRef = useRef<number>(Date.now())
-  const stableNow = stableNowRef.current
+  // Also update when timeframe changes (immediate refresh)
+  const handleTimeframeChange = (tf: "1H" | "6H" | "1J" | "1S" | "1M" | "TOUT") => {
+    setCurrentNow(Date.now())
+    setTimeframe(tf)
+  }
 
   // Check if market is resolved (betting disabled)
   const isResolved = !market.isLive
@@ -167,7 +179,29 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
     return multiMarket.historyAll || multiMarket.historyData || []
   }
 
-  const chartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
+  const rawChartData = market.type === "binary" ? getBinaryChartData() : getMultiChartData()
+  
+  // Extend chart data to current time (so curve always reaches "now")
+  const chartData = useMemo(() => {
+    if (rawChartData.length === 0) return rawChartData
+    
+    const lastPoint = rawChartData[rawChartData.length - 1] as any
+    const lastTs = lastPoint.fullDate instanceof Date 
+      ? lastPoint.fullDate.getTime() 
+      : new Date(lastPoint.fullDate).getTime()
+    
+    // If the last point is more than 5 seconds behind currentNow, add a new "now" point
+    if (currentNow - lastTs > 5000) {
+      const nowPoint = {
+        ...lastPoint,
+        time: 'Maintenant',
+        fullDate: new Date(currentNow)
+      }
+      return [...rawChartData.slice(0, -1), nowPoint] // Replace last "Maintenant" with updated one
+    }
+    
+    return rawChartData
+  }, [rawChartData, currentNow])
   
   // Calculate SMART dynamic scale for Binary Charts
   // Goals: 1) Show context (not too zoomed), 2) Highlight volatility, 3) Always make sense
@@ -281,7 +315,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
         <BinaryMarketContent
           market={market as BinaryMarket}
           timeframe={timeframe}
-          setTimeframe={setTimeframe}
+          setTimeframe={handleTimeframeChange}
           betChoice={betChoice}
           setBetChoice={setBetChoice}
           betAmount={betAmount}
@@ -296,13 +330,13 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           yMax={yMax}
           userBets={userBets}
           userAvatar={userAvatar}
-          stableNow={stableNow}
+          stableNow={currentNow}
         />
       ) : (
         <MultiMarketContent
           market={market as MultiOutcomeMarket}
           timeframe={timeframe}
-          setTimeframe={setTimeframe}
+          setTimeframe={handleTimeframeChange}
           betChoice={betChoice}
           setBetChoice={setBetChoice}
           betType={betType}
@@ -316,7 +350,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           isResolved={isResolved}
           userBets={userBets}
           userAvatar={userAvatar}
-          stableNow={stableNow}
+          stableNow={currentNow}
         />
       )}
     </div>
