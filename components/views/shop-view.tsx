@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
-import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package, CheckCircle } from "lucide-react"
+import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package, CheckCircle, AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { ShopItem } from "@/lib/types"
@@ -35,7 +35,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
     if (success === "true") {
       const amount = searchParams.get("amount")
       
-      toast.success("Paiement réussi ! 🎉", {
+      toast.success("Paiement réussi !", {
         description: `Votre compte a été crédité de ${Number(amount).toLocaleString()} Zeny.`,
         duration: 5000,
       })
@@ -240,9 +240,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
             )}
 
             {userBalance < selectedItem.price && (
-              <p className="text-center text-xs text-rose-400 font-bold uppercase tracking-widest">
-                ⚠️ Solde insuffisant ! Il vous manque {(selectedItem.price - userBalance).toLocaleString()} Zeny
-              </p>
+              <div className="flex items-center gap-2 text-xs text-rose-400 font-bold uppercase tracking-widest justify-center">
+                <AlertTriangle className="w-3 h-3" />
+                Solde insuffisant ! Il vous manque {(selectedItem.price - userBalance).toLocaleString()} Zeny
+              </div>
             )}
 
             <form onSubmit={handleConfirmPurchase} className="space-y-4">

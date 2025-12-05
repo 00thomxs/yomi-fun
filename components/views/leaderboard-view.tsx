@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles } from "lucide-react"
+import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
@@ -157,7 +157,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 {/* 1st Place */}
                   <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
-                      🥇
+                      <Trophy className="w-6 h-6 text-amber-400" />
                     </div>
                     <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-amber-400">1ère Place</p>
@@ -168,7 +168,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 {/* 2nd Place */}
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-lg shrink-0">
-                    🥈
+                    <Medal className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-white/60">2ème Place</p>
@@ -179,7 +179,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 {/* 3rd Place */}
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg shrink-0">
-                    🥉
+                    <Medal className="w-5 h-5 text-orange-500" />
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-orange-500/80">3ème Place</p>

@@ -262,39 +262,44 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         </div>
 
         {/* Bigger OUI/NON buttons OR Resolved State */}
-        {market.isLive ? (
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={(e) => {
+              if (!market.isLive) return
               e.stopPropagation()
               onBet(market.id, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
             }}
-            className="py-3.5 px-4 rounded-lg bg-emerald-500/10 border border-emerald-500/50 font-bold tracking-tight hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all text-emerald-400 text-base"
+            disabled={!market.isLive}
+            className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
+              !market.isLive && prob >= 50 
+                ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] opacity-100 cursor-default"
+                : !market.isLive
+                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400/50 opacity-50 cursor-default"
+                  : "bg-emerald-500/10 border-emerald-500/50 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] text-emerald-400"
+            }`}
           >
             OUI • <span className="font-mono">{prob}%</span>
+            {!market.isLive && prob >= 50 && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
           </button>
           <button
             onClick={(e) => {
+              if (!market.isLive) return
               e.stopPropagation()
               onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
             }}
-              className="py-3.5 px-4 rounded-lg bg-rose-500/20 border border-rose-500/50 font-bold tracking-tight hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all text-rose-400 text-base"
+            disabled={!market.isLive}
+            className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
+              !market.isLive && prob < 50 
+                ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default"
+                : !market.isLive
+                  ? "bg-rose-500/5 border-rose-500/10 text-rose-400/50 opacity-50 cursor-default"
+                  : "bg-rose-500/20 border-rose-500/50 hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] text-rose-400"
+            }`}
           >
             NON • <span className="font-mono">{100 - prob}%</span>
+            {!market.isLive && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-white px-1 rounded font-black">Win</span>}
           </button>
         </div>
-        ) : (
-          <div className="py-3 px-4 rounded-lg bg-white/5 border border-white/10 text-center">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Résultat Final</p>
-            <p className="font-mono font-bold text-lg">
-              {prob >= 50 ? (
-                <span className="text-emerald-400">OUI • {prob}%</span>
-              ) : (
-                <span className="text-rose-400">NON • {100 - prob}%</span>
-              )}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )
