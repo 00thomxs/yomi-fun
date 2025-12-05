@@ -117,6 +117,32 @@ const formatTickLabel = (ts: number, formatType: TickFormatType): string => {
   }
 }
 
+// Helper to generate clean Y-axis ticks (multiples of 5 or 10)
+const getCleanYTicks = (min: number, max: number) => {
+  const range = max - min
+  let step = 10
+  if (range <= 20) step = 5
+  else if (range <= 50) step = 10
+  else step = 25
+
+  const ticks = []
+  // Start at nearest multiple of step
+  let current = Math.ceil(min / step) * step
+  
+  // Ensure we cover the full range including near-boundaries
+  if (current > min) ticks.push(min) // Optional: include exact min? No, prefer clean numbers
+  
+  // Reset start to first clean number >= min
+  current = Math.ceil(min / step) * step
+  
+  while (current <= max) {
+    ticks.push(current)
+    current += step
+  }
+  
+  return ticks
+}
+
 type MarketDetailViewProps = {
   market: Market
   onBack: () => void
@@ -217,24 +243,28 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
   // Add 15% padding on each side
   const padding = Math.max(5, effectiveRange * 0.15)
   
+  // Helper to round to nearest multiple of 5
+  const roundDownTo5 = (n: number) => Math.floor(n / 5) * 5
+  const roundUpTo5 = (n: number) => Math.ceil(n / 5) * 5
+  
   // Calculate bounds, centered on data if range is small
   let yMin: number, yMax: number
   if (priceRange < minVisibleRange) {
     // Small volatility: center the view on the data
     const center = (minPrice + maxPrice) / 2
-    yMin = Math.max(0, Math.floor(center - effectiveRange / 2 - padding))
-    yMax = Math.min(100, Math.ceil(center + effectiveRange / 2 + padding))
+    yMin = Math.max(0, roundDownTo5(center - effectiveRange / 2 - padding))
+    yMax = Math.min(100, roundUpTo5(center + effectiveRange / 2 + padding))
   } else {
     // Normal volatility: use actual data bounds with padding
-    yMin = Math.max(0, Math.floor(minPrice - padding))
-    yMax = Math.min(100, Math.ceil(maxPrice + padding))
+    yMin = Math.max(0, roundDownTo5(minPrice - padding))
+    yMax = Math.min(100, roundUpTo5(maxPrice + padding))
   }
   
-  // Ensure we don't have a weird tiny range
-  if (yMax - yMin < 15) {
+  // Ensure we don't have a weird tiny range (min 20% spread)
+  if (yMax - yMin < 20) {
     const mid = (yMin + yMax) / 2
-    yMin = Math.max(0, Math.floor(mid - 10))
-    yMax = Math.min(100, Math.ceil(mid + 10))
+    yMin = Math.max(0, roundDownTo5(mid - 12))
+    yMax = Math.min(100, roundUpTo5(mid + 12))
   }
 
   const trend =
@@ -406,6 +436,9 @@ function BinaryMarketContent({
   }))
 
   const formatTick = (ts: number) => formatTickLabel(ts, formatType)
+  
+  // Generate clean Y ticks
+  const yTicks = getCleanYTicks(yMin, yMax)
 
   // Process user bets to get chart markers
   const userBetMarkers = useMemo(() => {
@@ -510,13 +543,13 @@ function BinaryMarketContent({
             />
             <YAxis
               domain={[yMin, yMax]}
+              ticks={yTicks}
               stroke="#64748b"
               orientation="right"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              tickCount={5}
             />
             <Tooltip
               contentStyle={{
@@ -768,6 +801,9 @@ function MultiMarketContent({
   ]
   const maxProb = Math.max(...allProbs, 40) // Minimum 40% scale to avoid too much zoom
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
+  
+  // Generate clean Y ticks for multi-outcome (always 0 at bottom)
+  const multiYTicks = getCleanYTicks(0, multiYMax)
 
   // Get axis params for timeframe (using stableNow to prevent shifting)
   const { domain, ticks, formatType } = getAxisParams(timeframe, chartData, market.created_at, stableNow)
@@ -944,13 +980,13 @@ function MultiMarketContent({
             />
             <YAxis
               domain={[0, multiYMax]} 
+              ticks={multiYTicks}
               orientation="right"
               stroke="#64748b"
               style={{ fontSize: "10px", fontFamily: "ui-monospace, monospace" }}
               tick={{ fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              tickCount={5}
             />
             <Tooltip
               content={({ active, payload, label }) => {
