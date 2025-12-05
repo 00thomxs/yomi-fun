@@ -43,6 +43,15 @@ export default function CreateMarketPage() {
     
     const formData = new FormData(e.currentTarget)
     
+    // Convert closesAt from datetime-local (no timezone) to ISO with timezone
+    const closesAtLocal = formData.get('closesAt') as string
+    if (closesAtLocal) {
+      // Parse as local time, then convert to ISO (which is UTC)
+      const localDate = new Date(closesAtLocal)
+      const isoDateTime = localDate.toISOString()
+      formData.set('closesAt', isoDateTime)
+    }
+    
     // Construct outcomes based on type
     let finalOutcomes = []
     if (marketType === 'binary') {
@@ -190,9 +199,14 @@ export default function CreateMarketPage() {
                   onClick={() => {
                     const date = new Date()
                     date.setHours(date.getHours() + 24)
-                    const isoString = date.toISOString().slice(0, 16) // Format for datetime-local
+                    // Format for datetime-local: YYYY-MM-DDTHH:mm (LOCAL time)
+                    const localString = date.getFullYear() + '-' + 
+                      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(date.getDate()).padStart(2, '0') + 'T' +
+                      String(date.getHours()).padStart(2, '0') + ':' +
+                      String(date.getMinutes()).padStart(2, '0')
                     const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = isoString
+                    if (input) input.value = localString
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
@@ -203,9 +217,13 @@ export default function CreateMarketPage() {
                   onClick={() => {
                     const date = new Date()
                     date.setDate(date.getDate() + 7)
-                    const isoString = date.toISOString().slice(0, 16)
+                    const localString = date.getFullYear() + '-' + 
+                      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(date.getDate()).padStart(2, '0') + 'T' +
+                      String(date.getHours()).padStart(2, '0') + ':' +
+                      String(date.getMinutes()).padStart(2, '0')
                     const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = isoString
+                    if (input) input.value = localString
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
@@ -216,9 +234,13 @@ export default function CreateMarketPage() {
                   onClick={() => {
                     const date = new Date()
                     date.setDate(date.getDate() + 30)
-                    const isoString = date.toISOString().slice(0, 16)
+                    const localString = date.getFullYear() + '-' + 
+                      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(date.getDate()).padStart(2, '0') + 'T' +
+                      String(date.getHours()).padStart(2, '0') + ':' +
+                      String(date.getMinutes()).padStart(2, '0')
                     const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = isoString
+                    if (input) input.value = localString
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
