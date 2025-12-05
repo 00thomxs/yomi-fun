@@ -1,7 +1,7 @@
 "use client"
 
 import { Clock, Users, Activity, HelpCircle } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot, Label } from "recharts"
+import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -197,9 +197,17 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <p className="font-semibold text-base tracking-tight text-balance leading-snug">{market.question}</p>
 
         {/* Real history chart */}
-        <div className="flex-1 min-h-[100px]">
+        <div className="flex-1 min-h-[100px] relative">
+          {/* Probability badge - positioned outside chart to avoid clipping */}
+          {chartData.length > 0 && (
+            <div className="absolute top-0 right-0 z-10 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-md border border-white/20">
+              <span className="text-xs font-mono font-bold text-white">
+                {Math.round(chartData[chartData.length - 1].price)}%
+              </span>
+            </div>
+          )}
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
@@ -222,20 +230,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       <circle cx={props.cx} cy={props.cy} r={3} fill="#ffffff" />
                     </g>
                   )}
-                >
-                  <Label
-                    value={`${Math.round(chartData[chartData.length - 1].price)}%`}
-                    position="top"
-                    offset={10}
-                    style={{
-                      fill: "#ffffff",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      fontFamily: "ui-monospace, monospace",
-                      textShadow: "0 1px 2px rgba(0,0,0,0.5)"
-                    }}
-                  />
-                </ReferenceDot>
+                />
               )}
               <Area
                 type="linear"

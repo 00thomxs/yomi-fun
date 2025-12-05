@@ -1,22 +1,48 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useMemo, useState, useEffect, useRef } from "react"
 import { MarketDetailView } from "@/components/views/market-detail-view"
 import { useUser } from "@/contexts/user-context"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
+import { getUserMarketBets } from "@/app/actions/betting"
 
 type MarketDetailContainerProps = {
   market: any // Raw Supabase data
   history: PricePoint[]
+  userBets?: any[]
 }
 
-export function MarketDetailContainer({ market: rawMarket, history }: MarketDetailContainerProps) {
+export function MarketDetailContainer({ market: rawMarket, history, userBets: initialUserBets = [] }: MarketDetailContainerProps) {
   const router = useRouter()
-  const { placeBet, userBalance } = useUser()
+  const { placeBet, userBalance, user } = useUser()
 
-  // Define NOW once at the top for consistent time reference
-  const now = new Date()
+  // Track user bets with state so we can refresh after betting
+  const [userBets, setUserBets] = useState(initialUserBets)
+  const lastBetRef = useRef<number>(0)
+
+  // Refresh user bets when user balance changes (indicates a bet was placed)
+  useEffect(() => {
+    const refreshBets = async () => {
+      // Only refresh if user exists and balance changed
+      if (user && userBalance !== lastBetRef.current) {
+        lastBetRef.current = userBalance
+        const freshBets = await getUserMarketBets(rawMarket.id)
+        setUserBets(freshBets)
+      }
+    }
+    refreshBets()
+  }, [userBalance, user, rawMarket.id])
+
+  // STABLE timestamp - rounded to nearest minute to prevent chart shifting
+  // Using useMemo ensures it stays consistent across re-renders
+  const now = useMemo(() => {
+    const d = new Date()
+    // Round to nearest minute for stability
+    d.setSeconds(0, 0)
+    return d
+  }, [])
 
   const handleBack = () => {
     router.back()
@@ -307,6 +333,8 @@ export function MarketDetailContainer({ market: rawMarket, history }: MarketDeta
       onBack={handleBack}
       onBet={handleBet}
       userBalance={userBalance}
+      userBets={userBets}
+      userAvatar={user?.avatar}
     />
   )
 }
