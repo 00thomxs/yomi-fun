@@ -225,7 +225,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 >
                   <Label
                     value={`${Math.round(chartData[chartData.length - 1].price)}%`}
-                    position="right"
+                    position="top"
                     offset={10}
                     style={{
                       fill: "#ffffff",
@@ -238,7 +238,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 </ReferenceDot>
               )}
               <Area
-                type="linear"
+                type="stepAfter"
                 dataKey="price"
                 stroke="#ffffff"
                 strokeWidth={1.5}
