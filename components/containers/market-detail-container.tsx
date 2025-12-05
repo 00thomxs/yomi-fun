@@ -18,6 +18,10 @@ export function MarketDetailContainer({ market: rawMarket, history, userBets = [
   const { placeBet, userBalance, user } = useUser()
   const lastBalanceRef = useRef<number>(userBalance)
   
+  // Debug: log userBets received from server
+  console.log('[Container] userBets from server:', userBets.length, userBets)
+  console.log('[Container] market ID:', rawMarket.id)
+  
   // STABLE timestamp using useRef - set once on mount, NEVER changes
   // This is crucial to prevent chart shifting on re-renders
   const nowRef = useRef<Date>(new Date())
