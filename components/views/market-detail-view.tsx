@@ -9,8 +9,11 @@ import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
 // Helper to generate X Axis domain and REGULAR ticks
-const getAxisParams = (timeframe: string, data: any[]) => {
+// Chart starts from market creation date (not before)
+const getAxisParams = (timeframe: string, data: any[], marketCreatedAt?: string) => {
   const now = new Date().getTime()
+  const createdAt = marketCreatedAt ? new Date(marketCreatedAt).getTime() : now - 24 * 3600 * 1000
+  
   let duration = 24 * 3600 * 1000
   let tickInterval: number
   let format: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
@@ -30,27 +33,21 @@ const getAxisParams = (timeframe: string, data: any[]) => {
   } else if (timeframe === '1S' || timeframe === '7J') {
     duration = 7 * 24 * 3600 * 1000
     tickInterval = 24 * 60 * 60 * 1000 // Every day
-    format = { weekday: 'short', day: 'numeric' }
+    format = { day: 'numeric', month: 'short' }
   } else if (timeframe === '1M' || timeframe === '30J') {
     duration = 30 * 24 * 3600 * 1000
     tickInterval = 5 * 24 * 60 * 60 * 1000 // Every 5 days
     format = { day: 'numeric', month: 'short' }
   } else if (timeframe === 'TOUT') {
-    // Calculate duration from data
-    if (data.length > 0) {
-      const times = data.map((d: any) => new Date(d.fullDate).getTime()).filter((t: number) => !isNaN(t))
-      const minTime = Math.min(...times)
-      if (isFinite(minTime)) {
-        duration = now - minTime + 3600 * 1000 // Add 1h padding
-      }
-    }
+    // TOUT = from market creation to now
+    duration = now - createdAt + 3600 * 1000 // Add 1h padding
     // Choose interval based on actual duration
     if (duration <= 24 * 3600 * 1000) {
       tickInterval = 4 * 60 * 60 * 1000
       format = { hour: '2-digit', minute: '2-digit' }
     } else if (duration <= 7 * 24 * 3600 * 1000) {
       tickInterval = 24 * 60 * 60 * 1000
-      format = { weekday: 'short', day: 'numeric' }
+      format = { day: 'numeric', month: 'short' }
     } else if (duration <= 30 * 24 * 3600 * 1000) {
       tickInterval = 5 * 24 * 60 * 60 * 1000
       format = { day: 'numeric', month: 'short' }
@@ -62,14 +59,19 @@ const getAxisParams = (timeframe: string, data: any[]) => {
     tickInterval = 4 * 60 * 60 * 1000 // Default: 4 hours
   }
 
-  const start = now - duration
+  // Domain starts from market creation OR (now - duration), whichever is LATER
+  // This ensures we never show time before the market existed
+  const theoreticalStart = now - duration
+  const start = Math.max(theoreticalStart, createdAt)
   const domain = [start, now]
 
-  // Generate regular ticks at round intervals
+  // Generate regular ticks at round intervals (only within domain)
   const ticks: number[] = []
   let tick = Math.ceil(start / tickInterval) * tickInterval // Start at next round interval
   while (tick <= now) {
-    ticks.push(tick)
+    if (tick >= start) { // Only add ticks within the domain
+      ticks.push(tick)
+    }
     tick += tickInterval
   }
 
@@ -287,7 +289,7 @@ function BinaryMarketContent({
   yMin: number
   yMax: number
 }) {
-  const { domain, ticks, format } = getAxisParams(timeframe, chartData)
+  const { domain, ticks, format } = getAxisParams(timeframe, chartData, market.created_at)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -297,7 +299,7 @@ function BinaryMarketContent({
 
   const formatTick = (ts: number) => {
     const date = new Date(ts)
-    return date.toLocaleTimeString('fr-FR', format)
+    return date.toLocaleString('fr-FR', format)
   }
 
   return (
@@ -498,7 +500,7 @@ function MultiMarketContent({
   const multiYMax = Math.min(100, Math.ceil((maxProb + 5) / 10) * 10) // Round up to nearest 10
 
   // Get axis params for timeframe
-  const { domain, ticks, format } = getAxisParams(timeframe, chartData)
+  const { domain, ticks, format } = getAxisParams(timeframe, chartData, market.created_at)
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -508,7 +510,7 @@ function MultiMarketContent({
 
   const formatTick = (ts: number) => {
     const date = new Date(ts)
-    return date.toLocaleTimeString('fr-FR', format)
+    return date.toLocaleString('fr-FR', format)
   }
 
   return (
