@@ -8,13 +8,10 @@ import { YomiLogo } from "@/components/ui/yomi-logo"
 import { 
   LayoutDashboard, 
   PlusCircle, 
-  Users, 
   Settings, 
   LogOut,
-  Trophy,
   ShoppingBag,
   Package,
-  Bug,
 } from "lucide-react"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +54,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Commandes", href: "/admin/orders", icon: Package },
     { name: "Shop Items", href: "/admin/shop", icon: ShoppingBag },
     { name: "Paramètres", href: "/admin/settings", icon: Settings },
-    { name: "🔧 Debug", href: "/admin/debug", icon: Bug },
   ]
 
   return (
