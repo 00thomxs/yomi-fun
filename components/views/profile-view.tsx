@@ -110,10 +110,12 @@ export function ProfileView() {
 
   // Calculate time domain and ticks for X axis
   // Domain starts from our artificial start point (0)
+  type TickFormatType = 'time' | 'day' | 'month'
+
   const getAxisConfig = () => {
     if (chartData.length === 0) {
       // No data - return default config (won't be displayed anyway)
-      return { domain: [now.getTime() - 24 * 60 * 60 * 1000, now.getTime()], ticks: [], format: {} as Intl.DateTimeFormatOptions }
+      return { domain: [now.getTime() - 24 * 60 * 60 * 1000, now.getTime()], ticks: [], formatType: 'time' as TickFormatType }
     }
 
     const firstTs = chartData[0].ts // This is our artificial 0 point
@@ -129,49 +131,80 @@ export function ProfileView() {
 
     // Generate regular ticks based on timeframe
     let tickInterval: number
-    let format: Intl.DateTimeFormatOptions
+    let formatType: TickFormatType = 'time'
 
-    if (pnlTimeframe === "1J" || totalRange <= 24 * 60 * 60 * 1000) {
-      // 1 day or less: tick every 4 hours
-      tickInterval = 4 * 60 * 60 * 1000
-      format = { hour: '2-digit', minute: '2-digit' }
-    } else if (pnlTimeframe === "1S" || totalRange <= 7 * 24 * 60 * 60 * 1000) {
-      // 1 week or less: tick every day
-      tickInterval = 24 * 60 * 60 * 1000
-      format = { weekday: 'short', day: 'numeric' }
-    } else if (pnlTimeframe === "1M" || totalRange <= 30 * 24 * 60 * 60 * 1000) {
-      // 1 month or less: tick every 5 days
-      tickInterval = 5 * 24 * 60 * 60 * 1000
-      format = { day: 'numeric', month: 'short' }
+    if (totalRange <= 24 * 60 * 60 * 1000) {
+      // Less than 24h -> Time format
+      formatType = 'time'
+      if (totalRange <= 3600 * 1000) tickInterval = 15 * 60 * 1000 // 15 min
+      else if (totalRange <= 6 * 3600 * 1000) tickInterval = 60 * 60 * 1000 // 1h
+      else tickInterval = 4 * 60 * 60 * 1000 // 4h
+    } else if (totalRange <= 30 * 24 * 60 * 60 * 1000) {
+      // Less than 1 month -> Day format
+      formatType = 'day'
+      if (totalRange <= 7 * 24 * 60 * 60 * 1000) tickInterval = 24 * 60 * 60 * 1000 // 1 day
+      else tickInterval = 5 * 24 * 60 * 60 * 1000 // 5 days
     } else {
-      // More than a month: tick every week
-      tickInterval = 7 * 24 * 60 * 60 * 1000
-      format = { day: 'numeric', month: 'short' }
+      // More than 1 month -> Day or Month format
+      if (totalRange <= 365 * 24 * 3600 * 1000) {
+        formatType = 'day'
+        tickInterval = 7 * 24 * 60 * 60 * 1000 // Weekly
+      } else {
+        formatType = 'month'
+        tickInterval = 30 * 24 * 60 * 60 * 1000 // Monthly
+      }
     }
 
     // Generate ticks at regular intervals
     const ticks: number[] = []
     let tick = Math.ceil(domainStart / tickInterval) * tickInterval // Start at next round interval
     while (tick <= domainEnd) {
-      ticks.push(tick)
+      if (tick >= domainStart) {
+        ticks.push(tick)
+      }
       tick += tickInterval
     }
 
     // Limit to ~6 ticks max for readability
     while (ticks.length > 6) {
       const newTicks: number[] = []
-      for (let i = 0; i < ticks.length; i += 2) {
+      // Keep first, take every 2nd, keep last
+      if (ticks.length > 0) newTicks.push(ticks[0])
+      for (let i = 1; i < ticks.length - 1; i += 2) {
         newTicks.push(ticks[i])
       }
+      if (ticks.length > 1) newTicks.push(ticks[ticks.length - 1])
+      
       ticks.length = 0
       ticks.push(...newTicks)
     }
 
-    return { domain: [domainStart, domainEnd], ticks, format }
+    return { domain: [domainStart, domainEnd], ticks, formatType }
+  }
+
+  // Explicit tick formatter - clean output without weird locale issues
+  const formatTickLabel = (ts: number, formatType: TickFormatType): string => {
+    const date = new Date(ts)
+    
+    if (formatType === 'time') {
+      // HH:mm format
+      const hours = date.getHours().toString().padStart(2, '0')
+      const mins = date.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${mins}`
+    } else if (formatType === 'day') {
+      // "5 déc." format - day + short month, NO time
+      const day = date.getDate()
+      const months = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+      return `${day} ${months[date.getMonth()]}`
+    } else {
+      // "déc. 2024" for very long events
+      const months = ['jan.', 'fév.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+      return `${months[date.getMonth()]} ${date.getFullYear()}`
+    }
   }
 
   const axisConfig = getAxisConfig()
-  const formatPnlTick = (ts: number) => new Date(ts).toLocaleString('fr-FR', axisConfig.format)
+  const formatPnlTick = (ts: number) => formatTickLabel(ts, axisConfig.formatType)
 
   // Use real PnL from history (last point in filtered data)
   const currentPnL = chartData.length > 0 
@@ -421,17 +454,18 @@ export function ProfileView() {
                   <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis 
-                dataKey="ts" 
-                type="number"
-                scale="time"
-                domain={axisConfig.domain}
-                ticks={axisConfig.ticks}
-                tickFormatter={formatPnlTick}
-                tick={{ fontSize: 10, fill: "#666" }} 
-                axisLine={false} 
-                tickLine={false} 
-              />
+            <XAxis 
+              dataKey="ts" 
+              type="number"
+              scale="time"
+              domain={axisConfig.domain}
+              ticks={axisConfig.ticks}
+              tickFormatter={formatPnlTick}
+              tick={{ fontSize: 10, fill: "#666" }} 
+              axisLine={false} 
+              tickLine={false} 
+              minTickGap={30}
+            />
               <YAxis 
                 domain={[yAxisMin, yAxisMax]} 
                 tick={{ fontSize: 10, fill: "#666" }} 
