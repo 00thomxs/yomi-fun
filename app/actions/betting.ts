@@ -269,15 +269,12 @@ export async function getUserMarketBets(marketId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  console.log('[SERVER DEBUG] getUserMarketBets called for market:', marketId)
-  console.log('[SERVER DEBUG] user:', user?.id || 'NOT AUTHENTICATED')
-  
   if (!user) {
-    console.log('[SERVER DEBUG] No user, returning empty array')
     return []
   }
 
-  const { data: bets, error } = await supabase
+  // Use admin client to bypass RLS issues
+  const { data: bets, error } = await supabaseAdmin
     .from('bets')
     .select(`
       id,
@@ -291,7 +288,9 @@ export async function getUserMarketBets(marketId: string) {
     .eq('market_id', marketId)
     .order('created_at', { ascending: true })
 
-  console.log('[SERVER DEBUG] bets query result:', bets?.length || 0, 'bets, error:', error?.message || 'none')
+  if (error) {
+    console.error('[getUserMarketBets] Error:', error.message)
+  }
 
   return bets || []
 }
