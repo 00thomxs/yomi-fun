@@ -265,3 +265,34 @@ export async function placeBet(
   return { success: true, newBalance: profile.balance - amount }
 }
 
+export async function getUserMarketBets(marketId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  console.log('[SERVER DEBUG] getUserMarketBets called for market:', marketId)
+  console.log('[SERVER DEBUG] user:', user?.id || 'NOT AUTHENTICATED')
+  
+  if (!user) {
+    console.log('[SERVER DEBUG] No user, returning empty array')
+    return []
+  }
+
+  const { data: bets, error } = await supabase
+    .from('bets')
+    .select(`
+      id,
+      created_at,
+      amount,
+      potential_payout,
+      outcome_id,
+      outcomes (name)
+    `)
+    .eq('user_id', user.id)
+    .eq('market_id', marketId)
+    .order('created_at', { ascending: true })
+
+  console.log('[SERVER DEBUG] bets query result:', bets?.length || 0, 'bets, error:', error?.message || 'none')
+
+  return bets || []
+}
+
