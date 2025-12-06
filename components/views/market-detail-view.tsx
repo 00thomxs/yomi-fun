@@ -834,6 +834,7 @@ function BinaryMarketContent({
           userBalance={userBalance}
           calculatePayout={calculatePayout}
           handlePlaceBet={handlePlaceBet}
+          hasBet={userBets && userBets.length > 0}
         />
       </div>
       )}
@@ -1374,6 +1375,7 @@ function MultiMarketContent({
           userBalance={userBalance}
           calculatePayout={calculatePayout}
           handlePlaceBet={handlePlaceBet}
+          hasBet={userBets && userBets.length > 0}
         />
       </div>
       )}
@@ -1388,13 +1390,24 @@ function BetAmountInput({
   userBalance,
   calculatePayout,
   handlePlaceBet,
+  hasBet
 }: {
   betAmount: string
   setBetAmount: (amount: string) => void
   userBalance: number
   calculatePayout: () => number
   handlePlaceBet: () => void
+  hasBet: boolean
 }) {
+  if (hasBet) {
+    return (
+      <div className="w-full py-4 rounded-lg bg-white/5 border border-white/10 text-muted-foreground font-bold text-lg tracking-tight uppercase text-center cursor-not-allowed flex items-center justify-center gap-2">
+        <Lock className="w-5 h-5" />
+        Pari déjà effectué
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="space-y-2">
