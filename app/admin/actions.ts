@@ -29,8 +29,8 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   const supabase = await createClient()
   
   // Calculate initial pools based on probability (for binary markets)
-  // Total liquidity = 1000 (can be adjusted)
-  const INITIAL_LIQUIDITY = 1000
+  // Total liquidity = 20000 (10k/10k per side for stability)
+  const INITIAL_LIQUIDITY = 20000
   let poolYes = INITIAL_LIQUIDITY / 2
   let poolNo = INITIAL_LIQUIDITY / 2
   
