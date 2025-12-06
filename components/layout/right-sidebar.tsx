@@ -83,7 +83,7 @@ export function RightSidebar({
               </p>
             </div>
             <div className="p-3 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Benefice Net</p>
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">PnL</p>
               <p className="text-2xl font-bold tracking-tight">
                 <span className={`font-mono ${userPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {userPnL >= 0 ? '+' : ''}{userPnL.toLocaleString()}
@@ -98,7 +98,7 @@ export function RightSidebar({
       <div className="rounded-xl bg-card border border-border p-5 space-y-4">
         <div className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-primary" />
-          <h3 className="text-sm font-bold tracking-tight uppercase">Top Players</h3>
+          <h3 className="text-sm font-bold tracking-tight uppercase">Top Traders</h3>
         </div>
         <div className="space-y-2">
           {topPlayers.map((player) => (
