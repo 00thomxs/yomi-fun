@@ -1465,26 +1465,32 @@ function BetAmountInput({
 
       <div className="flex gap-2">
         <button
-          onClick={() => setBetAmount("500")}
-          className="px-4 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
-        >
-          +500
-        </button>
-        <button
           onClick={() => setBetAmount("1000")}
-          className="px-4 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +1K
         </button>
         <button
+          onClick={() => setBetAmount("5000")}
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+        >
+          +5K
+        </button>
+        <button
           onClick={() => setBetAmount("10000")}
-          className="px-4 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +10K
         </button>
         <button
+          onClick={() => setBetAmount("25000")}
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+        >
+          +25K
+        </button>
+        <button
           onClick={() => setBetAmount(userBalance.toString())}
-          className="px-4 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight uppercase text-white hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight uppercase text-white hover:border-white/20 transition-all cursor-pointer"
         >
           Max
         </button>
