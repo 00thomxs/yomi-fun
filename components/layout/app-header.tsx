@@ -12,7 +12,7 @@ export function AppHeader() {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border rounded-xl mb-6">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 rounded-xl mb-6">
         <div className="flex items-center justify-between px-5 py-4">
           <div className="lg:hidden">
             <Link href="/">

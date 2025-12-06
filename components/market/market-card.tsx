@@ -314,7 +314,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }`}
           >
             NON • <span className="font-mono">{100 - prob}%</span>
-            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-white px-1 rounded font-black">Win</span>}
+            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-black px-1 rounded font-black">Win</span>}
             {!market.isLive && !(market.status === 'resolved' || market.resolved_at) && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
         </div>
