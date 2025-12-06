@@ -16,6 +16,14 @@ ALTER TABLE public.season_settings
 ADD COLUMN IF NOT EXISTS title TEXT DEFAULT 'Saison';
 
 -- =============================================
+-- 2b. ADD MISSING COLUMNS TO MARKETS (CRITICAL!)
+-- =============================================
+ALTER TABLE public.markets 
+ADD COLUMN IF NOT EXISTS pool_yes INTEGER DEFAULT 100 NOT NULL,
+ADD COLUMN IF NOT EXISTS pool_no INTEGER DEFAULT 100 NOT NULL,
+ADD COLUMN IF NOT EXISTS is_headline BOOLEAN DEFAULT false NOT NULL;
+
+-- =============================================
 -- 3. CREATE PAST_SEASONS TABLE (for season history)
 -- =============================================
 CREATE TABLE IF NOT EXISTS public.past_seasons (
