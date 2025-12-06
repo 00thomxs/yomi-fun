@@ -7,13 +7,19 @@ export const revalidate = 0
 
 export async function GET(request: Request) {
   try {
-    // Security check (optional but recommended for Vercel Cron)
+    console.log('[CRON] Check markets started')
+    
+    const { searchParams } = new URL(request.url)
+    const key = searchParams.get('key')
     const authHeader = request.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      // Allow local testing or if CRON_SECRET is not set yet (dev mode)
-      if (process.env.NODE_ENV === 'production' && process.env.CRON_SECRET) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
+    
+    // Check Auth: Header OR Query Param
+    const isValidHeader = authHeader === `Bearer ${process.env.CRON_SECRET}`
+    const isValidKey = key === process.env.CRON_SECRET
+    
+    if (process.env.CRON_SECRET && !isValidHeader && !isValidKey) {
+      console.warn('[CRON] Unauthorized attempt')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Initialize Supabase Admin Client
@@ -21,7 +27,7 @@ export async function GET(request: Request) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
     if (!supabaseServiceKey) {
-      console.error('SUPABASE_SERVICE_ROLE_KEY is missing')
+      console.error('[CRON] SUPABASE_SERVICE_ROLE_KEY is missing')
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
@@ -42,9 +48,11 @@ export async function GET(request: Request) {
       .select()
 
     if (error) {
-      console.error('Error closing markets:', error)
+      console.error('[CRON] Error closing markets:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    console.log(`[CRON] Closed ${data.length} markets`)
 
     return NextResponse.json({
       success: true,
@@ -53,7 +61,7 @@ export async function GET(request: Request) {
     })
 
   } catch (error) {
-    console.error('Cron job failed:', error)
+    console.error('[CRON] Cron job failed:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
