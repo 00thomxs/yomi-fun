@@ -92,7 +92,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.id, `OUI ${outcome.name}`, 100, 100 / (outcome.probability || 1))
+                      onMarketClick(market)
                     }}
                     className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
                   >
@@ -101,7 +101,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onBet(market.id, `NON ${outcome.name}`, 100, 100 / (100 - (outcome.probability || 1)))
+                      onMarketClick(market)
                     }}
                         className="py-1.5 px-3 rounded-md bg-rose-500/20 border border-rose-500/50 text-rose-400 text-xs font-bold hover:bg-rose-500/30 transition-all"
                   >
@@ -265,9 +265,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={(e) => {
-              if (!market.isLive) return
               e.stopPropagation()
-              onBet(market.id, "OUI", 100, 1 / (binaryMarket.yesPrice || 0.5))
+              onMarketClick(market)
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
@@ -283,9 +282,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           </button>
           <button
             onClick={(e) => {
-              if (!market.isLive) return
               e.stopPropagation()
-              onBet(market.id, "NON", 100, 1 / (binaryMarket.noPrice || 0.5))
+              onMarketClick(market)
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
