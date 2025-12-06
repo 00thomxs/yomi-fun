@@ -64,9 +64,15 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   </div>
                 </>
               ) : (
-                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                  Terminé
-                </div>
+                market.status === 'resolved' || market.resolved_at ? (
+                  <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                    Terminé
+                  </div>
+                ) : (
+                  <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
+                    En attente
+                  </div>
+                )
               )}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
@@ -110,14 +116,20 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                     </div>
                   ) : (
                     <div className={`py-2 px-3 rounded-md border text-center flex items-center justify-center gap-2 ${
-                      // @ts-ignore
-                      outcome.is_winner === true 
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      market.status === 'resolved' || market.resolved_at
+                        ? // @ts-ignore
+                          outcome.is_winner === true 
+                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                            : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                        : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                     }`}>
                       <span className="text-xs font-bold uppercase">
-                        {/* @ts-ignore */}
-                        {outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"}
+                        {market.status === 'resolved' || market.resolved_at ? (
+                          // @ts-ignore
+                          outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"
+                        ) : (
+                          "En attente"
+                        )}
                       </span>
                     </div>
                   )}
@@ -183,9 +195,15 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 </div>
               </>
             ) : (
-              <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                Terminé
-              </div>
+              market.status === 'resolved' || market.resolved_at ? (
+                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                  Terminé
+                </div>
+              ) : (
+                <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
+                  En attente
+                </div>
+              )
             )}
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
@@ -270,7 +288,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
-              !market.isLive && prob >= 50 
+              !market.isLive && (market.status === 'resolved' || market.resolved_at) && prob >= 50 
                 ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] opacity-100 cursor-default"
                 : !market.isLive
                   ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400/50 opacity-50 cursor-default"
@@ -278,7 +296,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }`}
           >
             OUI • <span className="font-mono">{prob}%</span>
-            {!market.isLive && prob >= 50 && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
+            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob >= 50 && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
+            {!market.isLive && !(market.status === 'resolved' || market.resolved_at) && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
           <button
             onClick={(e) => {
@@ -287,7 +306,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
-              !market.isLive && prob < 50 
+              !market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 
                 ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default"
                 : !market.isLive
                   ? "bg-rose-500/5 border-rose-500/10 text-rose-400/50 opacity-50 cursor-default"
@@ -295,7 +314,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }`}
           >
             NON • <span className="font-mono">{100 - prob}%</span>
-            {!market.isLive && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-white px-1 rounded font-black">Win</span>}
+            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-white px-1 rounded font-black">Win</span>}
+            {!market.isLive && !(market.status === 'resolved' || market.resolved_at) && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
         </div>
       </div>

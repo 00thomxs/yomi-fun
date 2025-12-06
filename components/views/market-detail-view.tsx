@@ -329,9 +329,15 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
             ) : (
               <>
                 <span className="text-muted-foreground">•</span>
-                <span className="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                  Terminé
-                </span>
+                {market.status === 'resolved' || market.resolved_at ? (
+                  <span className="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                    Terminé
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
+                    En attente
+                  </span>
+                )}
               </>
             )}
             <span className="text-muted-foreground">•</span>
@@ -483,12 +489,21 @@ function BinaryMarketContent({
     <>
       {/* Resolved Banner */}
       {isResolved && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
-            <Lock className="w-4 h-4" /> Marché Terminé
-          </p>
-          <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
-        </div>
+        market.status === 'resolved' || market.resolved_at ? (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
+            <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+              <Lock className="w-4 h-4" /> Marché Terminé
+            </p>
+            <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+            <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+              <Clock className="w-4 h-4" /> En attente du résultat
+            </p>
+            <p className="text-amber-400/70 text-sm mt-1">Le marché est clos, le résultat sera bientôt annoncé</p>
+          </div>
+        )
       )}
 
       {/* Probability Display */}
@@ -966,12 +981,21 @@ function MultiMarketContent({
     <>
       {/* Resolved Banner */}
       {isResolved && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
-            <Lock className="w-4 h-4" /> Marché Terminé
-          </p>
-          <p className="text-red-400/70 text-sm mt-1">Les paris ne sont plus acceptés</p>
-        </div>
+        market.status === 'resolved' || market.resolved_at ? (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
+            <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+              <Lock className="w-4 h-4" /> Marché Terminé
+            </p>
+            <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+            <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+              <Clock className="w-4 h-4" /> En attente du résultat
+            </p>
+            <p className="text-amber-400/70 text-sm mt-1">Le marché est clos, le résultat sera bientôt annoncé</p>
+          </div>
+        )
       )}
 
       {/* Outcomes List */}
@@ -998,14 +1022,20 @@ function MultiMarketContent({
               <div className="grid grid-cols-2 gap-2">
                 {isResolved ? (
                   <div className={`col-span-2 py-3 px-4 rounded-lg border text-center flex items-center justify-center gap-2 ${
-                    // @ts-ignore
-                    outcome.is_winner === true 
-                      ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' 
-                      : 'bg-rose-500/5 border-rose-500/30 text-rose-400'
+                    market.status === 'resolved' || market.resolved_at
+                      ? // @ts-ignore
+                        outcome.is_winner === true 
+                          ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' 
+                          : 'bg-rose-500/5 border-rose-500/30 text-rose-400'
+                      : 'bg-amber-500/5 border-amber-500/30 text-amber-400'
                   }`}>
                     <span className="text-sm font-bold uppercase">
-                      {/* @ts-ignore */}
-                      {outcome.is_winner === true ? "Résultat : OUI" : "Résultat : NON"}
+                      {market.status === 'resolved' || market.resolved_at ? (
+                        // @ts-ignore
+                        outcome.is_winner === true ? "Résultat : OUI" : "Résultat : NON"
+                      ) : (
+                        "En attente du résultat"
+                      )}
                     </span>
                   </div>
                 ) : (

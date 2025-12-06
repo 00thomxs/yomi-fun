@@ -13,6 +13,8 @@ export type BinaryMarket = {
   bgImage: string
   volatility: string
   isLive: boolean
+  status?: 'open' | 'closed' | 'resolved' | 'cancelled'
+  resolved_at?: string | null
   is_featured?: boolean // Added for trending markets
   is_headline?: boolean // Added for hero market
   yesPrice: number
@@ -38,6 +40,8 @@ export type MultiOutcomeMarket = {
   image: string
   bgImage: string
   isLive: boolean
+  status?: 'open' | 'closed' | 'resolved' | 'cancelled'
+  resolved_at?: string | null
   is_featured?: boolean // Added for trending markets
   is_headline?: boolean // Added for hero market
   countdown: string
