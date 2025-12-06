@@ -1,10 +1,13 @@
-import { getSeasonSettings, updateSeasonSettings } from "./actions"
+import { getSeasonSettings, getAllPastSeasons } from "./actions"
 import { resetPlatform } from "../actions"
 import { SettingsForm } from "./settings-form"
 import { ResetButton } from "./reset-button"
+import Link from "next/link"
+import { ExternalLink, History } from "lucide-react"
 
 export default async function AdminSettingsPage() {
   const settings = await getSeasonSettings()
+  const pastSeasons = await getAllPastSeasons()
 
   return (
     <div className="space-y-8">
@@ -25,6 +28,37 @@ export default async function AdminSettingsPage() {
             <div className="text-rose-400">
               Erreur : Impossible de charger les paramètres. Vérifiez que la table 'season_settings' existe et contient une ligne.
             </div>
+          )}
+        </div>
+
+        {/* Past Seasons History */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <History className="w-5 h-5" /> Historique des Saisons
+          </h2>
+          
+          {pastSeasons.length > 0 ? (
+            <div className="divide-y divide-border">
+              {pastSeasons.map((season: any) => (
+                <div key={season.id} className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="font-bold">{season.title || "Saison sans titre"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Terminée le {new Date(season.end_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Link 
+                    href={`/admin/recap/${season.id}`}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Voir le Récap
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">Aucune saison archivée pour le moment.</p>
           )}
         </div>
 
