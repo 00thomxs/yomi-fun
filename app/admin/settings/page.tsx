@@ -77,7 +77,7 @@ export default async function AdminSettingsPage() {
             <div>
               <h3 className="font-bold text-rose-400">Réinitialiser la Plateforme</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-md">
-                Supprime tous les paris, transactions, commandes et historiques. Remet les soldes à 10 000 Z. 
+                Supprime tous les paris, transactions, commandes et historiques. Remet les soldes à 0 Z. 
                 <br />
                 <strong>Les comptes utilisateurs et les articles du shop sont conservés.</strong>
               </p>
