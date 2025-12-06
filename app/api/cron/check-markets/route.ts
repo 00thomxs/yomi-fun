@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic' // Force dynamic execution for Vercel Cron
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   try {
