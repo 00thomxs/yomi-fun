@@ -29,6 +29,9 @@ export default async function AdminDashboard() {
   // Estimate revenue (2% fee on volume)
   const estimatedRevenue = Math.round(totalVolume * 0.02)
 
+  // Filter markets pending resolution
+  const pendingResolutionMarkets = markets?.filter(m => m.status === 'closed' && !m.resolved_at) || []
+
   const stats = [
     { label: "Volume Total", value: totalVolume.toLocaleString('fr-FR'), suffix: <CurrencySymbol /> },
     { label: "Marchés Actifs", value: markets?.filter(m => m.status === 'open').length.toString() || "0", suffix: "" },
@@ -72,6 +75,41 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Pending Resolution Alert */}
+      {pendingResolutionMarkets.length > 0 && (
+        <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 overflow-hidden">
+          <div className="p-4 border-b border-amber-500/20 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-500 animate-pulse">
+                <Gavel className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="font-bold text-amber-500">Action Requise</h2>
+                <p className="text-xs text-amber-500/80">{pendingResolutionMarkets.length} marché(s) en attente de résolution</p>
+              </div>
+            </div>
+          </div>
+          <div className="divide-y divide-amber-500/10">
+            {pendingResolutionMarkets.map((market) => (
+              <div key={market.id} className="p-4 flex items-center justify-between hover:bg-amber-500/5 transition-colors">
+                <div className="flex items-center gap-4">
+                  <span className="text-xs font-mono text-amber-500/60">
+                    {new Date(market.closes_at).toLocaleDateString()}
+                  </span>
+                  <span className="font-medium text-sm">{market.question}</span>
+                </div>
+                <Link
+                  href={`/admin/resolve/${market.id}`}
+                  className="px-4 py-2 bg-amber-500 text-black rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20"
+                >
+                  Résoudre
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Markets Table */}
       <div className="rounded-xl bg-card border border-border overflow-hidden">
@@ -118,9 +156,14 @@ export default async function AdminDashboard() {
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Live
                       </span>
+                    ) : market.status === 'closed' ? (
+                      <span className="inline-flex items-center gap-1.5 text-amber-500 text-xs font-bold uppercase">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        En attente
+                      </span>
                     ) : (
                       <span className="text-muted-foreground text-xs font-bold uppercase">
-                        {market.status}
+                        {market.status === 'resolved' ? 'Résolu' : market.status}
                       </span>
                     )}
                   </td>
