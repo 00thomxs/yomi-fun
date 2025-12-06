@@ -3,8 +3,9 @@ import { ArrowLeft, Trophy, Calendar, Share2, Crown, Coins } from "lucide-react"
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 
-export default async function SeasonRecapPage({ params }: { params: { id: string } }) {
-  const season = await getPastSeason(params.id)
+export default async function SeasonRecapPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const season = await getPastSeason(id)
 
   if (!season) {
     return <div className="p-8 text-center">Saison introuvable</div>

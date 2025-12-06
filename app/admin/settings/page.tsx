@@ -2,6 +2,7 @@ import { getSeasonSettings, getAllPastSeasons } from "./actions"
 import { resetPlatform } from "../actions"
 import { SettingsForm } from "./settings-form"
 import { ResetButton } from "./reset-button"
+import { DeleteSeasonButton } from "./delete-season-button"
 import Link from "next/link"
 import { ExternalLink, History } from "lucide-react"
 
@@ -47,13 +48,16 @@ export default async function AdminSettingsPage() {
                       Terminée le {new Date(season.end_date).toLocaleDateString()}
                     </p>
                   </div>
-                  <Link 
-                    href={`/admin/recap/${season.id}`}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Voir le Récap
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link 
+                      href={`/admin/recap/${season.id}`}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Voir le Récap
+                    </Link>
+                    <DeleteSeasonButton id={season.id} />
+                  </div>
                 </div>
               ))}
             </div>
