@@ -474,7 +474,8 @@ export async function deletePastSeason(id: string) {
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
-  const { error } = await supabase
+  // Use admin client to bypass RLS
+  const { error } = await supabaseAdmin
     .from('past_seasons')
     .delete()
     .eq('id', id)

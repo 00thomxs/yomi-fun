@@ -176,7 +176,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              {lastSeason.winners.map((winner) => (
+              {lastSeason.winners.slice(0, 3).map((winner) => (
                 <div key={winner.rank} className="flex flex-col items-center text-center">
                   <div className="relative mb-2">
                     {winner.rank === 1 && (

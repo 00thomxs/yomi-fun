@@ -47,7 +47,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
         <div className="relative z-10 p-6 md:p-10">
           
           {/* Season Title */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-14">
             <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">
               {season.title || "Saison"}
             </h2>
