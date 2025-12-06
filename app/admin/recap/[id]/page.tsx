@@ -60,13 +60,13 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           <div className="grid grid-cols-3 gap-2 md:gap-8 items-end max-w-2xl mx-auto mb-8">
             
             {/* 2nd Place */}
-            <div className="flex flex-col items-center pt-8">
+            <div className="flex flex-col items-center pt-6">
               <div className="relative mb-2">
                 <div className="absolute -inset-1 bg-gray-400/20 rounded-full blur-md" />
                 <img 
                   src={top2?.avatar || "/images/avatar.jpg"} 
                   alt={top2?.username} 
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-400 object-cover relative z-10"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gray-400 object-cover relative z-10"
                 />
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gray-700 border border-gray-500 text-gray-200 text-xs font-bold px-2 py-0.5 rounded-full z-20">
                   #2
@@ -83,14 +83,14 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             {/* 1st Place */}
             <div className="flex flex-col items-center">
               <div className="relative mb-2">
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                  <Crown className="w-8 h-8 text-amber-400 fill-amber-400/30" />
+                <div className="absolute -top-9 left-1/2 -translate-x-1/2">
+                  <Crown className="w-9 h-9 text-amber-400 fill-amber-400/30" />
                 </div>
                 <div className="absolute -inset-2 bg-amber-500/30 rounded-full blur-xl" />
                 <img 
                   src={top1?.avatar || "/images/avatar.jpg"} 
                   alt={top1?.username} 
-                  className="w-24 h-24 md:w-28 md:h-28 rounded-full border-[5px] border-amber-400 object-cover relative z-10 shadow-[0_0_30px_rgba(251,191,36,0.3)]"
+                  className="w-28 h-28 md:w-32 md:h-32 rounded-full border-[5px] border-amber-400 object-cover relative z-10 shadow-[0_0_30px_rgba(251,191,36,0.3)]"
                 />
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full z-20 shadow-lg">
                   #1
