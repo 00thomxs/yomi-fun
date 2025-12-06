@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/check-markets",
+      "path": "/api/cron/run",
       "schedule": "* * * * *"
     }
   ]
