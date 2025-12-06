@@ -116,6 +116,27 @@ GRANT EXECUTE ON FUNCTION reset_platform() TO authenticated;
 GRANT EXECUTE ON FUNCTION reset_platform() TO service_role;
 
 -- =============================================
+-- 5b. INCREMENT_BALANCE FUNCTION (fallback for resolve)
+-- =============================================
+CREATE OR REPLACE FUNCTION increment_balance(
+  p_user_id UUID,
+  p_amount BIGINT
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  UPDATE public.profiles
+  SET balance = balance + p_amount
+  WHERE id = p_user_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION increment_balance(UUID, BIGINT) TO authenticated;
+GRANT EXECUTE ON FUNCTION increment_balance(UUID, BIGINT) TO service_role;
+
+-- =============================================
 -- 6. ALLOW SEASON_REWARD TRANSACTION TYPE
 -- =============================================
 -- Drop existing constraint if exists and recreate with new type
