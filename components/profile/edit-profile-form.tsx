@@ -96,7 +96,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
       if (error.code === '23505') {
         toast({ title: "Pseudo indisponible", description: "Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.", variant: "destructive" })
       } else {
-        toast({ title: "Erreur", description: error.message, variant: "destructive" })
+      toast({ title: "Erreur", description: error.message, variant: "destructive" })
       }
     } finally {
       setIsLoading(false)

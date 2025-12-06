@@ -256,8 +256,8 @@ export async function endSeason() {
     }
   }
 
-  // Archive Season
-  const top3 = top10.slice(0, 3).map((p, i) => ({
+  // Archive Season - Save all top 10
+  const allWinners = top10.map((p, i) => ({
     rank: i + 1,
     username: p.username,
     avatar: p.avatar_url,
@@ -268,7 +268,7 @@ export async function endSeason() {
     title: settings.title || "Saison",
     start_date: settings.updated_at,
     end_date: new Date().toISOString(),
-    winners: top3
+    winners: allWinners
   })
 
   // Mark season as ended
@@ -388,8 +388,8 @@ async function endSeasonInternal(settings: any) {
     }
   }
 
-  // Archive Season
-  const top3 = top10.slice(0, 3).map((p: any, i: number) => ({
+  // Archive Season - Save all top 10
+  const allWinners = top10.map((p: any, i: number) => ({
     rank: i + 1,
     username: p.username,
     avatar: p.avatar_url,
@@ -400,7 +400,7 @@ async function endSeasonInternal(settings: any) {
     title: settings.title || "Saison",
     start_date: settings.updated_at,
     end_date: new Date().toISOString(),
-    winners: top3
+    winners: allWinners
   })
 
   // Mark season as ended

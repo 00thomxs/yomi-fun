@@ -65,9 +65,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 </>
               ) : (
                 market.status === 'resolved' || market.resolved_at ? (
-                  <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                    Terminé
-                  </div>
+                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                  Terminé
+                </div>
                 ) : (
                   <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
                     En attente
@@ -118,9 +118,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                     <div className={`py-2 px-3 rounded-md border text-center flex items-center justify-center gap-2 ${
                       market.status === 'resolved' || market.resolved_at
                         ? // @ts-ignore
-                          outcome.is_winner === true 
-                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                            : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      outcome.is_winner === true 
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                         : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                     }`}>
                       <span className="text-xs font-bold uppercase">
@@ -196,9 +196,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               </>
             ) : (
               market.status === 'resolved' || market.resolved_at ? (
-                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                  Terminé
-                </div>
+              <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                Terminé
+              </div>
               ) : (
                 <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
                   En attente
