@@ -9,6 +9,7 @@ import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
 import type { MarketWinner } from "@/app/actions/market-stats"
 import { TopWinners } from "@/components/market/top-winners"
+import { useToast } from "@/hooks/use-toast"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -156,6 +157,7 @@ type MarketDetailViewProps = {
 }
 
 export function MarketDetailView({ market, onBack, onBet, userBalance, userBets = [], userAvatar, topWinners = [] }: MarketDetailViewProps) {
+  const { toast } = useToast()
   const [timeframe, setTimeframe] = useState<"1H" | "6H" | "1J" | "1S" | "1M" | "TOUT">("1H")
   const [betChoice, setBetChoice] = useState<string>(market.type === "binary" ? "YES" : (market as MultiOutcomeMarket).outcomes[0].name)
   const [betAmount, setBetAmount] = useState("")
@@ -296,6 +298,8 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
 
   const handlePlaceBet = () => {
     const amount = Number.parseFloat(betAmount) || 0
+    const payout = calculatePayout()
+
     if (amount > 0) {
       if (market.type === "binary") {
         const displayChoice = betChoice === "YES" ? "OUI" : "NON"
@@ -1429,6 +1433,10 @@ function BetAmountInput({
   handlePlaceBet: () => void
   hasBet: boolean
 }) {
+  const potentialGain = calculatePayout()
+  const LIMIT_GAIN = 100000000 // 100 Millions
+  const isOverLimit = potentialGain > LIMIT_GAIN
+
   if (hasBet) {
     return (
       <div className="w-full py-4 rounded-lg bg-white/5 border border-white/10 text-muted-foreground font-bold text-lg tracking-tight uppercase text-center cursor-not-allowed flex items-center justify-center gap-2">
@@ -1449,7 +1457,9 @@ function BetAmountInput({
           value={betAmount}
           onChange={(e) => setBetAmount(e.target.value)}
           placeholder="0"
-          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-border focus:border-white/30 outline-none text-lg font-bold tracking-tight font-mono transition-all"
+          className={`w-full px-4 py-3 rounded-lg bg-white/5 border outline-none text-lg font-bold tracking-tight font-mono transition-all ${
+            isOverLimit ? "border-rose-500 focus:border-rose-500 text-rose-400" : "border-border focus:border-white/30"
+          }`}
         />
       </div>
 
@@ -1481,17 +1491,33 @@ function BetAmountInput({
       </div>
 
       {betAmount && (
-        <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Gain potentiel</p>
-          <p className="text-2xl font-bold text-primary tracking-tight font-mono">
-            {calculatePayout()} <CurrencySymbol />
-          </p>
-        </div>
+        isOverLimit ? (
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs text-rose-400 uppercase tracking-wider font-bold">Gain trop élevé</p>
+                <p className="text-xs text-rose-300 mt-1">
+                  Le gain potentiel ({potentialGain.toLocaleString()}) dépasse la limite de sécurité (100M).
+                </p>
+              </div>
+              <span className="text-rose-400 font-mono font-bold text-lg">
+                &gt; 100M
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Gain potentiel</p>
+            <p className="text-2xl font-bold text-primary tracking-tight font-mono">
+              {potentialGain} <CurrencySymbol />
+            </p>
+          </div>
+        )
       )}
 
       <button
         onClick={handlePlaceBet}
-        disabled={!betAmount || Number.parseFloat(betAmount) > userBalance}
+        disabled={!betAmount || Number.parseFloat(betAmount) > userBalance || isOverLimit}
         className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Confirmer le pari
