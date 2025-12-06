@@ -5,7 +5,7 @@ import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar,
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
-import { getSeasonSettings, checkAndDistributeRewards, type SeasonSettings } from "@/app/admin/settings/actions"
+import { getSeasonSettings, checkAndDistributeRewards, getLastSeason, type SeasonSettings } from "@/app/admin/settings/actions"
 import { toast } from "sonner"
 
 type LeaderboardViewProps = {
@@ -22,11 +22,23 @@ type Player = {
   totalWon: number
 }
 
+type PastSeason = {
+  id: string
+  title: string
+  winners: {
+    rank: number
+    username: string
+    avatar: string
+    reward: number
+  }[]
+}
+
 export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [seasonSettings, setSeasonSettings] = useState<SeasonSettings | null>(null)
+  const [lastSeason, setLastSeason] = useState<PastSeason | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +55,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             const newSettings = await getSeasonSettings()
             setSeasonSettings(newSettings)
             window.location.reload()
+          }
+        } else {
+          // If no active season, fetch last season
+          const past = await getLastSeason()
+          if (past) {
+            setLastSeason(past)
           }
         }
       } catch (e) {
@@ -135,14 +153,54 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         <div>
           <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
           {hasSeason ? (
-            <p className="text-xs text-primary font-medium flex items-center gap-1">
-              <Trophy className="w-3 h-3" /> Saison en cours
+            <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
+              <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">Classement Global</p>
           )}
         </div>
       </div>
+
+      {/* Last Season Winners Banner */}
+      {!hasSeason && lastSeason && (
+        <div className="w-full max-w-[95%] mx-auto rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-purple-500/10 border border-purple-500/30 p-4 relative overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 p-2 opacity-10">
+            <Trophy className="w-24 h-24 rotate-12 text-purple-500" />
+          </div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="w-4 h-4 text-purple-400" />
+              <h3 className="text-xs font-bold tracking-widest uppercase text-purple-400">Vainqueurs {lastSeason.title}</h3>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {lastSeason.winners.map((winner) => (
+                <div key={winner.rank} className="flex flex-col items-center text-center">
+                  <div className="relative mb-2">
+                    {winner.rank === 1 && <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xl">👑</div>}
+                    <img 
+                      src={winner.avatar || "/images/avatar.jpg"} 
+                      alt={winner.username} 
+                      className={`rounded-full object-cover border-2 ${
+                        winner.rank === 1 ? "w-12 h-12 border-amber-400" : 
+                        winner.rank === 2 ? "w-10 h-10 border-gray-400" : 
+                        "w-10 h-10 border-orange-500"
+                      }`}
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-black border border-white/20 flex items-center justify-center text-[8px] font-bold">
+                      {winner.rank}
+                    </div>
+                  </div>
+                  <p className="text-xs font-bold truncate w-full px-1">{winner.username}</p>
+                  <p className="text-[9px] font-mono text-primary">+{winner.reward.toLocaleString()} Z</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Season Banner */}
       {hasSeason && (

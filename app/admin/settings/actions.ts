@@ -11,6 +11,7 @@ const supabaseAdmin = createSupabaseClient(
 
 export type SeasonSettings = {
   id: string
+  title?: string
   cash_prize: number
   season_end: string
   top1_prize: string
@@ -55,6 +56,7 @@ export async function updateSeasonSettings(formData: FormData) {
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
   const id = formData.get('id') as string
+  const title = formData.get('title') as string || "Saison Régulière"
   const cash_prize = parseInt(formData.get('cash_prize') as string) || 0
   const season_end = formData.get('season_end') as string
   const top1_prize = formData.get('top1_prize') as string || 'Non défini'
@@ -75,6 +77,7 @@ export async function updateSeasonSettings(formData: FormData) {
   const { data, error } = await supabaseAdmin
     .from('season_settings')
     .update({
+      title,
       cash_prize,
       season_end: season_end, // Already ISO format from client
       top1_prize,
@@ -202,7 +205,7 @@ export async function endSeason() {
   // Fetch top 10 players by total_won (PnL)
   const { data: top10, error: top10Error } = await supabaseAdmin
     .from('profiles')
-    .select('id, username, balance')
+    .select('id, username, balance, avatar_url')
     .order('total_won', { ascending: false })
     .limit(10)
 
@@ -252,6 +255,21 @@ export async function endSeason() {
       }
     }
   }
+
+  // Archive Season
+  const top3 = top10.slice(0, 3).map((p, i) => ({
+    rank: i + 1,
+    username: p.username,
+    avatar: p.avatar_url,
+    reward: i === 0 ? (settings.cash_prize + (settings.zeny_rewards?.[0] || 0)) : (settings.zeny_rewards?.[i] || 0)
+  }))
+
+  await supabaseAdmin.from('past_seasons').insert({
+    title: settings.title || "Saison",
+    start_date: settings.updated_at,
+    end_date: new Date().toISOString(),
+    winners: top3
+  })
 
   // Mark season as ended
   const { error: endError } = await supabase
@@ -328,7 +346,7 @@ async function endSeasonInternal(settings: any) {
   // Fetch top 10 players
   const { data: top10 } = await supabaseAdmin
     .from('profiles')
-    .select('id, username, balance')
+    .select('id, username, balance, avatar_url')
     .order('total_won', { ascending: false })
     .limit(10)
 
@@ -370,6 +388,21 @@ async function endSeasonInternal(settings: any) {
     }
   }
 
+  // Archive Season
+  const top3 = top10.slice(0, 3).map((p: any, i: number) => ({
+    rank: i + 1,
+    username: p.username,
+    avatar: p.avatar_url,
+    reward: i === 0 ? (settings.cash_prize + (settings.zeny_rewards?.[0] || 0)) : (settings.zeny_rewards?.[i] || 0)
+  }))
+
+  await supabaseAdmin.from('past_seasons').insert({
+    title: settings.title || "Saison",
+    start_date: settings.updated_at,
+    end_date: new Date().toISOString(),
+    winners: top3
+  })
+
   // Mark season as ended
   await supabaseAdmin
     .from('season_settings')
@@ -384,4 +417,18 @@ async function endSeasonInternal(settings: any) {
     success: true, 
     message: `Saison terminée automatiquement ! ${totalDistributed.toLocaleString()} Zeny distribués.`
   }
+}
+
+export async function getLastSeason() {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('past_seasons')
+    .select('*')
+    .order('end_date', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) return null
+  return data
 }

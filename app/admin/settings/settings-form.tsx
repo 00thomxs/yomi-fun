@@ -100,7 +100,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               <CheckCircle className="w-6 h-6 text-emerald-500" />
             </div>
             <div>
-              <p className="text-xl font-bold text-emerald-400">🎯 Saison Active</p>
+              <p className="text-xl font-bold text-emerald-400">🎯 {settings.title || "Saison Active"}</p>
               <p className="text-sm text-muted-foreground">
                 Se termine le {seasonEnd.toLocaleDateString('fr-FR')} à {seasonEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 {daysLeft > 0 && ` (dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''})`}
@@ -190,6 +190,28 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
       <form action={handleSubmit} className="space-y-8">
         <input type="hidden" name="id" value={settings.id} />
+
+        {/* Season Title */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-primary" /> Titre de la Saison
+          </h3>
+          <div className="space-y-2">
+            <input
+              type="text"
+              name="title"
+              defaultValue={settings.title || "Saison Régulière"}
+              className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none text-xl font-bold"
+              placeholder="Ex: Saison Hiver 2025"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Ce titre sera affiché sur la page Classement (ex: "Saison Hiver 2025").
+            </p>
+          </div>
+        </div>
+
+        <div className="h-px bg-border" />
 
         {/* Date & Time Selection */}
         <div className="space-y-4">
