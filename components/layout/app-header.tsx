@@ -40,7 +40,7 @@ export function AppHeader() {
             {/* Login/User button */}
             {isAuthenticated ? (
               <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer">
                   <img
                     src={user?.avatar || "/images/avatar.jpg"}
                     alt={user?.username}
@@ -53,14 +53,14 @@ export function AppHeader() {
                 <div className="absolute right-0 top-full mt-2 w-48 py-2 rounded-xl bg-card border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-xl">
                   <Link
                     href="/profile"
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <User className="w-4 h-4" />
                     Mon Profil
                   </Link>
                   <button
                     onClick={signOut}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
                     Déconnexion

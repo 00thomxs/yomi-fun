@@ -295,7 +295,7 @@ export function ProfileView() {
                 <div className="space-y-3">
                   <button 
                     onClick={() => setActiveSettingsTab('edit')}
-                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group"
+                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       <UserCog className="w-5 h-5 text-primary" />
@@ -309,7 +309,7 @@ export function ProfileView() {
 
                   <button 
                     onClick={() => setActiveSettingsTab('password')}
-                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group"
+                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       <Key className="w-5 h-5 text-primary" />
@@ -339,7 +339,7 @@ export function ProfileView() {
         <h2 className="text-2xl font-bold tracking-tight uppercase">Profil</h2>
         <button
           onClick={toggleSettings}
-          className="p-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all"
+          className="p-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
         >
           <Settings className="w-5 h-5" />
         </button>
@@ -435,7 +435,7 @@ export function ProfileView() {
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
                   pnlTimeframe === tf
                     ? "bg-primary text-primary-foreground"
                     : "bg-white/5 border border-border hover:border-white/20"

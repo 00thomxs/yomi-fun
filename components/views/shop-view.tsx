@@ -142,7 +142,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm tracking-tight whitespace-nowrap transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-lg font-semibold text-sm tracking-tight whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                 selectedCategory === cat.id
                   ? "bg-white/10 text-white border border-white/20"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/10"
@@ -205,7 +205,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               <button
                   onClick={() => handlePurchaseClick(item)}
                   disabled={isPurchasing || item.stock === 0}
-                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                   {item.stock === 0 ? "Rupture" : "Acheter"}
               </button>
@@ -270,14 +270,14 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   type="button"
                   onClick={() => setSelectedItem(null)}
                   disabled={isPurchasing}
-                  className="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 font-semibold transition-all"
+                  className="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 font-semibold transition-all cursor-pointer"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={isPurchasing || !deliveryInfo.trim() || userBalance < selectedItem.price}
-                  className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isPurchasing && <Loader2 className="w-4 h-4 animate-spin" />}
                   {userBalance < selectedItem.price ? "Solde insuffisant" : "Confirmer"}
