@@ -94,14 +94,14 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             {featuredMarket.isLive ? (
             <button
               onClick={() => onMarketClick(featuredMarket)}
-              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all"
+              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all cursor-pointer"
             >
               Predire maintenant
             </button>
             ) : (
               <button
                 onClick={() => onMarketClick(featuredMarket)}
-                className="w-full py-4 rounded-lg bg-white/10 border border-white/20 text-white/80 font-bold text-lg tracking-tight uppercase hover:bg-white/15 transition-all"
+                className="w-full py-4 rounded-lg bg-white/10 border border-white/20 text-white/80 font-bold text-lg tracking-tight uppercase hover:bg-white/15 transition-all cursor-pointer"
               >
                 Voir les résultats
               </button>
@@ -120,7 +120,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={`
-                  flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold tracking-tight transition-all whitespace-nowrap flex items-center gap-2
+                  flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold tracking-tight transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer
                   ${
                     activeCategory === category.id
                       ? "bg-primary text-primary-foreground"
