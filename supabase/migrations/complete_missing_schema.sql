@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS public.past_seasons (
 -- Enable RLS on past_seasons
 ALTER TABLE public.past_seasons ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies first (in case they exist)
+DROP POLICY IF EXISTS "Past seasons are viewable by everyone" ON public.past_seasons;
+DROP POLICY IF EXISTS "Admin can manage past seasons" ON public.past_seasons;
+
 -- Everyone can view past seasons
 CREATE POLICY "Past seasons are viewable by everyone" 
 ON public.past_seasons FOR SELECT USING (true);
