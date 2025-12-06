@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal } from "lucide-react"
+import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Crown } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
@@ -179,7 +179,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               {lastSeason.winners.map((winner) => (
                 <div key={winner.rank} className="flex flex-col items-center text-center">
                   <div className="relative mb-2">
-                    {winner.rank === 1 && <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xl">👑</div>}
+                    {winner.rank === 1 && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <Crown className="w-6 h-6 text-amber-400 fill-amber-400/20 animate-pulse" />
+                      </div>
+                    )}
                     <img 
                       src={winner.avatar || "/images/avatar.jpg"} 
                       alt={winner.username} 
@@ -194,7 +198,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     </div>
                   </div>
                   <p className="text-xs font-bold truncate w-full px-1">{winner.username}</p>
-                  <p className="text-[9px] font-mono text-primary">+{winner.reward.toLocaleString()} Z</p>
+                  <p className="text-[9px] font-mono text-primary flex items-center justify-center gap-0.5">
+                    +{winner.reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
+                  </p>
                 </div>
               ))}
             </div>
