@@ -71,16 +71,20 @@ export async function updateSeasonSettings(formData: FormData) {
 
   console.log('Updating season settings:', { id, cash_prize, season_end, top1_prize, top2_prize, top3_prize, zeny_rewards })
 
+  // Use supabaseAdmin to bypass RLS
+  // season_end is already in ISO format from the client (with correct timezone)
+  // NOTE: Don't update 'updated_at' here - it's used to track season START time!
   const { data, error } = await supabaseAdmin
     .from('season_settings')
     .update({
       title,
       cash_prize,
-      season_end: season_end,
+      season_end: season_end, // Already ISO format from client
       top1_prize,
       top2_prize,
       top3_prize,
       zeny_rewards
+      // Don't touch updated_at - it marks when the season started
     })
     .eq('id', id)
     .select()
@@ -90,15 +94,19 @@ export async function updateSeasonSettings(formData: FormData) {
     return { error: `Erreur mise à jour: ${error.message}` }
   }
 
+  console.log('Update result:', data)
+
   revalidatePath('/admin/settings')
   revalidatePath('/leaderboard')
   
   return { success: true, message: "Paramètres mis à jour !" }
 }
 
+// Start a new season (reset rewards_distributed, set is_active = true)
 export async function startSeason() {
   const supabase = await createClient()
 
+  // Verify admin
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Non authentifié" }
   
@@ -110,6 +118,7 @@ export async function startSeason() {
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
+  // First check if settings row exists
   const { data: existing } = await supabaseAdmin
     .from('season_settings')
     .select('id')
@@ -117,12 +126,13 @@ export async function startSeason() {
     .single()
 
   if (!existing) {
+    // Create the row if it doesn't exist
     const { error: insertError } = await supabaseAdmin
       .from('season_settings')
       .insert({
         id: '00000000-0000-0000-0000-000000000001',
         cash_prize: 10000,
-        season_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        season_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
         top1_prize: 'Non défini',
         top2_prize: 'Non défini',
         top3_prize: 'Non défini',
@@ -132,9 +142,11 @@ export async function startSeason() {
       })
 
     if (insertError) {
+      console.error('Insert error:', insertError)
       return { error: `Erreur création settings: ${insertError.message}` }
     }
   } else {
+    // Update existing row
     const { error: updateError } = await supabaseAdmin
       .from('season_settings')
       .update({
@@ -145,6 +157,7 @@ export async function startSeason() {
       .eq('id', '00000000-0000-0000-0000-000000000001')
 
     if (updateError) {
+      console.error('Update error:', updateError)
       return { error: `Erreur démarrage saison: ${updateError.message}` }
     }
   }
@@ -155,9 +168,11 @@ export async function startSeason() {
   return { success: true, message: "🎉 Saison démarrée !" }
 }
 
+// End season: distribute rewards and set is_active = false
 export async function endSeason() {
   const supabase = await createClient()
 
+  // Verify admin
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Non authentifié" }
   
@@ -169,6 +184,7 @@ export async function endSeason() {
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
+  // Fetch current settings
   const { data: settings, error: settingsError } = await supabase
     .from('season_settings')
     .select('*')
@@ -186,6 +202,7 @@ export async function endSeason() {
     return { error: "Les récompenses ont déjà été distribuées" }
   }
 
+  // Fetch top 10 players by total_won (PnL)
   const { data: top10, error: top10Error } = await supabaseAdmin
     .from('profiles')
     .select('id, username, balance, avatar_url')
@@ -198,10 +215,13 @@ export async function endSeason() {
 
   const distributionResults: { rank: number; username: string; reward: number }[] = []
 
+  // Distribute rewards to each ranked player
   for (let i = 0; i < top10.length; i++) {
     const player = top10[i]
     const rank = i + 1
     
+    // Rank 1 gets cash_prize (as Zeny) + zeny_rewards[0]
+    // Ranks 2-10 get their respective zeny_rewards
     let reward = 0
     if (rank === 1) {
       reward = settings.cash_prize + (settings.zeny_rewards?.[0] || 0)
@@ -212,6 +232,7 @@ export async function endSeason() {
     if (reward > 0) {
       const newBalance = player.balance + reward
 
+      // Update player balance
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ balance: newBalance })
@@ -224,6 +245,7 @@ export async function endSeason() {
           reward
         })
 
+        // Log transaction
         await supabaseAdmin.from('transactions').insert({
           user_id: player.id,
           type: 'season_reward',
@@ -234,6 +256,7 @@ export async function endSeason() {
     }
   }
 
+  // Archive Season
   const top3 = top10.slice(0, 3).map((p, i) => ({
     rank: i + 1,
     username: p.username,
@@ -248,6 +271,7 @@ export async function endSeason() {
     winners: top3
   })
 
+  // Mark season as ended
   const { error: endError } = await supabase
     .from('season_settings')
     .update({
@@ -274,6 +298,7 @@ export async function endSeason() {
   }
 }
 
+// Check if season has ended and auto-distribute (called on leaderboard load)
 export async function checkAndDistributeRewards(): Promise<{ distributed: boolean; message?: string }> {
   const supabase = await createClient()
 
@@ -283,14 +308,31 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
     .single()
 
   if (error || !settings) {
+    console.log('[AutoEnd] No settings found or error:', error)
     return { distributed: false }
   }
 
+  console.log('[AutoEnd] Checking season:', {
+    is_active: settings.is_active,
+    rewards_distributed: settings.rewards_distributed,
+    season_end: settings.season_end,
+    now: new Date().toISOString()
+  })
+
+  // If season is active and end date has passed, auto-end it
   if (settings.is_active && !settings.rewards_distributed) {
     const now = new Date()
     const seasonEnd = new Date(settings.season_end)
 
+    console.log('[AutoEnd] Time comparison:', {
+      now: now.getTime(),
+      seasonEnd: seasonEnd.getTime(),
+      hasEnded: now.getTime() >= seasonEnd.getTime()
+    })
+
     if (now.getTime() >= seasonEnd.getTime()) {
+      console.log('[AutoEnd] Season has ended! Distributing rewards...')
+      // Season has ended naturally, distribute rewards
       const result = await endSeasonInternal(settings)
       return { distributed: true, message: result.message }
     }
@@ -299,7 +341,9 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
   return { distributed: false }
 }
 
+// Internal function for auto-distribution (bypasses admin check)
 async function endSeasonInternal(settings: any) {
+  // Fetch top 10 players
   const { data: top10 } = await supabaseAdmin
     .from('profiles')
     .select('id, username, balance, avatar_url')
@@ -344,6 +388,7 @@ async function endSeasonInternal(settings: any) {
     }
   }
 
+  // Archive Season
   const top3 = top10.slice(0, 3).map((p: any, i: number) => ({
     rank: i + 1,
     username: p.username,
@@ -358,6 +403,7 @@ async function endSeasonInternal(settings: any) {
     winners: top3
   })
 
+  // Mark season as ended
   await supabaseAdmin
     .from('season_settings')
     .update({
@@ -388,26 +434,53 @@ export async function getLastSeason() {
 }
 
 export async function getPastSeason(id: string) {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
+  // Use admin client to bypass potential RLS issues on new table
+  const { data, error } = await supabaseAdmin
     .from('past_seasons')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (error) return null
+  if (error) {
+    console.error('Error fetching past season:', error)
+    return null
+  }
   return data
 }
 
 export async function getAllPastSeasons() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
+  // Use admin client to ensure visibility
+  const { data, error } = await supabaseAdmin
     .from('past_seasons')
     .select('id, title, end_date')
     .order('end_date', { ascending: false })
 
   if (error) return []
   return data
+}
+
+export async function deletePastSeason(id: string) {
+  const supabase = await createClient()
+  
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+    
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  const { error } = await supabase
+    .from('past_seasons')
+    .delete()
+    .eq('id', id)
+
+  if (error) return { error: error.message }
+  
+  revalidatePath('/admin/settings')
+  return { success: true }
 }
