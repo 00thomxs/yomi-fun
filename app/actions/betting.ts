@@ -25,7 +25,7 @@ export async function placeBet(
 
   // 0. Validate amount
   if (amount < 10) return { error: "Mise minimum: 10 Zeny" }
-  if (amount > 100000) return { error: "Mise maximum: 100,000 Zeny" }
+  if (amount > 100000000) return { error: "Mise maximum: 100,000,000 Zeny" }
 
   // 1. Get User
   const { data: { user } } = await supabase.auth.getUser()
