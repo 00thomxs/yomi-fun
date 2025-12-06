@@ -12,7 +12,7 @@ CREATE TABLE public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   avatar_url TEXT,
-  balance INTEGER DEFAULT 10000 NOT NULL, -- Starting balance: 10,000 Zeny
+  balance INTEGER DEFAULT 0 NOT NULL, -- Starting balance: 0 Zeny
   xp INTEGER DEFAULT 0 NOT NULL,
   level INTEGER DEFAULT 1 NOT NULL,
   streak INTEGER DEFAULT 0 NOT NULL,

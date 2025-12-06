@@ -20,7 +20,7 @@ DECLARE
 BEGIN
   -- Get current stats
   SELECT 
-    COALESCE(balance, 10000), 
+    COALESCE(balance, 0), 
     COALESCE(total_won, 0), 
     COALESCE(streak, 0),
     COALESCE(xp, 0)
