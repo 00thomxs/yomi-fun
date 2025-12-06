@@ -34,7 +34,7 @@ export default async function AdminDashboard() {
 
   const stats = [
     { label: "Volume Total", value: totalVolume.toLocaleString('fr-FR'), suffix: <CurrencySymbol /> },
-    { label: "Marchés Actifs", value: markets?.filter(m => m.status === 'open').length.toString() || "0", suffix: "" },
+    { label: "Events Actifs", value: markets?.filter(m => m.status === 'open').length.toString() || "0", suffix: "" },
     { label: "Utilisateurs", value: (userCount || 0).toString(), suffix: "" },
     { label: "Revenus (Est.)", value: estimatedRevenue.toLocaleString('fr-FR'), suffix: <CurrencySymbol /> },
   ]
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-all flex items-center gap-2"
         >
           <PlayCircle className="w-4 h-4" />
-          Nouveau Marché
+          Créer un Event
         </Link>
       </div>
 
@@ -86,7 +86,7 @@ export default async function AdminDashboard() {
               </div>
               <div>
                 <h2 className="font-bold text-amber-500">Action Requise</h2>
-                <p className="text-xs text-amber-500/80">{pendingResolutionMarkets.length} marché(s) en attente de résolution</p>
+                <p className="text-xs text-amber-500/80">{pendingResolutionMarkets.length} event(s) en attente de résolution</p>
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default async function AdminDashboard() {
       {/* Markets Table */}
       <div className="rounded-xl bg-card border border-border overflow-hidden">
         <div className="p-6 border-b border-border flex items-center justify-between">
-          <h2 className="font-bold">Marchés Récents</h2>
+          <h2 className="font-bold">Events Récents</h2>
           <div className="flex gap-2">
             <select className="bg-background border border-border rounded-lg px-3 py-1.5 text-sm outline-none">
               <option>Tous les status</option>

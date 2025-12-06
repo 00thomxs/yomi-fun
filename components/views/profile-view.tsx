@@ -18,6 +18,7 @@ type Transaction = {
   amount: number
   status: 'pending' | 'won' | 'lost'
   potential_payout: number
+  direction?: 'YES' | 'NO'
 }
 
 export function ProfileView() {
@@ -43,6 +44,7 @@ export function ProfileView() {
           amount,
           status,
           potential_payout,
+          direction,
           outcome_id,
           markets (question),
           outcomes (name)
@@ -55,11 +57,12 @@ export function ProfileView() {
         const formattedHistory = betsData.map((bet: any) => ({
           id: bet.id,
           created_at: bet.created_at,
-          market_question: bet.markets?.question || "Marché inconnu",
+          market_question: bet.markets?.question || "Event inconnu",
           outcome_name: bet.outcomes?.name || "?",
           amount: bet.amount,
           status: bet.status,
-          potential_payout: bet.potential_payout
+          potential_payout: bet.potential_payout,
+          direction: bet.direction
         }))
         setHistory(formattedHistory)
       }
@@ -398,7 +401,7 @@ export function ProfileView() {
                 <p className="text-lg font-bold font-mono">{userStats.winRate}%</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Bets</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Nombre de paris</p>
                 <p className="text-lg font-bold font-mono">{userStats.totalBets}</p>
               </div>
               <div>
@@ -408,7 +411,7 @@ export function ProfileView() {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Bénéfice Net</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">PnL (Net)</p>
                 <p className={`text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
                 </p>
@@ -550,7 +553,12 @@ export function ProfileView() {
                     <span className="col-span-3 font-mono text-muted-foreground text-xs flex items-center">{date}</span>
                     <div className="col-span-4 flex flex-col justify-center">
                       <span className="font-medium truncate text-xs">{tx.market_question}</span>
-                      <span className="text-[10px] text-muted-foreground">Choix: {tx.outcome_name} • Mise: {tx.amount}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        Choix: <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                          {tx.direction === 'NO' ? "NON " : tx.direction === 'YES' && tx.outcome_name !== 'OUI' && tx.outcome_name !== 'NON' ? "OUI " : ""}
+                        </span>
+                        {tx.outcome_name} • Mise: {tx.amount}
+                      </span>
                     </div>
                     <span className="col-span-2 flex items-center">
                       {isWin && (

@@ -353,10 +353,10 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       {/* Leaderboard Table */}
       <div className="rounded-xl bg-card border border-border overflow-hidden mt-2">
         <div className="grid grid-cols-12 gap-2 px-4 py-4 bg-black/20 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-          <span className="col-span-1">Rank</span>
-          <span className="col-span-5">Joueur</span>
+          <span className="col-span-1">Rang</span>
+          <span className="col-span-5">Yomi</span>
           <span className="col-span-2 text-center">Win Rate</span>
-          <span className="col-span-4 text-right">PNL (Total)</span>
+          <span className="col-span-4 text-right">PnL (Total)</span>
         </div>
         <div className="divide-y divide-border/40">
           {rest.map((player, idx) => {

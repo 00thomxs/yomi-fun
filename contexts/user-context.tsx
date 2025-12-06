@@ -113,12 +113,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (bets) {
       const formattedBets: ActiveBet[] = bets.map((bet: any) => ({
         id: bet.id,
-        market: bet.markets?.question || "Marché inconnu",
+        market: bet.markets?.question || "Event inconnu",
         choice: bet.outcomes?.name || "Choix inconnu",
-        amount: bet.amount,
-        odds: bet.odds_at_bet || 1.0,
+        amount: Number(bet.amount), // Ensure number type (BigInt support)
+        odds: Number(bet.odds_at_bet) || 1.0,
         status: bet.status || 'pending',
-        potential_payout: bet.potential_payout,
+        potential_payout: Number(bet.potential_payout), // Ensure number type
         direction: bet.direction || 'YES'
       }))
       setActiveBets(formattedBets)

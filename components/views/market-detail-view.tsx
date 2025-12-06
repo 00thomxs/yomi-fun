@@ -496,7 +496,7 @@ function BinaryMarketContent({
         market.status === 'resolved' || market.resolved_at ? (
           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
             <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
-              <Lock className="w-4 h-4" /> Marché Terminé
+              <Lock className="w-4 h-4" /> Event Terminé
             </p>
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
           </div>
@@ -505,7 +505,7 @@ function BinaryMarketContent({
             <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
-            <p className="text-amber-400/70 text-sm mt-1">Le marché est clos, le résultat sera bientôt annoncé</p>
+            <p className="text-amber-400/70 text-sm mt-1">L'event est terminé, le résultat sera bientôt annoncé</p>
           </div>
         )
       )}
@@ -988,7 +988,7 @@ function MultiMarketContent({
         market.status === 'resolved' || market.resolved_at ? (
           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
             <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
-              <Lock className="w-4 h-4" /> Marché Terminé
+              <Lock className="w-4 h-4" /> Event Terminé
             </p>
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
           </div>
@@ -997,7 +997,7 @@ function MultiMarketContent({
             <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
-            <p className="text-amber-400/70 text-sm mt-1">Le marché est clos, le résultat sera bientôt annoncé</p>
+            <p className="text-amber-400/70 text-sm mt-1">L'event est terminé, le résultat sera bientôt annoncé</p>
           </div>
         )
       )}

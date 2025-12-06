@@ -73,7 +73,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
 
   if (marketError) {
     console.error('Market creation error:', marketError)
-    return { error: `Erreur création marché: ${marketError.message}` }
+    return { error: `Erreur création event: ${marketError.message}` }
   }
 
   // 2. Insert Outcomes (ensure integer probabilities)
@@ -122,7 +122,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   revalidatePath('/admin')
   revalidatePath('/')
   
-  return { success: true, message: 'Marché créé avec succès !' }
+  return { success: true, message: 'Event créé avec succès !' }
 }
 
 export async function deleteMarket(formData: FormData): Promise<{ error?: string; success?: boolean }> {
