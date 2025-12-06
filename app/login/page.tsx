@@ -139,7 +139,7 @@ export default function LoginPage() {
             <YomiLogo className="text-4xl justify-center" />
           </Link>
           <p className="text-muted-foreground mt-2 text-sm">
-            {isLogin ? "Content de te revoir !" : "Rejoins la communauté"}
+            {isLogin ? "Prêt à jouer ?" : "Rejoins la communauté"}
           </p>
         </div>
 
@@ -321,17 +321,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Divider - hide when in forgot password mode */}
-          {!showForgotPassword && (
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-4 text-muted-foreground">ou</span>
-              </div>
-            </div>
-          )}
 
           {/* Terms - hide when in forgot password mode */}
           {!isLogin && !showForgotPassword && (

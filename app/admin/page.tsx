@@ -3,7 +3,6 @@ import { Edit, ExternalLink, PlayCircle, Gavel } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { DeleteMarket } from "@/app/admin/components/delete-button"
-import { ResetPlatformButton } from "@/app/admin/components/reset-button"
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -55,11 +54,6 @@ export default async function AdminDashboard() {
           <PlayCircle className="w-4 h-4" />
           Créer un Event
         </Link>
-      </div>
-
-      {/* Reset Button (Danger Zone) */}
-      <div className="flex justify-end">
-        <ResetPlatformButton />
       </div>
 
       {/* Stats Cards */}
