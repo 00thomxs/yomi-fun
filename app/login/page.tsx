@@ -62,6 +62,20 @@ export default function LoginPage() {
           setIsLoading(false)
           return
         }
+
+        // Check username availability
+        const supabase = createClient()
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .ilike('username', username)
+        
+        if (count && count > 0) {
+          setError("Ce pseudo est déjà pris. Veuillez en choisir un autre.")
+          setIsLoading(false)
+          return
+        }
+
         const result = await signUp(email, password, username)
         if (result.error) {
           setError(result.error)
