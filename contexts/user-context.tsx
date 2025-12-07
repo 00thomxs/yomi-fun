@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import type { ActiveBet } from "@/lib/types"
 import { placeBet as placeBetAction } from "@/app/actions/betting"
+import { getAvatarUrl } from "@/lib/utils/avatar"
 
 // --- CONFIGURATION ---
 // Mettre à true si la connexion Supabase est bloquée (ex: sandbox Cursor)
@@ -186,7 +187,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         id: supabaseUser.id,
         username: userProfile.username,
         email: supabaseUser.email || '',
-        avatar: userProfile.avatar_url || '/images/avatar.jpg',
+        avatar: getAvatarUrl(userProfile.avatar_url),
         role: userProfile.role
       })
     } else {
@@ -195,7 +196,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         id: supabaseUser.id,
         username: supabaseUser.user_metadata?.username || `user_${supabaseUser.id.slice(0, 8)}`,
         email: supabaseUser.email || '',
-        avatar: supabaseUser.user_metadata?.avatar_url || '/images/avatar.jpg',
+        avatar: getAvatarUrl(supabaseUser.user_metadata?.avatar_url),
       })
     }
     

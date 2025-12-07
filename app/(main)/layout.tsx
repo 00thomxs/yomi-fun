@@ -10,6 +10,7 @@ import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
 import type { Market } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
+import { getAvatarUrl } from "@/lib/utils/avatar"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -33,7 +34,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           rank: i + 1,
           username: p.username || "User",
           points: p.total_won || 0, // Using PnL as points for leaderboard
-          avatar: p.avatar_url || "/images/default-avatar.svg"
+          avatar: getAvatarUrl(p.avatar_url)
         })))
       }
 

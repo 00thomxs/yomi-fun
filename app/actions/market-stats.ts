@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { getAvatarUrl } from '@/lib/utils/avatar'
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,7 +68,7 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
       
       userProfits.set(bet.user_id, {
         username: profile?.username || 'Anonyme',
-        avatar: profile?.avatar_url || '/images/default-avatar.svg',
+        avatar: getAvatarUrl(profile?.avatar_url),
         profit: 0
       })
     }

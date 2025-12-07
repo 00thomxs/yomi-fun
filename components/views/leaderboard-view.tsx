@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
 import { getSeasonSettings, checkAndDistributeRewards, getLastSeason, type SeasonSettings } from "@/app/admin/settings/actions"
 import { toast } from "sonner"
+import { getAvatarUrl } from "@/lib/utils/avatar"
 
 type LeaderboardViewProps = {
   onBack: () => void
@@ -78,7 +79,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           rank: idx + 1,
           id: p.id,
           username: p.username || `User ${p.id.slice(0, 4)}`,
-          avatar: p.avatar_url || "/images/default-avatar.svg",
+          avatar: getAvatarUrl(p.avatar_url),
           balance: p.balance,
           winRate: p.win_rate || 0,
           totalWon: p.total_won || 0
