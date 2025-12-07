@@ -3,6 +3,7 @@ import { Edit, ExternalLink, PlayCircle, Gavel } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { DeleteMarket } from "@/app/admin/components/delete-button"
+import { CloseMarket } from "@/app/admin/components/close-button"
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -173,6 +174,7 @@ export default async function AdminDashboard() {
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Link>
+                      <CloseMarket marketId={market.id} isLive={market.is_live} />
                       <Link
                         href={`/admin/resolve/${market.id}`}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300"
@@ -180,9 +182,6 @@ export default async function AdminDashboard() {
                       >
                         <Gavel className="w-4 h-4" />
                       </Link>
-                      {/* <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground">
-                        <Edit className="w-4 h-4" />
-                      </button> */}
                       <DeleteMarket marketId={market.id} />
                     </div>
                   </td>

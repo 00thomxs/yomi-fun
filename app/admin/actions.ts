@@ -178,3 +178,40 @@ export async function resetPlatform(): Promise<{ error?: string; success?: boole
   revalidatePath('/', 'layout') // Clear full cache
   return { success: true }
 }
+
+// =============================================
+// CLOSE/BLOCK MARKET MANUALLY
+// =============================================
+export async function closeMarketManually(marketId: string): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+    
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  // Close the market (set is_live = false and status = 'closed')
+  const { error } = await supabase
+    .from('markets')
+    .update({ 
+      is_live: false, 
+      status: 'closed' 
+    })
+    .eq('id', marketId)
+
+  if (error) {
+    console.error("Close market error:", error)
+    return { error: `Erreur: ${error.message}` }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  return { success: true }
+}
