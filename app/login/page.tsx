@@ -80,7 +80,7 @@ export default function LoginPage() {
         // 🎮 LIMITE DE JOUEURS POUR LE TOURNOI
         // Commenter ce bloc pour désactiver la limite
         // =============================================
-        const MAX_PLAYERS = 5 // Changer ce nombre selon le besoin
+        const MAX_PLAYERS = 15 // Changer ce nombre selon le besoin
         const { count: totalPlayers } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
