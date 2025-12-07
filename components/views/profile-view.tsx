@@ -349,7 +349,7 @@ export function ProfileView() {
       <div className="rounded-xl bg-card border border-border p-6">
         <div className="flex items-start gap-6">
           <img
-            src={user?.avatar || "/images/avatar.jpg"}
+            src={user?.avatar || "/images/default-avatar.svg"}
             alt="User Avatar"
             className="w-20 h-20 rounded-full border-4 border-primary/50 ring-4 ring-primary/20 object-cover"
           />

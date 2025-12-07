@@ -78,7 +78,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           rank: idx + 1,
           id: p.id,
           username: p.username || `User ${p.id.slice(0, 4)}`,
-          avatar: p.avatar_url || "/images/avatar.jpg",
+          avatar: p.avatar_url || "/images/default-avatar.svg",
           balance: p.balance,
           winRate: p.win_rate || 0,
           totalWon: p.total_won || 0
@@ -185,7 +185,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                       </div>
                     )}
                     <img 
-                      src={winner.avatar || "/images/avatar.jpg"} 
+                      src={winner.avatar || "/images/default-avatar.svg"} 
                       alt={winner.username} 
                       className={`rounded-full object-cover border-2 ${
                         winner.rank === 1 ? "w-12 h-12 border-amber-400" : 

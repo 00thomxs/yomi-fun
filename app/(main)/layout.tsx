@@ -33,7 +33,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           rank: i + 1,
           username: p.username || "User",
           points: p.total_won || 0, // Using PnL as points for leaderboard
-          avatar: p.avatar_url || "/images/avatar.jpg"
+          avatar: p.avatar_url || "/images/default-avatar.svg"
         })))
       }
 

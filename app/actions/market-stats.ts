@@ -67,7 +67,7 @@ export async function getMarketTopWinners(marketId: string): Promise<MarketWinne
       
       userProfits.set(bet.user_id, {
         username: profile?.username || 'Anonyme',
-        avatar: profile?.avatar_url || '/images/avatar.jpg',
+        avatar: profile?.avatar_url || '/images/default-avatar.svg',
         profit: 0
       })
     }

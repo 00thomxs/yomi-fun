@@ -64,7 +64,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
               <div className="relative mb-2">
                 <div className="absolute -inset-1 bg-gray-400/20 rounded-full blur-md" />
                 <img 
-                  src={top2?.avatar || "/images/avatar.jpg"} 
+                  src={top2?.avatar || "/images/default-avatar.svg"} 
                   alt={top2?.username} 
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gray-400 object-cover relative z-10"
                 />
@@ -88,7 +88,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                 </div>
                 <div className="absolute -inset-2 bg-amber-500/30 rounded-full blur-xl" />
                 <img 
-                  src={top1?.avatar || "/images/avatar.jpg"} 
+                  src={top1?.avatar || "/images/default-avatar.svg"} 
                   alt={top1?.username} 
                   className="w-28 h-28 md:w-32 md:h-32 rounded-full border-[5px] border-amber-400 object-cover relative z-10 shadow-[0_0_30px_rgba(251,191,36,0.3)]"
                 />
@@ -109,7 +109,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
               <div className="relative mb-2">
                 <div className="absolute -inset-1 bg-orange-600/20 rounded-full blur-md" />
                 <img 
-                  src={top3?.avatar || "/images/avatar.jpg"} 
+                  src={top3?.avatar || "/images/default-avatar.svg"} 
                   alt={top3?.username} 
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-orange-600 object-cover relative z-10"
                 />

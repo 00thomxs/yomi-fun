@@ -10,7 +10,7 @@ export const TIME_LABELS_4H = ["0h", "1h", "2h", "3h", "4h"]
 export const TIME_LABELS_1J = ["0h", "4h", "8h", "12h", "16h", "20h"]
 
 // Image URLs
-export const AVATAR_MAIN = "/images/avatar.jpg"
+export const AVATAR_MAIN = "/images/default-avatar.svg"
 export const AVATAR_2 = "/images/avatar-2.jpg"
 export const AVATAR_3 = "/images/avatar-3.jpg"
 export const GP_EXPLORER_BG = "/images/gp-explorer.webp"

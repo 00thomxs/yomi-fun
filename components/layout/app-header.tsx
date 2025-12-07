@@ -42,7 +42,7 @@ export function AppHeader() {
               <div className="relative group">
                 <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer">
                   <img
-                    src={user?.avatar || "/images/avatar.jpg"}
+                    src={user?.avatar || "/images/default-avatar.svg"}
                     alt={user?.username}
                     className="w-7 h-7 rounded-full object-cover"
                   />

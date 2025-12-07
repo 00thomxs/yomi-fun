@@ -183,7 +183,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col items-center gap-3">
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
             <img 
-              src={avatarPreview || "/images/avatar.jpg"} 
+              src={avatarPreview || "/images/default-avatar.svg"} 
               alt="Avatar" 
               className="w-24 h-24 rounded-full object-cover border-4 border-white/10 group-hover:border-primary/50 transition-all"
             />

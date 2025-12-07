@@ -131,7 +131,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return {
         id: userId,
         username: "AdminTest",
-        avatar_url: "/images/avatar.jpg",
+        avatar_url: "/images/default-avatar.svg",
         balance: 50000,
         xp: 1200,
         level: 5,
