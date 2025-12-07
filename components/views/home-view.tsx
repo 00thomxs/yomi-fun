@@ -18,14 +18,13 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
   const validMarkets = markets || []
   
   // Determine featured market dynamically
-  // Priority: Headline (binary) -> Featured (binary) -> First Binary -> First available
+  // Priority: Headline (any type) -> Featured (binary) -> First Binary -> First available
   const featuredMarket = (
-    validMarkets.find((m) => m.is_headline && m.type === 'binary') || 
+    validMarkets.find((m) => m.is_headline) ||  // Headline can be ANY type now
     validMarkets.find((m) => m.is_featured && m.type === 'binary') || 
     validMarkets.find((m) => m.type === 'binary') ||
-    // If no binary market, take first one but Hero will need to handle non-binary or be hidden
     validMarkets[0]
-  ) as BinaryMarket | undefined
+  ) as Market | undefined
 
   // Category filtering with null checks
   const filteredMarkets = activeCategory === "trending"
@@ -41,7 +40,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
   return (
     <div className="space-y-6">
       {/* Featured Market Hero */}
-      {featuredMarket && featuredMarket.type === 'binary' && (
+      {featuredMarket && (
         <div className="relative overflow-hidden rounded-xl bg-card border border-border h-[380px]">
           {featuredMarket.bgImage ? (
             <img
@@ -78,18 +77,36 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               {featuredMarket.question || "Question indisponible"}
             </h2>
 
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm font-bold tracking-tight">
-                <span className="text-white font-mono">{Math.round(featuredMarket.probability || 50)}% OUI</span>
-                <span className="text-white/60 font-mono">{Math.round(100 - (featuredMarket.probability || 50))}% NON</span>
+            {/* Binary market: show OUI/NON bar */}
+            {featuredMarket.type === 'binary' && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm font-bold tracking-tight">
+                  <span className="text-white font-mono">{Math.round((featuredMarket as BinaryMarket).probability || 50)}% OUI</span>
+                  <span className="text-white/60 font-mono">{Math.round(100 - ((featuredMarket as BinaryMarket).probability || 50))}% NON</span>
+                </div>
+                <div className="relative h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="absolute left-0 top-0 h-full bg-white rounded-full"
+                    style={{ width: `${(featuredMarket as BinaryMarket).probability || 50}%` }}
+                  />
+                </div>
               </div>
-              <div className="relative h-2 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="absolute left-0 top-0 h-full bg-white rounded-full"
-                  style={{ width: `${featuredMarket.probability || 50}%` }}
-                />
+            )}
+
+            {/* Multi market: show top outcomes */}
+            {featuredMarket.type === 'multi' && featuredMarket.outcomes && (
+              <div className="space-y-2">
+                {featuredMarket.outcomes.slice(0, 2).map((outcome: any, idx: number) => (
+                  <div key={idx} className="flex justify-between items-center text-sm">
+                    <span className="text-white/80 truncate max-w-[200px]">{outcome.name}</span>
+                    <span className="text-white font-mono font-bold">{Math.round(outcome.probability)}%</span>
+                  </div>
+                ))}
+                {featuredMarket.outcomes.length > 2 && (
+                  <span className="text-xs text-white/50">+{featuredMarket.outcomes.length - 2} autres options</span>
+                )}
               </div>
-            </div>
+            )}
 
             {featuredMarket.isLive ? (
             <button

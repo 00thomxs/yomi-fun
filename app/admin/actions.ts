@@ -50,6 +50,14 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
     }
   }
 
+  // 0. If this is a headline, remove headline from all other markets (only ONE headline allowed)
+  if (isHeadline) {
+    await supabase
+      .from('markets')
+      .update({ is_headline: false })
+      .eq('is_headline', true)
+  }
+
   // 1. Insert Market
   const { data: market, error: marketError } = await supabase
     .from('markets')
