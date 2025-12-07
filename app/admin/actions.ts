@@ -197,6 +197,17 @@ export async function closeMarketManually(marketId: string): Promise<{ success?:
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
+  // Check market exists and is currently live
+  const { data: market } = await supabase
+    .from('markets')
+    .select('id, is_live, status')
+    .eq('id', marketId)
+    .single()
+
+  if (!market) return { error: "Event introuvable" }
+  if (!market.is_live) return { error: "Cet event est déjà bloqué" }
+  if (market.status !== 'open') return { error: "Cet event n'est pas ouvert" }
+
   // Close the market (set is_live = false and status = 'closed')
   const { error } = await supabase
     .from('markets')
