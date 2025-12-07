@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/user-context"
 import { deleteAccount } from "@/app/auth/actions"
 import { useRouter } from "next/navigation"
 import { SuccessPopup } from "@/components/ui/success-popup"
+import { getAvatarUrl } from "@/lib/utils/avatar"
 
 export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const { profile, user, setUser } = useUser()
@@ -17,7 +18,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   
   const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState(profile?.username || "")
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url || null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(getAvatarUrl(profile?.avatar_url) || null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [notifWin, setNotifWin] = useState(profile?.email_notif_win ?? true)
   const [notifMarketing, setNotifMarketing] = useState(profile?.email_notif_marketing ?? true)

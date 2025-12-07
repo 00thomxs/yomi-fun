@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { getAvatarUrl } from '@/lib/utils/avatar'
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -260,7 +261,7 @@ export async function endSeason() {
   const allWinners = top10.map((p, i) => ({
     rank: i + 1,
     username: p.username,
-    avatar: p.avatar_url,
+    avatar: getAvatarUrl(p.avatar_url),
     reward: i === 0 ? (settings.cash_prize + (settings.zeny_rewards?.[0] || 0)) : (settings.zeny_rewards?.[i] || 0)
   }))
 
@@ -392,7 +393,7 @@ async function endSeasonInternal(settings: any) {
   const allWinners = top10.map((p: any, i: number) => ({
     rank: i + 1,
     username: p.username,
-    avatar: p.avatar_url,
+    avatar: getAvatarUrl(p.avatar_url),
     reward: i === 0 ? (settings.cash_prize + (settings.zeny_rewards?.[0] || 0)) : (settings.zeny_rewards?.[i] || 0)
   }))
 
