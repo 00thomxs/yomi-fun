@@ -86,7 +86,7 @@ export function BuyZenyView() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-foreground uppercase tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-bold text-foreground uppercase tracking-tight">
           Recharge tes <span className="text-primary">Zeny</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">

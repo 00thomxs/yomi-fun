@@ -114,22 +114,22 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link 
             href="/shop/buy-zeny"
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs sm:text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
           >
             <CreditCard className="w-4 h-4" />
-            Acheter des Zeny
+            <span className="hidden xs:inline">Acheter des</span> Zeny
           </Link>
           <Link 
             href="/orders"
-            className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-card border border-border rounded-lg text-xs sm:text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
           >
             <Package className="w-4 h-4" />
-            Mes Commandes
+            <span className="hidden sm:inline">Mes</span> Commandes
           </Link>
         </div>
       </div>
