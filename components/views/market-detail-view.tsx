@@ -525,13 +525,13 @@ function BinaryMarketContent({
       </div>
 
       {/* Timeframe Selector + Chart Actions */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
           {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-              className={`px-4 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer ${
               timeframe === tf
                 ? "bg-primary text-primary-foreground"
                 : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
@@ -1085,10 +1085,10 @@ function MultiMarketContent({
           <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
         </div>
 
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <p className="text-sm font-bold tracking-tight uppercase">Evolution des cotes</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 relative z-10">
+          <p className="text-sm font-bold tracking-tight uppercase shrink-0">Evolution des cotes</p>
           <div className="flex items-center gap-2">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}

@@ -81,7 +81,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             </div>
           </div>
 
-          <p className="font-semibold text-base tracking-tight text-balance leading-snug">{market.question}</p>
+          <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
           {/* Top 2 candidates with OUI/NON buttons */}
           <div className="flex-1 space-y-3">
@@ -212,7 +212,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           </div>
         </div>
 
-        <p className="font-semibold text-base tracking-tight text-balance leading-snug">{market.question}</p>
+        <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
         {/* Real history chart */}
         <div className="flex-1 min-h-[100px] relative overflow-visible">

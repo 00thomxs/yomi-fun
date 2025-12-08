@@ -346,20 +346,20 @@ export function ProfileView() {
       </div>
 
       {/* Profile Header */}
-      <div className="rounded-xl bg-card border border-border p-6">
-        <div className="flex items-start gap-6">
+      <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           <img
             src={user?.avatar || "/images/default-avatar.svg"}
             alt="User Avatar"
-            className="w-20 h-20 rounded-full border-4 border-primary/50 ring-4 ring-primary/20 object-cover"
+            className="w-20 h-20 rounded-full border-4 border-primary/50 ring-4 ring-primary/20 object-cover shrink-0"
           />
-          <div className="flex-1 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
+          <div className="flex-1 space-y-4 w-full">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
+              <div className="text-center sm:text-left">
                 <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
                 
                 {/* Level & XP Progress */}
-                <div className="mt-2 space-y-1.5 min-w-[200px]">
+                <div className="mt-2 space-y-1.5 min-w-[180px] sm:min-w-[200px]">
                   <div className="flex justify-between text-xs font-medium">
                     <span className="text-muted-foreground">Niveau <span className="text-primary">{userStats.level}</span></span>
                     <span className="text-muted-foreground"><span className="text-foreground">{userStats.xp % 1000}</span> / 1000 XP</span>
@@ -372,9 +372,9 @@ export function ProfileView() {
                   </div>
                 </div>
               </div>
-              <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Balance</p>
-                <p className="text-xl font-bold">
+              <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 shrink-0">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
+                <p className="text-xl font-bold text-center">
                   <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
                   <CurrencySymbol className="text-primary" />
                 </p>
@@ -395,24 +395,24 @@ export function ProfileView() {
               </div>
             )}
 
-            <div className="grid grid-cols-4 gap-4 pt-4 border-t border-border">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
-                <p className="text-lg font-bold font-mono">{userStats.winRate}%</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-border">
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
+                <p className="text-base sm:text-lg font-bold font-mono">{userStats.winRate}%</p>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Nombre de paris</p>
-                <p className="text-lg font-bold font-mono">{userStats.totalBets}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Paris</p>
+                <p className="text-base sm:text-lg font-bold font-mono">{userStats.totalBets}</p>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
-                <p className="text-lg font-bold font-mono flex items-center gap-1">
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
+                <p className="text-base sm:text-lg font-bold font-mono flex items-center justify-center sm:justify-start gap-1">
                   <Flame className="w-4 h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">PnL (Net)</p>
-                <p className={`text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
+                <p className={`text-base sm:text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
                 </p>
               </div>

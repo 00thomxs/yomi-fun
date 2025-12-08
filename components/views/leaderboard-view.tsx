@@ -298,7 +298,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       )}
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 items-end px-2 sm:px-8 pt-0 pb-0 max-w-5xl mx-auto">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end px-1 sm:px-8 pt-0 pb-0 max-w-5xl mx-auto">
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
@@ -368,7 +368,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                  <span className="inline-flex items-center gap-0.5 sm:gap-1 mt-2 px-2 sm:px-3 py-0.5 rounded-full bg-amber-500/20 text-[9px] sm:text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                     +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
@@ -417,11 +417,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
       {/* Leaderboard Table */}
       <div className="rounded-xl bg-card border border-border overflow-hidden mt-2">
-        <div className="grid grid-cols-12 gap-2 px-4 py-4 bg-black/20 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-          <span className="col-span-1">Rang</span>
-          <span className="col-span-5">Traders</span>
-          <span className="col-span-2 text-center">Win Rate</span>
-          <span className="col-span-4 text-right">PnL (Total)</span>
+        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 sm:py-4 bg-black/20 text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider sm:tracking-widest">
+          <span className="col-span-1">#</span>
+          <span className="col-span-5">Trader</span>
+          <span className="col-span-2 text-center">WR</span>
+          <span className="col-span-4 text-right">PnL</span>
         </div>
         <div className="divide-y divide-border/40">
           {rest.map((player, idx) => {
@@ -432,7 +432,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             return (
               <div
                 key={player.id}
-                className={`grid grid-cols-12 gap-2 px-4 py-3 items-center transition-all hover:bg-white/[0.02] ${
+                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-all hover:bg-white/[0.02] ${
                   isMe ? "bg-primary/5 border-l-2 border-primary" : ""
                 }`}
               >

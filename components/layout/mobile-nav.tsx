@@ -22,7 +22,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center justify-center gap-1 px-6 py-2 rounded-lg transition-all ${
+      className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-all ${
         active ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
       }`}
     >
