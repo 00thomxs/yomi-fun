@@ -93,7 +93,7 @@ export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeConta
       question: m.question,
       bgImage: m.image_url || "/placeholder.svg",
       probability: probability,
-      countdown: m.closes_at ? new Date(m.closes_at).toLocaleDateString() : "Bientôt",
+      countdown: m.closes_at ? new Date(m.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : "Bientôt",
       yesPrice: probability / 100, // Approx price
       noPrice: (100 - probability) / 100,
       is_featured: m.is_featured, // Ensure featured flag is passed
