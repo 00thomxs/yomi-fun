@@ -90,7 +90,7 @@ export default async function AdminDashboard() {
               <div key={market.id} className="p-4 flex items-center justify-between hover:bg-amber-500/5 transition-colors">
                 <div className="flex items-center gap-4">
                   <span className="text-xs font-mono text-amber-500/60">
-                    {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}
                   </span>
                   <span className="font-medium text-sm">{market.question}</span>
                 </div>
@@ -163,7 +163,7 @@ export default async function AdminDashboard() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-muted-foreground">
-                    {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
