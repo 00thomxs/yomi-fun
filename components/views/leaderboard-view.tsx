@@ -118,10 +118,19 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   
   const getCountdown = () => {
     if (timeLeftMs <= 0) return "Terminée"
-    if (daysLeftTotal > 0) return `${daysLeftTotal} jour${daysLeftTotal > 1 ? 's' : ''}`
-    if (hoursLeftTotal > 0) return `${hoursLeftTotal} heure${hoursLeftTotal > 1 ? 's' : ''}`
-    if (minutesLeft > 0) return `${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}`
-    return "< 1 minute"
+    
+    if (daysLeftTotal > 0) {
+      const hours = Math.floor((timeLeftMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      return `${daysLeftTotal}j ${hours}h`
+    }
+    
+    if (hoursLeftTotal > 0) {
+      const minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60))
+      return `${hoursLeftTotal}h ${minutes}min`
+    }
+    
+    if (minutesLeft > 0) return `${minutesLeft} min`
+    return "< 1 min"
   }
 
   // Zeny Rewards - Rank 1 gets ONLY cash_prize, others get zeny_rewards[rank-1]
