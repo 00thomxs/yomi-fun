@@ -157,6 +157,31 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   const binaryMarket = market as BinaryMarket
   const prob = Math.round(binaryMarket.probability || 50)
 
+  // Determiner winner based on winner_outcome_id (Critical fix for Binary)
+  // @ts-ignore
+  const outcomes = market.outcomes || []
+  const yesOutcome = outcomes.find((o: any) => o.name === 'OUI')
+  // @ts-ignore
+  const winnerId = market.winner_outcome_id
+
+  const isResolved = !market.isLive && (market.status === 'resolved' || market.resolved_at)
+  
+  // If resolved, check who really won
+  let yesWon = false
+  let noWon = false
+
+  if (isResolved) {
+    if (winnerId && yesOutcome) {
+      // Robust check using ID
+      yesWon = winnerId === yesOutcome.id
+      noWon = winnerId !== yesOutcome.id
+    } else {
+      // Fallback (should not happen if resolved correctly)
+      yesWon = prob >= 50
+      noWon = prob < 50
+    }
+  }
+
   return (
     <div
       role="button"
@@ -288,7 +313,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
-              !market.isLive && (market.status === 'resolved' || market.resolved_at) && prob >= 50 
+              yesWon
                 ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] opacity-100 cursor-default"
                 : !market.isLive
                   ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400/50 opacity-50 cursor-default"
@@ -296,8 +321,8 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }`}
           >
             OUI • <span className="font-mono">{prob}%</span>
-            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob >= 50 && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
-            {!market.isLive && !(market.status === 'resolved' || market.resolved_at) && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
+            {yesWon && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
+            {!market.isLive && !yesWon && !noWon && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
           <button
             onClick={(e) => {
@@ -306,16 +331,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             }}
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
-              !market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 
-                ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default"
+              noWon 
+                ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default" // Use GREEN style for WIN even if it's NO? Or keep RED for NO? User asked for consistent style. Let's keep red for NO but highlighted.
                 : !market.isLive
                   ? "bg-rose-500/5 border-rose-500/10 text-rose-400/50 opacity-50 cursor-default"
                   : "bg-rose-500/20 border-rose-500/50 hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] text-rose-400"
             }`}
           >
             NON • <span className="font-mono">{100 - prob}%</span>
-            {!market.isLive && (market.status === 'resolved' || market.resolved_at) && prob < 50 && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-black px-1 rounded font-black">Win</span>}
-            {!market.isLive && !(market.status === 'resolved' || market.resolved_at) && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
+            {noWon && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
+            {!market.isLive && !yesWon && !noWon && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
         </div>
       </div>
