@@ -332,14 +332,14 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             disabled={!market.isLive}
             className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
               noWon 
-                ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default" // Use GREEN style for WIN even if it's NO? Or keep RED for NO? User asked for consistent style. Let's keep red for NO but highlighted.
+                ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default" 
                 : !market.isLive
                   ? "bg-rose-500/5 border-rose-500/10 text-rose-400/50 opacity-50 cursor-default"
                   : "bg-rose-500/20 border-rose-500/50 hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] text-rose-400"
             }`}
           >
             NON • <span className="font-mono">{100 - prob}%</span>
-            {noWon && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
+            {noWon && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-black px-1 rounded font-black">Win</span>}
             {!market.isLive && !yesWon && !noWon && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
           </button>
         </div>
