@@ -70,7 +70,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       
       const { data } = await supabase
         .from('profiles')
-        .select('id, username, avatar_url, total_won, win_rate, balance')
+        .select('id, username, avatar_url, total_won, win_rate, balance, role')
+        .neq('role', 'admin') // Exclude admins from leaderboard
         .order('total_won', { ascending: false })
         .limit(50)
 
