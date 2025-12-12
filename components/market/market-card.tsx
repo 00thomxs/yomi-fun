@@ -126,7 +126,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       <span className="text-[10px] font-bold uppercase">
                         {market.status === 'resolved' || market.resolved_at ? (
                           // @ts-ignore
-                          outcome.is_winner === true ? "WIN : OUI" : "RÉSULTAT : NON"
+                          outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"
                         ) : (
                           "En attente"
                         )}
@@ -145,7 +145,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               <span className="font-mono">{market.volume || 0}</span>
             </span>
             {remainingCount > 0 && (
-              <span className="text-primary font-medium hover:underline">+{remainingCount} outcomes...</span>
+              <span className="text-primary font-medium hover:underline">+{remainingCount} options...</span>
             )}
           </div>
         </div>
