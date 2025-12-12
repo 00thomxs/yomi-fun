@@ -84,14 +84,14 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
           {/* Top 2 candidates with OUI/NON buttons */}
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-2">
             {topTwo.map((outcome) => {
               const nonProb = 100 - outcome.probability
               return (
-              <div key={outcome.name} className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{outcome.name}</span>
-                    <span className="font-mono font-bold text-lg">{Math.round(outcome.probability)}%</span>
+              <div key={outcome.name} className="p-2 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium truncate max-w-[180px]" title={outcome.name}>{outcome.name}</span>
+                    <span className="font-mono font-bold text-sm">{Math.round(outcome.probability)}%</span>
                 </div>
                   {market.isLive ? (
                 <div className="grid grid-cols-2 gap-2">
@@ -100,7 +100,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       e.stopPropagation()
                       onMarketClick(market)
                     }}
-                    className="py-1.5 px-3 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all"
+                    className="py-1 px-2 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold hover:bg-emerald-500/20 transition-all uppercase"
                   >
                         OUI {Math.round(outcome.probability)}%
                   </button>
@@ -109,13 +109,13 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                       e.stopPropagation()
                       onMarketClick(market)
                     }}
-                        className="py-1.5 px-3 rounded-md bg-rose-500/20 border border-rose-500/50 text-rose-400 text-xs font-bold hover:bg-rose-500/30 transition-all"
+                        className="py-1 px-2 rounded bg-rose-500/20 border border-rose-500/50 text-rose-400 text-[10px] font-bold hover:bg-rose-500/30 transition-all uppercase"
                   >
                         NON {Math.round(nonProb)}%
                   </button>
                     </div>
                   ) : (
-                    <div className={`py-2 px-3 rounded-md border text-center flex items-center justify-center gap-2 ${
+                    <div className={`py-1 px-2 rounded border text-center flex items-center justify-center gap-2 ${
                       market.status === 'resolved' || market.resolved_at
                         ? // @ts-ignore
                       outcome.is_winner === true 
@@ -123,10 +123,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                         : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                         : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                     }`}>
-                      <span className="text-xs font-bold uppercase">
+                      <span className="text-[10px] font-bold uppercase">
                         {market.status === 'resolved' || market.resolved_at ? (
                           // @ts-ignore
-                          outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"
+                          outcome.is_winner === true ? "WIN : OUI" : "RÉSULTAT : NON"
                         ) : (
                           "En attente"
                         )}
@@ -139,15 +139,13 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
           </div>
 
           {/* Link to see more outcomes */}
-          <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t border-border">
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border mt-1">
             <span className="flex items-center gap-1">
-              <Users className="w-3.5 h-3.5" />
+              <Users className="w-3 h-3" />
               <span className="font-mono">{market.volume || 0}</span>
             </span>
-            {remainingCount > 0 ? (
-              <span className="text-primary text-xs font-medium hover:underline">+{remainingCount} outcomes...</span>
-            ) : (
-              <span /> // Spacer to keep volume on left if needed
+            {remainingCount > 0 && (
+              <span className="text-primary font-medium hover:underline">+{remainingCount} outcomes...</span>
             )}
           </div>
         </div>
