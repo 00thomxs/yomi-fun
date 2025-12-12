@@ -144,8 +144,10 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               <Users className="w-3.5 h-3.5" />
               <span className="font-mono">{market.volume || 0}</span>
             </span>
-            {remainingCount > 0 && (
+            {remainingCount > 0 ? (
               <span className="text-primary text-xs font-medium hover:underline">+{remainingCount} outcomes...</span>
+            ) : (
+              <span /> // Spacer to keep volume on left if needed
             )}
           </div>
         </div>
