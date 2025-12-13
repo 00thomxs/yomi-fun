@@ -22,10 +22,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const fetchData = async () => {
       const supabase = createClient()
 
-      // 1. Fetch Top 3 Players (by total_won aka PnL)
+      // 1. Fetch Top 3 Players (by total_won aka PnL), exclude admin
       const { data: players } = await supabase
         .from('profiles')
-        .select('username, total_won, avatar_url')
+        .select('username, total_won, avatar_url, role')
+        .neq('role', 'admin') // Exclude admins
         .order('total_won', { ascending: false })
         .limit(3)
 
