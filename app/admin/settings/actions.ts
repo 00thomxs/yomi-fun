@@ -203,10 +203,11 @@ export async function endSeason() {
     return { error: "Les récompenses ont déjà été distribuées" }
   }
 
-  // Fetch top 10 players by total_won (PnL)
+  // Fetch top 10 players by total_won (PnL), exclude admins
   const { data: top10, error: top10Error } = await supabaseAdmin
     .from('profiles')
-    .select('id, username, balance, avatar_url')
+    .select('id, username, balance, avatar_url, role')
+    .neq('role', 'admin') // EXCLUDE ADMINS
     .order('total_won', { ascending: false })
     .limit(10)
 
@@ -344,10 +345,11 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
 
 // Internal function for auto-distribution (bypasses admin check)
 async function endSeasonInternal(settings: any) {
-  // Fetch top 10 players
+  // Fetch top 10 players, exclude admins
   const { data: top10 } = await supabaseAdmin
     .from('profiles')
-    .select('id, username, balance, avatar_url')
+    .select('id, username, balance, avatar_url, role')
+    .neq('role', 'admin') // EXCLUDE ADMINS
     .order('total_won', { ascending: false })
     .limit(10)
 
