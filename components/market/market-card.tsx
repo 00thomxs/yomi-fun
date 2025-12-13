@@ -312,7 +312,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               onMarketClick(market)
             }}
             disabled={!market.isLive}
-            className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
+            className={`py-3.5 px-2 sm:px-4 rounded-lg border font-bold tracking-tight transition-all text-sm sm:text-base flex items-center justify-center gap-1.5 sm:gap-2 ${
               yesWon
                 ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] opacity-100 cursor-default"
                 : !market.isLive
@@ -320,9 +320,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   : "bg-emerald-500/10 border-emerald-500/50 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] text-emerald-400"
             }`}
           >
-            OUI • <span className="font-mono">{prob}%</span>
-            {yesWon && <span className="ml-1 text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black">Win</span>}
-            {!market.isLive && !yesWon && !noWon && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
+            <span>OUI • <span className="font-mono">{prob}%</span></span>
+            {yesWon && <span className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] uppercase bg-emerald-500 text-black px-1 rounded font-black shrink-0">Win</span>}
+            {!market.isLive && !yesWon && !noWon && <span className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold shrink-0">?</span>}
           </button>
           <button
             onClick={(e) => {
@@ -330,7 +330,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               onMarketClick(market)
             }}
             disabled={!market.isLive}
-            className={`py-3.5 px-4 rounded-lg border font-bold tracking-tight transition-all text-base flex items-center justify-center gap-2 ${
+            className={`py-3.5 px-2 sm:px-4 rounded-lg border font-bold tracking-tight transition-all text-sm sm:text-base flex items-center justify-center gap-1.5 sm:gap-2 ${
               noWon 
                 ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)] opacity-100 cursor-default" 
                 : !market.isLive
@@ -338,9 +338,9 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   : "bg-rose-500/20 border-rose-500/50 hover:bg-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] text-rose-400"
             }`}
           >
-            NON • <span className="font-mono">{100 - prob}%</span>
-            {noWon && <span className="ml-1 text-[10px] uppercase bg-rose-500 text-black px-1 rounded font-black">Win</span>}
-            {!market.isLive && !yesWon && !noWon && <span className="ml-1 text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold">?</span>}
+            <span>NON • <span className="font-mono">{100 - prob}%</span></span>
+            {noWon && <span className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] uppercase bg-rose-500 text-black px-1 rounded font-black shrink-0">Win</span>}
+            {!market.isLive && !yesWon && !noWon && <span className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1 rounded font-bold shrink-0">?</span>}
           </button>
         </div>
       </div>
