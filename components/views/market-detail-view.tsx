@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Plus } from "lucide-react"
+import Link from "next/link"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
@@ -1521,13 +1522,23 @@ function BetAmountInput({
         )
       )}
 
-      <button
-        onClick={handlePlaceBet}
-        disabled={!betAmount || Number.parseFloat(betAmount) > userBalance || isOverLimit}
-        className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-      >
-        Confirmer le pari
-      </button>
+      {betAmount && Number.parseFloat(betAmount) > userBalance ? (
+        <Link
+          href="/shop/buy-zeny"
+          className="w-full py-4 rounded-lg bg-amber-500 text-black font-bold text-lg tracking-tight uppercase hover:bg-amber-400 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+        >
+          <Plus className="w-5 h-5" />
+          Recharger (Solde insuffisant)
+        </Link>
+      ) : (
+        <button
+          onClick={handlePlaceBet}
+          disabled={!betAmount || isOverLimit}
+          className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        >
+          Confirmer le pari
+        </button>
+      )}
     </>
   )
 }

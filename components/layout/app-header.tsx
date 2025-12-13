@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { Trophy, Zap, User, LogOut } from "lucide-react"
+import { Trophy, Zap, User, LogOut, Plus } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
@@ -44,11 +44,18 @@ export function AppHeader() {
 
             {/* Wallet - only show when authenticated */}
             {isAuthenticated && (
-              <div className="px-4 py-2.5 rounded-lg bg-card border border-border">
+              <Link 
+                href="/shop/buy-zeny"
+                className="px-3 sm:px-4 py-2.5 rounded-lg bg-card border border-border hover:bg-primary/5 hover:border-primary/30 transition-all group flex items-center gap-2"
+                title="Recharger des Zeny"
+              >
                 <span className="flex items-center gap-1 text-sm font-semibold tracking-tight">
-                  <span className="font-mono font-bold">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
+                  <span className="font-mono font-bold group-hover:text-primary transition-colors">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
                 </span>
-              </div>
+                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                  <Plus className="w-3 h-3" />
+                </div>
+              </Link>
             )}
 
             {/* Login/User button */}
