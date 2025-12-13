@@ -68,9 +68,13 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
                 <Zap className="w-3 h-3" />
                 Live Event
               </div>
-            ) : (
+            ) : featuredMarket.status === 'resolved' || featuredMarket.resolved_at ? (
               <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-tight uppercase">
                 Terminé
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold tracking-tight uppercase">
+                En attente
               </div>
             )}
             <h2 className="text-3xl font-bold tracking-tight text-balance leading-tight text-shadow-lg">
