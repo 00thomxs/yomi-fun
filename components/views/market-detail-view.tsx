@@ -532,10 +532,10 @@ function BinaryMarketContent({
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
               timeframe === tf
-                ? "bg-primary text-primary-foreground"
-                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20"
+                ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
+                : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
             }`}
           >
             {tf}
@@ -1094,10 +1094,10 @@ function MultiMarketContent({
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap cursor-pointer border ${
                   timeframe === tf
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-white/5 border border-border hover:border-white/20"
+                    ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
+                    : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
                 }`}
               >
                 {tf}

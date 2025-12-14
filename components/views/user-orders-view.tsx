@@ -54,7 +54,7 @@ export function UserOrdersView({ initialOrders }: UserOrdersViewProps) {
         <div className="flex items-center gap-4">
           <Link 
             href="/shop"
-            className="p-2 hover:bg-card rounded-lg transition-colors"
+            className="p-2 hover:bg-card border border-transparent hover:border-white/10 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -80,7 +80,7 @@ export function UserOrdersView({ initialOrders }: UserOrdersViewProps) {
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg font-medium hover:bg-primary/20 transition-all"
           >
             <ShoppingBag className="w-5 h-5" />
             Découvrir le Shop
