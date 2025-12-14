@@ -353,7 +353,7 @@ export function ProfileView() {
             <img
               src={user?.avatar || "/images/default-avatar.svg"}
               alt="User Avatar"
-              className="w-20 h-20 rounded-full border-4 border-card ring-2 ring-white/10 object-cover relative z-10"
+              className="w-20 h-20 rounded-full border-4 border-card ring-4 ring-primary/50 object-cover relative z-10"
             />
           </div>
           <div className="flex-1 space-y-4 w-full">
@@ -563,22 +563,19 @@ export function ProfileView() {
                         {tx.outcome_name} • Mise: {tx.amount}
                       </span>
                     </div>
-                    <span className="col-span-2 flex items-center">
+                    <span className="col-span-2 flex items-center justify-center">
                       {isWin && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          <ArrowUpRight className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.15)] uppercase tracking-wider">
                           GAGNÉ
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                          <ArrowDownRight className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider">
                           PERDU
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                          <Clock className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse uppercase tracking-wider">
                           EN COURS
                         </span>
                       )}
