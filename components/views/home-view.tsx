@@ -141,15 +141,15 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={`
-                  flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold tracking-tight transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer
+                  flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold tracking-tight transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer border
                   ${
                     activeCategory === category.id
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground border border-border hover:border-white/20 hover:text-foreground"
+                      ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
+                      : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
                   }
                 `}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
                 {category.label}
               </button>
             )
