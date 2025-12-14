@@ -346,40 +346,37 @@ export function ProfileView() {
       </div>
 
       {/* Profile Header */}
-      <div className="rounded-xl bg-card border border-white/10 p-4 sm:p-6 shadow-2xl shadow-black/50">
+      <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
-            <img
-              src={user?.avatar || "/images/default-avatar.svg"}
-              alt="User Avatar"
-              className="w-20 h-20 rounded-full border-4 border-card ring-4 ring-primary/50 object-cover relative z-10"
-            />
-          </div>
+          <img
+            src={user?.avatar || "/images/default-avatar.svg"}
+            alt="User Avatar"
+            className="w-20 h-20 rounded-full border-4 border-primary/50 ring-4 ring-primary/20 object-cover shrink-0"
+          />
           <div className="flex-1 space-y-4 w-full">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-white">@{user?.username || "Utilisateur"}</h3>
+                <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
                 
                 {/* Level & XP Progress */}
                 <div className="mt-2 space-y-1.5 min-w-[180px] sm:min-w-[200px]">
-                  <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                  <div className="flex justify-between text-xs font-medium">
                     <span className="text-muted-foreground">Niveau <span className="text-primary">{userStats.level}</span></span>
                     <span className="text-muted-foreground"><span className="text-foreground">{userStats.xp % 1000}</span> / 1000 XP</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary/50 to-primary rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(220,38,38,0.5)]"
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${(userStats.xp % 1000) / 10}%` }}
                     />
                   </div>
                 </div>
               </div>
-              <div className="px-5 py-3 rounded-xl bg-gradient-to-b from-primary/10 to-primary/5 border border-primary/20 shrink-0 shadow-[0_0_20px_rgba(220,38,38,0.1)]">
-                <p className="text-[10px] text-primary/80 uppercase tracking-widest font-bold text-center mb-1">Balance</p>
-                <p className="text-2xl font-black text-center text-white drop-shadow-md">
+              <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 shrink-0">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
+                <p className="text-xl font-bold text-center">
                   <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
-                  <CurrencySymbol className="text-primary inline-block" />
+                  <CurrencySymbol className="text-primary" />
                 </p>
               </div>
             </div>
@@ -389,7 +386,7 @@ export function ProfileView() {
                 {badges.map((badge, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold flex items-center gap-1.5 text-muted-foreground hover:text-white hover:bg-white/10 transition-colors cursor-default"
+                    className="px-3 py-1.5 rounded-lg bg-white/5 border border-border text-sm font-medium flex items-center gap-1.5"
                   >
                     <span>{badge.icon}</span>
                     <span>{badge.label}</span>
@@ -398,24 +395,24 @@ export function ProfileView() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-white/5">
-              <div className="text-center sm:text-left p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Win Rate</p>
-                <p className="text-base sm:text-lg font-black font-mono text-white">{userStats.winRate}%</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-border">
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
+                <p className="text-base sm:text-lg font-bold font-mono">{userStats.winRate}%</p>
               </div>
-              <div className="text-center sm:text-left p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Paris</p>
-                <p className="text-base sm:text-lg font-black font-mono text-white">{userStats.totalBets}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Paris</p>
+                <p className="text-base sm:text-lg font-bold font-mono">{userStats.totalBets}</p>
               </div>
-              <div className="text-center sm:text-left p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Streak</p>
-                <p className="text-base sm:text-lg font-black font-mono flex items-center justify-center sm:justify-start gap-1 text-white">
-                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500/20" /> {userStats.currentStreak}
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
+                <p className="text-base sm:text-lg font-bold font-mono flex items-center justify-center sm:justify-start gap-1">
+                  <Flame className="w-4 h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
-              <div className="text-center sm:text-left p-2 rounded-lg hover:bg-white/5 transition-colors">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">PnL Net</p>
-                <p className={`text-base sm:text-lg font-black font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]" : "text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]"}`}>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
+                <p className={`text-base sm:text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
                 </p>
               </div>
@@ -523,9 +520,8 @@ export function ProfileView() {
       </div>
 
       {/* Transaction History */}
-      <div className="rounded-xl bg-card border border-white/10 overflow-hidden shadow-lg">
-        <div className="p-4 border-b border-white/10 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-primary" />
+      <div className="rounded-xl bg-card border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
           <p className="text-sm font-bold tracking-tight uppercase">Historique des paris</p>
         </div>
         {loadingHistory ? (
@@ -533,67 +529,67 @@ export function ProfileView() {
             <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
           </div>
         ) : history.length === 0 ? (
-          <div className="p-12 text-center flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-2">
-              <Clock className="w-6 h-6 text-muted-foreground/50" />
-            </div>
-            <p className="text-muted-foreground font-medium">Aucun pari pour le moment</p>
-            <p className="text-xs text-muted-foreground/60">Tes futures victoires apparaîtront ici</p>
+          <div className="p-8 text-center">
+            <p className="text-muted-foreground">Aucun pari pour le moment</p>
+            <p className="text-sm text-muted-foreground mt-1">Place ton premier pari pour commencer !</p>
           </div>
         ) : (
-          <div className="space-y-1 p-2">
-            {/* Mobile-first card layout instead of table */}
-            {history.map((tx) => {
-              const date = new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-              const isWin = tx.status === 'won'
-              const isLost = tx.status === 'lost'
-              const isPending = tx.status === 'pending'
-              
-              return (
-                <div key={tx.id} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/5 flex items-center justify-between gap-3">
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+          <>
+            <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <span className="col-span-3">Date</span>
+              <span className="col-span-4">Event</span>
+              <span className="col-span-2">Status</span>
+              <span className="col-span-3 text-right">Gain/Perte</span>
+            </div>
+            <div className="divide-y divide-border">
+              {history.map((tx, idx) => {
+                const date = new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                const isWin = tx.status === 'won'
+                const isLost = tx.status === 'lost'
+                const isPending = tx.status === 'pending'
+                
+                return (
+                  <div key={tx.id} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
+                    <span className="col-span-3 font-mono text-muted-foreground text-xs flex items-center">{date}</span>
+                    <div className="col-span-4 flex flex-col justify-center">
+                      <span className="font-medium truncate text-xs">{tx.market_question}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        Choix: <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                          {tx.direction === 'NO' ? "NON " : tx.direction === 'YES' && tx.outcome_name !== 'OUI' && tx.outcome_name !== 'NON' ? "OUI " : ""}
+                        </span>
+                        {tx.outcome_name} • Mise: {tx.amount}
+                      </span>
+                    </div>
+                    <span className="col-span-2 flex items-center">
                       {isWin && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider shrink-0">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          <ArrowUpRight className="w-3 h-3" />
                           GAGNÉ
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wider shrink-0">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                          <ArrowDownRight className="w-3 h-3" />
                           PERDU
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse uppercase tracking-wider shrink-0">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                          <Clock className="w-3 h-3" />
                           EN COURS
                         </span>
                       )}
-                      <span className="text-[10px] font-mono text-muted-foreground truncate">{date}</span>
-                    </div>
-                    
-                    <p className="font-medium text-xs truncate text-white/90">{tx.market_question}</p>
-                    
-                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                      <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
-                        {tx.direction === 'NO' ? "NON" : "OUI"}
-                      </span>
-                      <span className="mx-1">•</span>
-                      {tx.outcome_name}
-                      <span className="mx-1">•</span>
-                      Mise: {tx.amount.toLocaleString()}
-                    </p>
+                    </span>
+                    <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
+                      isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
+                    }`}>
+                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
+                    </span>
                   </div>
-
-                  <div className={`text-right font-mono font-bold text-sm shrink-0 ${
-                    isWin ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]" : isLost ? "text-rose-400" : "text-muted-foreground"
-                  }`}>
-                    {isWin ? `+${Math.round(tx.potential_payout - tx.amount).toLocaleString()}` : isLost ? `-${tx.amount.toLocaleString()}` : "..."} 
-                    <span className="text-[10px] ml-0.5">Ƶ</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>
