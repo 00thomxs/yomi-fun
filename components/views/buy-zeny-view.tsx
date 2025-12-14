@@ -173,7 +173,7 @@ export function BuyZenyView() {
                 disabled={!!loadingId}
                 className={`mt-8 w-full py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all relative overflow-hidden
                   ${theme.popular
-                    ? 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20' 
+                    ? 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none' 
                     : 'bg-white/5 hover:bg-white/10 text-foreground border border-white/5 hover:border-white/10'
                   }
                 `}
