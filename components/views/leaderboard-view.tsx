@@ -175,7 +175,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
       {/* Last Season Winners Banner */}
       {!hasSeason && lastSeason && (
-        <div className="w-full max-w-[95%] mx-auto rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-purple-500/10 border border-purple-500/30 p-4 relative overflow-hidden shadow-lg">
+        <div className="w-full max-w-[95%] mx-auto rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-purple-500/10 border border-purple-500/30 p-4 relative overflow-hidden shadow-lg mb-8">
           <div className="absolute top-0 right-0 p-2 opacity-10">
             <Trophy className="w-24 h-24 rotate-12 text-purple-500" />
           </div>
