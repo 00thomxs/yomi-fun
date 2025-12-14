@@ -312,32 +312,40 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
-            <div className="w-full h-[260px] rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
+            <div className="w-full h-[260px] rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl shadow-black/50 group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              <span className="text-2xl font-black text-white/20 absolute top-2 left-3">#2</span>
+              <span className="text-4xl font-black text-white/5 absolute -top-2 left-2 select-none">2</span>
               
               <div className="relative mt-4">
                 <div className="absolute inset-0 bg-white/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
-              <img
-                src={top2.avatar}
-                alt={top2.username}
-                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-white/20 object-cover relative z-10"
-              />
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-gray-300 to-gray-500 blur-md opacity-50" />
+                  <img
+                    src={top2.avatar}
+                    alt={top2.username}
+                    className="w-16 h-16 rounded-full border-2 border-gray-400 object-cover relative z-10"
+                  />
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-black font-bold text-xs shadow-lg border border-white">
+                  2
+                </div>
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+                <p className="font-bold text-sm truncate px-2 text-gray-200">@{top2.username}</p>
+                <div className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                  <span className="text-[10px] text-gray-400 font-mono font-bold">{top2.winRate}% WR</span>
+                </div>
               </div>
               
               <div className="w-full pt-3 border-t border-white/5 text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-bold">PNL</p>
                 <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-rose-400'}`}>
                   {top2.totalWon >= 0 ? '+' : ''}{Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/5 text-[10px] font-bold text-white border border-white/10">
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-white border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]">
                     +{getZenyReward(2).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
@@ -347,39 +355,49 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </div>
 
         {/* 1st Place */}
-        <div className="flex flex-col items-center w-full z-10">
+        <div className="flex flex-col items-center w-full z-10 -mt-8">
           {top1 ? (
-            <div className="w-full h-[300px] rounded-xl bg-black border border-amber-500/50 p-5 flex flex-col items-center justify-between relative overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.15)] group hover:-translate-y-1 transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50" />
+            <div className="w-full h-[300px] rounded-xl bg-gradient-to-b from-[#1a1a1a] to-black border border-amber-500/30 p-5 flex flex-col items-center justify-between relative overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)] group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-50" />
               
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-amber-500/20 blur-2xl rounded-full" />
+              <span className="text-6xl font-black text-amber-500/5 absolute -top-4 left-2 select-none">1</span>
               
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-                <Trophy className="w-8 h-8 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-amber-500/20 blur-[60px] rounded-full pointer-events-none" />
+              
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 animate-bounce duration-[3000ms]">
+                <Crown className="w-8 h-8 text-amber-400 fill-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
               </div>
               
-              <div className="relative mt-10">
-                <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
-              <img
-                src={top1.avatar}
-                alt={top1.username}
-                  className="w-20 h-20 rounded-full border-4 border-amber-500/30 ring-2 ring-amber-500/50 object-cover relative z-10"
-              />
+              <div className="relative mt-8">
+                <div className="absolute inset-0 bg-amber-500/40 blur-xl rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-amber-300 to-amber-600 blur-md opacity-60" />
+                  <img 
+                    src={top1.avatar} 
+                    alt={top1.username}
+                    className="w-20 h-20 rounded-full border-[3px] border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)] object-cover relative z-10"
+                  />
+                </div>
+                <div className="absolute -bottom-3 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center text-black font-black text-sm shadow-lg border-2 border-black z-20">
+                  1
+                </div>
               </div>
               
-              <div className="text-center w-full relative z-10">
-                <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
-                <p className="text-xs text-amber-500/80 font-mono mt-1 font-bold">{top1.winRate}% WR</p>
+              <div className="text-center w-full relative z-10 mt-2">
+                <p className="font-black text-lg truncate px-2 text-transparent bg-clip-text bg-gradient-to-b from-amber-100 to-amber-400">@{top1.username}</p>
+                <div className="inline-flex items-center gap-1 mt-1 px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                  <span className="text-xs text-amber-400 font-mono font-bold">{top1.winRate}% WR</span>
+                </div>
               </div>
               
-              <div className="w-full pt-3 border-t border-amber-500/20 text-center relative z-10">
-                <p className="text-xs text-amber-500/60 uppercase tracking-wider mb-1">PNL</p>
+              <div className="w-full pt-4 border-t border-amber-500/10 text-center relative z-10 bg-gradient-to-t from-amber-500/5 to-transparent -mx-5 px-5 -mb-5 pb-5">
+                <p className="text-[10px] text-amber-500/60 uppercase tracking-widest mb-1 font-bold">PNL TOTAL</p>
                 <p className={`text-2xl font-black font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
-                  <span className="inline-flex items-center gap-0.5 sm:gap-1 mt-2 px-2 sm:px-3 py-0.5 rounded-full bg-amber-500/20 text-[9px] sm:text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                    +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
+                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-[10px] sm:text-xs font-black text-amber-300 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                    +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-3 h-3" />
                   </span>
                 )}
               </div>
@@ -390,28 +408,36 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 3rd Place */}
         <div className="flex flex-col items-center w-full">
           {top3 ? (
-            <div className="w-full h-[230px] rounded-xl bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
+            <div className="w-full h-[230px] rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              <span className="text-2xl font-black text-orange-500/20 absolute top-2 left-3">#3</span>
+              <span className="text-4xl font-black text-white/5 absolute -top-2 left-2 select-none">3</span>
               
               <div className="relative mt-2">
                 <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
-              <img
-                src={top3.avatar}
-                alt={top3.username}
-                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-orange-500/20 object-cover relative z-10"
-              />
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-orange-400 to-orange-700 blur-md opacity-50" />
+                  <img
+                    src={top3.avatar}
+                    alt={top3.username}
+                    className="w-14 h-14 rounded-full border-2 border-orange-500 object-cover relative z-10"
+                  />
+                </div>
+                <div className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-[10px] shadow-lg border border-black">
+                  3
+                </div>
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+                <p className="font-bold text-sm truncate px-2 text-orange-100">@{top3.username}</p>
+                <div className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                  <span className="text-[10px] text-orange-400/80 font-mono font-bold">{top3.winRate}% WR</span>
+                </div>
               </div>
               
-              <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
-                <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
+              <div className="w-full pt-3 border-t border-white/5 text-center relative z-10">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 font-bold">PNL</p>
+                <p className={`text-base font-black font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
                   {top3.totalWon >= 0 ? '+' : ''}{Math.abs(top3.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
