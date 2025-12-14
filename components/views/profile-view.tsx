@@ -523,8 +523,9 @@ export function ProfileView() {
       </div>
 
       {/* Transaction History */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
-        <div className="p-4 border-b border-border">
+      <div className="rounded-xl bg-card border border-white/10 overflow-hidden shadow-lg">
+        <div className="p-4 border-b border-white/10 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-primary" />
           <p className="text-sm font-bold tracking-tight uppercase">Historique des paris</p>
         </div>
         {loadingHistory ? (
@@ -532,64 +533,67 @@ export function ProfileView() {
             <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
           </div>
         ) : history.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground">Aucun pari pour le moment</p>
-            <p className="text-sm text-muted-foreground mt-1">Place ton premier pari pour commencer !</p>
+          <div className="p-12 text-center flex flex-col items-center gap-2">
+            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-2">
+              <Clock className="w-6 h-6 text-muted-foreground/50" />
+            </div>
+            <p className="text-muted-foreground font-medium">Aucun pari pour le moment</p>
+            <p className="text-xs text-muted-foreground/60">Tes futures victoires apparaîtront ici</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              <span className="col-span-3">Date</span>
-              <span className="col-span-4">Event</span>
-              <span className="col-span-2">Status</span>
-              <span className="col-span-3 text-right">Gain/Perte</span>
-            </div>
-            <div className="divide-y divide-border">
-              {history.map((tx, idx) => {
-                const date = new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-                const isWin = tx.status === 'won'
-                const isLost = tx.status === 'lost'
-                const isPending = tx.status === 'pending'
-                
-                return (
-                  <div key={tx.id} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
-                    <span className="col-span-3 font-mono text-muted-foreground text-xs flex items-center">{date}</span>
-                    <div className="col-span-4 flex flex-col justify-center">
-                      <span className="font-medium truncate text-xs">{tx.market_question}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        Choix: <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
-                          {tx.direction === 'NO' ? "NON " : tx.direction === 'YES' && tx.outcome_name !== 'OUI' && tx.outcome_name !== 'NON' ? "OUI " : ""}
-                        </span>
-                        {tx.outcome_name} • Mise: {tx.amount}
-                      </span>
-                    </div>
-                    <span className="col-span-2 flex items-center justify-center">
+          <div className="space-y-1 p-2">
+            {/* Mobile-first card layout instead of table */}
+            {history.map((tx) => {
+              const date = new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+              const isWin = tx.status === 'won'
+              const isLost = tx.status === 'lost'
+              const isPending = tx.status === 'pending'
+              
+              return (
+                <div key={tx.id} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/5 flex items-center justify-between gap-3">
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
                       {isWin && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.15)] uppercase tracking-wider">
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider shrink-0">
                           GAGNÉ
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider">
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wider shrink-0">
                           PERDU
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse uppercase tracking-wider">
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse uppercase tracking-wider shrink-0">
                           EN COURS
                         </span>
                       )}
-                    </span>
-                    <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
-                      isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
-                    }`}>
-                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
-                    </span>
+                      <span className="text-[10px] font-mono text-muted-foreground truncate">{date}</span>
+                    </div>
+                    
+                    <p className="font-medium text-xs truncate text-white/90">{tx.market_question}</p>
+                    
+                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                      <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                        {tx.direction === 'NO' ? "NON" : "OUI"}
+                      </span>
+                      <span className="mx-1">•</span>
+                      {tx.outcome_name}
+                      <span className="mx-1">•</span>
+                      Mise: {tx.amount.toLocaleString()}
+                    </p>
                   </div>
-                )
-              })}
-            </div>
-          </>
+
+                  <div className={`text-right font-mono font-bold text-sm shrink-0 ${
+                    isWin ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]" : isLost ? "text-rose-400" : "text-muted-foreground"
+                  }`}>
+                    {isWin ? `+${Math.round(tx.potential_payout - tx.amount).toLocaleString()}` : isLost ? `-${tx.amount.toLocaleString()}` : "..."} 
+                    <span className="text-[10px] ml-0.5">Ƶ</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         )}
       </div>
     </div>
