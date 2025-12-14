@@ -23,7 +23,9 @@ function NavLink({
     <Link
       href={href}
       className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-all ${
-        active ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+        active 
+          ? "bg-primary/10 text-primary shadow-[0_0_15px_rgba(220,38,38,0.15)]" 
+          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
       }`}
     >
       {icon}

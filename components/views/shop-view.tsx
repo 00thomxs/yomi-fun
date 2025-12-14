@@ -115,7 +115,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link 
             href="/shop/buy-zeny"

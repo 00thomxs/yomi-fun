@@ -32,7 +32,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         tabIndex={0}
         onClick={() => onMarketClick(market)}
         onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-        className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer"
+        className="group relative overflow-hidden rounded-xl bg-card border border-white/10 hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg hover:shadow-primary/5"
       >
         <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
           {market.bgImage ? (
@@ -188,7 +188,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       tabIndex={0}
       onClick={() => onMarketClick(market)}
       onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-      className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer"
+      className="group relative overflow-hidden rounded-xl bg-card border border-white/10 hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg hover:shadow-primary/5"
     >
       <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
         {market.bgImage ? (

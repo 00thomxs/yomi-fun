@@ -27,7 +27,9 @@ function SidebarLink({
     <Link
       href={href}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-        active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+        active 
+          ? "bg-primary/10 text-primary border-l-2 border-primary shadow-[0_0_15px_rgba(220,38,38,0.15)]" 
+          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
       }`}
     >
       {icon}
