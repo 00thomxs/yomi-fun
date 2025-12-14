@@ -223,7 +223,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       {hasSeason && (
         <div className="space-y-6 flex flex-col items-center">
           {/* Rewards Card - Golden Border Style */}
-          <div className="w-full max-w-[95%] rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-lg">
+          <div className="w-full max-w-[95%] rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-2xl shadow-amber-500/5">
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <Trophy className="w-32 h-32 rotate-12 text-amber-500" />
             </div>
@@ -236,7 +237,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* 1st Place */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 bg-amber-500/5 rounded-xl p-3 border border-amber-500/10">
                   <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
                       <Trophy className="w-6 h-6 text-amber-400" />
                     </div>
@@ -247,7 +248,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </div>
 
                 {/* 2nd Place */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-lg shrink-0">
                     <Medal className="w-5 h-5 text-white/80" />
                   </div>
@@ -258,7 +259,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 </div>
 
                 {/* 3rd Place */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 bg-orange-500/5 rounded-xl p-3 border border-orange-500/10">
                   <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg shrink-0">
                     <Medal className="w-5 h-5 text-orange-500" />
                   </div>
@@ -272,15 +273,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           </div>
 
           {/* Progress & Status Bar */}
-          <div className="w-full max-w-[90%] rounded-xl border border-border bg-card p-4 relative overflow-hidden shadow-md mb-2">
+          <div className="w-full max-w-[90%] rounded-xl border border-white/10 bg-card p-4 relative overflow-hidden shadow-lg mb-2">
             {/* Background glow */}
-            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
             
             <div className="flex items-end justify-between mb-3 relative z-10">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Saison en cours</p>
-                <p className="text-2xl font-black text-white flex items-baseline gap-2">
-                  {getCountdown()} <span className="text-sm font-normal text-muted-foreground">restants</span>
+                <p className="text-2xl font-black text-white flex items-baseline gap-2 tabular-nums tracking-tight">
+                  {getCountdown()} <span className="text-sm font-bold text-muted-foreground/50 uppercase">restants</span>
                 </p>
               </div>
               <div className="text-right">
@@ -292,14 +293,16 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             </div>
 
             {/* Progress Bar */}
-            <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
               <div 
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 to-primary transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 via-primary to-orange-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_15px_rgba(239,68,68,0.6)]"
                 style={{ width: `${progress}%` }}
-              />
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+              </div>
             </div>
             
-            <div className="flex justify-between mt-1.5 text-[9px] font-mono text-muted-foreground uppercase">
+            <div className="flex justify-between mt-2 text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider font-bold">
               <span>Début</span>
               <span>Fin</span>
             </div>
