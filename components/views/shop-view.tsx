@@ -119,7 +119,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link 
             href="/shop/buy-zeny"
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs sm:text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs sm:text-sm font-bold hover:bg-primary/20 transition-all shadow-[0_0_15px_rgba(220,38,38,0.15)]"
           >
             <CreditCard className="w-4 h-4" />
             <span className="hidden xs:inline">Acheter des</span> Zeny
@@ -202,12 +202,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     {item.stock === -1 ? 'Infini' : `${item.stock} dispo`}
                 </span>
               </div>
+              {/* Button - Always at bottom */}
               <button
-                  onClick={() => handlePurchaseClick(item)}
-                  disabled={isPurchasing || item.stock === 0}
-                  className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                onClick={() => handlePurchaseClick(item)}
+                disabled={isPurchasing || item.stock === 0}
+                className="w-full py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-bold text-sm tracking-tight uppercase hover:bg-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_10px_rgba(220,38,38,0.1)]"
               >
-                  {item.stock === 0 ? "Rupture" : "Acheter"}
+                {item.stock === 0 ? "Rupture" : "Acheter"}
               </button>
             </div>
           </div>

@@ -141,7 +141,7 @@ export function RightSidebar({
         </div>
         <Link
           href="/leaderboard"
-          className="block w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-bold tracking-tight uppercase hover:bg-primary/90 transition-all text-center"
+          className="block w-full py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm font-bold tracking-tight uppercase hover:bg-primary/20 transition-all text-center shadow-[0_0_10px_rgba(220,38,38,0.1)]"
         >
           Voir le Classement
         </Link>
