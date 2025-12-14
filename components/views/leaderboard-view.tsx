@@ -395,12 +395,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="w-full pt-4 border-t border-amber-500/10 text-center relative z-10 bg-gradient-to-t from-amber-500/5 to-transparent -mx-5 px-5 -mb-5 pb-5">
                 <p className="text-[10px] text-amber-500/60 uppercase tracking-widest mb-1 font-bold">PNL TOTAL</p>
-                <p className={`text-2xl font-black font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
+                <p className={`text-lg sm:text-2xl font-black font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-[10px] sm:text-xs font-black text-amber-300 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                    +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-[9px] sm:text-xs font-black text-amber-300 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                    +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   </span>
                 )}
               </div>
