@@ -41,7 +41,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
     <div className="space-y-6">
       {/* Featured Market Hero */}
       {featuredMarket && (
-        <div className="relative overflow-hidden rounded-xl bg-card border border-border h-[380px]">
+        <div className="relative overflow-hidden rounded-xl bg-card border border-white/10 h-[380px] shadow-2xl shadow-black/50">
           {featuredMarket.bgImage ? (
             <img
               src={featuredMarket.bgImage}
@@ -115,7 +115,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             {featuredMarket.isLive ? (
             <button
               onClick={() => onMarketClick(featuredMarket)}
-              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all cursor-pointer"
+              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all cursor-pointer shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
             >
               Predire maintenant
             </button>
