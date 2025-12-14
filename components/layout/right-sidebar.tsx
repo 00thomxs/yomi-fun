@@ -95,21 +95,43 @@ export function RightSidebar({
       )}
 
       {/* Top Players Widget */}
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+      <div className="rounded-xl bg-card border border-white/10 p-5 space-y-4">
         <div className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-primary" />
           <h3 className="text-sm font-bold tracking-tight uppercase">Top Traders</h3>
         </div>
         <div className="space-y-2">
           {topPlayers.map((player) => (
-            <div key={player.rank} className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-              <span className="text-sm font-bold text-muted-foreground w-6 font-mono">#{player.rank}</span>
-              {player.avatar && (
-                <img src={player.avatar} alt={player.username} className="w-6 h-6 rounded-full object-cover" />
-              )}
+            <div 
+              key={player.rank} 
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
+                player.rank === 1 
+                  ? "bg-amber-500/10 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]" 
+                  : "bg-white/5 border border-transparent"
+              }`}
+            >
+              <span className={`text-sm font-bold w-6 font-mono ${player.rank === 1 ? "text-amber-400" : "text-muted-foreground"}`}>
+                #{player.rank}
+              </span>
+              <div className="relative">
+                {player.avatar && (
+                  <img 
+                    src={player.avatar} 
+                    alt={player.username} 
+                    className={`w-8 h-8 rounded-full object-cover ${player.rank === 1 ? "ring-2 ring-amber-500/50" : ""}`} 
+                  />
+                )}
+                {player.rank === 1 && (
+                  <div className="absolute -top-2 -right-1">
+                    <Trophy className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  </div>
+                )}
+              </div>
               <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-semibold tracking-tight truncate">{player.username}</p>
-                <p className="text-xs text-muted-foreground font-mono">
+                <p className={`text-sm font-semibold tracking-tight truncate ${player.rank === 1 ? "text-amber-100" : ""}`}>
+                  {player.username}
+                </p>
+                <p className={`text-xs font-mono ${player.rank === 1 ? "text-amber-400" : "text-muted-foreground"}`}>
                   {player.points.toLocaleString()} <CurrencySymbol />
                 </p>
               </div>

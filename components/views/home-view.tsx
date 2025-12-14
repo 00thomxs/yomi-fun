@@ -174,7 +174,9 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             return "Events"
           })()}
         </h3>
-        <span className="text-sm text-muted-foreground font-mono">{filteredMarkets.length} Events</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 px-2 py-1 rounded-full text-muted-foreground font-mono">
+          {filteredMarkets.length} Events
+        </span>
       </div>
 
       {/* Markets Grid */}
@@ -184,8 +186,12 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             <MarketCard key={market.id} market={market} onMarketClick={onMarketClick} onBet={onBet} />
           ))
         ) : (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            Aucun événement trouvé.
+          <div className="col-span-full py-16 flex flex-col items-center justify-center text-center text-muted-foreground bg-card/30 rounded-xl border border-white/5 border-dashed">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Newspaper className="w-8 h-8 opacity-20" />
+            </div>
+            <p className="text-sm font-medium">Aucun événement disponible</p>
+            <p className="text-xs mt-1 opacity-50">Reviens plus tard pour de nouveaux paris !</p>
           </div>
         )}
       </div>
