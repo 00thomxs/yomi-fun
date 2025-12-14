@@ -435,10 +435,10 @@ export function ProfileView() {
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all cursor-pointer ${
+                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all cursor-pointer border ${
                   pnlTimeframe === tf
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-white/5 border border-border hover:border-white/20"
+                    ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
+                    : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
                 }`}
               >
                 {tf}
