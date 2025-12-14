@@ -426,14 +426,17 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       </div>
 
       {/* Leaderboard Table */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden mt-2">
-        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 sm:py-4 bg-black/20 text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider sm:tracking-widest">
+      <div className="space-y-2 mt-4">
+        {/* Header */}
+        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider sm:tracking-widest">
           <span className="col-span-1">#</span>
           <span className="col-span-5">Trader</span>
           <span className="col-span-2 text-center">WR</span>
           <span className="col-span-4 text-right">PnL</span>
         </div>
-        <div className="divide-y divide-border/40">
+        
+        {/* List */}
+        <div className="space-y-2">
           {rest.map((player, idx) => {
             const actualRank = idx + 4
             const reward = getZenyReward(actualRank)
@@ -442,11 +445,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             return (
               <div
                 key={player.id}
-                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-all hover:bg-white/[0.02] ${
-                  isMe ? "bg-primary/5 border-l-2 border-primary" : ""
+                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center rounded-xl border transition-all ${
+                  isMe 
+                    ? "bg-primary/5 border-primary/30 shadow-[0_0_15px_rgba(220,38,38,0.1)]" 
+                    : "bg-card border-white/5 hover:border-white/10"
                 }`}
               >
-                <span className="col-span-1 font-mono text-sm font-bold text-muted-foreground">#{actualRank}</span>
+                <span className="col-span-1 font-mono text-sm font-bold text-muted-foreground/50">#{actualRank}</span>
                 <div className="col-span-5 flex items-center gap-3 min-w-0">
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
                   <div className="flex flex-col min-w-0">
@@ -473,7 +478,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             )
           })}
           {players.length <= 3 && (
-            <div className="p-8 text-center text-sm text-muted-foreground italic">
+            <div className="p-8 text-center text-sm text-muted-foreground italic border border-white/5 rounded-xl bg-card">
               Le classement se remplit...
             </div>
           )}
