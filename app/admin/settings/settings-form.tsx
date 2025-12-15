@@ -2,7 +2,7 @@
 
 import { updateSeasonSettings, startSeason, endSeason, type SeasonSettings } from "./actions"
 import { useState, useEffect } from "react"
-import { Save, Calendar, Trophy, Coins, Loader2, Play, StopCircle, CheckCircle, XCircle, AlertTriangle, Clock, Link2, Unlink, ChevronRight } from "lucide-react"
+import { Save, Calendar, Trophy, Coins, Loader2, Play, StopCircle, CheckCircle, XCircle, AlertTriangle, Link2, Unlink, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
@@ -21,10 +21,16 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const [isEnding, setIsEnding] = useState(false)
   const [showEndConfirm, setShowEndConfirm] = useState(false)
   
-  // Date/Time state for better UX
+  // Date/Time state for better UX - using datetime-local format
   const initialDate = new Date(settings.season_end)
-  const [selectedDate, setSelectedDate] = useState(initialDate.toISOString().slice(0, 10))
-  const [selectedTime, setSelectedTime] = useState(initialDate.toTimeString().slice(0, 5))
+  const formatDateTimeLocal = (date: Date) => {
+    return date.getFullYear() + '-' + 
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0') + 'T' +
+      String(date.getHours()).padStart(2, '0') + ':' +
+      String(date.getMinutes()).padStart(2, '0')
+  }
+  const [seasonEndDateTime, setSeasonEndDateTime] = useState(formatDateTimeLocal(initialDate))
   
   // Markets linked to this season
   const [seasonMarkets, setSeasonMarkets] = useState<MarketForSeason[]>([])
@@ -124,24 +130,17 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const setDatePreset = (days: number) => {
     const date = new Date()
     date.setDate(date.getDate() + days)
-    setSelectedDate(date.toISOString().slice(0, 10))
-    setSelectedTime('23:59')
+    date.setHours(23, 59, 0, 0)
+    setSeasonEndDateTime(formatDateTimeLocal(date))
   }
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true)
     try {
-      // Combine date and time, then convert to ISO with timezone info
-      // The browser creates the Date in LOCAL timezone, then toISOString() converts to UTC
-      const localDate = new Date(`${selectedDate}T${selectedTime}:00`)
+      // Convert datetime-local to ISO with timezone info
+      const localDate = new Date(seasonEndDateTime)
       const isoDateTime = localDate.toISOString()
       formData.set('season_end', isoDateTime)
-      
-      console.log('Submitting season_end:', {
-        input: `${selectedDate}T${selectedTime}`,
-        localDate: localDate.toString(),
-        isoDateTime: isoDateTime
-      })
       
       const result = await updateSeasonSettings(formData)
       if (result.success) {
@@ -304,61 +303,49 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <h3 className="text-lg font-bold flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" /> Date de Fin de Saison
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Date</label>
+          <div className="space-y-2">
+            <div className="relative">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none font-mono text-lg"
+                type="datetime-local"
+                value={seasonEndDateTime}
+                onChange={(e) => setSeasonEndDateTime(e.target.value)}
+                className="w-full bg-black/20 border border-white/10 rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none text-white scheme-dark font-mono text-lg"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Clock className="w-4 h-4" /> Heure
-              </label>
-              <input
-                type="time"
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none font-mono text-lg"
-                required
-              />
+            {/* Date Presets */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-muted-foreground self-center mr-2">Raccourcis :</span>
+              <button
+                type="button"
+                onClick={() => setDatePreset(7)}
+                className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+              >
+                +7j
+              </button>
+              <button
+                type="button"
+                onClick={() => setDatePreset(14)}
+                className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+              >
+                +14j
+              </button>
+              <button
+                type="button"
+                onClick={() => setDatePreset(30)}
+                className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+              >
+                +1 mois
+              </button>
+              <button
+                type="button"
+                onClick={() => setDatePreset(90)}
+                className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
+              >
+                +3 mois
+              </button>
             </div>
-          </div>
-          {/* Date Presets */}
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-muted-foreground self-center mr-2">Raccourcis :</span>
-            <button
-              type="button"
-              onClick={() => setDatePreset(7)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              +7 jours
-            </button>
-            <button
-              type="button"
-              onClick={() => setDatePreset(14)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              +14 jours
-            </button>
-            <button
-              type="button"
-              onClick={() => setDatePreset(30)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              +1 mois
-            </button>
-            <button
-              type="button"
-              onClick={() => setDatePreset(90)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              +3 mois
-            </button>
           </div>
         </div>
 
@@ -526,7 +513,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                         {availableMarkets.map(market => {
                           // Check if market end date is within season end date
                           const marketEnd = new Date(market.closes_at)
-                          const seasonEndDate = new Date(`${selectedDate}T${selectedTime}:00`)
+                          const seasonEndDate = new Date(seasonEndDateTime)
                           const isCompatible = marketEnd <= seasonEndDate
                           
                           return (
