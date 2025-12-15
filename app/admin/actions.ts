@@ -25,12 +25,15 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   const isFeatured = formData.get('isFeatured') === 'on'
   const isHeadline = formData.get('isHeadline') === 'on'
   const outcomes = JSON.parse(formData.get('outcomes') as string)
+  
+  // New fields: Season and Initial Liquidity
+  const seasonId = formData.get('seasonId') as string || null
+  const initialLiquidityStr = formData.get('initialLiquidity') as string
+  const INITIAL_LIQUIDITY = initialLiquidityStr ? parseInt(initialLiquidityStr) : 10000
 
   const supabase = await createClient()
   
   // Calculate initial pools based on probability (for binary markets)
-  // Total liquidity = 10000 (5k/5k per side for balanced reactivity)
-  const INITIAL_LIQUIDITY = 10000
   let poolYes = INITIAL_LIQUIDITY / 2
   let poolNo = INITIAL_LIQUIDITY / 2
   
@@ -74,7 +77,8 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
       is_headline: isHeadline,
       volume: 0,
       pool_yes: poolYes,
-      pool_no: poolNo
+      pool_no: poolNo,
+      season_id: seasonId || null
     })
     .select()
     .single()

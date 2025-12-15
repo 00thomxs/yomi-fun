@@ -2,11 +2,13 @@
 
 import { createMarket } from "@/app/admin/actions"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart, Star } from "lucide-react"
+import { Calendar, Image as ImageIcon, Type, List, Plus, X, Clock, PieChart, Star, Trophy, Coins } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 import { MARKET_CATEGORIES } from "@/lib/constants"
+import type { Season } from "@/lib/types"
 
 export default function CreateMarketPage() {
   const router = useRouter()
@@ -15,6 +17,39 @@ export default function CreateMarketPage() {
   
   // Market Type
   const [marketType, setMarketType] = useState<'binary' | 'multi'>('binary')
+  
+  // Season selector state
+  const [seasons, setSeasons] = useState<Season[]>([])
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string>("")
+  const [closesAtValue, setClosesAtValue] = useState<string>("")
+  
+  // Initial liquidity (seed)
+  const [initialLiquidity, setInitialLiquidity] = useState<number>(10000)
+  
+  // Fetch active seasons on mount
+  useEffect(() => {
+    const fetchSeasons = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('seasons')
+        .select('*')
+        .eq('is_active', true)
+        .order('end_date', { ascending: true })
+      
+      if (data) {
+        setSeasons(data)
+      }
+    }
+    fetchSeasons()
+  }, [])
+  
+  // Filter seasons: only show seasons whose end_date is AFTER the event's closes_at
+  const availableSeasons = seasons.filter(season => {
+    if (!closesAtValue) return true // Show all if no date selected yet
+    const eventEndDate = new Date(closesAtValue)
+    const seasonEndDate = new Date(season.end_date)
+    return seasonEndDate >= eventEndDate
+  })
   
   // Outcomes State
   const [binaryProb, setBinaryProb] = useState(50)
@@ -65,6 +100,8 @@ export default function CreateMarketPage() {
     
     formData.append('type', marketType)
     formData.append('outcomes', JSON.stringify(finalOutcomes))
+    formData.append('seasonId', selectedSeasonId || '')
+    formData.append('initialLiquidity', initialLiquidity.toString())
     
     const result = await createMarket(formData)
     
@@ -188,6 +225,17 @@ export default function CreateMarketPage() {
                   id="closesAt"
                   name="closesAt"
                   type="datetime-local"
+                  value={closesAtValue}
+                  onChange={(e) => {
+                    setClosesAtValue(e.target.value)
+                    // Reset season selection if the new date makes it invalid
+                    if (selectedSeasonId) {
+                      const selectedSeason = seasons.find(s => s.id === selectedSeasonId)
+                      if (selectedSeason && new Date(selectedSeason.end_date) < new Date(e.target.value)) {
+                        setSelectedSeasonId("")
+                      }
+                    }
+                  }}
                   className="w-full bg-white/5 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none text-white scheme-dark"
                   required
                 />
@@ -205,8 +253,7 @@ export default function CreateMarketPage() {
                       String(date.getDate()).padStart(2, '0') + 'T' +
                       String(date.getHours()).padStart(2, '0') + ':' +
                       String(date.getMinutes()).padStart(2, '0')
-                    const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = localString
+                    setClosesAtValue(localString)
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
@@ -222,8 +269,7 @@ export default function CreateMarketPage() {
                       String(date.getDate()).padStart(2, '0') + 'T' +
                       String(date.getHours()).padStart(2, '0') + ':' +
                       String(date.getMinutes()).padStart(2, '0')
-                    const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = localString
+                    setClosesAtValue(localString)
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
@@ -239,8 +285,7 @@ export default function CreateMarketPage() {
                       String(date.getDate()).padStart(2, '0') + 'T' +
                       String(date.getHours()).padStart(2, '0') + ':' +
                       String(date.getMinutes()).padStart(2, '0')
-                    const input = document.getElementById('closesAt') as HTMLInputElement
-                    if (input) input.value = localString
+                    setClosesAtValue(localString)
                   }}
                   className="px-3 py-1.5 rounded bg-white/5 border border-border text-xs hover:bg-white/10 transition-all"
                 >
@@ -287,7 +332,105 @@ export default function CreateMarketPage() {
           </div>
         </div>
 
-        {/* 3. Probabilités & Réponses */}
+        {/* 3. Saison & Liquidité */}
+        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+          <h2 className="font-semibold flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-primary" />
+            Saison & Liquidité
+          </h2>
+
+          {/* Season Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Saison (Optionnel)
+            </label>
+            <select
+              value={selectedSeasonId}
+              onChange={(e) => setSelectedSeasonId(e.target.value)}
+              className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all"
+            >
+              <option value="">Aucune saison (Event global)</option>
+              {availableSeasons.map((season) => (
+                <option key={season.id} value={season.id}>
+                  {season.name} (jusqu'au {new Date(season.end_date).toLocaleDateString('fr-FR')})
+                </option>
+              ))}
+            </select>
+            {closesAtValue && availableSeasons.length === 0 && seasons.length > 0 && (
+              <p className="text-xs text-amber-400">
+                ⚠️ Aucune saison disponible - la date de fin de l'event dépasse toutes les saisons actives.
+              </p>
+            )}
+            {!closesAtValue && seasons.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                💡 Sélectionnez d'abord une date de fin pour voir les saisons compatibles.
+              </p>
+            )}
+            {seasons.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                Aucune saison active. Les events créés ne compteront pas pour un classement saisonnier.
+              </p>
+            )}
+          </div>
+
+          {/* Initial Liquidity */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Coins className="w-3 h-3" />
+              Liquidité Initiale (Seed)
+            </label>
+            <div className="flex gap-3 items-center">
+              <input
+                type="number"
+                value={initialLiquidity}
+                onChange={(e) => setInitialLiquidity(Math.max(100, parseInt(e.target.value) || 1000))}
+                min="100"
+                step="1000"
+                className="flex-1 bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all font-mono"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setInitialLiquidity(1000)}
+                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                    initialLiquidity === 1000 
+                      ? 'bg-primary/20 text-primary border border-primary/50' 
+                      : 'bg-white/5 border border-border hover:bg-white/10'
+                  }`}
+                >
+                  1K
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInitialLiquidity(5000)}
+                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                    initialLiquidity === 5000 
+                      ? 'bg-primary/20 text-primary border border-primary/50' 
+                      : 'bg-white/5 border border-border hover:bg-white/10'
+                  }`}
+                >
+                  5K
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInitialLiquidity(10000)}
+                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                    initialLiquidity === 10000 
+                      ? 'bg-primary/20 text-primary border border-primary/50' 
+                      : 'bg-white/5 border border-border hover:bg-white/10'
+                  }`}
+                >
+                  10K
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Plus la liquidité est élevée, plus les cotes sont stables. Recommandé : 5K-10K.
+            </p>
+          </div>
+        </div>
+
+        {/* 4. Probabilités & Réponses */}
         <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <List className="w-4 h-4 text-primary" />
