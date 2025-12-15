@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Crown, Target, Clock, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -47,18 +47,21 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isMetaLoading, setIsMetaLoading] = useState(true) // season settings + activeSeasonId bootstrap
   const [seasonSettings, setSeasonSettings] = useState<SeasonSettings | null>(null)
   const [lastSeason, setLastSeason] = useState<PastSeason | null>(null)
   const [viewMode, setViewMode] = useState<'season' | 'global'>('season') // Toggle state
   const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
   const [seasonEvents, setSeasonEvents] = useState<SeasonEvent[]>([])
   const [eventsExpanded, setEventsExpanded] = useState(false)
+  const rewardsCheckedRef = useRef(false)
 
   // Fetch season settings on mount
   useEffect(() => {
     let isMounted = true
     
     const fetchSeasonSettings = async () => {
+      if (isMounted) setIsMetaLoading(true)
       try {
         const settings = await getSeasonSettings()
         if (!isMounted) return
@@ -68,7 +71,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         if (settings?.is_active) {
           // Get active season ID from seasons table
           const supabase = createClient()
-          const { data: activeSeason } = await supabase
+          const { data: activeSeason, error: activeSeasonError } = await supabase
             .from('seasons')
             .select('id')
             .eq('is_active', true)
@@ -76,31 +79,20 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           
           if (!isMounted) return
           
-          if (activeSeason) {
+          if (!activeSeasonError && activeSeason) {
             setActiveSeasonId(activeSeason.id)
+            // Ensure we stay in season mode when season is active
+            setViewMode('season')
           } else {
             // Season settings says active but no season found in seasons table
             // Fallback to global
             setViewMode('global')
-          }
-          
-          // Check for reward distribution (don't reload, just update state)
-          const { distributed, message } = await checkAndDistributeRewards()
-          if (distributed && isMounted) {
-            toast.success(message || "Récompenses distribuées !")
-            // Refetch settings instead of reloading
-            const newSettings = await getSeasonSettings()
-            if (isMounted) {
-              setSeasonSettings(newSettings)
-              if (!newSettings?.is_active) {
-                setViewMode('global')
-                setActiveSeasonId(null)
-              }
-            }
+            setActiveSeasonId(null)
           }
         } else {
           // If no active season, default to global view
           setViewMode('global')
+          setActiveSeasonId(null)
           const past = await getLastSeason()
           if (past && isMounted) {
             setLastSeason(past)
@@ -110,7 +102,10 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         console.error("Failed to fetch season settings", e)
         if (isMounted) {
           setViewMode('global')
+          setActiveSeasonId(null)
         }
+      } finally {
+        if (isMounted) setIsMetaLoading(false)
       }
     }
     
@@ -120,6 +115,34 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       isMounted = false
     }
   }, [])
+
+  // Admin-only: check/distribute rewards (avoid doing this for normal users on every refresh)
+  useEffect(() => {
+    if (rewardsCheckedRef.current) return
+    if (!user?.role || user.role !== 'admin') return
+    if (!seasonSettings?.is_active) return
+
+    rewardsCheckedRef.current = true
+
+    const run = async () => {
+      try {
+        const { distributed, message } = await checkAndDistributeRewards()
+        if (distributed) {
+          toast.success(message || "Récompenses distribuées !")
+          const newSettings = await getSeasonSettings()
+          setSeasonSettings(newSettings)
+          if (!newSettings?.is_active) {
+            setViewMode('global')
+            setActiveSeasonId(null)
+          }
+        }
+      } catch (e) {
+        console.error("checkAndDistributeRewards failed", e)
+      }
+    }
+
+    run()
+  }, [user?.role, seasonSettings?.is_active])
 
   // Fetch season events when there's an active season
   useEffect(() => {
@@ -147,11 +170,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   // Fetch leaderboard data based on viewMode
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      // Wait for season data to be loaded before fetching season leaderboard
-      if (viewMode === 'season' && seasonSettings?.is_active && !activeSeasonId) {
-        // Season mode is selected but activeSeasonId not yet loaded, wait...
-        return
-      }
+      // Wait for bootstrap (season settings + active season id) to finish
+      if (isMetaLoading) return
       
       setIsLoading(true)
       const supabase = createClient()
@@ -224,7 +244,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
     }
     
     fetchLeaderboard()
-  }, [viewMode, activeSeasonId, seasonSettings?.is_active])
+  }, [viewMode, activeSeasonId, seasonSettings?.is_active, isMetaLoading])
 
   const top1 = players[0]
   const top2 = players[1]
