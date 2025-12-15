@@ -99,17 +99,8 @@ export async function placeBet(
     return { error: `Choix invalide: ${outcomeName}` }
   }
 
-  // 2.5 Check if already bet
-  const { data: existingBet } = await supabase
-    .from('bets')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('market_id', marketId)
-    .single()
-
-  if (existingBet) {
-    return { error: "Vous avez déjà parié sur ce marché." }
-  }
+  // 2.5 Check if already bet - REMOVED for Multi-Bet support
+  // Users can now place multiple bets on the same market.
 
   // --- 3. CORE LOGIC ---
   const poolYes = Number(market.pool_yes) || 100
@@ -119,7 +110,7 @@ export async function placeBet(
 
   let odds = 0
   let potentialPayout = 0
-  const fee = amount * 0.02
+  const fee = amount * 0.05 // Fee increased to 5%
   const investment = amount - fee
 
   // Simplified Odds for all types: 1 / Probability
