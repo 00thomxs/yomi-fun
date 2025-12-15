@@ -38,6 +38,7 @@ type MarketData = {
   volume: number
   pool_yes: number
   pool_no: number
+  initial_liquidity: number
   season_id: string | null
   season?: { id: string; name: string } | null
 }
@@ -430,7 +431,9 @@ export default function EditMarketPage({ params }: PageProps) {
               <p className="font-bold font-mono">{market.volume?.toLocaleString() || 0}</p>
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Liquidité Pools</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                {market.type === 'binary' ? 'Liquidité Pools' : 'Flux OUI/NON (direction)'}
+              </p>
               <p className="font-bold font-mono text-sm">
                 OUI: {market.pool_yes?.toLocaleString() || 0} / NON: {market.pool_no?.toLocaleString() || 0}
               </p>
@@ -438,7 +441,10 @@ export default function EditMarketPage({ params }: PageProps) {
           </div>
           
           <p className="text-xs text-muted-foreground">
-            💡 Pour ajuster la liquidité, utilisez le compte admin pour placer des paris sur l'event.
+            {market.type === 'binary'
+              ? "💡 Pour ajuster la liquidité, utilisez le compte admin pour placer des paris sur l'event."
+              : "💡 Multi-choix : ces pools ne pilotent pas le prix, ils servent à suivre le flux OUI/NON (direction) pour détecter un déséquilibre."
+            }
           </p>
         </div>
 

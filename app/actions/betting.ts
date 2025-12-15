@@ -268,6 +268,15 @@ export async function placeBet(
        probability: (newProbsById[o.id] ?? o.probability) / 100, // Stored as decimal 0-1
      }))
      await supabaseAdmin.from('market_prices_history').insert(historyRows)
+
+     // Track direction liquidity for admin monitoring (does NOT affect multi pricing logic)
+     // This makes pool_yes / pool_no evolve over time so admins can spot "OUI vs NON" directional imbalance.
+     if (direction === 'YES') {
+       newPoolYes = poolYes + investment
+     } else {
+       newPoolNo = poolNo + investment
+     }
+     updateData = { ...updateData, pool_yes: newPoolYes, pool_no: newPoolNo }
   }
 
   const { error: updateError } = await supabase
