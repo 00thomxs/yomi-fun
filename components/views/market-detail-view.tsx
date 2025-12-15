@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Pl
 import Link from "next/link"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { ConfirmBetModal } from "@/components/ui/confirm-bet-modal"
 import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
@@ -450,6 +451,24 @@ function BinaryMarketContent({
   
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false)
+  
+  // Confirm modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [isPlacingBet, setIsPlacingBet] = useState(false)
+  
+  // Get display choice for modal
+  const displayChoice = betChoice === "YES" ? "OUI" : "NON"
+  
+  // Handle confirm bet with loading state
+  const handleConfirmBet = async () => {
+    setIsPlacingBet(true)
+    handlePlaceBet()
+    // Close modal after bet is placed
+    setTimeout(() => {
+      setShowConfirmModal(false)
+      setIsPlacingBet(false)
+    }, 500)
+  }
 
   // Transform data to have numeric timestamp for proper X axis scaling
   const chartDataWithTs = chartData.map((d: any) => ({
@@ -853,11 +872,22 @@ function BinaryMarketContent({
           setBetAmount={setBetAmount}
           userBalance={userBalance}
           calculatePayout={calculatePayout}
-          handlePlaceBet={handlePlaceBet}
+          handlePlaceBet={() => setShowConfirmModal(true)}
           hasBet={userBets && userBets.length > 0}
         />
       </div>
       )}
+      
+      {/* Confirm Bet Modal */}
+      <ConfirmBetModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmBet}
+        betAmount={Number.parseFloat(betAmount) || 0}
+        betChoice={displayChoice}
+        potentialGain={calculatePayout()}
+        isLoading={isPlacingBet}
+      />
     </>
   )
 }
@@ -907,6 +937,24 @@ function MultiMarketContent({
   
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false)
+  
+  // Confirm modal state
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [isPlacingBet, setIsPlacingBet] = useState(false)
+  
+  // Get display choice for modal (format: "OUI - Joueur1" or "NON - Joueur1")
+  const displayChoice = `${betType} ${betChoice}`
+  
+  // Handle confirm bet with loading state
+  const handleConfirmBet = async () => {
+    setIsPlacingBet(true)
+    handlePlaceBet()
+    // Close modal after bet is placed
+    setTimeout(() => {
+      setShowConfirmModal(false)
+      setIsPlacingBet(false)
+    }, 500)
+  }
 
   const toggleOutcome = (name: string) => {
     setVisibleOutcomes(prev => {
@@ -1409,11 +1457,22 @@ function MultiMarketContent({
           setBetAmount={setBetAmount}
           userBalance={userBalance}
           calculatePayout={calculatePayout}
-          handlePlaceBet={handlePlaceBet}
+          handlePlaceBet={() => setShowConfirmModal(true)}
           hasBet={userBets && userBets.length > 0}
         />
       </div>
       )}
+      
+      {/* Confirm Bet Modal */}
+      <ConfirmBetModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmBet}
+        betAmount={Number.parseFloat(betAmount) || 0}
+        betChoice={displayChoice}
+        potentialGain={calculatePayout()}
+        isLoading={isPlacingBet}
+      />
     </>
   )
 }
