@@ -49,6 +49,8 @@ type PageProps = {
 export default function EditMarketPage({ params }: PageProps) {
   const router = useRouter()
   const { toast } = useToast()
+
+  const WHALE_BET_THRESHOLD = 10000
   
   const [marketId, setMarketId] = useState<string | null>(null)
   const [market, setMarket] = useState<MarketData | null>(null)
@@ -206,6 +208,13 @@ export default function EditMarketPage({ params }: PageProps) {
 
   const isResolved = market.status === 'resolved'
   const hasSeasonLink = !!market.season_id
+
+  const getStatusBadge = (status: string) => {
+    if (status === 'won') return { label: 'GAGNÉ', cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' }
+    if (status === 'lost') return { label: 'PERDU', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20' }
+    if (status === 'cancelled') return { label: 'ANNULÉ', cls: 'bg-white/10 text-white/70 border-white/10' }
+    return { label: 'PENDING', cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' }
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
@@ -454,6 +463,15 @@ export default function EditMarketPage({ params }: PageProps) {
             </div>
           </div>
 
+          <div className="text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 font-bold text-[10px] uppercase tracking-wider">
+                Whale
+              </span>
+              = pari ≥ <span className="font-mono font-bold text-white/80">{WHALE_BET_THRESHOLD.toLocaleString()}</span>
+            </span>
+          </div>
+
           {loadingTopBets ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -469,6 +487,8 @@ export default function EditMarketPage({ params }: PageProps) {
                 const choiceLabel = market.type === 'binary'
                   ? b.outcome?.name
                   : `${dirLabel} ${b.outcome?.name}`
+                const isWhale = b.amount >= WHALE_BET_THRESHOLD
+                const status = getStatusBadge(b.status)
 
                 return (
                   <div
@@ -496,6 +516,16 @@ export default function EditMarketPage({ params }: PageProps) {
                     </div>
 
                     <div className="text-right shrink-0">
+                      <div className="flex items-center justify-end gap-2 mb-1">
+                        {isWhale && (
+                          <span className="px-2 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 font-bold text-[10px] uppercase tracking-wider">
+                            Whale
+                          </span>
+                        )}
+                        <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${status.cls}`}>
+                          {status.label}
+                        </span>
+                      </div>
                       <p className="text-sm font-black font-mono text-amber-400">
                         {b.amount.toLocaleString()}
                       </p>
