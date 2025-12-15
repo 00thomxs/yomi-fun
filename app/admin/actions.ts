@@ -25,7 +25,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
   const isFeatured = formData.get('isFeatured') === 'on'
   const isHeadline = formData.get('isHeadline') === 'on'
   const outcomes = JSON.parse(formData.get('outcomes') as string)
-  
+
   // New fields: Season and Initial Liquidity
   const seasonId = formData.get('seasonId') as string || null
   const initialLiquidityStr = formData.get('initialLiquidity') as string

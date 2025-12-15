@@ -151,7 +151,7 @@ export default async function AdminDashboard() {
                     </span>
                   )}
                 </p>
-              </div>
+          </div>
             </div>
 
             {/* Grouped Events */}
@@ -163,22 +163,22 @@ export default async function AdminDashboard() {
                     {monthLabel}
                     <span className="ml-2 text-xs font-normal">({monthMarkets.length} events)</span>
                   </h3>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-white/5 text-muted-foreground font-medium uppercase text-xs">
-                      <tr>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-white/5 text-muted-foreground font-medium uppercase text-xs">
+              <tr>
                         <th className="px-6 py-3 w-8"></th>
-                        <th className="px-6 py-3">Question</th>
-                        <th className="px-6 py-3">Catégorie</th>
-                        <th className="px-6 py-3">Volume</th>
-                        <th className="px-6 py-3">Status</th>
-                        <th className="px-6 py-3">Fin</th>
-                        <th className="px-6 py-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
+                <th className="px-6 py-3">Question</th>
+                <th className="px-6 py-3">Catégorie</th>
+                <th className="px-6 py-3">Volume</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Fin</th>
+                <th className="px-6 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
                       {monthMarkets.map((market) => (
                         <tr 
                           key={market.id} 
@@ -188,53 +188,55 @@ export default async function AdminDashboard() {
                         >
                           <td className="px-4 py-4">
                             {market.is_visible === false && (
-                              <EyeOff className="w-4 h-4 text-muted-foreground" title="Event caché" />
-                            )}
-                          </td>
-                          <td className="px-6 py-4 font-medium max-w-md truncate">
-                            {market.question}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10">
-                              {market.category}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 font-mono">
-                            {market.volume}
-                          </td>
-                          <td className="px-6 py-4">
-                            {market.status === 'open' ? (
-                              <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-bold uppercase">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                Live
-                              </span>
-                            ) : market.status === 'closed' ? (
-                              <span className="inline-flex items-center gap-1.5 text-amber-500 text-xs font-bold uppercase">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                En attente
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground text-xs font-bold uppercase">
-                                {market.status === 'resolved' ? 'Résolu' : market.status}
+                              <span title="Event caché">
+                                <EyeOff className="w-4 h-4 text-muted-foreground" />
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-muted-foreground">
-                            {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}
-                          </td>
-                          <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 font-medium max-w-md truncate">
+                    {market.question}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10">
+                      {market.category}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 font-mono">
+                    {market.volume}
+                  </td>
+                  <td className="px-6 py-4">
+                    {market.status === 'open' ? (
+                      <span className="inline-flex items-center gap-1.5 text-emerald-400 text-xs font-bold uppercase">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Live
+                      </span>
+                    ) : market.status === 'closed' ? (
+                      <span className="inline-flex items-center gap-1.5 text-amber-500 text-xs font-bold uppercase">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        En attente
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground text-xs font-bold uppercase">
+                        {market.status === 'resolved' ? 'Résolu' : market.status}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}
+                  </td>
+                  <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-1">
                               <VisibilityToggle 
                                 marketId={market.id} 
                                 isVisible={market.is_visible !== false} 
                               />
-                              <Link 
-                                href={`/market/${market.id}`}
-                                className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-                                title="Voir"
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                              </Link>
+                      <Link 
+                        href={`/market/${market.id}`}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                        title="Voir"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Link>
                               <Link
                                 href={`/admin/edit/${market.id}`}
                                 className="p-2 hover:bg-white/10 rounded-lg transition-colors text-amber-400 hover:text-amber-300"
@@ -242,23 +244,23 @@ export default async function AdminDashboard() {
                               >
                                 <Edit className="w-4 h-4" />
                               </Link>
-                              <CloseMarket marketId={market.id} isLive={market.is_live} />
-                              <Link
-                                href={`/admin/resolve/${market.id}`}
-                                className="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300"
-                                title="Résoudre"
-                              >
-                                <Gavel className="w-4 h-4" />
-                              </Link>
-                              <DeleteMarket marketId={market.id} />
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                      <CloseMarket marketId={market.id} isLive={market.is_live} />
+                      <Link
+                        href={`/admin/resolve/${market.id}`}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300"
+                        title="Résoudre"
+                      >
+                        <Gavel className="w-4 h-4" />
+                      </Link>
+                      <DeleteMarket marketId={market.id} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
             ))}
 
             {(!markets || markets.length === 0) && (

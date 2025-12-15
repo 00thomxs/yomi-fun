@@ -316,14 +316,14 @@ export async function endSeason() {
   // Fallback to global stats if no season data
   if (top10Data.length === 0) {
     const { data: globalTop10, error: top10Error } = await supabaseAdmin
-      .from('profiles')
-      .select('id, username, balance, avatar_url, role')
+    .from('profiles')
+    .select('id, username, balance, avatar_url, role')
       .neq('role', 'admin')
-      .order('total_won', { ascending: false })
-      .limit(10)
+    .order('total_won', { ascending: false })
+    .limit(10)
 
     if (top10Error || !globalTop10) {
-      return { error: `Erreur récupération classement: ${top10Error?.message}` }
+    return { error: `Erreur récupération classement: ${top10Error?.message}` }
     }
     top10Data = globalTop10
     console.log('[endSeason] Fallback to profiles.total_won for ranking')
@@ -511,14 +511,14 @@ async function endSeasonInternal(settings: any) {
   // Fallback to global stats if no season data
   if (top10Data.length === 0) {
     const { data: globalTop10 } = await supabaseAdmin
-      .from('profiles')
-      .select('id, username, balance, avatar_url, role')
+    .from('profiles')
+    .select('id, username, balance, avatar_url, role')
       .neq('role', 'admin')
-      .order('total_won', { ascending: false })
-      .limit(10)
+    .order('total_won', { ascending: false })
+    .limit(10)
 
     if (!globalTop10) {
-      return { success: false, message: "Erreur récupération classement" }
+    return { success: false, message: "Erreur récupération classement" }
     }
     top10Data = globalTop10
     console.log('[endSeasonInternal] Fallback to profiles.total_won for ranking')

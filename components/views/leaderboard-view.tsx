@@ -167,25 +167,25 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         }
       } else {
         // Fetch from profiles (global)
-        const { data } = await supabase
-          .from('profiles')
-          .select('id, username, avatar_url, total_won, win_rate, balance, role')
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, total_won, win_rate, balance, role')
           .neq('role', 'admin')
-          .order('total_won', { ascending: false })
-          .limit(50)
+        .order('total_won', { ascending: false })
+        .limit(50)
 
-        if (data) {
-          const formatted = data.map((p: any, idx: number) => ({
-            rank: idx + 1,
-            id: p.id,
-            username: p.username || `User ${p.id.slice(0, 4)}`,
-            avatar: getAvatarUrl(p.avatar_url),
-            balance: p.balance,
-            winRate: p.win_rate || 0,
-            totalWon: p.total_won || 0
-          }))
-          setPlayers(formatted)
-        }
+      if (data) {
+        const formatted = data.map((p: any, idx: number) => ({
+          rank: idx + 1,
+          id: p.id,
+          username: p.username || `User ${p.id.slice(0, 4)}`,
+          avatar: getAvatarUrl(p.avatar_url),
+          balance: p.balance,
+          winRate: p.win_rate || 0,
+          totalWon: p.total_won || 0
+        }))
+        setPlayers(formatted)
+      }
       }
       
       setIsLoading(false)
@@ -257,23 +257,23 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onBack}
+          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
             {viewMode === 'season' && hasSeason ? (
-              <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
-                <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
-              </p>
-            ) : (
+            <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
+              <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
+            </p>
+          ) : (
               <p className="text-xs text-muted-foreground">Classement Global (All-time)</p>
-            )}
-          </div>
+          )}
+        </div>
         </div>
         
         {/* Toggle Saison / Global */}

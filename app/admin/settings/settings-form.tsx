@@ -204,13 +204,13 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const isSeasonActive = settings.is_active
 
   // Show configuration form (works for both active and inactive seasons)
-  return (
+    return (
     <div className="space-y-8">
       {/* Season Status Banner */}
       {isSeasonActive ? (
         <div className="rounded-xl p-4 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-emerald-500" />
+              <CheckCircle className="w-6 h-6 text-emerald-500" />
             <div>
               <p className="font-bold text-emerald-400">🎯 Saison Active</p>
               <p className="text-xs text-muted-foreground">
@@ -219,58 +219,58 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               </p>
             </div>
           </div>
-          
+
           {/* End Season Button */}
-          {!showEndConfirm ? (
-            <button
-              type="button"
-              onClick={() => setShowEndConfirm(true)}
-              className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold transition-all flex items-center gap-2"
-            >
-              <StopCircle className="w-4 h-4" />
-              Terminer
-            </button>
-          ) : (
-            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
-              <span className="text-xs text-amber-500 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" />
-                Confirmer ?
-              </span>
+            {!showEndConfirm ? (
               <button
                 type="button"
-                onClick={() => setShowEndConfirm(false)}
-                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
-                disabled={isEnding}
+                onClick={() => setShowEndConfirm(true)}
+                className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold transition-all flex items-center gap-2"
               >
-                Annuler
+                <StopCircle className="w-4 h-4" />
+                Terminer
               </button>
-              <button
-                type="button"
-                onClick={handleEndSeason}
-                disabled={isEnding}
-                className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold text-xs flex items-center gap-1"
-              >
-                {isEnding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trophy className="w-3 h-3" />}
-                DISTRIBUER
-              </button>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
+                <span className="text-xs text-amber-500 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" />
+                  Confirmer ?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowEndConfirm(false)}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
+                  disabled={isEnding}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEndSeason}
+                  disabled={isEnding}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold text-xs flex items-center gap-1"
+                >
+                  {isEnding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trophy className="w-3 h-3" />}
+                  DISTRIBUER
+                </button>
+              </div>
+            )}
+          </div>
       ) : (
-        <div className="rounded-xl p-4 bg-white/5 border border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <XCircle className="w-6 h-6 text-muted-foreground" />
-            <div>
-              <p className="font-bold">⏸️ Aucune Saison Active</p>
-              <p className="text-xs text-muted-foreground">
-                {settings.rewards_distributed 
-                  ? 'Dernière saison terminée, récompenses distribuées ✓'
-                  : 'Configure les paramètres puis démarre la saison'
-                }
-              </p>
-            </div>
+      <div className="rounded-xl p-4 bg-white/5 border border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <XCircle className="w-6 h-6 text-muted-foreground" />
+          <div>
+            <p className="font-bold">⏸️ Aucune Saison Active</p>
+            <p className="text-xs text-muted-foreground">
+              {settings.rewards_distributed 
+                ? 'Dernière saison terminée, récompenses distribuées ✓'
+                : 'Configure les paramètres puis démarre la saison'
+              }
+            </p>
           </div>
         </div>
+      </div>
       )}
 
       <form action={handleSubmit} className="space-y-8">
@@ -303,7 +303,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <h3 className="text-lg font-bold flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" /> Date de Fin de Saison
           </h3>
-          <div className="space-y-2">
+            <div className="space-y-2">
             <div className="relative">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
@@ -579,15 +579,15 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           </button>
 
           {!isSeasonActive && (
-            <button
-              type="button"
-              onClick={handleStartSeason}
-              disabled={isStarting}
-              className="px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-            >
-              {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
-              🚀 Démarrer la Saison
-            </button>
+          <button
+            type="button"
+            onClick={handleStartSeason}
+            disabled={isStarting}
+            className="px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+          >
+            {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
+            🚀 Démarrer la Saison
+          </button>
           )}
         </div>
       </form>
