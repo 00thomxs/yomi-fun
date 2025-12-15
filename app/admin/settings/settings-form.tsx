@@ -1,9 +1,19 @@
 'use client'
 
 import { updateSeasonSettings, startSeason, endSeason, type SeasonSettings } from "./actions"
-import { useState } from "react"
-import { Save, Calendar, Trophy, Coins, Loader2, Play, StopCircle, CheckCircle, XCircle, AlertTriangle, Clock } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Save, Calendar, Trophy, Coins, Loader2, Play, StopCircle, CheckCircle, XCircle, AlertTriangle, Clock, Link2, Unlink, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
+import { createClient } from "@/lib/supabase/client"
+import Link from "next/link"
+
+type MarketForSeason = {
+  id: string
+  question: string
+  closes_at: string
+  season_id: string | null
+  status: string
+}
 
 export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const [isLoading, setIsLoading] = useState(false)
@@ -15,6 +25,108 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const initialDate = new Date(settings.season_end)
   const [selectedDate, setSelectedDate] = useState(initialDate.toISOString().slice(0, 10))
   const [selectedTime, setSelectedTime] = useState(initialDate.toTimeString().slice(0, 5))
+  
+  // Markets linked to this season
+  const [seasonMarkets, setSeasonMarkets] = useState<MarketForSeason[]>([])
+  const [availableMarkets, setAvailableMarkets] = useState<MarketForSeason[]>([])
+  const [loadingMarkets, setLoadingMarkets] = useState(false)
+  const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
+  
+  // Fetch markets and active season
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoadingMarkets(true)
+      const supabase = createClient()
+      
+      // Get active season from seasons table
+      const { data: activeSeason } = await supabase
+        .from('seasons')
+        .select('id')
+        .eq('is_active', true)
+        .single()
+      
+      if (activeSeason) {
+        setActiveSeasonId(activeSeason.id)
+        
+        // Fetch markets linked to this season
+        const { data: linkedMarkets } = await supabase
+          .from('markets')
+          .select('id, question, closes_at, season_id, status')
+          .eq('season_id', activeSeason.id)
+          .order('closes_at', { ascending: true })
+        
+        if (linkedMarkets) setSeasonMarkets(linkedMarkets)
+        
+        // Fetch markets NOT linked to any season (available to add)
+        const { data: unlinkedMarkets } = await supabase
+          .from('markets')
+          .select('id, question, closes_at, season_id, status')
+          .is('season_id', null)
+          .eq('status', 'open')
+          .order('closes_at', { ascending: true })
+        
+        if (unlinkedMarkets) setAvailableMarkets(unlinkedMarkets)
+      }
+      
+      setLoadingMarkets(false)
+    }
+    
+    if (settings.is_active) {
+      fetchData()
+    }
+  }, [settings.is_active])
+  
+  // Link/Unlink market to season
+  const handleLinkMarket = async (marketId: string) => {
+    if (!activeSeasonId) return
+    
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('markets')
+      .update({ season_id: activeSeasonId })
+      .eq('id', marketId)
+    
+    if (!error) {
+      const market = availableMarkets.find(m => m.id === marketId)
+      if (market) {
+        setSeasonMarkets([...seasonMarkets, { ...market, season_id: activeSeasonId }])
+        setAvailableMarkets(availableMarkets.filter(m => m.id !== marketId))
+      }
+      toast.success("Event ajouté à la saison")
+    } else {
+      toast.error("Erreur: " + error.message)
+    }
+  }
+  
+  const handleUnlinkMarket = async (marketId: string) => {
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('markets')
+      .update({ season_id: null })
+      .eq('id', marketId)
+    
+    if (!error) {
+      const market = seasonMarkets.find(m => m.id === marketId)
+      if (market) {
+        // Only add to availableMarkets if the event is still 'open'
+        if (market.status === 'open') {
+          setAvailableMarkets([...availableMarkets, { ...market, season_id: null }])
+        }
+        setSeasonMarkets(seasonMarkets.filter(m => m.id !== marketId))
+      }
+      toast.success("Event retiré de la saison")
+    } else {
+      toast.error("Erreur: " + error.message)
+    }
+  }
+  
+  // Date presets helper
+  const setDatePreset = (days: number) => {
+    const date = new Date()
+    date.setDate(date.getDate() + days)
+    setSelectedDate(date.toISOString().slice(0, 10))
+    setSelectedTime('23:59')
+  }
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true)
@@ -216,6 +328,38 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               />
             </div>
           </div>
+          {/* Date Presets */}
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs text-muted-foreground self-center mr-2">Raccourcis :</span>
+            <button
+              type="button"
+              onClick={() => setDatePreset(7)}
+              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+            >
+              +7 jours
+            </button>
+            <button
+              type="button"
+              onClick={() => setDatePreset(14)}
+              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+            >
+              +14 jours
+            </button>
+            <button
+              type="button"
+              onClick={() => setDatePreset(30)}
+              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+            >
+              +1 mois
+            </button>
+            <button
+              type="button"
+              onClick={() => setDatePreset(90)}
+              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+            >
+              +3 mois
+            </button>
+          </div>
         </div>
 
         <div className="h-px bg-border" />
@@ -310,6 +454,131 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             ))}
           </div>
         </div>
+
+        {/* Season Events Management - Only shown when season is active */}
+        {isSeasonActive && (
+          <>
+            <div className="h-px bg-border" />
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Link2 className="w-5 h-5 text-primary" /> Events de la Saison
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Les events liés à cette saison comptent pour le classement saisonnier. 
+                Tu peux aussi lier un event lors de sa création.
+              </p>
+              
+              {loadingMarkets ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Events currently in season */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-emerald-400 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      Events liés ({seasonMarkets.length})
+                    </p>
+                    {seasonMarkets.length > 0 ? (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {seasonMarkets.map(market => (
+                          <div 
+                            key={market.id} 
+                            className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{market.question}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Fin: {new Date(market.closes_at).toLocaleDateString('fr-FR')}
+                                {market.status !== 'open' && (
+                                  <span className="ml-2 text-amber-400">({market.status})</span>
+                                )}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleUnlinkMarket(market.id)}
+                              className="ml-2 p-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all"
+                              title="Retirer de la saison"
+                            >
+                              <Unlink className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic py-2">
+                        Aucun event lié. Ajoute des events ci-dessous ou lors de la création.
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* Available events to add */}
+                  {availableMarkets.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <ChevronRight className="w-4 h-4" />
+                        Events disponibles ({availableMarkets.length})
+                      </p>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {availableMarkets.map(market => {
+                          // Check if market end date is within season end date
+                          const marketEnd = new Date(market.closes_at)
+                          const seasonEndDate = new Date(`${selectedDate}T${selectedTime}:00`)
+                          const isCompatible = marketEnd <= seasonEndDate
+                          
+                          return (
+                            <div 
+                              key={market.id} 
+                              className={`flex items-center justify-between p-3 rounded-lg border ${
+                                isCompatible 
+                                  ? 'bg-white/5 border-white/10 hover:border-white/20' 
+                                  : 'bg-amber-500/5 border-amber-500/20 opacity-60'
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{market.question}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Fin: {new Date(market.closes_at).toLocaleDateString('fr-FR')}
+                                  {!isCompatible && (
+                                    <span className="ml-2 text-amber-400">⚠️ Après la saison</span>
+                                  )}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleLinkMarket(market.id)}
+                                disabled={!isCompatible}
+                                className={`ml-2 p-2 rounded-lg transition-all ${
+                                  isCompatible 
+                                    ? 'text-emerald-400 hover:bg-emerald-500/10' 
+                                    : 'text-muted-foreground cursor-not-allowed'
+                                }`}
+                                title={isCompatible ? "Ajouter à la saison" : "Date incompatible"}
+                              >
+                                <Link2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Link to create new event */}
+                  <Link
+                    href="/admin/create"
+                    className="flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed border-white/20 text-muted-foreground hover:text-white hover:border-primary/50 transition-all"
+                  >
+                    <span className="text-sm">+ Créer un nouvel event</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-border">
