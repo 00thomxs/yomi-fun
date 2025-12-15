@@ -21,6 +21,9 @@ export type BinaryMarket = {
   noPrice: number
   countdown: string
   created_at?: string // Market creation date
+  // Season info
+  season_id?: string | null
+  season?: { id: string; name: string } | null
   history1h?: { time: string; price: number }[]
   history6h?: { time: string; price: number }[]
   history24h: { time: string; price: number }[]
@@ -46,6 +49,9 @@ export type MultiOutcomeMarket = {
   is_headline?: boolean // Added for hero market
   countdown: string
   created_at?: string // Market creation date
+  // Season info
+  season_id?: string | null
+  season?: { id: string; name: string } | null
   historyData: { time: string; [key: string]: number | string }[]
   history1h?: { time: string; [key: string]: number | string | Date }[]
   history6h?: { time: string; [key: string]: number | string | Date }[]

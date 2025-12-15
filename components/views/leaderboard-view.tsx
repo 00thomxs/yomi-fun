@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Crown } from "lucide-react"
+import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Crown, Target, Clock, CheckCircle2 } from "lucide-react"
+import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
@@ -34,6 +35,14 @@ type PastSeason = {
   }[]
 }
 
+type SeasonEvent = {
+  id: string
+  question: string
+  status: string
+  closes_at: string
+  volume: number
+}
+
 export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
@@ -42,6 +51,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const [lastSeason, setLastSeason] = useState<PastSeason | null>(null)
   const [viewMode, setViewMode] = useState<'season' | 'global'>('season') // Toggle state
   const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
+  const [seasonEvents, setSeasonEvents] = useState<SeasonEvent[]>([])
+  const [eventsExpanded, setEventsExpanded] = useState(false)
 
   // Fetch season settings on mount
   useEffect(() => {
@@ -86,6 +97,29 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
     
     fetchSeasonSettings()
   }, [])
+
+  // Fetch season events when there's an active season
+  useEffect(() => {
+    const fetchSeasonEvents = async () => {
+      if (!activeSeasonId) {
+        setSeasonEvents([])
+        return
+      }
+      
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('markets')
+        .select('id, question, status, closes_at, volume')
+        .eq('season_id', activeSeasonId)
+        .order('closes_at', { ascending: true })
+      
+      if (data) {
+        setSeasonEvents(data)
+      }
+    }
+    
+    fetchSeasonEvents()
+  }, [activeSeasonId])
 
   // Fetch leaderboard data based on viewMode
   useEffect(() => {
@@ -409,6 +443,77 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <span>Fin</span>
             </div>
           </div>
+
+          {/* Season Events */}
+          {seasonEvents.length > 0 && (
+            <div className="w-full max-w-[95%] rounded-xl border border-white/10 bg-card p-4 relative overflow-hidden">
+              <button 
+                onClick={() => setEventsExpanded(!eventsExpanded)}
+                className="w-full flex items-center justify-between mb-3"
+              >
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-white/80">
+                    Events de la saison
+                  </h4>
+                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                    {seasonEvents.length}
+                  </span>
+                </div>
+                <span className={`text-xs text-muted-foreground transition-transform ${eventsExpanded ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
+              </button>
+              
+              {eventsExpanded && (
+                <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                  {seasonEvents.map((event) => {
+                    const isResolved = event.status === 'resolved'
+                    const closesAt = new Date(event.closes_at)
+                    const now = new Date()
+                    const isExpired = closesAt < now && !isResolved
+                    
+                    return (
+                      <Link
+                        key={event.id}
+                        href={`/market/${event.id}`}
+                        className={`flex items-center justify-between p-3 rounded-lg border transition-all hover:bg-white/5 ${
+                          isResolved 
+                            ? 'bg-emerald-500/5 border-emerald-500/20' 
+                            : isExpired
+                              ? 'bg-amber-500/5 border-amber-500/20'
+                              : 'bg-white/5 border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          {isResolved ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          ) : (
+                            <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                          )}
+                          <p className="text-sm font-medium truncate">{event.question}</p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0 ml-2">
+                          <span className="text-xs font-mono text-muted-foreground">
+                            {event.volume?.toLocaleString() || 0} vol
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            isResolved 
+                              ? 'bg-emerald-500/10 text-emerald-400' 
+                              : isExpired
+                                ? 'bg-amber-500/10 text-amber-400'
+                                : 'bg-primary/10 text-primary'
+                          }`}>
+                            {isResolved ? 'Terminé' : isExpired ? 'En attente' : 'Live'}
+                          </span>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

@@ -21,7 +21,8 @@ export default async function MarketPage({ params }: Props) {
     .from('markets')
     .select(`
       *,
-      outcomes:outcomes!market_id (*)
+      outcomes:outcomes!market_id (*),
+      season:seasons!season_id (id, name)
     `)
     .eq('id', id)
     .single()

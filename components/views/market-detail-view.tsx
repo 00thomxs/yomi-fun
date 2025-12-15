@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Plus } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Plus, Trophy } from "lucide-react"
 import Link from "next/link"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -353,6 +353,15 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
             </span>
           </div>
           <h2 className="text-lg font-bold tracking-tight text-balance leading-tight">{market.question}</h2>
+          {/* Season Badge */}
+          {market.season && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit mt-2">
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                {market.season.name}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

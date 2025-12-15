@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Users, Activity, HelpCircle } from "lucide-react"
+import { Clock, Users, Activity, HelpCircle, Trophy } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -80,6 +80,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               {market.countdown || "-"}
             </div>
           </div>
+
+          {/* Season Badge */}
+          {market.season && (
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit">
+              <Trophy className="w-3 h-3 text-amber-400" />
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                {market.season.name}
+              </span>
+            </div>
+          )}
 
           <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
@@ -236,6 +246,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             {market.countdown || "-"}
           </div>
         </div>
+
+        {/* Season Badge */}
+        {market.season && (
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit">
+            <Trophy className="w-3 h-3 text-amber-400" />
+            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+              {market.season.name}
+            </span>
+          </div>
+        )}
 
         <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
