@@ -83,12 +83,15 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
 
           {/* Season Badge */}
           {market.season && (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit">
-              <Trophy className="w-3 h-3 text-amber-400" />
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 w-fit max-w-[170px]"
+              title={market.season.name}
+            >
+              <Trophy className="w-3 h-3 text-amber-400 shrink-0" />
+              <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider truncate">
                 {market.season.name}
               </span>
-            </div>
+            </span>
           )}
 
           <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>

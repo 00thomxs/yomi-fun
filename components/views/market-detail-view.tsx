@@ -355,12 +355,15 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           <h2 className="text-lg font-bold tracking-tight text-balance leading-tight">{market.question}</h2>
           {/* Season Badge */}
           {market.season && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit mt-2">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 w-fit max-w-[260px] mt-2"
+              title={market.season.name}
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider truncate">
                 {market.season.name}
               </span>
-            </div>
+            </span>
           )}
         </div>
       </div>
