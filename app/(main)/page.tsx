@@ -12,6 +12,7 @@ export default async function HomePage() {
       outcomes:outcomes!market_id (*),
       season:seasons!season_id (id, name)
     `)
+    .eq('is_visible', true) // Only show visible markets to users
     .order('created_at', { ascending: false })
 
   // Load history for all binary markets

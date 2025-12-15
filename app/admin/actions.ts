@@ -306,3 +306,48 @@ export async function updateMarket(formData: FormData): Promise<CreateMarketStat
   
   return { success: true, message: 'Event mis à jour avec succès !' }
 }
+
+// =============================================
+// TOGGLE MARKET VISIBILITY
+// =============================================
+export async function toggleMarketVisibility(marketId: string): Promise<{ success?: boolean; error?: string; isVisible?: boolean }> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+    
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  // Get current visibility state
+  const { data: market } = await supabase
+    .from('markets')
+    .select('is_visible')
+    .eq('id', marketId)
+    .single()
+
+  if (!market) return { error: "Event introuvable" }
+
+  const newVisibility = !market.is_visible
+
+  // Update visibility
+  const { error } = await supabase
+    .from('markets')
+    .update({ is_visible: newVisibility })
+    .eq('id', marketId)
+
+  if (error) {
+    console.error("Toggle visibility error:", error)
+    return { error: `Erreur: ${error.message}` }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  return { success: true, isVisible: newVisibility }
+}
