@@ -424,7 +424,7 @@ export default function CreateMarketPage() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Plus la liquidité est élevée, plus les cotes sont stables. Recommandé : 5K-10K.
+              Liquidité totale répartie entre OUI/NON selon la probabilité initiale. Plus elle est élevée, plus les cotes sont stables. Recommandé : 5K-10K.
             </p>
           </div>
         </div>
