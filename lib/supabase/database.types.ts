@@ -153,6 +153,7 @@ export interface Database {
           potential_payout: number
           odds_at_bet: number
           status: 'pending' | 'won' | 'lost' | 'cancelled'
+          direction: 'YES' | 'NO'
           created_at: string
           resolved_at: string | null
         }
@@ -165,6 +166,7 @@ export interface Database {
           potential_payout: number
           odds_at_bet: number
           status?: 'pending' | 'won' | 'lost' | 'cancelled'
+          direction?: 'YES' | 'NO'
           created_at?: string
           resolved_at?: string | null
         }
@@ -172,6 +174,7 @@ export interface Database {
           amount?: number
           potential_payout?: number
           status?: 'pending' | 'won' | 'lost' | 'cancelled'
+          direction?: 'YES' | 'NO'
           resolved_at?: string | null
         }
       }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
 import { updateMarket } from "@/app/admin/actions"
+import { getAdminMarketTopBets, type AdminMarketTopBet } from "@/app/admin/actions"
 import { 
   Calendar, 
   Type, 
@@ -53,6 +54,11 @@ export default function EditMarketPage({ params }: PageProps) {
   const [market, setMarket] = useState<MarketData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Admin stats (top bets)
+  const [topBets, setTopBets] = useState<AdminMarketTopBet[]>([])
+  const [totalBetsCount, setTotalBetsCount] = useState<number>(0)
+  const [loadingTopBets, setLoadingTopBets] = useState(false)
   
   // Form state
   const [question, setQuestion] = useState("")
@@ -115,6 +121,36 @@ export default function EditMarketPage({ params }: PageProps) {
     
     fetchMarket()
   }, [marketId, router, toast])
+
+  // Fetch top bets (admin)
+  useEffect(() => {
+    if (!marketId) return
+    let isMounted = true
+
+    const fetchTopBets = async () => {
+      setLoadingTopBets(true)
+      const res = await getAdminMarketTopBets(marketId)
+      if (!isMounted) return
+
+      if (res.error) {
+        // Silent fail (admin only), but show toast for feedback
+        toast({
+          title: "Erreur",
+          description: res.error,
+          variant: "destructive",
+        })
+      } else {
+        setTopBets(res.topBets || [])
+        setTotalBetsCount(res.totalBets || 0)
+      }
+      setLoadingTopBets(false)
+    }
+
+    fetchTopBets()
+    return () => {
+      isMounted = false
+    }
+  }, [marketId, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -395,6 +431,83 @@ export default function EditMarketPage({ params }: PageProps) {
           <p className="text-xs text-muted-foreground">
             💡 Pour ajuster la liquidité, utilisez le compte admin pour placer des paris sur l'event.
           </p>
+        </div>
+
+        {/* Top 10 Biggest Bets */}
+        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-semibold flex items-center gap-2">
+              <Coins className="w-4 h-4 text-amber-400" />
+              Top 10 plus gros paris
+            </h2>
+            <div className="text-xs text-muted-foreground">
+              Total bets: <span className="font-mono font-bold text-white/80">{totalBetsCount}</span>
+              {totalBetsCount > 0 && (
+                <>
+                  <span className="text-muted-foreground"> • </span>
+                  Moyenne:{" "}
+                  <span className="font-mono font-bold text-white/80">
+                    {Math.round((market.volume || 0) / Math.max(1, totalBetsCount)).toLocaleString()}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {loadingTopBets ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : topBets.length === 0 ? (
+            <div className="p-6 rounded-lg bg-white/5 border border-white/10 text-sm text-muted-foreground italic">
+              Aucun pari pour le moment.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {topBets.map((b, idx) => {
+                const dirLabel = b.direction === 'NO' ? 'NON' : 'OUI'
+                const choiceLabel = market.type === 'binary'
+                  ? b.outcome?.name
+                  : `${dirLabel} ${b.outcome?.name}`
+
+                return (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xs font-mono text-muted-foreground w-8 shrink-0">
+                        #{idx + 1}
+                      </span>
+                      <img
+                        src={b.user.avatar_url || "/images/default-avatar.svg"}
+                        alt={b.user.username || "User"}
+                        className="w-8 h-8 rounded-full object-cover bg-white/5 shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">
+                          {b.user.username || `User ${b.user.id?.slice(0, 4)}`}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          Choix: <span className="font-mono text-white/80">{choiceLabel}</span> •{" "}
+                          {new Date(b.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-black font-mono text-amber-400">
+                        {b.amount.toLocaleString()}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground font-mono">
+                        x{Number(b.odds_at_bet).toFixed(2)} → {b.potential_payout.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Submit */}

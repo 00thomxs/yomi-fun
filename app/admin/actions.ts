@@ -15,6 +15,101 @@ export type CreateMarketState = {
   success?: boolean
 }
 
+export type AdminMarketTopBet = {
+  id: string
+  created_at: string
+  amount: number
+  status: string
+  direction: 'YES' | 'NO'
+  odds_at_bet: number
+  potential_payout: number
+  user: {
+    id: string
+    username: string
+    avatar_url: string | null
+  }
+  outcome: {
+    id: string
+    name: string
+  }
+}
+
+export async function getAdminMarketTopBets(marketId: string): Promise<{ error?: string; topBets?: AdminMarketTopBet[]; totalBets?: number }> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  // Total count (exact)
+  const { count: totalBets, error: countError } = await supabaseAdmin
+    .from('bets')
+    .select('id', { count: 'exact', head: true })
+    .eq('market_id', marketId)
+
+  if (countError) {
+    return { error: `Erreur count: ${countError.message}` }
+  }
+
+  // Top 10 biggest bets (per bet)
+  const { data, error } = await supabaseAdmin
+    .from('bets')
+    .select(`
+      id,
+      created_at,
+      amount,
+      status,
+      direction,
+      odds_at_bet,
+      potential_payout,
+      profiles:profiles!bets_user_id_fkey (
+        id,
+        username,
+        avatar_url
+      ),
+      outcomes:outcomes!bets_outcome_id_fkey (
+        id,
+        name
+      )
+    `)
+    .eq('market_id', marketId)
+    .order('amount', { ascending: false })
+    .limit(10)
+
+  if (error) {
+    return { error: `Erreur fetch bets: ${error.message}` }
+  }
+
+  const topBets: AdminMarketTopBet[] = (data || []).map((row: any) => ({
+    id: row.id,
+    created_at: row.created_at,
+    amount: row.amount,
+    status: row.status,
+    direction: (row.direction || 'YES') as 'YES' | 'NO',
+    odds_at_bet: Number(row.odds_at_bet),
+    potential_payout: row.potential_payout,
+    user: {
+      id: row.profiles?.id,
+      username: row.profiles?.username,
+      avatar_url: row.profiles?.avatar_url ?? null,
+    },
+    outcome: {
+      id: row.outcomes?.id,
+      name: row.outcomes?.name,
+    }
+  }))
+
+  return { topBets, totalBets: totalBets || 0 }
+}
+
 export async function createMarket(formData: FormData): Promise<CreateMarketState> {
   const type = formData.get('type') as 'binary' | 'multi'
   const question = formData.get('question') as string
