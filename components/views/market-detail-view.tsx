@@ -1506,14 +1506,7 @@ function BetAmountInput({
   const LIMIT_GAIN = 100000000 // 100 Millions
   const isOverLimit = potentialGain > LIMIT_GAIN
 
-  if (hasBet) {
-    return (
-      <div className="w-full py-4 rounded-lg bg-white/5 border border-white/10 text-muted-foreground font-bold text-lg tracking-tight uppercase text-center cursor-not-allowed flex items-center justify-center gap-2">
-        <Lock className="w-5 h-5" />
-        Pari déjà effectué
-      </div>
-    )
-  }
+  // Multi-bet is allowed: do NOT block UI when user already has bets on this market.
 
   return (
     <>
