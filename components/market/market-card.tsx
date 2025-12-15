@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Users, Activity, HelpCircle, Trophy } from "lucide-react"
+import { Clock, Users, Activity, HelpCircle, Crown } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -32,7 +32,11 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         tabIndex={0}
         onClick={() => onMarketClick(market)}
         onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-        className="group relative overflow-hidden rounded-xl bg-card border border-white/10 hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg hover:shadow-primary/5"
+        className={`group relative overflow-hidden rounded-xl bg-card border transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg ${
+          market.season
+            ? "border-amber-500/30 hover:border-amber-400/50 hover:shadow-amber-500/10"
+            : "border-white/10 hover:border-white/20 hover:shadow-primary/5"
+        }`}
       >
         <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
           {market.bgImage ? (
@@ -55,6 +59,14 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                 {categoryDef?.label || market.category || "Divers"}
               </span>
+              {market.season && (
+                <span
+                  className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
+                  title={`Saison: ${market.season.name}`}
+                >
+                  <Crown className="w-3 h-3 text-amber-400" />
+                </span>
+              )}
               {market.isLive ? (
                 <>
                   <span className="text-muted-foreground">•</span>
@@ -80,19 +92,6 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
               {market.countdown || "-"}
             </div>
           </div>
-
-          {/* Season Badge */}
-          {market.season && (
-            <span
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 w-fit max-w-[170px]"
-              title={market.season.name}
-            >
-              <Trophy className="w-3 h-3 text-amber-400 shrink-0" />
-              <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider truncate">
-                {market.season.name}
-              </span>
-            </span>
-          )}
 
           <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
@@ -201,7 +200,11 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       tabIndex={0}
       onClick={() => onMarketClick(market)}
       onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-      className="group relative overflow-hidden rounded-xl bg-card border border-white/10 hover:border-white/20 transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg hover:shadow-primary/5"
+      className={`group relative overflow-hidden rounded-xl bg-card border transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg ${
+        market.season
+          ? "border-amber-500/30 hover:border-amber-400/50 hover:shadow-amber-500/10"
+          : "border-white/10 hover:border-white/20 hover:shadow-primary/5"
+      }`}
     >
       <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
         {market.bgImage ? (
@@ -224,6 +227,14 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {categoryDef?.label || market.category || "Divers"}
             </span>
+            {market.season && (
+              <span
+                className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
+                title={`Saison: ${market.season.name}`}
+              >
+                <Crown className="w-3 h-3 text-amber-400" />
+              </span>
+            )}
             {market.isLive ? (
               <>
                 <span className="text-muted-foreground">•</span>
@@ -249,16 +260,6 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
             {market.countdown || "-"}
           </div>
         </div>
-
-        {/* Season Badge */}
-        {market.season && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 w-fit">
-            <Trophy className="w-3 h-3 text-amber-400" />
-            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-              {market.season.name}
-            </span>
-          </div>
-        )}
 
         <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
 
