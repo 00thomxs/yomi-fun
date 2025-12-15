@@ -78,6 +78,7 @@ export async function createMarket(formData: FormData): Promise<CreateMarketStat
       volume: 0,
       pool_yes: poolYes,
       pool_no: poolNo,
+      initial_liquidity: INITIAL_LIQUIDITY,
       season_id: seasonId || null
     })
     .select()

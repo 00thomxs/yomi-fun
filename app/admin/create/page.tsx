@@ -424,7 +424,7 @@ export default function CreateMarketPage() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Liquidité totale répartie entre OUI/NON selon la probabilité initiale. Plus elle est élevée, plus les cotes sont stables. Recommandé : 5K-10K.
+              Binaire : liquidité totale répartie entre OUI/NON selon la probabilité initiale. Multi-choix : contrôle la volatilité (plus élevé = probas plus stables). Recommandé : 5K-10K.
             </p>
           </div>
         </div>

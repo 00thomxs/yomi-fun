@@ -62,8 +62,14 @@ export interface Database {
           status: 'open' | 'closed' | 'resolved' | 'cancelled'
           type: 'binary' | 'multi'
           volume: number
+          pool_yes: number
+          pool_no: number
           is_live: boolean
           is_featured: boolean
+          is_headline: boolean
+          season_id: string | null
+          is_visible: boolean
+          initial_liquidity: number
           created_at: string
           closes_at: string
           resolved_at: string | null
@@ -78,8 +84,14 @@ export interface Database {
           status?: 'open' | 'closed' | 'resolved' | 'cancelled'
           type?: 'binary' | 'multi'
           volume?: number
+          pool_yes?: number
+          pool_no?: number
           is_live?: boolean
           is_featured?: boolean
+          is_headline?: boolean
+          season_id?: string | null
+          is_visible?: boolean
+          initial_liquidity?: number
           created_at?: string
           closes_at: string
           resolved_at?: string | null
@@ -93,8 +105,14 @@ export interface Database {
           status?: 'open' | 'closed' | 'resolved' | 'cancelled'
           type?: 'binary' | 'multi'
           volume?: number
+          pool_yes?: number
+          pool_no?: number
           is_live?: boolean
           is_featured?: boolean
+          is_headline?: boolean
+          season_id?: string | null
+          is_visible?: boolean
+          initial_liquidity?: number
           closes_at?: string
           resolved_at?: string | null
         }

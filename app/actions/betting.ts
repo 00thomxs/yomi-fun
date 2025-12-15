@@ -43,7 +43,7 @@ export async function placeBet(
 
   const { data: market, error: marketError } = await supabase
     .from('markets')
-    .select('pool_yes, pool_no, volume, status, is_live, type')
+    .select('pool_yes, pool_no, volume, status, is_live, type, initial_liquidity')
     .eq('id', marketId)
     .single()
 
@@ -187,36 +187,87 @@ export async function placeBet(
      ])
 
   } else {
-     // Multi Market Dynamic Odds Logic (Simplified)
-     // Increase probability of the chosen outcome based on bet amount relative to "virtual liquidity"
-     const LIQUIDITY_FACTOR = 50000; // Adjust to control volatility
-     const probChange = (amount / LIQUIDITY_FACTOR) * 100; // Convert to percentage points
-     
-     let newProb = selectedOutcome.probability;
-     
-     if (direction === 'YES') {
-        newProb += probChange;
-     } else {
-        newProb -= probChange;
-     }
-     
-     // Cap between 1% and 99% (ensure integer)
-     newProb = Math.round(Math.max(1, Math.min(99, newProb)));
-     
-     await supabase.from('outcomes').update({ probability: newProb }).eq('id', selectedOutcome.id)
+     // Multi Market Dynamic Odds Logic (A+)
+     // - Volatility is now driven by the market seed (initial_liquidity) instead of a hardcoded constant
+     // - We renormalize ALL outcomes so total always stays at 100%
+     //
+     // Why: previously we only changed the selected outcome probability without adjusting others,
+     // which makes the system drift and can feel buggy over time.
 
-     // HISTORY: Insert price history for Multi
-     // Find index based on sorted list to keep consistency
-     const sortedOutcomes = [...marketOutcomes].sort((a, b) => a.name.localeCompare(b.name))
-     const outcomeIndex = sortedOutcomes.findIndex(o => o.id === selectedOutcome.id)
-     
-     if (outcomeIndex !== -1) {
-        await supabaseAdmin.from('market_prices_history').insert({
-          market_id: marketId,
-          outcome_index: outcomeIndex,
-          probability: newProb / 100 // Stored as decimal 0-1
-        })
+     const marketSeed = Number((market as any).initial_liquidity) || 10000
+     // Keep same "feel" as old LIQUIDITY_FACTOR=50000 when seed=10000
+     const MULTI_LIQUIDITY_MULTIPLIER = 5
+     const liquidityFactor = Math.max(1000, marketSeed * MULTI_LIQUIDITY_MULTIPLIER)
+
+     // Use investment (amount - fee) for economics consistency
+     const probChange = (investment / liquidityFactor) * 100 // percentage points
+
+     const otherOutcomes = marketOutcomes.filter(o => o.id !== selectedOutcome.id)
+     const minOther = 1
+     const maxSelected = Math.max(1, 100 - otherOutcomes.length * minOther)
+
+     let newSelectedProb = selectedOutcome.probability + (direction === 'YES' ? probChange : -probChange)
+     newSelectedProb = Math.round(Math.max(1, Math.min(maxSelected, newSelectedProb)))
+
+     const remaining = 100 - newSelectedProb
+     const remainingAfterMin = remaining - otherOutcomes.length * minOther
+     // remainingAfterMin should be >= 0 due to maxSelected clamp
+
+     const sumOthersCurrent = otherOutcomes.reduce((sum, o) => sum + (Number(o.probability) || 0), 0)
+     const weights = otherOutcomes.map(o =>
+       sumOthersCurrent > 0 ? (Number(o.probability) || 0) / sumOthersCurrent : 1 / Math.max(1, otherOutcomes.length)
+     )
+
+     const rawExtras = weights.map(w => w * Math.max(0, remainingAfterMin))
+     const floorExtras = rawExtras.map(v => Math.floor(v))
+     let distributed = floorExtras.reduce((sum, v) => sum + v, 0)
+     let leftover = Math.max(0, remainingAfterMin - distributed)
+
+     const fracOrder = rawExtras
+       .map((v, i) => ({ i, frac: v - floorExtras[i] }))
+       .sort((a, b) => b.frac - a.frac)
+
+     const extras = [...floorExtras]
+     for (let k = 0; k < leftover; k++) {
+       // If all fracs are equal, just round-robin
+       extras[fracOrder[k % Math.max(1, fracOrder.length)].i] += 1
      }
+
+     const newProbsById: Record<string, number> = {
+       [selectedOutcome.id]: newSelectedProb,
+     }
+     otherOutcomes.forEach((o, idx) => {
+       newProbsById[o.id] = minOther + (extras[idx] || 0)
+     })
+
+     // Safety: ensure we really sum to 100
+     const sumCheck =
+       newProbsById[selectedOutcome.id] +
+       otherOutcomes.reduce((sum, o) => sum + (newProbsById[o.id] || 0), 0)
+     if (sumCheck !== 100) {
+       // Adjust last outcome to fix any off-by-one due to rounding
+       const last = otherOutcomes[otherOutcomes.length - 1]
+       if (last) {
+         newProbsById[last.id] = Math.max(minOther, (newProbsById[last.id] || minOther) + (100 - sumCheck))
+       }
+     }
+
+     // Update ALL outcomes probabilities
+     await Promise.all(
+       Object.entries(newProbsById).map(([outcomeId, prob]) =>
+         supabase.from('outcomes').update({ probability: prob }).eq('id', outcomeId)
+       )
+     )
+
+     // HISTORY: Insert price history for Multi (for ALL outcomes, like binary)
+     // Keep indexing consistent (sorted by name)
+     const sortedOutcomes = [...marketOutcomes].sort((a, b) => a.name.localeCompare(b.name))
+     const historyRows = sortedOutcomes.map((o, index) => ({
+       market_id: marketId,
+       outcome_index: index,
+       probability: (newProbsById[o.id] ?? o.probability) / 100, // Stored as decimal 0-1
+     }))
+     await supabaseAdmin.from('market_prices_history').insert(historyRows)
   }
 
   const { error: updateError } = await supabase
