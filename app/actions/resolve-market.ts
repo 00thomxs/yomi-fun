@@ -50,7 +50,7 @@ export async function resolveMarket(
       winner_outcome_id: winningOutcomeId
     })
     .eq('id', marketId)
-    .select()
+    .select('*, season_id')
     .single()
 
   if (marketError) {
@@ -59,6 +59,9 @@ export async function resolveMarket(
   }
   
   console.log(`[RESOLVE] Market updated successfully:`, updatedMarket)
+  
+  // Get season_id for season leaderboard updates
+  const seasonId = updatedMarket?.season_id as string | null
 
   // 3. Fetch all pending bets for this market
   const { data: bets, error: betsError } = await supabase
@@ -146,6 +149,22 @@ export async function resolveMarket(
         console.error(`[RESOLVE_ERROR] Bet status update to 'won' failed:`, betUpdateError)
       }
       
+      // C. Update Season Leaderboard (if market belongs to a season)
+      if (seasonId) {
+        const { error: seasonError } = await supabaseAdmin.rpc('upsert_season_leaderboard', {
+          p_user_id: bet.user_id,
+          p_season_id: seasonId,
+          p_points_change: profit,
+          p_is_win: true,
+          p_bet_amount: bet.amount
+        })
+        if (seasonError) {
+          console.error(`[RESOLVE_ERROR] Season leaderboard update failed:`, seasonError)
+        } else {
+          console.log(`[RESOLVE] Season leaderboard updated for user ${bet.user_id}, profit: ${profit}`)
+        }
+      }
+      
       payoutsCount++
       totalPaid += payout
 
@@ -177,6 +196,20 @@ export async function resolveMarket(
         console.error(`[RESOLVE_ERROR] Bet status update to 'lost' failed:`, betUpdateError)
       } else {
         console.log(`[RESOLVE] Bet ${bet.id} status updated to 'lost'`)
+      }
+      
+      // Update Season Leaderboard for losers (if market belongs to a season)
+      if (seasonId) {
+        const { error: seasonError } = await supabaseAdmin.rpc('upsert_season_leaderboard', {
+          p_user_id: bet.user_id,
+          p_season_id: seasonId,
+          p_points_change: profit, // profit is negative for losers
+          p_is_win: false,
+          p_bet_amount: bet.amount
+        })
+        if (seasonError) {
+          console.error(`[RESOLVE_ERROR] Season leaderboard update (loser) failed:`, seasonError)
+        }
       }
     }
   }
@@ -217,8 +250,8 @@ export async function resolveMarketMulti(
       .eq('id', res.outcomeId)
   }
 
-  // 3. Update Market Status
-  await supabase
+  // 3. Update Market Status & Get season_id
+  const { data: updatedMarket } = await supabase
     .from('markets')
     .update({
       is_live: false,
@@ -226,6 +259,10 @@ export async function resolveMarketMulti(
       // winner_outcome_id: null // Not used anymore in multi logic
     })
     .eq('id', marketId)
+    .select('season_id')
+    .single()
+  
+  const seasonId = updatedMarket?.season_id as string | null
 
   // 4. Fetch Bets
   const { data: bets, error: betsError } = await supabase
@@ -304,6 +341,20 @@ export async function resolveMarketMulti(
 
       await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
       
+      // Update Season Leaderboard (if market belongs to a season)
+      if (seasonId) {
+        const { error: seasonError } = await supabaseAdmin.rpc('upsert_season_leaderboard', {
+          p_user_id: bet.user_id,
+          p_season_id: seasonId,
+          p_points_change: profit,
+          p_is_win: true,
+          p_bet_amount: bet.amount
+        })
+        if (seasonError) {
+          console.error(`[RESOLVE_MULTI] Season leaderboard update failed:`, seasonError)
+        }
+      }
+      
       payoutsCount++
       totalPaid += payout
 
@@ -328,6 +379,20 @@ export async function resolveMarketMulti(
       if (rpcError) console.error(`[RESOLVE_MULTI] RPC update_loser_stats failed:`, rpcError)
 
       await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      
+      // Update Season Leaderboard for losers (if market belongs to a season)
+      if (seasonId) {
+        const { error: seasonError } = await supabaseAdmin.rpc('upsert_season_leaderboard', {
+          p_user_id: bet.user_id,
+          p_season_id: seasonId,
+          p_points_change: profit,
+          p_is_win: false,
+          p_bet_amount: bet.amount
+        })
+        if (seasonError) {
+          console.error(`[RESOLVE_MULTI] Season leaderboard update (loser) failed:`, seasonError)
+        }
+      }
     }
   }
 

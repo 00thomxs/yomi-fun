@@ -40,16 +40,29 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [seasonSettings, setSeasonSettings] = useState<SeasonSettings | null>(null)
   const [lastSeason, setLastSeason] = useState<PastSeason | null>(null)
+  const [viewMode, setViewMode] = useState<'season' | 'global'>('season') // Toggle state
+  const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
 
+  // Fetch season settings on mount
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createClient()
-      
+    const fetchSeasonSettings = async () => {
       try {
         const settings = await getSeasonSettings()
         setSeasonSettings(settings)
         
         if (settings?.is_active) {
+          // Get active season ID from seasons table
+          const supabase = createClient()
+          const { data: activeSeason } = await supabase
+            .from('seasons')
+            .select('id')
+            .eq('is_active', true)
+            .single()
+          
+          if (activeSeason) {
+            setActiveSeasonId(activeSeason.id)
+          }
+          
           const { distributed, message } = await checkAndDistributeRewards()
           if (distributed) {
             toast.success(message || "Récompenses distribuées !")
@@ -58,7 +71,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             window.location.reload()
           }
         } else {
-          // If no active season, fetch last season
+          // If no active season, default to global view
+          setViewMode('global')
           const past = await getLastSeason()
           if (past) {
             setLastSeason(past)
@@ -66,32 +80,85 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         }
       } catch (e) {
         console.error("Failed to fetch season settings", e)
+        setViewMode('global')
+      }
+    }
+    
+    fetchSeasonSettings()
+  }, [])
+
+  // Fetch leaderboard data based on viewMode
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      setIsLoading(true)
+      const supabase = createClient()
+      
+      if (viewMode === 'season' && activeSeasonId) {
+        // Fetch from season_leaderboards
+        const { data } = await supabase
+          .from('season_leaderboards')
+          .select(`
+            user_id,
+            points,
+            wins,
+            losses,
+            total_bet_amount,
+            profiles!inner (
+              id,
+              username,
+              avatar_url,
+              role
+            )
+          `)
+          .eq('season_id', activeSeasonId)
+          .neq('profiles.role', 'admin')
+          .order('points', { ascending: false })
+          .limit(50)
+
+        if (data) {
+          const formatted = data.map((entry: any, idx: number) => {
+            const totalBets = entry.wins + entry.losses
+            const winRate = totalBets > 0 ? Math.round((entry.wins / totalBets) * 100) : 0
+            return {
+              rank: idx + 1,
+              id: entry.profiles.id,
+              username: entry.profiles.username || `User ${entry.profiles.id.slice(0, 4)}`,
+              avatar: getAvatarUrl(entry.profiles.avatar_url),
+              balance: 0, // Not relevant for season view
+              winRate: winRate,
+              totalWon: entry.points // points = PnL for the season
+            }
+          })
+          setPlayers(formatted)
+        }
+      } else {
+        // Fetch from profiles (global)
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url, total_won, win_rate, balance, role')
+          .neq('role', 'admin')
+          .order('total_won', { ascending: false })
+          .limit(50)
+
+        if (data) {
+          const formatted = data.map((p: any, idx: number) => ({
+            rank: idx + 1,
+            id: p.id,
+            username: p.username || `User ${p.id.slice(0, 4)}`,
+            avatar: getAvatarUrl(p.avatar_url),
+            balance: p.balance,
+            winRate: p.win_rate || 0,
+            totalWon: p.total_won || 0
+          }))
+          setPlayers(formatted)
+        }
       }
       
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, total_won, win_rate, balance, role')
-        .neq('role', 'admin') // Exclude admins from leaderboard
-        .order('total_won', { ascending: false })
-        .limit(50)
-
-      if (data) {
-        const formatted = data.map((p: any, idx: number) => ({
-          rank: idx + 1,
-          id: p.id,
-          username: p.username || `User ${p.id.slice(0, 4)}`,
-          avatar: getAvatarUrl(p.avatar_url),
-          balance: p.balance,
-          winRate: p.win_rate || 0,
-          totalWon: p.total_won || 0
-        }))
-        setPlayers(formatted)
-      }
       setIsLoading(false)
     }
     
-    fetchData()
-  }, [])
+    fetchLeaderboard()
+  }, [viewMode, activeSeasonId])
 
   const top1 = players[0]
   const top2 = players[1]
@@ -135,8 +202,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   }
 
   // Zeny Rewards - Rank 1 gets ONLY cash_prize, others get zeny_rewards[rank-1]
+  // Only show rewards in season view mode
   const getZenyReward = (rank: number) => {
-    if (!hasSeason) return 0
+    if (!hasSeason || viewMode !== 'season') return 0
     if (rank === 1) {
       return seasonSettings?.cash_prize || 0
     }
@@ -154,23 +222,57 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
-          {hasSeason ? (
-            <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
-              <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
-            </p>
-          ) : (
-            <p className="text-xs text-muted-foreground">Classement Global</p>
-          )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
+            {viewMode === 'season' && hasSeason ? (
+              <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
+                <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Classement Global (All-time)</p>
+            )}
+          </div>
         </div>
+        
+        {/* Toggle Saison / Global */}
+        {hasSeason && (
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-card border border-white/10">
+            <button
+              onClick={() => setViewMode('season')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                viewMode === 'season'
+                  ? 'bg-primary text-white shadow-lg'
+                  : 'text-muted-foreground hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <Flame className="w-3 h-3" />
+                Saison
+              </span>
+            </button>
+            <button
+              onClick={() => setViewMode('global')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                viewMode === 'global'
+                  ? 'bg-white/10 text-white shadow-lg'
+                  : 'text-muted-foreground hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <Trophy className="w-3 h-3" />
+                Global
+              </span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Last Season Winners Banner */}
@@ -219,8 +321,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </div>
       )}
 
-      {/* Season Banner */}
-      {hasSeason && (
+      {/* Season Banner - Only show in season view mode */}
+      {hasSeason && viewMode === 'season' && (
         <div className="space-y-6 flex flex-col items-center">
           {/* Rewards Card - Golden Border Style */}
           <div className="w-full max-w-[95%] rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-2xl shadow-amber-500/5">

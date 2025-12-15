@@ -110,3 +110,31 @@ export type ShopOrder = {
   shop_items?: ShopItem // Joined data
   profiles?: { username: string; email: string } // Joined data
 }
+
+// Season Types
+export type Season = {
+  id: string
+  name: string
+  start_date: string
+  end_date: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type SeasonLeaderboardEntry = {
+  id: string
+  user_id: string
+  season_id: string
+  points: number      // PnL for this season
+  wins: number
+  losses: number
+  total_bet_amount: number
+  created_at: string
+  updated_at: string
+  // Joined data
+  profiles?: {
+    username: string
+    avatar_url: string | null
+  }
+}

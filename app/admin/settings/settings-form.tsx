@@ -89,104 +89,78 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
   const now = new Date()
   const daysLeft = Math.max(0, Math.ceil((seasonEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
 
-  // If season is active, show simplified view with only End Season button
-  if (settings.is_active) {
-    return (
-      <div className="space-y-6">
-        {/* Active Season Banner */}
-        <div className="rounded-xl p-6 bg-emerald-500/10 border border-emerald-500/30">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-emerald-500" />
-            </div>
+  // Season is active - show editable form with End Season option
+  const isSeasonActive = settings.is_active
+
+  // Show configuration form (works for both active and inactive seasons)
+  return (
+    <div className="space-y-8">
+      {/* Season Status Banner */}
+      {isSeasonActive ? (
+        <div className="rounded-xl p-4 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-6 h-6 text-emerald-500" />
             <div>
-              <p className="text-xl font-bold text-emerald-400">🎯 {settings.title || "Saison Active"}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-bold text-emerald-400">🎯 Saison Active</p>
+              <p className="text-xs text-muted-foreground">
                 Se termine le {seasonEnd.toLocaleDateString('fr-FR')} à {seasonEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 {daysLeft > 0 && ` (dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''})`}
               </p>
             </div>
           </div>
-
-          {/* Current Rewards Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="p-4 rounded-lg bg-black/20 border border-white/10">
-              <p className="text-xs text-muted-foreground uppercase mb-1">Cash Prize (1er)</p>
-              <p className="text-2xl font-mono font-bold text-amber-400">{settings.cash_prize?.toLocaleString()} Z</p>
+          
+          {/* End Season Button */}
+          {!showEndConfirm ? (
+            <button
+              type="button"
+              onClick={() => setShowEndConfirm(true)}
+              className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold transition-all flex items-center gap-2"
+            >
+              <StopCircle className="w-4 h-4" />
+              Terminer
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
+              <span className="text-xs text-amber-500 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" />
+                Confirmer ?
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowEndConfirm(false)}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
+                disabled={isEnding}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={handleEndSeason}
+                disabled={isEnding}
+                className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold text-xs flex items-center gap-1"
+              >
+                {isEnding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trophy className="w-3 h-3" />}
+                DISTRIBUER
+              </button>
             </div>
-            <div className="p-4 rounded-lg bg-black/20 border border-white/10">
-              <p className="text-xs text-muted-foreground uppercase mb-1">Total Zeny à distribuer</p>
-              <p className="text-2xl font-mono font-bold text-primary">
-                {(settings.cash_prize + (settings.zeny_rewards?.reduce((a, b) => a + b, 0) || 0)).toLocaleString()} Z
+          )}
+        </div>
+      ) : (
+        <div className="rounded-xl p-4 bg-white/5 border border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <XCircle className="w-6 h-6 text-muted-foreground" />
+            <div>
+              <p className="font-bold">⏸️ Aucune Saison Active</p>
+              <p className="text-xs text-muted-foreground">
+                {settings.rewards_distributed 
+                  ? 'Dernière saison terminée, récompenses distribuées ✓'
+                  : 'Configure les paramètres puis démarre la saison'
+                }
               </p>
             </div>
           </div>
-
-          {/* End Season Button */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-            <div>
-              <p className="font-bold text-amber-400">Terminer la Saison</p>
-              <p className="text-xs text-muted-foreground">Les Zeny seront distribués aux top 10 joueurs</p>
-            </div>
-            
-            {!showEndConfirm ? (
-              <button
-                type="button"
-                onClick={() => setShowEndConfirm(true)}
-                className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold transition-all flex items-center gap-2"
-              >
-                <StopCircle className="w-4 h-4" />
-                Terminer
-              </button>
-            ) : (
-              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
-                <span className="text-xs text-amber-500 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />
-                  Confirmer ?
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowEndConfirm(false)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
-                  disabled={isEnding}
-                >
-                  Annuler
-                </button>
-                <button
-                  type="button"
-                  onClick={handleEndSeason}
-                  disabled={isEnding}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold text-xs flex items-center gap-1"
-                >
-                  {isEnding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trophy className="w-3 h-3" />}
-                  DISTRIBUER
-                </button>
-              </div>
-            )}
-          </div>
         </div>
-      </div>
-    )
-  }
-
-  // Season not active - show configuration form
-  return (
-    <div className="space-y-8">
-      {/* Inactive Status */}
-      <div className="rounded-xl p-4 bg-white/5 border border-white/10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <XCircle className="w-6 h-6 text-muted-foreground" />
-          <div>
-            <p className="font-bold">⏸️ Aucune Saison Active</p>
-            <p className="text-xs text-muted-foreground">
-              {settings.rewards_distributed 
-                ? 'Dernière saison terminée, récompenses distribuées ✓'
-                : 'Configure les paramètres puis démarre la saison'
-              }
-            </p>
-          </div>
-        </div>
-      </div>
+      )}
 
       <form action={handleSubmit} className="space-y-8">
         <input type="hidden" name="id" value={settings.id} />
@@ -348,15 +322,17 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             Enregistrer
           </button>
 
-          <button
-            type="button"
-            onClick={handleStartSeason}
-            disabled={isStarting}
-            className="px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-          >
-            {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
-            🚀 Démarrer la Saison
-          </button>
+          {!isSeasonActive && (
+            <button
+              type="button"
+              onClick={handleStartSeason}
+              disabled={isStarting}
+              className="px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            >
+              {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
+              🚀 Démarrer la Saison
+            </button>
+          )}
         </div>
       </form>
     </div>

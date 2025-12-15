@@ -97,6 +97,25 @@ export async function updateSeasonSettings(formData: FormData) {
 
   console.log('Update result:', data)
 
+  // SYNC: Also update the active season in seasons table (if exists)
+  const { data: activeSeason } = await supabaseAdmin
+    .from('seasons')
+    .select('id')
+    .eq('is_active', true)
+    .single()
+
+  if (activeSeason?.id) {
+    await supabaseAdmin
+      .from('seasons')
+      .update({
+        name: title,
+        end_date: season_end
+      })
+      .eq('id', activeSeason.id)
+    
+    console.log('[updateSeasonSettings] Synced seasons table with new title/end_date')
+  }
+
   revalidatePath('/admin/settings')
   revalidatePath('/leaderboard')
   
@@ -122,18 +141,59 @@ export async function startSeason() {
   // First check if settings row exists
   const { data: existing } = await supabaseAdmin
     .from('season_settings')
-    .select('id')
+    .select('*')
     .eq('id', '00000000-0000-0000-0000-000000000001')
     .single()
 
+  const now = new Date()
+  let seasonEnd: Date
+  let seasonTitle: string
+
+  if (!existing) {
+    seasonEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    seasonTitle = 'Saison 1'
+  } else {
+    seasonEnd = new Date(existing.season_end)
+    seasonTitle = existing.title || 'Saison'
+  }
+
+  // STEP 1: First, create season in seasons table (before marking settings as active)
+  // Deactivate any previously active season
+  await supabaseAdmin
+    .from('seasons')
+    .update({ is_active: false })
+    .eq('is_active', true)
+
+  // Create new season entry
+  const { data: newSeason, error: seasonError } = await supabaseAdmin
+    .from('seasons')
+    .insert({
+      name: seasonTitle,
+      start_date: now.toISOString(),
+      end_date: seasonEnd.toISOString(),
+      is_active: true
+    })
+    .select('id')
+    .single()
+
+  if (seasonError) {
+    console.error('Season creation error:', seasonError)
+    // If we can't create the season entry, we still continue but log the error
+    // The system will fallback to global stats if needed
+  } else {
+    console.log('[startSeason] Created season entry:', newSeason?.id)
+  }
+
+  // STEP 2: Now update season_settings (after seasons table is set up)
   if (!existing) {
     // Create the row if it doesn't exist
     const { error: insertError } = await supabaseAdmin
       .from('season_settings')
       .insert({
         id: '00000000-0000-0000-0000-000000000001',
+        title: seasonTitle,
         cash_prize: 10000,
-        season_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        season_end: seasonEnd.toISOString(),
         top1_prize: 'Non défini',
         top2_prize: 'Non défini',
         top3_prize: 'Non défini',
@@ -144,6 +204,10 @@ export async function startSeason() {
 
     if (insertError) {
       console.error('Insert error:', insertError)
+      // Rollback: deactivate the season we just created
+      if (newSeason?.id) {
+        await supabaseAdmin.from('seasons').update({ is_active: false }).eq('id', newSeason.id)
+      }
       return { error: `Erreur création settings: ${insertError.message}` }
     }
   } else {
@@ -153,12 +217,16 @@ export async function startSeason() {
       .update({
         is_active: true,
         rewards_distributed: false,
-        updated_at: new Date().toISOString()
+        updated_at: now.toISOString()
       })
       .eq('id', '00000000-0000-0000-0000-000000000001')
 
     if (updateError) {
       console.error('Update error:', updateError)
+      // Rollback: deactivate the season we just created
+      if (newSeason?.id) {
+        await supabaseAdmin.from('seasons').update({ is_active: false }).eq('id', newSeason.id)
+      }
       return { error: `Erreur démarrage saison: ${updateError.message}` }
     }
   }
@@ -203,23 +271,69 @@ export async function endSeason() {
     return { error: "Les récompenses ont déjà été distribuées" }
   }
 
-  // Fetch top 10 players by total_won (PnL), exclude admins
-  const { data: top10, error: top10Error } = await supabaseAdmin
-    .from('profiles')
-    .select('id, username, balance, avatar_url, role')
-    .neq('role', 'admin') // EXCLUDE ADMINS
-    .order('total_won', { ascending: false })
-    .limit(10)
+  // Get active season ID from seasons table
+  const { data: activeSeason } = await supabaseAdmin
+    .from('seasons')
+    .select('id')
+    .eq('is_active', true)
+    .single()
 
-  if (top10Error || !top10) {
-    return { error: `Erreur récupération classement: ${top10Error?.message}` }
+  let top10Data: any[] = []
+
+  // Try to get top 10 from season_leaderboards first (if season exists and has data)
+  if (activeSeason?.id) {
+    const { data: seasonTop10 } = await supabaseAdmin
+      .from('season_leaderboards')
+      .select(`
+        user_id,
+        points,
+        profiles!inner (
+          id,
+          username,
+          balance,
+          avatar_url,
+          role
+        )
+      `)
+      .eq('season_id', activeSeason.id)
+      .neq('profiles.role', 'admin')
+      .order('points', { ascending: false })
+      .limit(10)
+
+    if (seasonTop10 && seasonTop10.length > 0) {
+      // Use season leaderboard data
+      top10Data = seasonTop10.map((entry: any) => ({
+        id: entry.profiles.id,
+        username: entry.profiles.username,
+        balance: entry.profiles.balance,
+        avatar_url: entry.profiles.avatar_url,
+        points: entry.points
+      }))
+      console.log('[endSeason] Using season_leaderboards for ranking')
+    }
+  }
+
+  // Fallback to global stats if no season data
+  if (top10Data.length === 0) {
+    const { data: globalTop10, error: top10Error } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username, balance, avatar_url, role')
+      .neq('role', 'admin')
+      .order('total_won', { ascending: false })
+      .limit(10)
+
+    if (top10Error || !globalTop10) {
+      return { error: `Erreur récupération classement: ${top10Error?.message}` }
+    }
+    top10Data = globalTop10
+    console.log('[endSeason] Fallback to profiles.total_won for ranking')
   }
 
   const distributionResults: { rank: number; username: string; reward: number }[] = []
 
   // Distribute rewards to each ranked player
-  for (let i = 0; i < top10.length; i++) {
-    const player = top10[i]
+  for (let i = 0; i < top10Data.length; i++) {
+    const player = top10Data[i]
     const rank = i + 1
     
     // Rank 1 gets cash_prize (as Zeny) + zeny_rewards[0]
@@ -247,19 +361,19 @@ export async function endSeason() {
           reward
         })
 
-        // Log transaction
+        // Log transaction (using 'bonus' type as 'season_reward' is not in CHECK constraint)
         await supabaseAdmin.from('transactions').insert({
           user_id: player.id,
-          type: 'season_reward',
+          type: 'bonus',
           amount: reward,
-          description: `Récompense Saison - Rang #${rank}`
+          description: `🏆 Récompense Saison - Rang #${rank}`
         })
       }
     }
   }
 
   // Archive Season - Save all top 10
-  const allWinners = top10.map((p, i) => ({
+  const allWinners = top10Data.map((p, i) => ({
     rank: i + 1,
     username: p.username,
     avatar: getAvatarUrl(p.avatar_url),
@@ -273,7 +387,7 @@ export async function endSeason() {
     winners: allWinners
   })
 
-  // Mark season as ended
+  // Mark season as ended in season_settings
   const { error: endError } = await supabase
     .from('season_settings')
     .update({
@@ -285,6 +399,14 @@ export async function endSeason() {
 
   if (endError) {
     return { error: `Erreur fin de saison: ${endError.message}` }
+  }
+
+  // Also mark season as ended in seasons table
+  if (activeSeason?.id) {
+    await supabaseAdmin
+      .from('seasons')
+      .update({ is_active: false })
+      .eq('id', activeSeason.id)
   }
 
   revalidatePath('/admin/settings')
@@ -345,23 +467,68 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
 
 // Internal function for auto-distribution (bypasses admin check)
 async function endSeasonInternal(settings: any) {
-  // Fetch top 10 players, exclude admins
-  const { data: top10 } = await supabaseAdmin
-    .from('profiles')
-    .select('id, username, balance, avatar_url, role')
-    .neq('role', 'admin') // EXCLUDE ADMINS
-    .order('total_won', { ascending: false })
-    .limit(10)
+  // Get active season ID from seasons table
+  const { data: activeSeason } = await supabaseAdmin
+    .from('seasons')
+    .select('id')
+    .eq('is_active', true)
+    .single()
 
-  if (!top10) {
-    return { success: false, message: "Erreur récupération classement" }
+  let top10Data: any[] = []
+
+  // Try to get top 10 from season_leaderboards first
+  if (activeSeason?.id) {
+    const { data: seasonTop10 } = await supabaseAdmin
+      .from('season_leaderboards')
+      .select(`
+        user_id,
+        points,
+        profiles!inner (
+          id,
+          username,
+          balance,
+          avatar_url,
+          role
+        )
+      `)
+      .eq('season_id', activeSeason.id)
+      .neq('profiles.role', 'admin')
+      .order('points', { ascending: false })
+      .limit(10)
+
+    if (seasonTop10 && seasonTop10.length > 0) {
+      top10Data = seasonTop10.map((entry: any) => ({
+        id: entry.profiles.id,
+        username: entry.profiles.username,
+        balance: entry.profiles.balance,
+        avatar_url: entry.profiles.avatar_url,
+        points: entry.points
+      }))
+      console.log('[endSeasonInternal] Using season_leaderboards for ranking')
+    }
+  }
+
+  // Fallback to global stats if no season data
+  if (top10Data.length === 0) {
+    const { data: globalTop10 } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username, balance, avatar_url, role')
+      .neq('role', 'admin')
+      .order('total_won', { ascending: false })
+      .limit(10)
+
+    if (!globalTop10) {
+      return { success: false, message: "Erreur récupération classement" }
+    }
+    top10Data = globalTop10
+    console.log('[endSeasonInternal] Fallback to profiles.total_won for ranking')
   }
 
   let totalDistributed = 0
   let playersRewarded = 0
 
-  for (let i = 0; i < top10.length; i++) {
-    const player = top10[i]
+  for (let i = 0; i < top10Data.length; i++) {
+    const player = top10Data[i]
     const rank = i + 1
     
     let reward = 0
@@ -379,11 +546,12 @@ async function endSeasonInternal(settings: any) {
         .update({ balance: newBalance })
         .eq('id', player.id)
 
+      // Log transaction (using 'bonus' type as 'season_reward' is not in CHECK constraint)
       await supabaseAdmin.from('transactions').insert({
         user_id: player.id,
-        type: 'season_reward',
+        type: 'bonus',
         amount: reward,
-        description: `Récompense Saison - Rang #${rank}`
+        description: `🏆 Récompense Saison - Rang #${rank}`
       })
 
       totalDistributed += reward
@@ -392,7 +560,7 @@ async function endSeasonInternal(settings: any) {
   }
 
   // Archive Season - Save all top 10
-  const allWinners = top10.map((p: any, i: number) => ({
+  const allWinners = top10Data.map((p: any, i: number) => ({
     rank: i + 1,
     username: p.username,
     avatar: getAvatarUrl(p.avatar_url),
@@ -406,7 +574,7 @@ async function endSeasonInternal(settings: any) {
     winners: allWinners
   })
 
-  // Mark season as ended
+  // Mark season as ended in season_settings
   await supabaseAdmin
     .from('season_settings')
     .update({
@@ -415,6 +583,14 @@ async function endSeasonInternal(settings: any) {
       updated_at: new Date().toISOString()
     })
     .eq('id', '00000000-0000-0000-0000-000000000001')
+
+  // Also mark season as ended in seasons table
+  if (activeSeason?.id) {
+    await supabaseAdmin
+      .from('seasons')
+      .update({ is_active: false })
+      .eq('id', activeSeason.id)
+  }
 
   return { 
     success: true, 
