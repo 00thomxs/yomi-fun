@@ -238,3 +238,71 @@ export async function closeMarketManually(marketId: string): Promise<{ success?:
   revalidatePath('/')
   return { success: true }
 }
+
+// =============================================
+// UPDATE MARKET
+// =============================================
+export async function updateMarket(formData: FormData): Promise<CreateMarketState> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+    
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  const id = formData.get('id') as string
+  const question = formData.get('question') as string
+  const description = formData.get('description') as string
+  const category = formData.get('category') as string
+  const imageUrl = formData.get('imageUrl') as string
+  const closesAt = formData.get('closesAt') as string | null
+  const isFeatured = formData.get('isFeatured') === 'true'
+  const isHeadline = formData.get('isHeadline') === 'true'
+
+  // Build update object
+  const updateData: Record<string, any> = {
+    question,
+    description: description || null,
+    category,
+    image_url: imageUrl || null,
+    is_featured: isFeatured,
+    is_headline: isHeadline
+  }
+
+  // Only update closes_at if provided (not locked by season)
+  if (closesAt) {
+    updateData.closes_at = closesAt
+  }
+
+  // If setting as headline, remove headline from others first
+  if (isHeadline) {
+    await supabase
+      .from('markets')
+      .update({ is_headline: false })
+      .eq('is_headline', true)
+      .neq('id', id)
+  }
+
+  const { error } = await supabase
+    .from('markets')
+    .update(updateData)
+    .eq('id', id)
+
+  if (error) {
+    console.error('Update market error:', error)
+    return { error: `Erreur mise à jour: ${error.message}` }
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  revalidatePath(`/market/${id}`)
+  
+  return { success: true, message: 'Event mis à jour avec succès !' }
+}

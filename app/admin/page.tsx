@@ -174,6 +174,13 @@ export default async function AdminDashboard() {
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Link>
+                      <Link
+                        href={`/admin/edit/${market.id}`}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-amber-400 hover:text-amber-300"
+                        title="Modifier"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Link>
                       <CloseMarket marketId={market.id} isLive={market.is_live} />
                       <Link
                         href={`/admin/resolve/${market.id}`}
