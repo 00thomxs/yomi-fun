@@ -385,7 +385,6 @@ export default function CreateMarketPage() {
                 value={initialLiquidity}
                 onChange={(e) => setInitialLiquidity(Math.max(100, parseInt(e.target.value) || 1000))}
                 min="100"
-                step="1000"
                 className="flex-1 bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all font-mono"
               />
               <div className="flex gap-2">
