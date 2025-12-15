@@ -56,9 +56,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
   // Fetch season settings on mount
   useEffect(() => {
+    let isMounted = true
+    
     const fetchSeasonSettings = async () => {
       try {
         const settings = await getSeasonSettings()
+        if (!isMounted) return
+        
         setSeasonSettings(settings)
         
         if (settings?.is_active) {
@@ -70,32 +74,51 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             .eq('is_active', true)
             .single()
           
+          if (!isMounted) return
+          
           if (activeSeason) {
             setActiveSeasonId(activeSeason.id)
+          } else {
+            // Season settings says active but no season found in seasons table
+            // Fallback to global
+            setViewMode('global')
           }
           
+          // Check for reward distribution (don't reload, just update state)
           const { distributed, message } = await checkAndDistributeRewards()
-          if (distributed) {
+          if (distributed && isMounted) {
             toast.success(message || "Récompenses distribuées !")
+            // Refetch settings instead of reloading
             const newSettings = await getSeasonSettings()
-            setSeasonSettings(newSettings)
-            window.location.reload()
+            if (isMounted) {
+              setSeasonSettings(newSettings)
+              if (!newSettings?.is_active) {
+                setViewMode('global')
+                setActiveSeasonId(null)
+              }
+            }
           }
         } else {
           // If no active season, default to global view
           setViewMode('global')
           const past = await getLastSeason()
-          if (past) {
+          if (past && isMounted) {
             setLastSeason(past)
           }
         }
       } catch (e) {
         console.error("Failed to fetch season settings", e)
-        setViewMode('global')
+        if (isMounted) {
+          setViewMode('global')
+        }
       }
     }
     
     fetchSeasonSettings()
+    
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   // Fetch season events when there's an active season
@@ -124,6 +147,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   // Fetch leaderboard data based on viewMode
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      // Wait for season data to be loaded before fetching season leaderboard
+      if (viewMode === 'season' && seasonSettings?.is_active && !activeSeasonId) {
+        // Season mode is selected but activeSeasonId not yet loaded, wait...
+        return
+      }
+      
       setIsLoading(true)
       const supabase = createClient()
       
@@ -164,35 +193,38 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             }
           })
           setPlayers(formatted)
+        } else {
+          // No season data yet, show empty
+          setPlayers([])
         }
       } else {
         // Fetch from profiles (global)
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, total_won, win_rate, balance, role')
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url, total_won, win_rate, balance, role')
           .neq('role', 'admin')
-        .order('total_won', { ascending: false })
-        .limit(50)
+          .order('total_won', { ascending: false })
+          .limit(50)
 
-      if (data) {
-        const formatted = data.map((p: any, idx: number) => ({
-          rank: idx + 1,
-          id: p.id,
-          username: p.username || `User ${p.id.slice(0, 4)}`,
-          avatar: getAvatarUrl(p.avatar_url),
-          balance: p.balance,
-          winRate: p.win_rate || 0,
-          totalWon: p.total_won || 0
-        }))
-        setPlayers(formatted)
-      }
+        if (data) {
+          const formatted = data.map((p: any, idx: number) => ({
+            rank: idx + 1,
+            id: p.id,
+            username: p.username || `User ${p.id.slice(0, 4)}`,
+            avatar: getAvatarUrl(p.avatar_url),
+            balance: p.balance,
+            winRate: p.win_rate || 0,
+            totalWon: p.total_won || 0
+          }))
+          setPlayers(formatted)
+        }
       }
       
       setIsLoading(false)
     }
     
     fetchLeaderboard()
-  }, [viewMode, activeSeasonId])
+  }, [viewMode, activeSeasonId, seasonSettings?.is_active])
 
   const top1 = players[0]
   const top2 = players[1]
