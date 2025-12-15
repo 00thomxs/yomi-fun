@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Users, Activity, HelpCircle, Crown } from "lucide-react"
+import { Clock, Users, Activity, HelpCircle, Trophy } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -64,7 +64,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                   className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
                   title={`Saison: ${market.season.name}`}
                 >
-                  <Crown className="w-3 h-3 text-amber-400" />
+                  <Trophy className="w-3 h-3 text-amber-400" />
                 </span>
               )}
               {market.isLive ? (
@@ -232,7 +232,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
                 className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
                 title={`Saison: ${market.season.name}`}
               >
-                <Crown className="w-3 h-3 text-amber-400" />
+                <Trophy className="w-3 h-3 text-amber-400" />
               </span>
             )}
             {market.isLive ? (
