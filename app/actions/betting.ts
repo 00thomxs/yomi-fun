@@ -114,6 +114,25 @@ export async function placeBet(
   const fee = Math.round(amount * feeRate)
   const investment = amount - fee
 
+  // --- 3.0 ANTI-FAILLE: Dynamic max bet vs liquidity/seed ---
+  // Prevent a single bet from moving the market too much.
+  // Rule of thumb: max investment ~= 10% of reference liquidity.
+  const MAX_INVEST_FRACTION = 0.10
+  const poolTotal = poolYes + poolNo
+  const seed = Number((market as any).initial_liquidity) || 10000
+  const referenceLiquidity = market.type === 'binary' ? poolTotal : Math.max(seed, poolTotal)
+  const maxInvestmentAllowed = Math.floor(referenceLiquidity * MAX_INVEST_FRACTION)
+  const maxAmountAllowed = Math.max(
+    10,
+    Math.floor(maxInvestmentAllowed / Math.max(0.0001, (1 - feeRate)))
+  )
+
+  if (amount > maxAmountAllowed) {
+    return {
+      error: `Mise trop élevée pour la liquidité actuelle. Max pour cet event: ${maxAmountAllowed.toLocaleString('fr-FR')} Zeny.`
+    }
+  }
+
   // Simplified Odds for all types: 1 / Probability
   // Use current probability from DB
   const probability = selectedOutcome.probability / 100
