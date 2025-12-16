@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
@@ -18,10 +18,18 @@ import {
   Loader2,
   Trophy,
   AlertTriangle,
-  Lock
+  Lock,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Target
 } from "lucide-react"
 import Link from "next/link"
 import { MARKET_CATEGORIES } from "@/lib/constants"
+import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+
+const CHART_COLORS = ['#10b981', '#ef4444', '#f59e0b', '#6366f1', '#ec4899', '#14b8a6', '#8b5cf6']
 
 type MarketData = {
   id: string
@@ -62,6 +70,11 @@ export default function EditMarketPage({ params }: PageProps) {
   const [topBets, setTopBets] = useState<AdminMarketTopBet[]>([])
   const [totalBetsCount, setTotalBetsCount] = useState<number>(0)
   const [loadingTopBets, setLoadingTopBets] = useState(false)
+  
+  // Extended stats
+  const [allBets, setAllBets] = useState<any[]>([])
+  const [outcomes, setOutcomes] = useState<any[]>([])
+  const [loadingExtendedStats, setLoadingExtendedStats] = useState(false)
   
   // Form state
   const [question, setQuestion] = useState("")
@@ -154,6 +167,107 @@ export default function EditMarketPage({ params }: PageProps) {
       isMounted = false
     }
   }, [marketId, toast])
+
+  // Fetch extended stats (all bets + outcomes)
+  useEffect(() => {
+    if (!marketId) return
+    let isMounted = true
+
+    const fetchExtendedStats = async () => {
+      setLoadingExtendedStats(true)
+      const supabase = createClient()
+      
+      // Fetch all bets for this market
+      const { data: betsData } = await supabase
+        .from('bets')
+        .select('id, user_id, amount, outcome_id, direction, status, created_at')
+        .eq('market_id', marketId)
+        .order('created_at', { ascending: true })
+      
+      // Fetch outcomes
+      const { data: outcomesData } = await supabase
+        .from('outcomes')
+        .select('*')
+        .eq('market_id', marketId)
+      
+      if (!isMounted) return
+      
+      setAllBets(betsData || [])
+      setOutcomes(outcomesData || [])
+      setLoadingExtendedStats(false)
+    }
+
+    fetchExtendedStats()
+    return () => { isMounted = false }
+  }, [marketId])
+
+  // Computed stats
+  const extendedStats = useMemo(() => {
+    if (allBets.length === 0) return null
+
+    const uniqueBettors = new Set(allBets.map(b => b.user_id)).size
+    const avgBetSize = Math.round(allBets.reduce((sum, b) => sum + b.amount, 0) / allBets.length)
+    const medianBetSize = (() => {
+      const sorted = [...allBets].sort((a, b) => a.amount - b.amount)
+      const mid = Math.floor(sorted.length / 2)
+      return sorted.length % 2 ? sorted[mid].amount : Math.round((sorted[mid - 1].amount + sorted[mid].amount) / 2)
+    })()
+
+    // Whale concentration (top 3 bettors' volume)
+    const volumeByUser = allBets.reduce((acc, b) => {
+      acc[b.user_id] = (acc[b.user_id] || 0) + b.amount
+      return acc
+    }, {} as Record<string, number>)
+    const sortedUsers = Object.entries(volumeByUser).sort(([, a], [, b]) => (b as number) - (a as number))
+    const top3Volume = sortedUsers.slice(0, 3).reduce((sum, [, vol]) => sum + (vol as number), 0)
+    const totalVolume = allBets.reduce((sum, b) => sum + b.amount, 0)
+    const whaleConcentration = totalVolume > 0 ? Math.round((top3Volume / totalVolume) * 100) : 0
+
+    // Distribution by outcome
+    const outcomeDistribution = outcomes.map(o => {
+      const outcomeBets = allBets.filter(b => b.outcome_id === o.id)
+      return {
+        name: o.name,
+        value: outcomeBets.reduce((sum, b) => sum + b.amount, 0),
+        count: outcomeBets.length
+      }
+    }).filter(o => o.value > 0)
+
+    // YES/NO distribution for binary
+    const yesNoBets = {
+      yes: allBets.filter(b => b.direction === 'YES' || (!b.direction && outcomes.find(o => o.id === b.outcome_id)?.name?.toLowerCase() === 'oui')),
+      no: allBets.filter(b => b.direction === 'NO' || (!b.direction && outcomes.find(o => o.id === b.outcome_id)?.name?.toLowerCase() === 'non'))
+    }
+    const yesVolume = yesNoBets.yes.reduce((sum, b) => sum + b.amount, 0)
+    const noVolume = yesNoBets.no.reduce((sum, b) => sum + b.amount, 0)
+
+    // Betting timing (by hour)
+    const betsByHour = allBets.reduce((acc, b) => {
+      const hour = new Date(b.created_at).getHours()
+      acc[hour] = (acc[hour] || 0) + 1
+      return acc
+    }, {} as Record<number, number>)
+    const peakHour = Object.entries(betsByHour).sort(([, a], [, b]) => (b as number) - (a as number))[0]
+
+    // Risk/Exposure calculation (payout if each outcome wins)
+    const exposureByOutcome = outcomes.map(o => {
+      const outcomeBets = topBets.filter(b => b.outcome_id === o.id)
+      const totalPayout = outcomeBets.reduce((sum, b) => sum + b.potential_payout, 0)
+      return { name: o.name, exposure: totalPayout }
+    })
+
+    return {
+      uniqueBettors,
+      avgBetSize,
+      medianBetSize,
+      whaleConcentration,
+      outcomeDistribution,
+      yesVolume,
+      noVolume,
+      peakHour: peakHour ? { hour: Number(peakHour[0]), count: peakHour[1] as number } : null,
+      exposureByOutcome
+    }
+  }, [allBets, outcomes, topBets])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -447,6 +561,137 @@ export default function EditMarketPage({ params }: PageProps) {
             }
           </p>
         </div>
+
+        {/* Extended Stats */}
+        {extendedStats && (
+          <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+            <h2 className="font-semibold flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" />
+              Statistiques Avancées
+            </h2>
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="p-3 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wider mb-1">
+                  <Users className="w-3 h-3" /> Parieurs Uniques
+                </div>
+                <p className="text-xl font-bold">{extendedStats.uniqueBettors}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wider mb-1">
+                  <Target className="w-3 h-3" /> Mise Moyenne
+                </div>
+                <p className="text-xl font-bold flex items-center gap-0.5">
+                  {extendedStats.avgBetSize.toLocaleString()}<CurrencySymbol className="w-4 h-4" />
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wider mb-1">
+                  <TrendingUp className="w-3 h-3" /> Mise Médiane
+                </div>
+                <p className="text-xl font-bold flex items-center gap-0.5">
+                  {extendedStats.medianBetSize.toLocaleString()}<CurrencySymbol className="w-4 h-4" />
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-white/5 border border-border">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wider mb-1">
+                  <Trophy className="w-3 h-3 text-amber-400" /> Top 3 = Volume
+                </div>
+                <p className={`text-xl font-bold ${extendedStats.whaleConcentration > 50 ? 'text-amber-400' : ''}`}>
+                  {extendedStats.whaleConcentration}%
+                </p>
+              </div>
+            </div>
+
+            {/* Pie Chart + YES/NO Distribution */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Distribution by Outcome */}
+              {extendedStats.outcomeDistribution.length > 0 && (
+                <div className="p-4 rounded-lg bg-white/5 border border-border">
+                  <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Volume par Choix</h4>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPie>
+                        <Pie
+                          data={extendedStats.outcomeDistribution}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={60}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
+                        >
+                          {extendedStats.outcomeDistribution.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', fontSize: '12px' }}
+                          formatter={(value: number) => [`${value.toLocaleString()} Zeny`, 'Volume']}
+                        />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Info */}
+              <div className="space-y-3">
+                {/* YES/NO Bar for Binary */}
+                {market?.type === 'binary' && (extendedStats.yesVolume > 0 || extendedStats.noVolume > 0) && (
+                  <div className="p-4 rounded-lg bg-white/5 border border-border">
+                    <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">OUI vs NON</h4>
+                    <div className="flex h-6 rounded-lg overflow-hidden">
+                      <div 
+                        className="bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ width: `${(extendedStats.yesVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100}%` }}
+                      >
+                        {extendedStats.yesVolume > 0 && `OUI ${Math.round((extendedStats.yesVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100)}%`}
+                      </div>
+                      <div 
+                        className="bg-rose-500 flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ width: `${(extendedStats.noVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100}%` }}
+                      >
+                        {extendedStats.noVolume > 0 && `NON ${Math.round((extendedStats.noVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100)}%`}
+                      </div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
+                      <span>{extendedStats.yesVolume.toLocaleString()} Zeny</span>
+                      <span>{extendedStats.noVolume.toLocaleString()} Zeny</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Peak Hour */}
+                {extendedStats.peakHour && (
+                  <div className="p-4 rounded-lg bg-white/5 border border-border">
+                    <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Heure de Pointe</h4>
+                    <p className="text-lg font-bold">
+                      {extendedStats.peakHour.hour}h00 - {(extendedStats.peakHour.hour + 1) % 24}h00
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {extendedStats.peakHour.count} paris placés à cette heure
+                    </p>
+                  </div>
+                )}
+
+                {/* Whale Alert */}
+                {extendedStats.whaleConcentration > 60 && (
+                  <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                    <div className="flex items-center gap-2 text-amber-400">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span className="font-bold text-sm">Concentration élevée</span>
+                    </div>
+                    <p className="text-xs text-amber-400/80 mt-1">
+                      Les 3 plus gros parieurs représentent {extendedStats.whaleConcentration}% du volume.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Top 10 Biggest Bets */}
         <div className="space-y-4 p-6 rounded-xl bg-card border border-border">

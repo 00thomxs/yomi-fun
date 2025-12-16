@@ -214,6 +214,16 @@ export async function resolveMarket(
     }
   }
 
+  // Capture season leaderboard snapshot for position history tracking
+  if (seasonId) {
+    const { error: snapshotError } = await supabaseAdmin.rpc('capture_season_leaderboard_snapshot', {
+      p_season_id: seasonId
+    })
+    if (snapshotError) {
+      console.error(`[RESOLVE] Season snapshot failed (non-blocking):`, snapshotError)
+    }
+  }
+
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/admin')
 
@@ -393,6 +403,16 @@ export async function resolveMarketMulti(
           console.error(`[RESOLVE_MULTI] Season leaderboard update (loser) failed:`, seasonError)
         }
       }
+    }
+  }
+
+  // Capture season leaderboard snapshot for position history tracking
+  if (seasonId) {
+    const { error: snapshotError } = await supabaseAdmin.rpc('capture_season_leaderboard_snapshot', {
+      p_season_id: seasonId
+    })
+    if (snapshotError) {
+      console.error(`[RESOLVE_MULTI] Season snapshot failed (non-blocking):`, snapshotError)
     }
   }
 
