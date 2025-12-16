@@ -1472,6 +1472,10 @@ function MultiMarketContent({
           betAmount={betAmount}
           setBetAmount={setBetAmount}
           userBalance={userBalance}
+          marketType="multi"
+          poolYes={Number((market as any).pool_yes) || 0}
+          poolNo={Number((market as any).pool_no) || 0}
+          initialLiquidity={Number((market as any).initial_liquidity) || 10000}
           calculatePayout={calculatePayout}
           handlePlaceBet={() => setShowConfirmModal(true)}
           hasBet={userBets && userBets.length > 0}
