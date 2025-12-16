@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Crown, Target, Clock, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Target, Clock, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
-import { getSeasonSettings, checkAndDistributeRewards, getLastSeason, type SeasonSettings } from "@/app/admin/settings/actions"
+import { getSeasonSettings, checkAndDistributeRewards, type SeasonSettings } from "@/app/admin/settings/actions"
 import { toast } from "sonner"
 import { getAvatarUrl } from "@/lib/utils/avatar"
 
@@ -24,17 +24,6 @@ type Player = {
   totalWon: number
 }
 
-type PastSeason = {
-  id: string
-  title: string
-  winners: {
-    rank: number
-    username: string
-    avatar: string
-    reward: number
-  }[]
-}
-
 type SeasonEvent = {
   id: string
   question: string
@@ -49,7 +38,6 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isMetaLoading, setIsMetaLoading] = useState(true) // season settings + activeSeasonId bootstrap
   const [seasonSettings, setSeasonSettings] = useState<SeasonSettings | null>(null)
-  const [lastSeason, setLastSeason] = useState<PastSeason | null>(null)
   const [viewMode, setViewMode] = useState<'season' | 'global'>('season') // Toggle state
   const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
   const [seasonEvents, setSeasonEvents] = useState<SeasonEvent[]>([])
@@ -93,10 +81,6 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           // If no active season, default to global view
           setViewMode('global')
           setActiveSeasonId(null)
-          const past = await getLastSeason()
-          if (past && isMounted) {
-            setLastSeason(past)
-          }
         }
       } catch (e) {
         console.error("Failed to fetch season settings", e)
@@ -366,51 +350,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         )}
       </div>
 
-      {/* Last Season Winners Banner */}
-      {!hasSeason && lastSeason && (
-        <div className="w-full max-w-[95%] mx-auto rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-purple-500/10 border border-purple-500/30 p-4 relative overflow-hidden shadow-lg mb-16">
-          <div className="absolute top-0 right-0 p-2 opacity-10">
-            <Trophy className="w-24 h-24 rotate-12 text-purple-500" />
-          </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-4 h-4 text-purple-400" />
-              <h3 className="text-xs font-bold tracking-widest uppercase text-purple-400">Vainqueurs {lastSeason.title}</h3>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {lastSeason.winners.slice(0, 3).map((winner) => (
-                <div key={winner.rank} className="flex flex-col items-center text-center">
-                  <div className="relative mb-2">
-                    {winner.rank === 1 && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <Crown className="w-6 h-6 text-amber-400 fill-amber-400/20 animate-pulse" />
-                      </div>
-                    )}
-                    <img 
-                      src={winner.avatar || "/images/default-avatar.svg"} 
-                      alt={winner.username} 
-                      className={`rounded-full object-cover border-2 ${
-                        winner.rank === 1 ? "w-12 h-12 border-amber-400" : 
-                        winner.rank === 2 ? "w-10 h-10 border-gray-400" : 
-                        "w-10 h-10 border-orange-500"
-                      }`}
-                    />
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-black border border-white/20 flex items-center justify-center text-[8px] font-bold">
-                      {winner.rank}
-                    </div>
-                  </div>
-                  <p className="text-xs font-bold truncate w-full px-1">{winner.username}</p>
-                  <p className="text-[9px] font-mono text-primary flex items-center justify-center gap-0.5">
-                    +{winner.reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Last Season Winners Banner - REMOVED: Now redundant since Saison tab stays visible when season ends */}
 
       {/* Season Banner - Only show in season view mode */}
       {hasSeason && viewMode === 'season' && (
