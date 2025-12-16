@@ -117,7 +117,10 @@ export async function placeBet(
   // --- 3.0 ANTI-FAILLE: Dynamic max bet vs liquidity/seed ---
   // Prevent a single bet from moving the market too much.
   // Rule of thumb: max investment ~= 10% of reference liquidity.
-  const MAX_INVEST_FRACTION = 0.10
+  // Slightly more permissive for "fun" while still preventing single-bet nukes.
+  // - Binary markets: 15% of pool total
+  // - Multi markets: 20% of seed/reference liquidity
+  const MAX_INVEST_FRACTION = market.type === 'binary' ? 0.15 : 0.20
   const poolTotal = poolYes + poolNo
   const seed = Number((market as any).initial_liquidity) || 10000
   const referenceLiquidity = market.type === 'binary' ? poolTotal : Math.max(seed, poolTotal)
@@ -216,7 +219,9 @@ export async function placeBet(
 
      const marketSeed = Number((market as any).initial_liquidity) || 10000
      // Keep same "feel" as old LIQUIDITY_FACTOR=50000 when seed=10000
-     const MULTI_LIQUIDITY_MULTIPLIER = 5
+     // Lower multiplier => more volatility for the same bet size.
+     // (Was 5, now 2.5 for "fun" early-stage markets)
+     const MULTI_LIQUIDITY_MULTIPLIER = 2.5
      const liquidityFactor = Math.max(1000, marketSeed * MULTI_LIQUIDITY_MULTIPLIER)
 
      // Use investment (amount - fee) for economics consistency
