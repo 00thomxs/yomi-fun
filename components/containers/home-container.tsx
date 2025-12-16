@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { HomeView } from "@/components/views/home-view"
+import { DailyReward } from "@/components/daily-reward"
 import { useUser } from "@/contexts/user-context"
 import type { Market } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
@@ -14,7 +15,7 @@ type HomeContainerProps = {
 
 export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeContainerProps) {
   const router = useRouter()
-  const { placeBet } = useUser()
+  const { placeBet, setUserBalance } = useUser()
   const [activeCategory, setActiveCategory] = useState("trending")
 
   // DEBUG: Log received markets to console
@@ -106,13 +107,23 @@ export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeConta
     }
   })
 
+  const handleDailyClaim = (newBalance: number) => {
+    setUserBalance(newBalance)
+  }
+
   return (
-    <HomeView
-      markets={markets}
-      onBet={handleBet}
-      onMarketClick={handleMarketClick}
-      activeCategory={activeCategory}
-      setActiveCategory={setActiveCategory}
-    />
+    <div className="space-y-4">
+      {/* Daily Reward Banner */}
+      <DailyReward onClaim={handleDailyClaim} />
+      
+      {/* Main Content */}
+      <HomeView
+        markets={markets}
+        onBet={handleBet}
+        onMarketClick={handleMarketClick}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
+    </div>
   )
 }

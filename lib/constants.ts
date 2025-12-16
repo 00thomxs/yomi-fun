@@ -22,6 +22,47 @@ export const CATEGORIES = [
 
 export const MARKET_CATEGORIES = CATEGORIES.filter(c => c.id !== 'trending' && c.id !== 'all')
 
+// ============================================
+// ECONOMY: Daily Rewards & Welcome Bonus
+// ============================================
+
+// Welcome bonus for first-time users (enough for 2 minimum bets)
+export const WELCOME_BONUS = 200
+
+// Gacha Streak Daily Rewards
+// Days 1-6: Fixed amounts, Day 7: Jackpot with weighted random
+export const DAILY_REWARDS_CONFIG = {
+  // Fixed rewards for days 1-6 (total: 380 Zeny)
+  base: [30, 40, 50, 65, 85, 110] as const,
+  
+  // Day 7 Jackpot: Weighted random rewards
+  // Expected value: ~386 Zeny
+  jackpot_weights: [
+    { amount: 200, weight: 55, rarity: 'common', label: 'Commun', color: '#9ca3af' },
+    { amount: 400, weight: 30, rarity: 'rare', label: 'Rare', color: '#3b82f6' },
+    { amount: 800, weight: 12, rarity: 'epic', label: 'Épique', color: '#a855f7' },
+    { amount: 2000, weight: 3, rarity: 'legendary', label: 'Légendaire', color: '#f59e0b' }
+  ] as const
+}
+
+// Helper to get Day 7 jackpot result
+export function rollJackpot(): { amount: number; rarity: string; label: string; color: string } {
+  const { jackpot_weights } = DAILY_REWARDS_CONFIG
+  const totalWeight = jackpot_weights.reduce((sum, j) => sum + j.weight, 0)
+  const roll = Math.random() * totalWeight
+  
+  let cumulative = 0
+  for (const jackpot of jackpot_weights) {
+    cumulative += jackpot.weight
+    if (roll < cumulative) {
+      return jackpot
+    }
+  }
+  
+  // Fallback (should never happen)
+  return jackpot_weights[0]
+}
+
 export const ZENY_PACKS = [
   {
     id: 'pack_little_player',
