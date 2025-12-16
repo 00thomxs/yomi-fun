@@ -175,11 +175,19 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
   // Fast aggregate totals via RPC (scales better than fetching all rows)
-  const { data: totals, error: totalsError } = await supabaseAdmin
-    .rpc('get_monetary_totals')
-    .maybeSingle()
+  // Note: Supabase generated types don't know about this custom RPC yet, so we type it explicitly.
+  type MonetaryTotalsRow = {
+    total_supply: number
+    total_burned_fees: number
+    total_burned_shop: number
+    total_burned: number
+  }
 
+  const { data: totalsData, error: totalsError } = await supabaseAdmin.rpc('get_monetary_totals')
   if (totalsError) return { error: `Erreur RPC get_monetary_totals: ${totalsError.message}` }
+
+  // RPC returns an array for set-returning functions; we expect exactly 1 row (or 0 if access denied)
+  const totals = (Array.isArray(totalsData) ? totalsData[0] : totalsData) as MonetaryTotalsRow | null | undefined
   if (!totals) return { error: "Accès refusé (RPC)" }
 
   const totalSupply = Number(totals.total_supply || 0)
