@@ -99,7 +99,7 @@ export function SeasonRecapStats({
       .slice(0, 3)
 
     // Top 3 by volume (whales)
-    const topWhales = leaderboard
+    const topWhales = [...leaderboard]
       .sort((a, b) => b.total_bet_amount - a.total_bet_amount)
       .slice(0, 3)
 
@@ -120,7 +120,7 @@ export function SeasonRecapStats({
       .slice(0, 3)
 
     // Biggest single bets
-    const biggestBets = bets
+    const biggestBets = [...bets]
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5)
 
@@ -171,7 +171,7 @@ export function SeasonRecapStats({
       const dayData: any = { date: new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }
       
       positionHistory
-        .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id))
+        .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id) && h.profiles?.username)
         .forEach(h => {
           dayData[h.profiles.username] = h.position
         })

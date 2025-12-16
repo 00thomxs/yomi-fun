@@ -103,7 +103,7 @@ export function SeasonStatsClient({
       .slice(0, 3)
 
     // Top 3 by volume (whales)
-    const topWhales = leaderboard
+    const topWhales = [...leaderboard]
       .sort((a, b) => b.total_bet_amount - a.total_bet_amount)
       .slice(0, 3)
 
@@ -124,7 +124,7 @@ export function SeasonStatsClient({
       .slice(0, 3)
 
     // Biggest single bets
-    const biggestBets = bets
+    const biggestBets = [...bets]
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5)
 
@@ -164,7 +164,7 @@ export function SeasonStatsClient({
       const dayData: any = { date: new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }
       
       positionHistory
-        .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id))
+        .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id) && h.profiles?.username)
         .forEach(h => {
           dayData[h.profiles.username] = h.position
         })
@@ -410,17 +410,21 @@ export function SeasonStatsClient({
               <BarChart3 className="w-4 h-4" /> Plus Grosses Mises
             </h4>
             <div className="space-y-2">
-              {stats.biggestBets.map((bet, i) => (
-                <div key={bet.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
-                  <div>
-                    <span className="font-medium text-sm">{bet.profiles?.username}</span>
-                    <span className="text-xs text-muted-foreground ml-2">sur {bet.markets?.question?.substring(0, 40)}...</span>
+              {stats.biggestBets.map((bet, i) => {
+                const question = bet.markets?.question || ''
+                const truncatedQuestion = question.length > 40 ? question.substring(0, 40) + '...' : question
+                return (
+                  <div key={bet.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
+                    <div>
+                      <span className="font-medium text-sm">{bet.profiles?.username}</span>
+                      <span className="text-xs text-muted-foreground ml-2">sur {truncatedQuestion}</span>
+                    </div>
+                    <span className="font-bold font-mono flex items-center gap-0.5">
+                      {bet.amount.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                    </span>
                   </div>
-                  <span className="font-bold font-mono flex items-center gap-0.5">
-                    {bet.amount.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

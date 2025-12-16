@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS public.season_position_history (
   season_id UUID REFERENCES public.seasons(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   captured_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-  position INTEGER NOT NULL, -- Rank at this snapshot
-  points INTEGER NOT NULL, -- PnL at this snapshot
+  captured_date DATE DEFAULT CURRENT_DATE NOT NULL,
+  position INTEGER NOT NULL,
+  points INTEGER NOT NULL,
   wins INTEGER DEFAULT 0 NOT NULL,
   losses INTEGER DEFAULT 0 NOT NULL,
   total_bets INTEGER DEFAULT 0 NOT NULL
@@ -22,7 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_season_position_history_user
 
 -- Unique constraint: one snapshot per user per day per season
 CREATE UNIQUE INDEX IF NOT EXISTS idx_season_position_history_unique 
-  ON public.season_position_history(season_id, user_id, DATE(captured_at));
+  ON public.season_position_history(season_id, user_id, captured_date);
 
 -- RLS
 ALTER TABLE public.season_position_history ENABLE ROW LEVEL SECURITY;
@@ -49,11 +50,11 @@ AS $$
 DECLARE
   v_count INTEGER := 0;
 BEGIN
-  -- Insert current standings for top 50 players
-  INSERT INTO public.season_position_history (season_id, user_id, position, points, wins, losses, total_bets)
+  INSERT INTO public.season_position_history (season_id, user_id, captured_date, position, points, wins, losses, total_bets)
   SELECT 
     p_season_id,
     sl.user_id,
+    CURRENT_DATE,
     ROW_NUMBER() OVER (ORDER BY sl.points DESC, sl.wins DESC) as position,
     sl.points,
     sl.wins,
@@ -61,10 +62,10 @@ BEGIN
     sl.wins + sl.losses as total_bets
   FROM public.season_leaderboards sl
   WHERE sl.season_id = p_season_id
-    AND (sl.wins + sl.losses) > 0 -- Only players who participated
+    AND (sl.wins + sl.losses) > 0
   ORDER BY sl.points DESC, sl.wins DESC
   LIMIT 50
-  ON CONFLICT (season_id, user_id, DATE(captured_at)) 
+  ON CONFLICT (season_id, user_id, captured_date) 
   DO UPDATE SET
     position = EXCLUDED.position,
     points = EXCLUDED.points,
