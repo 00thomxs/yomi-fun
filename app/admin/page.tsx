@@ -36,8 +36,8 @@ function groupMarketsByMonth(markets: any[]) {
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
-  const { metrics } = await getAdminMonetaryMetrics()
-  const { snapshots } = await getAdminMonetarySnapshots(30)
+  const { metrics, error: monetaryError } = await getAdminMonetaryMetrics()
+  const { snapshots, error: snapshotsError } = await getAdminMonetarySnapshots(30)
   
   // Fetch real markets
   const { data: markets, error } = await supabase
@@ -103,7 +103,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Monetary Health */}
-      {metrics && (
+      {(metrics || monetaryError) && (
         <div className="rounded-xl bg-card border border-border p-6 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-bold flex items-center gap-2">
@@ -115,43 +115,66 @@ export default async function AdminDashboard() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Circulating Supply</p>
-              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1">
-                {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Somme des balances de tous les profils.
-              </p>
-            </div>
+          {metrics ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Circulating Supply</p>
+                <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1">
+                  {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Somme des balances de tous les profils.
+                </p>
+              </div>
 
-            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Zeny Burned</p>
-              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1 text-amber-400">
-                {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
-              </p>
-            </div>
+              <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Zeny Burned</p>
+                <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1 text-amber-400">
+                  {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
+                </p>
+              </div>
 
-            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Inflation Rate (7j)</p>
-              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-2">
-                <Flame className="w-5 h-5 text-primary" />
-                {metrics.weekly_inflation_rate_pct === null
-                  ? "—"
-                  : `${metrics.weekly_inflation_rate_pct >= 0 ? "+" : ""}${metrics.weekly_inflation_rate_pct.toFixed(2)}%`}
+              <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Inflation Rate (7j)</p>
+                <p className="text-2xl font-black mt-2 font-mono flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-primary" />
+                  {metrics.weekly_inflation_rate_pct === null
+                    ? "—"
+                    : `${metrics.weekly_inflation_rate_pct >= 0 ? "+" : ""}${metrics.weekly_inflation_rate_pct.toFixed(2)}%`}
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Basé sur la variation du supply vs snapshot d’il y a 7 jours.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="p-5 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <p className="text-sm font-bold text-rose-400">Impossible de charger les métriques monétaires</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {monetaryError}
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                Basé sur la variation du supply vs snapshot d’il y a 7 jours.
+                Vérifie que ton compte a bien <span className="font-mono text-white/80">profiles.role = 'admin'</span> et que les migrations monétaires sont exécutées
+                (<span className="font-mono">add_bet_fee_tracking</span>, <span className="font-mono">create_monetary_snapshots</span>, <span className="font-mono">create_get_monetary_totals_rpc</span>, <span className="font-mono">harden_get_monetary_totals_rpc</span>).
               </p>
             </div>
-          </div>
+          )}
 
           {/* Graph */}
-          <MonetaryChart points={snapshots || []} />
+          {metrics ? (
+            <>
+              {snapshotsError ? (
+                <div className="p-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-muted-foreground">
+                  Erreur snapshots: {snapshotsError}
+                </div>
+              ) : (
+                <MonetaryChart points={snapshots || []} />
+              )}
+            </>
+          ) : null}
         </div>
       )}
 
