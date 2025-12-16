@@ -6,6 +6,8 @@ import { DeleteMarket } from "@/app/admin/components/delete-button"
 import { CloseMarket } from "@/app/admin/components/close-button"
 import { VisibilityToggle } from "@/app/admin/components/visibility-toggle"
 import { getAdminMonetaryMetrics } from "@/app/admin/actions"
+import { getAdminMonetarySnapshots } from "@/app/admin/actions"
+import { MonetaryChart } from "@/components/admin/monetary-chart"
 
 // Helper to group markets by month
 function groupMarketsByMonth(markets: any[]) {
@@ -35,6 +37,7 @@ function groupMarketsByMonth(markets: any[]) {
 export default async function AdminDashboard() {
   const supabase = await createClient()
   const { metrics } = await getAdminMonetaryMetrics()
+  const { snapshots } = await getAdminMonetarySnapshots(30)
   
   // Fetch real markets
   const { data: markets, error } = await supabase
@@ -146,6 +149,9 @@ export default async function AdminDashboard() {
               </p>
             </div>
           </div>
+
+          {/* Graph */}
+          <MonetaryChart points={snapshots || []} />
         </div>
       )}
 

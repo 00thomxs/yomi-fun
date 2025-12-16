@@ -120,6 +120,45 @@ export type MonetaryMetrics = {
   last_snapshot_at: string | null
 }
 
+export type MonetarySnapshotRow = {
+  captured_at: string
+  total_supply: number
+  total_burned: number
+}
+
+export async function getAdminMonetarySnapshots(days: number = 30): Promise<{ error?: string; snapshots?: MonetarySnapshotRow[] }> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  const sinceIso = new Date(Date.now() - Math.max(1, days) * 24 * 3600 * 1000).toISOString()
+  const { data, error } = await supabaseAdmin
+    .from('monetary_snapshots')
+    .select('captured_at, total_supply, total_burned')
+    .gte('captured_at', sinceIso)
+    .order('captured_at', { ascending: true })
+
+  if (error) return { error: `Erreur snapshots: ${error.message}` }
+
+  return {
+    snapshots: (data || []).map((r: any) => ({
+      captured_at: r.captured_at,
+      total_supply: Number(r.total_supply || 0),
+      total_burned: Number(r.total_burned || 0),
+    }))
+  }
+}
+
 export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metrics?: MonetaryMetrics }> {
   const supabase = await createClient()
 
