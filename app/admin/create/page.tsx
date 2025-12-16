@@ -374,57 +374,111 @@ export default function CreateMarketPage() {
           </div>
 
           {/* Initial Liquidity */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Coins className="w-3 h-3" />
               Liquidité Initiale (Seed)
             </label>
-            <div className="flex gap-3 items-center">
+            
+            {/* Preset buttons with descriptions */}
+            <div className="grid grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => setInitialLiquidity(5000)}
+                className={`p-3 rounded-lg text-center transition-all border ${
+                  initialLiquidity === 5000 
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' 
+                    : 'bg-white/5 border-border hover:bg-white/10'
+                }`}
+              >
+                <div className="text-lg font-bold font-mono">5K</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">🔥 Fun</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setInitialLiquidity(10000)}
+                className={`p-3 rounded-lg text-center transition-all border ${
+                  initialLiquidity === 10000 
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' 
+                    : 'bg-white/5 border-border hover:bg-white/10'
+                }`}
+              >
+                <div className="text-lg font-bold font-mono">10K</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">⚡ Équilibré</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setInitialLiquidity(20000)}
+                className={`p-3 rounded-lg text-center transition-all border ${
+                  initialLiquidity === 20000 
+                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' 
+                    : 'bg-white/5 border-border hover:bg-white/10'
+                }`}
+              >
+                <div className="text-lg font-bold font-mono">20K</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">📊 Stable</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setInitialLiquidity(50000)}
+                className={`p-3 rounded-lg text-center transition-all border ${
+                  initialLiquidity === 50000 
+                    ? 'bg-purple-500/20 text-purple-400 border-purple-500/50' 
+                    : 'bg-white/5 border-border hover:bg-white/10'
+                }`}
+              >
+                <div className="text-lg font-bold font-mono">50K</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">🏛️ Pro</div>
+              </button>
+            </div>
+
+            {/* Custom input */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Personnalisé:</span>
               <input
                 type="number"
                 value={initialLiquidity}
                 onChange={(e) => setInitialLiquidity(Math.max(100, parseInt(e.target.value) || 1000))}
                 min="100"
-                className="flex-1 bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all font-mono"
+                className="w-32 bg-white/5 border border-border rounded-lg px-3 py-2 outline-none focus:border-primary/50 transition-all font-mono text-sm"
               />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setInitialLiquidity(1000)}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
-                    initialLiquidity === 1000 
-                      ? 'bg-primary/20 text-primary border border-primary/50' 
-                      : 'bg-white/5 border border-border hover:bg-white/10'
-                  }`}
-                >
-                  1K
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInitialLiquidity(5000)}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
-                    initialLiquidity === 5000 
-                      ? 'bg-primary/20 text-primary border border-primary/50' 
-                      : 'bg-white/5 border border-border hover:bg-white/10'
-                  }`}
-                >
-                  5K
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInitialLiquidity(10000)}
-                  className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
-                    initialLiquidity === 10000 
-                      ? 'bg-primary/20 text-primary border border-primary/50' 
-                      : 'bg-white/5 border border-border hover:bg-white/10'
-                  }`}
-                >
-                  10K
-                </button>
+            </div>
+
+            {/* Dynamic explanation based on selected liquidity */}
+            <div className="p-3 rounded-lg bg-white/5 border border-border space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Volatilité:</span>
+                <span className={`font-bold ${
+                  initialLiquidity <= 5000 ? 'text-amber-400' :
+                  initialLiquidity <= 10000 ? 'text-emerald-400' :
+                  initialLiquidity <= 20000 ? 'text-blue-400' : 'text-purple-400'
+                }`}>
+                  {initialLiquidity <= 5000 ? '🔥 Haute (fun)' :
+                   initialLiquidity <= 10000 ? '⚡ Moyenne' :
+                   initialLiquidity <= 20000 ? '📊 Basse' : '🏛️ Très basse'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Mise max/joueur:</span>
+                <span className="font-mono font-bold text-white">
+                  ~{Math.floor(initialLiquidity * (marketType === 'binary' ? 0.15 : 0.20) / 0.95).toLocaleString('fr-FR')} Zeny
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Mouvement proba (1K bet):</span>
+                <span className="font-mono font-bold text-white">
+                  ~{marketType === 'binary' 
+                    ? Math.round((950 / (initialLiquidity * 2)) * 100)
+                    : Math.round((950 / (initialLiquidity * 2.5)) * 100)
+                  }%
+                </span>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Binaire : liquidité totale répartie entre OUI/NON selon la probabilité initiale. Multi-choix : contrôle la volatilité (plus élevé = probas plus stables). Recommandé : 5K-10K.
+
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              <strong>Binaire:</strong> Liquidité répartie OUI/NON selon proba initiale. 
+              <strong> Multi:</strong> Contrôle la volatilité des cotes. 
+              <strong> Recommandé pour 30-50 joueurs:</strong> 5K-10K.
             </p>
           </div>
         </div>
