@@ -15,6 +15,7 @@ export type BinaryMarket = {
   isLive: boolean
   status?: 'open' | 'closed' | 'resolved' | 'cancelled'
   resolved_at?: string | null
+  closes_at?: string | null
   is_featured?: boolean // Added for trending markets
   is_headline?: boolean // Added for hero market
   yesPrice: number
@@ -45,6 +46,7 @@ export type MultiOutcomeMarket = {
   isLive: boolean
   status?: 'open' | 'closed' | 'resolved' | 'cancelled'
   resolved_at?: string | null
+  closes_at?: string | null
   is_featured?: boolean // Added for trending markets
   is_headline?: boolean // Added for hero market
   countdown: string
