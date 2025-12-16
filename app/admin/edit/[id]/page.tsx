@@ -610,17 +610,20 @@ export default function EditMarketPage({ params }: PageProps) {
               {extendedStats.outcomeDistribution.length > 0 && (
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
                   <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Volume par Choix</h4>
-                  <div className="h-48">
+                  <div className="h-56">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
                         <Pie
-                          data={extendedStats.outcomeDistribution}
+                          data={extendedStats.outcomeDistribution.map(d => ({
+                            ...d,
+                            name: d.name.length > 15 ? d.name.substring(0, 15) + '...' : d.name
+                          }))}
                           cx="50%"
-                          cy="50%"
-                          outerRadius={60}
+                          cy="40%"
+                          innerRadius={30}
+                          outerRadius={55}
                           dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          paddingAngle={2}
                         >
                           {extendedStats.outcomeDistribution.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -628,7 +631,12 @@ export default function EditMarketPage({ params }: PageProps) {
                         </Pie>
                         <Tooltip 
                           contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', fontSize: '12px' }}
-                          formatter={(value: number) => [`${value.toLocaleString()} Zeny`, 'Volume']}
+                          formatter={(value: number, name: string) => [`${value.toLocaleString()} Z`, name]}
+                        />
+                        <Legend 
+                          verticalAlign="bottom"
+                          height={50}
+                          formatter={(value: string) => <span className="text-[10px] text-muted-foreground">{value}</span>}
                         />
                       </RechartsPie>
                     </ResponsiveContainer>
@@ -740,48 +748,65 @@ export default function EditMarketPage({ params }: PageProps) {
                   : `${dirLabel} ${b.outcome?.name}`
                 const isWhale = b.amount >= WHALE_BET_THRESHOLD
                 const status = getStatusBadge(b.status)
+                
+                // Calculate PnL based on status
+                const pnl = b.status === 'won' 
+                  ? b.potential_payout - b.amount  // Profit = gain - mise
+                  : b.status === 'lost' 
+                    ? -b.amount  // Loss = -mise
+                    : b.potential_payout - b.amount  // Pending: potential profit
+                
+                const pnlColor = b.status === 'won' 
+                  ? 'text-emerald-400' 
+                  : b.status === 'lost' 
+                    ? 'text-rose-400' 
+                    : 'text-amber-400'
 
                 return (
                   <div
                     key={b.id}
-                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10"
+                    className="flex items-center justify-between gap-4 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/[0.07] transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs font-mono text-muted-foreground w-8 shrink-0">
+                      <span className="text-xs font-mono text-muted-foreground w-6 shrink-0">
                         #{idx + 1}
                       </span>
                       <img
                         src={b.user.avatar_url || "/images/default-avatar.svg"}
                         alt={b.user.username || "User"}
-                        className="w-8 h-8 rounded-full object-cover bg-white/5 shrink-0"
+                        className="w-9 h-9 rounded-full object-cover bg-white/5 shrink-0 border border-white/10"
                       />
                       <div className="min-w-0">
                         <p className="text-sm font-bold truncate">
                           {b.user.username || `User ${b.user.id?.slice(0, 4)}`}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          Choix: <span className="font-mono text-white/80">{choiceLabel}</span> •{" "}
-                          {new Date(b.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          Choix: <span className="font-medium text-white/70">{choiceLabel}</span>
                         </p>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="flex items-center justify-end gap-2 mb-1">
+                      {/* Badges */}
+                      <div className="flex items-center justify-end gap-1.5 mb-1">
                         {isWhale && (
-                          <span className="px-2 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 font-bold text-[10px] uppercase tracking-wider">
+                          <span className="px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-bold text-[9px] uppercase">
                             Whale
                           </span>
                         )}
-                        <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${status.cls}`}>
+                        <span className={`px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase ${status.cls}`}>
                           {status.label}
                         </span>
                       </div>
-                      <p className="text-sm font-black font-mono text-amber-400">
-                        {b.amount.toLocaleString()}
+                      
+                      {/* PnL (main) */}
+                      <p className={`text-base font-black font-mono ${pnlColor}`}>
+                        {pnl >= 0 ? '+' : ''}{pnl.toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-muted-foreground font-mono">
-                        x{Number(b.odds_at_bet).toFixed(2)} → {b.potential_payout.toLocaleString()}
+                      
+                      {/* Details (mise + multiplier) */}
+                      <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
+                        Mise: {b.amount.toLocaleString()} • x{Number(b.odds_at_bet).toFixed(2)}
                       </p>
                     </div>
                   </div>
