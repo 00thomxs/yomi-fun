@@ -324,7 +324,7 @@ export default async function AdminDashboard() {
                                 title="Modifier"
                               >
                                 <Edit className="w-4 h-4" />
-                              </Link>
+                      </Link>
                       <CloseMarket marketId={market.id} isLive={market.is_live} />
                       <Link
                         href={`/admin/resolve/${market.id}`}

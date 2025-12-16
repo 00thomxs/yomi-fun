@@ -196,7 +196,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           .eq('season_id', activeSeasonId)
           .neq('profiles.role', 'admin')
           .order('points', { ascending: false })
-          .limit(50)
+          .limit(10)
 
         if (data) {
           const formatted = data.map((entry: any, idx: number) => {
@@ -224,7 +224,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           .select('id, username, avatar_url, total_won, win_rate, balance, role')
           .neq('role', 'admin')
           .order('total_won', { ascending: false })
-          .limit(50)
+          .limit(10)
 
         if (data) {
           const formatted = data.map((p: any, idx: number) => ({

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X, Trophy } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
@@ -30,6 +30,8 @@ export function ProfileView() {
   const [history, setHistory] = useState<Transaction[]>([])
   const [loadingHistory, setLoadingHistory] = useState(true)
   const [pnlHistory, setPnlHistory] = useState<PnlPoint[]>([])
+  const [globalRank, setGlobalRank] = useState<number | null>(null)
+  const [seasonRank, setSeasonRank] = useState<number | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -72,10 +74,59 @@ export function ProfileView() {
       // 2. Fetch PnL History
       const pnlData = await getUserPnLHistory(user.id)
       setPnlHistory(pnlData)
+
+      // 3. Fetch Global Rank (only if profile is loaded)
+      if (!profile) return
+      
+      const { count: higherGlobalCount } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .neq('role', 'admin')
+        .gt('total_won', profile.total_won || 0)
+
+      if (higherGlobalCount !== null) {
+        setGlobalRank(higherGlobalCount + 1)
+      }
+
+      // 4. Fetch Season Rank (if active season exists)
+      const { data: activeSeason } = await supabase
+        .from('seasons')
+        .select('id')
+        .eq('is_active', true)
+        .single()
+
+      if (activeSeason) {
+        // Check if user is in season leaderboard
+        const { data: userSeasonEntry } = await supabase
+          .from('season_leaderboards')
+          .select('points')
+          .eq('user_id', user.id)
+          .eq('season_id', activeSeason.id)
+          .single()
+
+        if (userSeasonEntry) {
+          // Count how many players have more points
+          const { count: higherSeasonCount } = await supabase
+            .from('season_leaderboards')
+            .select('id', { count: 'exact', head: true })
+            .eq('season_id', activeSeason.id)
+            .gt('points', userSeasonEntry.points)
+
+          if (higherSeasonCount !== null) {
+            setSeasonRank(higherSeasonCount + 1)
+          }
+        } else {
+          // User not in season leaderboard yet (N/A)
+          setSeasonRank(null)
+        }
+      } else {
+        // No active season
+        setSeasonRank(null)
+      }
     }
 
     loadData()
-  }, [user])
+  }, [user, profile])
 
   // Prepare Chart Data with timeframe filtering
   const now = new Date()
@@ -396,7 +447,7 @@ export function ProfileView() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-border">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
                 <p className="text-base sm:text-lg font-bold font-mono">{userStats.winRate}%</p>
@@ -415,6 +466,22 @@ export function ProfileView() {
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
                 <p className={`text-base sm:text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
+                </p>
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                  <Trophy className="w-3 h-3" /> Global
+                </p>
+                <p className="text-base sm:text-lg font-bold font-mono text-primary">
+                  {globalRank ? `#${globalRank}` : '-'}
+                </p>
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                  <Trophy className="w-3 h-3 text-amber-400" /> Saison
+                </p>
+                <p className="text-base sm:text-lg font-bold font-mono text-amber-400">
+                  {seasonRank ? `#${seasonRank}` : 'N/A'}
                 </p>
               </div>
             </div>

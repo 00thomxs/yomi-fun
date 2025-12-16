@@ -66,6 +66,7 @@ export type Market = BinaryMarket | MultiOutcomeMarket
 // Bet Types
 export type ActiveBet = {
   id: string
+  market_id: string
   market: string
   choice: string
   amount: number

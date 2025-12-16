@@ -12,6 +12,7 @@ import Image from "next/image"
 import type { MarketWinner } from "@/app/actions/market-stats"
 import { TopWinners } from "@/components/market/top-winners"
 import { useToast } from "@/hooks/use-toast"
+import { LowBalancePopup } from "@/components/low-balance-popup"
 
 // Helper to generate X Axis domain and REGULAR ticks
 // Chart starts from market creation date (not before)
@@ -315,6 +316,11 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
 
   return (
     <div className="space-y-6 pb-8">
+      {/* Low Balance Popup - shows if user has < 100 Zeny and event closes soon */}
+      {market.closes_at && (
+        <LowBalancePopup eventName={market.question} closesAt={market.closes_at} />
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3">
         <button

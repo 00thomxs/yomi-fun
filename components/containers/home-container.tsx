@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { HomeView } from "@/components/views/home-view"
 import { DailyRewardBanner } from "@/components/daily-reward-banner"
+import { LowBalanceBanner } from "@/components/low-balance-banner"
 import { useUser } from "@/contexts/user-context"
 import type { Market } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
@@ -115,6 +116,9 @@ export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeConta
     <div className="space-y-4">
       {/* Daily Reward Banner - compact, hides after claim */}
       <DailyRewardBanner onClaim={handleDailyClaim} />
+
+      {/* Low Balance Banner - shows when user has < 100 Zeny and event closing soon */}
+      <LowBalanceBanner />
       
       {/* Main Content */}
       <HomeView

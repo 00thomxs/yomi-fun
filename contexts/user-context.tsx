@@ -89,6 +89,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       .from('bets')
       .select(`
         id,
+        market_id,
         amount,
         odds_at_bet,
         outcome_id,
@@ -96,6 +97,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         potential_payout,
         direction,
         markets (
+          id,
           question
         ),
         outcomes (
@@ -103,6 +105,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         )
       `)
       .eq('user_id', userId)
+      .eq('status', 'pending') // Only fetch pending bets (not won/lost)
       .order('created_at', { ascending: false })
       .limit(10)
 
@@ -114,6 +117,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (bets) {
       const formattedBets: ActiveBet[] = bets.map((bet: any) => ({
         id: bet.id,
+        market_id: bet.market_id || bet.markets?.id || '',
         market: bet.markets?.question || "Event inconnu",
         choice: bet.outcomes?.name || "Choix inconnu",
         amount: Number(bet.amount), // Ensure number type (BigInt support)
@@ -358,6 +362,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       
       const newBet: ActiveBet = {
         id: `${Date.now()}`,
+        market_id: marketId,
         market: marketId, // Mock uses marketId as name
         choice,
         amount,
@@ -413,6 +418,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         // We can fetch the market question if needed, but for now let's use generic
         const newBet: ActiveBet = {
           id: `${Date.now()}`,
+          market_id: marketId,
           market: "Pari en cours...", // Will be fetched on reload
           choice,
           amount,
