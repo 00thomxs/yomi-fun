@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Home, User, ShoppingBag, Trophy, Zap, CheckCircle, XCircle, Clock, Package } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { DailyRewardWidget } from "@/components/daily-reward-widget"
 import type { ActiveBet } from "@/lib/types"
 
 type LeftSidebarProps = {
@@ -84,6 +85,9 @@ export function LeftSidebar({
             active={activeTab === "orders"}
           />
         </nav>
+
+        {/* Daily Reward Widget */}
+        <DailyRewardWidget />
 
         {/* Active Bets Widget */}
         {activeBets.length > 0 && (

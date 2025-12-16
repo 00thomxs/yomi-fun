@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { HomeView } from "@/components/views/home-view"
-import { DailyReward } from "@/components/daily-reward"
+import { DailyRewardBanner } from "@/components/daily-reward-banner"
 import { useUser } from "@/contexts/user-context"
 import type { Market } from "@/lib/types"
 import { PricePoint } from "@/app/actions/history"
@@ -113,8 +113,8 @@ export function HomeContainer({ initialMarkets, marketsHistory = {} }: HomeConta
 
   return (
     <div className="space-y-4">
-      {/* Daily Reward Banner */}
-      <DailyReward onClaim={handleDailyClaim} />
+      {/* Daily Reward Banner - compact, hides after claim */}
+      <DailyRewardBanner onClaim={handleDailyClaim} />
       
       {/* Main Content */}
       <HomeView
