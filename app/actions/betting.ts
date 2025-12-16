@@ -110,7 +110,8 @@ export async function placeBet(
 
   let odds = 0
   let potentialPayout = 0
-  const fee = amount * 0.05 // Fee increased to 5%
+  const feeRate = 0.05 // Fee increased to 5%
+  const fee = Math.round(amount * feeRate)
   const investment = amount - fee
 
   // Simplified Odds for all types: 1 / Probability
@@ -298,6 +299,8 @@ export async function placeBet(
       market_id: marketId,
       outcome_id: selectedOutcome.id,
       amount: amount,
+      fee_paid: fee,
+      fee_rate: feeRate,
       potential_payout: potentialPayout,
       odds_at_bet: currentOdds,
       status: 'pending',

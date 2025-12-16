@@ -110,6 +110,119 @@ export async function getAdminMarketTopBets(marketId: string): Promise<{ error?:
   return { topBets, totalBets: totalBets || 0 }
 }
 
+export type MonetaryMetrics = {
+  total_supply: number
+  total_burned: number
+  total_burned_fees: number
+  total_burned_shop: number
+  weekly_inflation_rate_pct: number | null
+  supply_7d_ago: number | null
+  last_snapshot_at: string | null
+}
+
+export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metrics?: MonetaryMetrics }> {
+  const supabase = await createClient()
+
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Non authentifié" }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') return { error: "Accès refusé" }
+
+  // 1) Total supply = sum of all user balances
+  const { data: supplyRows, error: supplyError } = await supabaseAdmin
+    .from('profiles')
+    .select('balance')
+
+  if (supplyError) return { error: `Erreur supply: ${supplyError.message}` }
+
+  const totalSupply = (supplyRows || []).reduce((sum: number, r: any) => sum + (Number(r.balance) || 0), 0)
+
+  // 2) Total fees burned = sum(bets.fee_paid) (fallback: estimate at 5% if fee_paid is null)
+  const { data: betRows, error: betsError } = await supabaseAdmin
+    .from('bets')
+    .select('amount, fee_paid, fee_rate, status')
+    .neq('status', 'cancelled')
+
+  if (betsError) return { error: `Erreur bets: ${betsError.message}` }
+
+  const totalFeesBurned = (betRows || []).reduce((sum: number, b: any) => {
+    const feePaid = b.fee_paid
+    if (feePaid !== null && feePaid !== undefined) return sum + (Number(feePaid) || 0)
+    // fallback estimate (historical bets before fee tracking)
+    const amount = Number(b.amount) || 0
+    const rate = Number(b.fee_rate) || 0.05
+    return sum + Math.round(amount * rate)
+  }, 0)
+
+  // 3) Total shop burned = sum(orders.price_paid) for non-cancelled orders (pending+completed both reduce balance)
+  const { data: orderRows, error: ordersError } = await supabaseAdmin
+    .from('orders')
+    .select('price_paid, status')
+    .neq('status', 'cancelled')
+
+  if (ordersError) return { error: `Erreur orders: ${ordersError.message}` }
+
+  const totalShopBurned = (orderRows || []).reduce((sum: number, o: any) => sum + (Number(o.price_paid) || 0), 0)
+
+  const totalBurned = totalFeesBurned + totalShopBurned
+
+  // 4) Snapshot logic (to compute weekly inflation rate)
+  const { data: lastSnap } = await supabaseAdmin
+    .from('monetary_snapshots')
+    .select('captured_at, total_supply, total_burned')
+    .order('captured_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const lastSnapshotAt = lastSnap?.captured_at as string | undefined
+  const shouldInsertSnapshot = !lastSnapshotAt || (Date.now() - new Date(lastSnapshotAt).getTime()) > 24 * 3600 * 1000
+
+  if (shouldInsertSnapshot) {
+    // Insert a daily snapshot (admin-only via service role)
+    await supabaseAdmin
+      .from('monetary_snapshots')
+      .insert({
+        total_supply: totalSupply,
+        total_burned: totalBurned,
+      })
+  }
+
+  // Get supply 7 days ago (closest snapshot <= now-7d)
+  const sevenDaysAgoIso = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+  const { data: snap7d } = await supabaseAdmin
+    .from('monetary_snapshots')
+    .select('total_supply, captured_at')
+    .lte('captured_at', sevenDaysAgoIso)
+    .order('captured_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const supply7dAgo = (snap7d?.total_supply ?? null) as number | null
+  const weeklyInflationRatePct =
+    supply7dAgo && supply7dAgo > 0
+      ? ((totalSupply - supply7dAgo) / supply7dAgo) * 100
+      : null
+
+  return {
+    metrics: {
+      total_supply: totalSupply,
+      total_burned: totalBurned,
+      total_burned_fees: totalFeesBurned,
+      total_burned_shop: totalShopBurned,
+      weekly_inflation_rate_pct: weeklyInflationRatePct,
+      supply_7d_ago: supply7dAgo,
+      last_snapshot_at: lastSnapshotAt || null,
+    }
+  }
+}
+
 export async function createMarket(formData: FormData): Promise<CreateMarketState> {
   const type = formData.get('type') as 'binary' | 'multi'
   const question = formData.get('question') as string

@@ -150,6 +150,8 @@ export interface Database {
           market_id: string
           outcome_id: string
           amount: number
+          fee_paid: number | null
+          fee_rate: number | null
           potential_payout: number
           odds_at_bet: number
           status: 'pending' | 'won' | 'lost' | 'cancelled'
@@ -163,6 +165,8 @@ export interface Database {
           market_id: string
           outcome_id: string
           amount: number
+          fee_paid?: number | null
+          fee_rate?: number | null
           potential_payout: number
           odds_at_bet: number
           status?: 'pending' | 'won' | 'lost' | 'cancelled'
@@ -172,6 +176,8 @@ export interface Database {
         }
         Update: {
           amount?: number
+          fee_paid?: number | null
+          fee_rate?: number | null
           potential_payout?: number
           status?: 'pending' | 'won' | 'lost' | 'cancelled'
           direction?: 'YES' | 'NO'

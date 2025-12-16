@@ -1,10 +1,11 @@
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { Edit, ExternalLink, PlayCircle, Gavel, EyeOff } from "lucide-react"
+import { Edit, ExternalLink, PlayCircle, Gavel, EyeOff, Coins, Flame } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { DeleteMarket } from "@/app/admin/components/delete-button"
 import { CloseMarket } from "@/app/admin/components/close-button"
 import { VisibilityToggle } from "@/app/admin/components/visibility-toggle"
+import { getAdminMonetaryMetrics } from "@/app/admin/actions"
 
 // Helper to group markets by month
 function groupMarketsByMonth(markets: any[]) {
@@ -33,6 +34,7 @@ function groupMarketsByMonth(markets: any[]) {
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
+  const { metrics } = await getAdminMonetaryMetrics()
   
   // Fetch real markets
   const { data: markets, error } = await supabase
@@ -52,8 +54,8 @@ export default async function AdminDashboard() {
   // Calculate total volume from all markets
   const totalVolume = markets?.reduce((sum, m) => sum + (m.volume || 0), 0) || 0
 
-  // Estimate revenue (2% fee on volume)
-  const estimatedRevenue = Math.round(totalVolume * 0.02)
+  // Estimate revenue (fallback): 5% fee on volume (real fee revenue is shown below via burned fees)
+  const estimatedRevenue = Math.round(totalVolume * 0.05)
 
   // Filter markets pending resolution
   const pendingResolutionMarkets = markets?.filter(m => m.status === 'closed' && !m.resolved_at) || []
@@ -96,6 +98,56 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Monetary Health */}
+      {metrics && (
+        <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="font-bold flex items-center gap-2">
+              <Coins className="w-5 h-5 text-primary" />
+              Masse Monétaire (Zeny)
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Snapshot hebdo basé sur historiques (si pas assez de snapshots, l’inflation affichera “—”)
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Circulating Supply</p>
+              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1">
+                {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Somme des balances de tous les profils.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Total Zeny Burned</p>
+              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-1 text-amber-400">
+                {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
+              </p>
+            </div>
+
+            <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Inflation Rate (7j)</p>
+              <p className="text-2xl font-black mt-2 font-mono flex items-center gap-2">
+                <Flame className="w-5 h-5 text-primary" />
+                {metrics.weekly_inflation_rate_pct === null
+                  ? "—"
+                  : `${metrics.weekly_inflation_rate_pct >= 0 ? "+" : ""}${metrics.weekly_inflation_rate_pct.toFixed(2)}%`}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Basé sur la variation du supply vs snapshot d’il y a 7 jours.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pending Resolution Alert */}
       {pendingResolutionMarkets.length > 0 && (
