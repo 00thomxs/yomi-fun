@@ -1530,16 +1530,16 @@ function BetAmountInput({
 
       <div className="flex gap-2">
         <button
-          onClick={() => setBetAmount("1000")}
+          onClick={() => setBetAmount("500")}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
-          +1K
+          +500
         </button>
         <button
-          onClick={() => setBetAmount("5000")}
+          onClick={() => setBetAmount("2000")}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
-          +5K
+          +2K
         </button>
         <button
           onClick={() => setBetAmount("10000")}
