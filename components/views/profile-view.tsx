@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
 import { EditProfileForm } from "@/components/profile/edit-profile-form"
 import { ChangePasswordForm } from "@/components/profile/change-password-form"
+import { DailyRewardWidget } from "@/components/daily-reward-widget"
 import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 
 type Transaction = {
@@ -419,6 +420,11 @@ export function ProfileView() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Daily Reward Widget - Mobile Only (sidebar hidden on mobile) */}
+      <div className="lg:hidden">
+        <DailyRewardWidget />
       </div>
 
       {/* P&L Chart */}
