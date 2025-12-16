@@ -251,7 +251,7 @@ export default function EditMarketPage({ params }: PageProps) {
 
     // Risk/Exposure calculation (payout if each outcome wins)
     const exposureByOutcome = outcomes.map(o => {
-      const outcomeBets = topBets.filter(b => b.outcome_id === o.id)
+      const outcomeBets = topBets.filter(b => b.outcome?.id === o.id)
       const totalPayout = outcomeBets.reduce((sum, b) => sum + b.potential_payout, 0)
       return { name: o.name, exposure: totalPayout }
     })
