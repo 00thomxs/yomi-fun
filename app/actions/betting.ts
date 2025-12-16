@@ -126,7 +126,7 @@ export async function placeBet(
   const referenceLiquidity = market.type === 'binary' ? poolTotal : Math.max(seed, poolTotal)
   const maxInvestmentAllowed = Math.floor(referenceLiquidity * MAX_INVEST_FRACTION)
   const maxAmountAllowed = Math.max(
-    10,
+    100,
     Math.floor(maxInvestmentAllowed / Math.max(0.0001, (1 - feeRate)))
   )
 

@@ -883,6 +883,10 @@ function BinaryMarketContent({
           betAmount={betAmount}
           setBetAmount={setBetAmount}
           userBalance={userBalance}
+          marketType={market.type}
+          poolYes={Number((market as any).pool_yes) || 0}
+          poolNo={Number((market as any).pool_no) || 0}
+          initialLiquidity={Number((market as any).initial_liquidity) || 10000}
           calculatePayout={calculatePayout}
           handlePlaceBet={() => setShowConfirmModal(true)}
           hasBet={userBets && userBets.length > 0}
@@ -1494,6 +1498,10 @@ function BetAmountInput({
   betAmount,
   setBetAmount,
   userBalance,
+  marketType,
+  poolYes,
+  poolNo,
+  initialLiquidity,
   calculatePayout,
   handlePlaceBet,
   hasBet
@@ -1501,6 +1509,10 @@ function BetAmountInput({
   betAmount: string
   setBetAmount: (amount: string) => void
   userBalance: number
+  marketType: 'binary' | 'multi'
+  poolYes: number
+  poolNo: number
+  initialLiquidity: number
   calculatePayout: () => number
   handlePlaceBet: () => void
   hasBet: boolean
@@ -1508,6 +1520,21 @@ function BetAmountInput({
   const potentialGain = calculatePayout()
   const LIMIT_GAIN = 100000000 // 100 Millions
   const isOverLimit = potentialGain > LIMIT_GAIN
+  const MIN_BET = 100
+  const feeRate = 0.05
+
+  // Mirror server-side dynamic max bet rule for a better UX ("Max autorisé")
+  const poolTotal = (Number(poolYes) || 0) + (Number(poolNo) || 0)
+  const seed = Number(initialLiquidity) || 10000
+  const referenceLiquidity = marketType === 'binary' ? poolTotal : Math.max(seed, poolTotal)
+  const maxInvestFraction = marketType === 'binary' ? 0.15 : 0.20
+  const maxInvestmentAllowed = Math.floor(referenceLiquidity * maxInvestFraction)
+  const maxAmountAllowed = Math.max(MIN_BET, Math.floor(maxInvestmentAllowed / Math.max(0.0001, (1 - feeRate))))
+  const maxUserAffordable = Math.max(MIN_BET, Math.min(userBalance, maxAmountAllowed))
+
+  const betAmountNum = Number.parseFloat(betAmount || "0")
+  const isBelowMin = betAmountNum > 0 && betAmountNum < MIN_BET
+  const isAboveAllowed = betAmountNum > maxAmountAllowed
 
   // Multi-bet is allowed: do NOT block UI when user already has bets on this market.
 
@@ -1530,35 +1557,46 @@ function BetAmountInput({
 
       <div className="flex gap-2">
         <button
-          onClick={() => setBetAmount("500")}
+          onClick={() => setBetAmount(Math.min(500, maxUserAffordable).toString())}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +500
         </button>
         <button
-          onClick={() => setBetAmount("2000")}
+          onClick={() => setBetAmount(Math.min(2000, maxUserAffordable).toString())}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +2K
         </button>
         <button
-          onClick={() => setBetAmount("10000")}
+          onClick={() => setBetAmount(Math.min(10000, maxUserAffordable).toString())}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +10K
         </button>
         <button
-          onClick={() => setBetAmount("25000")}
+          onClick={() => setBetAmount(Math.min(25000, maxUserAffordable).toString())}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
         >
           +25K
         </button>
         <button
-          onClick={() => setBetAmount(userBalance.toString())}
+          onClick={() => setBetAmount(maxUserAffordable.toString())}
           className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight uppercase text-white hover:border-white/20 transition-all cursor-pointer"
         >
-          Max
+          Max autorisé
         </button>
+      </div>
+
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>Mise min: <span className="font-mono font-bold text-white/80">{MIN_BET}</span></span>
+        <span>
+          Max event:{" "}
+          <span className="font-mono font-bold text-white/80">
+            {maxAmountAllowed.toLocaleString('fr-FR')}
+          </span>{" "}
+          <CurrencySymbol />
+        </span>
       </div>
 
       {betAmount && (
@@ -1586,6 +1624,24 @@ function BetAmountInput({
         )
       )}
 
+      {isBelowMin ? (
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+          <p className="text-xs text-amber-400 uppercase tracking-wider font-bold">Mise trop faible</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Mise minimum: {MIN_BET.toLocaleString('fr-FR')} <CurrencySymbol />
+          </p>
+        </div>
+      ) : null}
+
+      {isAboveAllowed ? (
+        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
+          <p className="text-xs text-rose-400 uppercase tracking-wider font-bold">Mise trop élevée</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Max pour cet event: {maxAmountAllowed.toLocaleString('fr-FR')} <CurrencySymbol />
+          </p>
+        </div>
+      ) : null}
+
       {betAmount && Number.parseFloat(betAmount) > userBalance ? (
         <Link
           href="/shop/buy-zeny"
@@ -1597,7 +1653,7 @@ function BetAmountInput({
       ) : (
         <button
           onClick={handlePlaceBet}
-          disabled={!betAmount || isOverLimit}
+          disabled={!betAmount || isOverLimit || isBelowMin || isAboveAllowed}
           className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Confirmer le pari
