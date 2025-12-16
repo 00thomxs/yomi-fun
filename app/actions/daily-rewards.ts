@@ -221,8 +221,10 @@ export async function claimDailyBonus(): Promise<DailyRewardResult> {
   }
   
   // Determine current streak (reset if needed)
+  // Ensure daily_streak is always a number (could be null for new users)
   const resetStreak = shouldResetStreak(profile.last_daily_claim)
-  const currentStreak = resetStreak ? 0 : profile.daily_streak
+  const rawStreak = profile.daily_streak ?? 0
+  const currentStreak = resetStreak ? 0 : rawStreak
   
   // Get reward for today
   const { amount, isJackpot, jackpot } = getRewardForDay(currentStreak)

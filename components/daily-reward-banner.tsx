@@ -21,6 +21,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   const [isClaiming, setIsClaiming] = useState(false)
   const [claimResult, setClaimResult] = useState<DailyRewardResult | null>(null)
   const [dismissed, setDismissed] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -33,6 +34,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
 
   const handleClaimWelcome = async () => {
     setIsClaiming(true)
+    setError(null)
     const result = await claimWelcomeBonus()
     
     if (result.success && result.newBalance !== undefined) {
@@ -41,6 +43,9 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       setTimeout(() => {
         setDismissed(true)
       }, 2000)
+    } else if (result.error) {
+      setError(result.error)
+      setTimeout(() => setError(null), 3000)
     }
     
     setIsClaiming(false)
@@ -48,6 +53,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
 
   const handleClaimDaily = async () => {
     setIsClaiming(true)
+    setError(null)
     const result = await claimDailyBonus()
     
     if (result.success) {
@@ -59,6 +65,9 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       setTimeout(() => {
         setDismissed(true)
       }, result.isJackpot ? 3000 : 2000)
+    } else if (result.error) {
+      setError(result.error)
+      setTimeout(() => setError(null), 3000)
     }
     
     setIsClaiming(false)
@@ -67,8 +76,17 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   // Don't show if loading, dismissed, or no status
   if (isLoading || dismissed || !status) return null
 
-  // Don't show if nothing to claim
-  if (!status.canClaimWelcome && !status.canClaim) return null
+  // Don't show if nothing to claim (unless showing error)
+  if (!status.canClaimWelcome && !status.canClaim && !error) return null
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 animate-in fade-in duration-300">
+        <span className="text-sm text-rose-400">{error}</span>
+      </div>
+    )
+  }
 
   // Success state (brief display before hiding)
   if (claimResult?.success) {
