@@ -11,11 +11,11 @@ type LeaderboardEntry = {
   wins: number
   losses: number
   total_bet_amount: number
-  profiles: {
+  profiles?: {
     id: string
     username: string
     avatar_url: string
-  }
+  } | null
 }
 
 type Event = {
@@ -29,16 +29,17 @@ type Event = {
 type Bet = {
   id: string
   user_id: string
+  market_id: string
   amount: number
   status: string
   potential_payout?: number
-  profiles: {
+  profiles?: {
     id: string
     username: string
-  }
-  markets: {
+  } | null
+  markets?: {
     question: string
-  }
+  } | null
 }
 
 type PositionHistory = {
@@ -46,10 +47,10 @@ type PositionHistory = {
   captured_at: string
   position: number
   points: number
-  profiles: {
+  profiles?: {
     id: string
     username: string
-  }
+  } | null
 }
 
 type SeasonRecapStatsProps = {
@@ -153,8 +154,10 @@ export function SeasonRecapStats({
 
     // Event stats
     const eventBetCounts = bets.reduce((acc, bet) => {
-      const marketId = (bet as any).market_id
-      acc[marketId] = (acc[marketId] || 0) + 1
+      const marketId = bet.market_id
+      if (marketId) {
+        acc[marketId] = (acc[marketId] || 0) + 1
+      }
       return acc
     }, {} as Record<string, number>)
 
@@ -210,7 +213,9 @@ export function SeasonRecapStats({
       positionHistory
         .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id) && h.profiles?.username)
         .forEach(h => {
-          dayData[h.profiles.username] = h.position
+          if (h.profiles?.username) {
+            dayData[h.profiles.username] = h.position
+          }
         })
       
       return dayData
