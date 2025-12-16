@@ -447,40 +447,40 @@ export function ProfileView() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 pt-4 border-t border-border">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
-                <p className="text-base sm:text-lg font-bold font-mono">{userStats.winRate}%</p>
+                <p className="text-sm sm:text-base font-bold font-mono">{userStats.winRate}%</p>
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Paris</p>
-                <p className="text-base sm:text-lg font-bold font-mono">{userStats.totalBets}</p>
+                <p className="text-sm sm:text-base font-bold font-mono">{userStats.totalBets}</p>
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
-                <p className="text-base sm:text-lg font-bold font-mono flex items-center justify-center sm:justify-start gap-1">
-                  <Flame className="w-4 h-4 text-orange-500" /> {userStats.currentStreak}
+                <p className="text-sm sm:text-base font-bold font-mono flex items-center justify-center sm:justify-start gap-1">
+                  <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
-                <p className={`text-base sm:text-lg font-bold font-mono ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()} <CurrencySymbol />
+                <p className={`text-sm sm:text-base font-bold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
                 </p>
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Global
                 </p>
-                <p className="text-base sm:text-lg font-bold font-mono text-primary">
+                <p className="text-sm sm:text-base font-bold font-mono text-primary">
                   {globalRank ? `#${globalRank}` : '-'}
                 </p>
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
-                  <Trophy className="w-3 h-3 text-amber-400" /> Saison
+                  <Trophy className="w-3 h-3" /> Saison
                 </p>
-                <p className="text-base sm:text-lg font-bold font-mono text-amber-400">
+                <p className="text-sm sm:text-base font-bold font-mono text-amber-400">
                   {seasonRank ? `#${seasonRank}` : 'N/A'}
                 </p>
               </div>
