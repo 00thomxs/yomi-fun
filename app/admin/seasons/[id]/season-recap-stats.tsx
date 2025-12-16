@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Trophy, Target, Flame, TrendingUp, TrendingDown, Zap, BarChart3, Medal } from 'lucide-react'
+import { Trophy, Target, Flame, TrendingUp, TrendingDown, Zap, BarChart3, Medal, Percent, Star } from 'lucide-react'
 import { CurrencySymbol } from '@/components/ui/currency-symbol'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts'
 
@@ -31,6 +31,7 @@ type Bet = {
   user_id: string
   amount: number
   status: string
+  potential_payout?: number
   profiles: {
     id: string
     username: string
@@ -68,7 +69,7 @@ export function SeasonRecapStats({
   bets,
   positionHistory 
 }: SeasonRecapStatsProps) {
-  // Calculate stats
+  // Calculate all stats
   const stats = useMemo(() => {
     // Top 3 by WR (min 3 bets)
     const topWR = leaderboard
@@ -103,6 +104,26 @@ export function SeasonRecapStats({
       .sort((a, b) => b.total_bet_amount - a.total_bet_amount)
       .slice(0, 3)
 
+    // Top 3 by ROI % (PnL / total_bet_amount * 100)
+    const topROI = leaderboard
+      .filter(e => e.total_bet_amount > 0 && (e.wins + e.losses) >= 3)
+      .map(e => ({
+        ...e,
+        roi: (e.points / e.total_bet_amount) * 100
+      }))
+      .sort((a, b) => b.roi - a.roi)
+      .slice(0, 3)
+
+    // Worst ROI %
+    const worstROI = leaderboard
+      .filter(e => e.total_bet_amount > 0 && (e.wins + e.losses) >= 3)
+      .map(e => ({
+        ...e,
+        roi: (e.points / e.total_bet_amount) * 100
+      }))
+      .sort((a, b) => a.roi - b.roi)
+      .slice(0, 3)
+
     // Top 3 most active (by number of bets)
     const betCountByUser = bets.reduce((acc, bet) => {
       acc[bet.user_id] = (acc[bet.user_id] || 0) + 1
@@ -124,13 +145,20 @@ export function SeasonRecapStats({
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5)
 
-    // Most popular events
+    // Biggest single WIN (potential_payout on won bets)
+    const biggestWins = [...bets]
+      .filter(b => b.status === 'won' && b.potential_payout)
+      .sort((a, b) => (b.potential_payout || 0) - (a.potential_payout || 0))
+      .slice(0, 3)
+
+    // Event stats
     const eventBetCounts = bets.reduce((acc, bet) => {
       const marketId = (bet as any).market_id
       acc[marketId] = (acc[marketId] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 
+    // Most popular events (by bet count)
     const popularEvents = events
       .map(e => ({
         ...e,
@@ -139,15 +167,24 @@ export function SeasonRecapStats({
       .sort((a, b) => b.betCount - a.betCount)
       .slice(0, 3)
 
+    // Highest volume events
+    const highVolumeEvents = [...events]
+      .sort((a, b) => b.volume - a.volume)
+      .slice(0, 3)
+
     return {
       topWR,
       topWins,
       topGainers,
       topLosers,
       topWhales,
+      topROI,
+      worstROI,
       topActive,
       biggestBets,
+      biggestWins,
       popularEvents,
+      highVolumeEvents,
       totalVolume: events.reduce((sum, e) => sum + (e.volume || 0), 0),
       avgBetSize: bets.length > 0 
         ? Math.round(bets.reduce((sum, b) => sum + b.amount, 0) / bets.length)
@@ -183,12 +220,12 @@ export function SeasonRecapStats({
   // PnL distribution
   const pnlDistribution = useMemo(() => {
     const ranges = [
-      { name: '< -10K', min: -Infinity, max: -10000 },
+      { name: '<-10K', min: -Infinity, max: -10000 },
       { name: '-10K/-1K', min: -10000, max: -1000 },
       { name: '-1K/0', min: -1000, max: 0 },
       { name: '0/1K', min: 0, max: 1000 },
       { name: '1K/10K', min: 1000, max: 10000 },
-      { name: '> 10K', min: 10000, max: Infinity },
+      { name: '>10K', min: 10000, max: Infinity },
     ]
 
     return ranges.map(range => ({
@@ -197,8 +234,95 @@ export function SeasonRecapStats({
     }))
   }, [leaderboard])
 
+  // Podium duration (who stayed longest in top 3)
+  const podiumDuration = useMemo(() => {
+    if (positionHistory.length === 0) return []
+
+    const podiumCounts: Record<string, { count: number; username: string }> = {}
+    
+    positionHistory.forEach(h => {
+      if (h.position <= 3 && h.profiles?.username) {
+        if (!podiumCounts[h.user_id]) {
+          podiumCounts[h.user_id] = { count: 0, username: h.profiles.username }
+        }
+        podiumCounts[h.user_id].count++
+      }
+    })
+
+    return Object.entries(podiumCounts)
+      .map(([userId, data]) => ({ userId, ...data }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3)
+  }, [positionHistory])
+
   return (
     <div className="space-y-6">
+      {/* Position Evolution Chart */}
+      {positionChartData.length > 0 ? (
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">
+            Évolution des Positions (Course au Titre)
+          </h4>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={positionChartData}>
+                <XAxis dataKey="date" tick={{ fill: '#888', fontSize: 10 }} />
+                <YAxis 
+                  reversed 
+                  domain={[1, 10]} 
+                  tick={{ fill: '#888', fontSize: 10 }}
+                  tickFormatter={(v) => `#${v}`}
+                />
+                <Tooltip 
+                  contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                  labelStyle={{ color: '#fff' }}
+                />
+                <Legend wrapperStyle={{ fontSize: '10px' }} />
+                {leaderboard.slice(0, 10).map((entry, i) => (
+                  <Line
+                    key={entry.user_id}
+                    type="monotone"
+                    dataKey={entry.profiles?.username}
+                    stroke={COLORS[i]}
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      ) : (
+        <div className="p-6 rounded-xl bg-card border border-border text-center">
+          <TrendingUp className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <h4 className="font-bold text-sm">Pas d'historique de positions</h4>
+          <p className="text-xs text-muted-foreground mt-1">
+            Les snapshots sont créés après chaque résolution d'event.
+          </p>
+        </div>
+      )}
+
+      {/* Podium Duration */}
+      {podiumDuration.length > 0 && (
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
+            <Star className="w-4 h-4 text-amber-400" /> Plus Longtemps sur le Podium
+          </h4>
+          <div className="space-y-2">
+            {podiumDuration.map((p, i) => (
+              <div key={p.userId} className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
+                  <span className="font-medium text-sm">{p.username}</span>
+                </span>
+                <span className="font-bold text-amber-400">{p.count} jour{p.count > 1 ? 's' : ''}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Top WR */}
@@ -217,6 +341,44 @@ export function SeasonRecapStats({
               </div>
             ))}
             {stats.topWR.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
+          </div>
+        </div>
+
+        {/* Top ROI % */}
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
+            <Percent className="w-4 h-4 text-emerald-400" /> Meilleur ROI
+          </h4>
+          <div className="space-y-2">
+            {stats.topROI.map((p, i) => (
+              <div key={p.user_id} className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
+                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                </span>
+                <span className="font-bold text-emerald-400">+{p.roi.toFixed(1)}%</span>
+              </div>
+            ))}
+            {stats.topROI.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
+          </div>
+        </div>
+
+        {/* Worst ROI % */}
+        <div className="p-4 rounded-xl bg-card border border-border">
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
+            <TrendingDown className="w-4 h-4 text-rose-400" /> Pire ROI
+          </h4>
+          <div className="space-y-2">
+            {stats.worstROI.map((p, i) => (
+              <div key={p.user_id} className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  {i === 0 && '💀'}{i === 1 && '😵'}{i === 2 && '😢'}
+                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                </span>
+                <span className="font-bold text-rose-400">{p.roi.toFixed(1)}%</span>
+              </div>
+            ))}
+            {stats.worstROI.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
           </div>
         </div>
 
@@ -318,109 +480,96 @@ export function SeasonRecapStats({
         </div>
       </div>
 
-      {/* Position Evolution Chart */}
-      {positionChartData.length > 0 && (
+      {/* Biggest Single Wins */}
+      {stats.biggestWins.length > 0 && (
         <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">
-            Évolution des Positions (Course au Titre)
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
+            <Trophy className="w-4 h-4 text-amber-400" /> Plus Gros Gains (single bet)
           </h4>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={positionChartData}>
-                <XAxis dataKey="date" tick={{ fill: '#888', fontSize: 10 }} />
-                <YAxis 
-                  reversed 
-                  domain={[1, 10]} 
-                  tick={{ fill: '#888', fontSize: 10 }}
-                  tickFormatter={(v) => `#${v}`}
-                />
-                <Tooltip 
-                  contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
-                  labelStyle={{ color: '#fff' }}
-                />
-                <Legend />
-                {leaderboard.slice(0, 10).map((entry, i) => (
-                  <Line
-                    key={entry.user_id}
-                    type="monotone"
-                    dataKey={entry.profiles?.username}
-                    stroke={COLORS[i]}
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    connectNulls
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="space-y-2">
+            {stats.biggestWins.map((bet, i) => {
+              const question = bet.markets?.question || ''
+              const truncatedQuestion = question.length > 35 ? question.substring(0, 35) + '...' : question
+              return (
+                <div key={bet.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
+                  <div className="min-w-0 flex-1">
+                    <span className="font-medium text-sm">{bet.profiles?.username}</span>
+                    <p className="text-[10px] text-muted-foreground truncate">{truncatedQuestion}</p>
+                  </div>
+                  <span className="font-bold font-mono text-emerald-400 flex items-center gap-0.5 ml-2">
+                    +{(bet.potential_payout || 0).toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* Biggest Bets + PnL Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Biggest Bets */}
+      {/* Event Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Most Popular Events */}
         <div className="p-4 rounded-xl bg-card border border-border">
           <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <BarChart3 className="w-4 h-4" /> Plus Grosses Mises
+            <Flame className="w-4 h-4 text-orange-400" /> Events les Plus Populaires
           </h4>
           <div className="space-y-2">
-            {stats.biggestBets.map((bet, i) => (
-              <div key={bet.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
-                <div className="min-w-0 flex-1">
-                  <span className="font-medium text-sm">{bet.profiles?.username}</span>
-                  <p className="text-xs text-muted-foreground truncate">{bet.markets?.question}</p>
+            {stats.popularEvents.map((event, i) => {
+              const truncatedQuestion = event.question.length > 40 ? event.question.substring(0, 40) + '...' : event.question
+              return (
+                <div key={event.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
+                    <span className="font-medium text-sm truncate">{truncatedQuestion}</span>
+                  </div>
+                  <span className="font-bold text-orange-400 ml-2">{event.betCount} paris</span>
                 </div>
-                <span className="font-bold font-mono flex items-center gap-0.5 ml-2">
-                  {bet.amount.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
-                </span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
-        {/* PnL Distribution */}
+        {/* Highest Volume Events */}
         <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">Distribution des PnL</h4>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnlDistribution}>
-                <XAxis dataKey="name" tick={{ fill: '#888', fontSize: 9 }} />
-                <YAxis tick={{ fill: '#888', fontSize: 10 }} />
-                <Tooltip 
-                  contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
-                  labelStyle={{ color: '#fff' }}
-                />
-                <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
+            <BarChart3 className="w-4 h-4 text-primary" /> Events Plus Gros Volume
+          </h4>
+          <div className="space-y-2">
+            {stats.highVolumeEvents.map((event, i) => {
+              const truncatedQuestion = event.question.length > 40 ? event.question.substring(0, 40) + '...' : event.question
+              return (
+                <div key={event.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
+                    <span className="font-medium text-sm truncate">{truncatedQuestion}</span>
+                  </div>
+                  <span className="font-bold font-mono text-primary flex items-center gap-0.5 ml-2">
+                    {event.volume.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* Most Popular Events */}
-      {stats.popularEvents.length > 0 && (
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-amber-400" /> Events les Plus Populaires
-          </h4>
-          <div className="space-y-2">
-            {stats.popularEvents.map((event, i) => (
-              <div key={event.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{event.question}</span>
-                </div>
-                <div className="text-right">
-                  <span className="font-bold font-mono flex items-center gap-0.5 justify-end">
-                    {event.volume.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
-                  </span>
-                  <span className="text-xs text-muted-foreground">{event.betCount} paris</span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* PnL Distribution */}
+      <div className="p-4 rounded-xl bg-card border border-border">
+        <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">Distribution des PnL</h4>
+        <div className="h-48">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={pnlDistribution}>
+              <XAxis dataKey="name" tick={{ fill: '#888', fontSize: 9 }} />
+              <YAxis tick={{ fill: '#888', fontSize: 10 }} />
+              <Tooltip 
+                contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                labelStyle={{ color: '#fff' }}
+              />
+              <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      )}
+      </div>
 
       {/* Full Leaderboard */}
       <div className="rounded-xl bg-card border border-border overflow-hidden">
@@ -434,40 +583,43 @@ export function SeasonRecapStats({
                 <th className="px-4 py-2 text-left">#</th>
                 <th className="px-4 py-2 text-left">Joueur</th>
                 <th className="px-4 py-2 text-right">PnL</th>
+                <th className="px-4 py-2 text-right">ROI</th>
                 <th className="px-4 py-2 text-right">W/L</th>
                 <th className="px-4 py-2 text-right">WR</th>
-                <th className="px-4 py-2 text-right">Volume</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {leaderboard.map((entry, i) => (
-                <tr key={entry.user_id} className="hover:bg-white/5">
-                  <td className="px-4 py-2">
-                    {i === 0 && <span className="text-amber-400">🥇</span>}
-                    {i === 1 && <span className="text-gray-400">🥈</span>}
-                    {i === 2 && <span className="text-amber-700">🥉</span>}
-                    {i > 2 && <span className="text-muted-foreground">{i + 1}</span>}
-                  </td>
-                  <td className="px-4 py-2 font-medium">{entry.profiles?.username || 'Unknown'}</td>
-                  <td className={`px-4 py-2 text-right font-mono font-bold ${entry.points >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {entry.points >= 0 ? '+' : ''}{entry.points.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2 text-right text-muted-foreground">
-                    <span className="text-emerald-400">{entry.wins}</span>
-                    /
-                    <span className="text-rose-400">{entry.losses}</span>
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    {entry.wins + entry.losses > 0 
-                      ? `${Math.round(entry.wins / (entry.wins + entry.losses) * 100)}%`
-                      : '-'
-                    }
-                  </td>
-                  <td className="px-4 py-2 text-right font-mono text-muted-foreground">
-                    {entry.total_bet_amount.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
+              {leaderboard.map((entry, i) => {
+                const roi = entry.total_bet_amount > 0 ? (entry.points / entry.total_bet_amount) * 100 : 0
+                return (
+                  <tr key={entry.user_id} className="hover:bg-white/5">
+                    <td className="px-4 py-2">
+                      {i === 0 && <span className="text-amber-400">🥇</span>}
+                      {i === 1 && <span className="text-gray-400">🥈</span>}
+                      {i === 2 && <span className="text-amber-700">🥉</span>}
+                      {i > 2 && <span className="text-muted-foreground">{i + 1}</span>}
+                    </td>
+                    <td className="px-4 py-2 font-medium">{entry.profiles?.username || 'Unknown'}</td>
+                    <td className={`px-4 py-2 text-right font-mono font-bold ${entry.points >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {entry.points >= 0 ? '+' : ''}{entry.points.toLocaleString()}
+                    </td>
+                    <td className={`px-4 py-2 text-right font-mono text-xs ${roi >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+                    </td>
+                    <td className="px-4 py-2 text-right text-muted-foreground">
+                      <span className="text-emerald-400">{entry.wins}</span>
+                      /
+                      <span className="text-rose-400">{entry.losses}</span>
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      {entry.wins + entry.losses > 0 
+                        ? `${Math.round(entry.wins / (entry.wins + entry.losses) * 100)}%`
+                        : '-'
+                      }
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -475,4 +627,3 @@ export function SeasonRecapStats({
     </div>
   )
 }
-

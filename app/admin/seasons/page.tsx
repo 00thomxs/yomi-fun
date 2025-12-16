@@ -186,7 +186,6 @@ export default async function AdminSeasonsPage() {
           {/* Client Component for Interactive Charts and Detailed Stats */}
           <SeasonStatsClient 
             seasonId={activeSeason.id}
-            seasonName={activeSeason.name}
             leaderboard={seasonLeaderboard}
             events={seasonEvents}
             bets={seasonBets}

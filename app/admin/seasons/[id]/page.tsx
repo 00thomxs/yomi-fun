@@ -96,12 +96,8 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             </div>
           </div>
           
-          <Link
-            href={`/admin/recap/${seasonId}`}
-            className="px-4 py-2 bg-amber-500 text-black rounded-lg font-bold text-sm hover:bg-amber-400 transition-all"
-          >
-            Voir Image Récap
-          </Link>
+          {/* Only show recap link if past_seasons entry exists (rewards distributed) */}
+          {/* For now, show season details instead */}
         </div>
       </div>
 
