@@ -183,7 +183,8 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
     total_burned: number
   }
 
-  const { data: totalsData, error: totalsError } = await supabaseAdmin.rpc('get_monetary_totals')
+  // IMPORTANT: call RPC with the authenticated client so auth.uid() is available inside the function.
+  const { data: totalsData, error: totalsError } = await supabase.rpc('get_monetary_totals')
   if (totalsError) return { error: `Erreur RPC get_monetary_totals: ${totalsError.message}` }
 
   // RPC returns an array for set-returning functions; we expect exactly 1 row (or 0 if access denied)
