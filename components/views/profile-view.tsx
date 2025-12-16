@@ -11,6 +11,21 @@ import { ChangePasswordForm } from "@/components/profile/change-password-form"
 import { DailyRewardWidget } from "@/components/daily-reward-widget"
 import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 
+// Helper to abbreviate large numbers (e.g., 2420000 → 2.4M)
+function formatCompactNumber(num: number): string {
+  const absNum = Math.abs(num)
+  if (absNum >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M'
+  }
+  if (absNum >= 100_000) {
+    return (num / 1_000).toFixed(0) + 'K'
+  }
+  if (absNum >= 10_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K'
+  }
+  return num.toLocaleString()
+}
+
 type Transaction = {
   id: string
   created_at: string
@@ -465,7 +480,7 @@ export function ProfileView() {
               <div className="text-center sm:text-left">
                 <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
                 <p className={`text-sm sm:text-base font-bold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  {userStats.totalPnL >= 0 ? "+" : ""}{userStats.totalPnL.toLocaleString()}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
+                  {userStats.totalPnL >= 0 ? "+" : ""}{formatCompactNumber(userStats.totalPnL)}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
                 </p>
               </div>
               <div className="text-center sm:text-left">
