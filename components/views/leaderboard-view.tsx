@@ -258,6 +258,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const seasonStart = seasonSettings?.updated_at ? new Date(seasonSettings.updated_at) : new Date()
   const now = new Date()
   
+  // Check if season time has elapsed (even if is_active is still true)
+  const isSeasonTimeElapsed = hasSeason && seasonEnd.getTime() < now.getTime()
+  
   // Calculate time remaining
   const timeLeftMs = Math.max(0, seasonEnd.getTime() - now.getTime())
   const minutesLeft = Math.floor(timeLeftMs / (1000 * 60))
@@ -319,8 +322,10 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         <div>
           <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
             {viewMode === 'season' && hasSeason ? (
-            <p className="text-xs text-primary font-medium flex items-center gap-1 max-w-[250px] truncate">
-              <Trophy className="w-3 h-3 shrink-0" /> {seasonSettings?.title || "Saison en cours"}
+            <p className={`text-xs font-medium flex items-center gap-1 max-w-[250px] truncate ${isSeasonTimeElapsed ? 'text-muted-foreground' : 'text-primary'}`}>
+              <Trophy className="w-3 h-3 shrink-0" /> 
+              {seasonSettings?.title || "Saison"} 
+              {isSeasonTimeElapsed && <span className="text-[10px] opacity-60">(terminée)</span>}
             </p>
           ) : (
               <p className="text-xs text-muted-foreground">Classement Global (All-time)</p>
@@ -461,16 +466,28 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           </div>
 
           {/* Progress & Status Bar */}
-          <div className="w-full max-w-[90%] rounded-xl border border-white/10 bg-card p-4 relative overflow-hidden shadow-lg mb-2">
+          <div className={`w-full max-w-[90%] rounded-xl border bg-card p-4 relative overflow-hidden shadow-lg mb-2 ${
+            isSeasonTimeElapsed ? 'border-muted-foreground/30' : 'border-white/10'
+          }`}>
             {/* Background glow */}
-            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none ${
+              isSeasonTimeElapsed ? 'bg-muted-foreground/10' : 'bg-primary/10'
+            }`} />
             
             <div className="flex items-end justify-between mb-3 relative z-10">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Saison en cours</p>
-                <p className="text-2xl font-black text-white flex items-baseline gap-2 tabular-nums tracking-tight">
-                  {getCountdown()} <span className="text-sm font-bold text-muted-foreground/50 uppercase">restants</span>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  {isSeasonTimeElapsed ? 'Saison terminée' : 'Saison en cours'}
                 </p>
+                {isSeasonTimeElapsed ? (
+                  <p className="text-2xl font-black text-muted-foreground flex items-baseline gap-2 tabular-nums tracking-tight">
+                    Terminée
+                  </p>
+                ) : (
+                  <p className="text-2xl font-black text-white flex items-baseline gap-2 tabular-nums tracking-tight">
+                    {getCountdown()} <span className="text-sm font-bold text-muted-foreground/50 uppercase">restants</span>
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Cash Prize</p>
@@ -483,10 +500,16 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             {/* Progress Bar */}
             <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
               <div 
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-600 via-primary to-orange-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_15px_rgba(239,68,68,0.6)]"
+                className={`absolute left-0 top-0 h-full transition-all duration-1000 ease-out rounded-full ${
+                  isSeasonTimeElapsed 
+                    ? 'bg-gradient-to-r from-muted-foreground/60 to-muted-foreground/40' 
+                    : 'bg-gradient-to-r from-rose-600 via-primary to-orange-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]'
+                }`}
                 style={{ width: `${progress}%` }}
               >
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+                {!isSeasonTimeElapsed && (
+                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+                )}
               </div>
             </div>
             
