@@ -135,43 +135,18 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
 
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
-  // 1) Total supply = sum of all user balances
-  const { data: supplyRows, error: supplyError } = await supabaseAdmin
-    .from('profiles')
-    .select('balance')
+  // Fast aggregate totals via RPC (scales better than fetching all rows)
+  const { data: totals, error: totalsError } = await supabaseAdmin
+    .rpc('get_monetary_totals')
+    .maybeSingle()
 
-  if (supplyError) return { error: `Erreur supply: ${supplyError.message}` }
+  if (totalsError) return { error: `Erreur RPC get_monetary_totals: ${totalsError.message}` }
+  if (!totals) return { error: "Accès refusé (RPC)" }
 
-  const totalSupply = (supplyRows || []).reduce((sum: number, r: any) => sum + (Number(r.balance) || 0), 0)
-
-  // 2) Total fees burned = sum(bets.fee_paid) (fallback: estimate at 5% if fee_paid is null)
-  const { data: betRows, error: betsError } = await supabaseAdmin
-    .from('bets')
-    .select('amount, fee_paid, fee_rate, status')
-    .neq('status', 'cancelled')
-
-  if (betsError) return { error: `Erreur bets: ${betsError.message}` }
-
-  const totalFeesBurned = (betRows || []).reduce((sum: number, b: any) => {
-    const feePaid = b.fee_paid
-    if (feePaid !== null && feePaid !== undefined) return sum + (Number(feePaid) || 0)
-    // fallback estimate (historical bets before fee tracking)
-    const amount = Number(b.amount) || 0
-    const rate = Number(b.fee_rate) || 0.05
-    return sum + Math.round(amount * rate)
-  }, 0)
-
-  // 3) Total shop burned = sum(orders.price_paid) for non-cancelled orders (pending+completed both reduce balance)
-  const { data: orderRows, error: ordersError } = await supabaseAdmin
-    .from('orders')
-    .select('price_paid, status')
-    .neq('status', 'cancelled')
-
-  if (ordersError) return { error: `Erreur orders: ${ordersError.message}` }
-
-  const totalShopBurned = (orderRows || []).reduce((sum: number, o: any) => sum + (Number(o.price_paid) || 0), 0)
-
-  const totalBurned = totalFeesBurned + totalShopBurned
+  const totalSupply = Number(totals.total_supply || 0)
+  const totalFeesBurned = Number(totals.total_burned_fees || 0)
+  const totalShopBurned = Number(totals.total_burned_shop || 0)
+  const totalBurned = Number(totals.total_burned || 0)
 
   // 4) Snapshot logic (to compute weekly inflation rate)
   const { data: lastSnap } = await supabaseAdmin
