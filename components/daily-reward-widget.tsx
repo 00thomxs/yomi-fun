@@ -21,6 +21,11 @@ export function DailyRewardWidget() {
       setIsLoading(false)
     }
     fetchStatus()
+    
+    // Refresh periodically to catch updates from banner claims
+    // More frequent when welcome bonus is pending (user likely to claim soon)
+    const interval = setInterval(fetchStatus, 5000) // Every 5 seconds
+    return () => clearInterval(interval)
   }, [])
 
   // Countdown timer
@@ -77,7 +82,7 @@ export function DailyRewardWidget() {
   }
 
   const isJackpotDay = status.isJackpotDay
-  const dayDisplay = status.currentStreak + 1
+  const dayDisplay = (status.currentStreak ?? 0) + 1
 
   return (
     <div className={`p-3 rounded-lg border ${

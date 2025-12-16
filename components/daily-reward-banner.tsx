@@ -141,7 +141,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
           <Gift className="w-5 h-5 text-primary" />
         )}
         <span className={`font-bold ${isJackpotDay ? 'text-amber-400' : 'text-foreground'}`}>
-          Jour {status.currentStreak + 1}/7
+          Jour {(status.currentStreak ?? 0) + 1}/7
         </span>
         <span className="text-sm text-muted-foreground hidden sm:inline">
           {isJackpotDay ? 'Jackpot disponible !' : 'Bonus quotidien'}

@@ -121,7 +121,9 @@ export async function getDailyRewardStatus(): Promise<DailyRewardStatus> {
   const resetStreak = shouldResetStreak(profile.last_daily_claim)
   
   // If streak should reset, treat as day 0
-  const effectiveStreak = resetStreak ? 0 : profile.daily_streak
+  // Ensure daily_streak is always a number (could be null/undefined for new users)
+  const rawStreak = profile.daily_streak ?? 0
+  const effectiveStreak = resetStreak ? 0 : rawStreak
   
   // Calculate today's potential reward
   const { amount: todayReward, isJackpot } = getRewardForDay(effectiveStreak)
