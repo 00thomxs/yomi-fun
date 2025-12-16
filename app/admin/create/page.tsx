@@ -392,7 +392,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-bold font-mono">5K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">🔥 Fun</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">Fun</div>
               </button>
               <button
                 type="button"
@@ -404,7 +404,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-bold font-mono">10K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">⚡ Équilibré</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">Équilibré</div>
               </button>
               <button
                 type="button"
@@ -416,7 +416,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-bold font-mono">20K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">📊 Stable</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">Stable</div>
               </button>
               <button
                 type="button"
@@ -428,7 +428,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-bold font-mono">50K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">🏛️ Pro</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">Pro</div>
               </button>
             </div>
 
@@ -453,9 +453,9 @@ export default function CreateMarketPage() {
                   initialLiquidity <= 10000 ? 'text-emerald-400' :
                   initialLiquidity <= 20000 ? 'text-blue-400' : 'text-purple-400'
                 }`}>
-                  {initialLiquidity <= 5000 ? '🔥 Haute (fun)' :
-                   initialLiquidity <= 10000 ? '⚡ Moyenne' :
-                   initialLiquidity <= 20000 ? '📊 Basse' : '🏛️ Très basse'}
+                  {initialLiquidity <= 5000 ? 'Haute (fun)' :
+                   initialLiquidity <= 10000 ? 'Moyenne' :
+                   initialLiquidity <= 20000 ? 'Basse' : 'Très basse'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">

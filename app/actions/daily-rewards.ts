@@ -160,18 +160,21 @@ export async function claimWelcomeBonus(): Promise<WelcomeBonusResult> {
     return { error: "Bonus de bienvenue déjà récupéré !" }
   }
   
-  // Give welcome bonus
+  // Give welcome bonus with CONDITIONAL check to prevent race conditions
   const newBalance = profile.balance + WELCOME_BONUS
   
-  const { error: updateError } = await supabase
+  const { error: updateError, data: updatedRows } = await supabase
     .from('profiles')
     .update({
       balance: newBalance,
       welcome_bonus_claimed: true
     })
     .eq('id', user.id)
+    .eq('welcome_bonus_claimed', false) // Only update if still false (atomic check)
+    .select()
   
   if (updateError) return { error: "Erreur lors de la récupération du bonus." }
+  if (!updatedRows || updatedRows.length === 0) return { error: "Bonus déjà récupéré. Rafraîchis la page." }
   
   // Log transaction
   await supabase.from('transactions').insert({
@@ -225,19 +228,33 @@ export async function claimDailyBonus(): Promise<DailyRewardResult> {
   // Calculate new streak (wraps around after day 6)
   const newStreak = (currentStreak + 1) % 7
   
-  // Update profile
+  // Update profile with CONDITIONAL check to prevent race conditions
+  // Only update if last_daily_claim hasn't changed (atomic check)
   const newBalance = profile.balance + amount
+  const now = new Date().toISOString()
   
-  const { error: updateError } = await supabase
+  let updateQuery = supabase
     .from('profiles')
     .update({
       balance: newBalance,
-      last_daily_claim: new Date().toISOString(),
+      last_daily_claim: now,
       daily_streak: newStreak
     })
     .eq('id', user.id)
   
+  // Add condition: only update if last_daily_claim matches what we read
+  // This prevents race conditions where two requests try to claim simultaneously
+  if (profile.last_daily_claim) {
+    updateQuery = updateQuery.eq('last_daily_claim', profile.last_daily_claim)
+  } else {
+    updateQuery = updateQuery.is('last_daily_claim', null)
+  }
+  
+  const { error: updateError, data: updatedRows } = await updateQuery.select()
+  
+  // If no rows were updated, someone else claimed in the meantime (race condition)
   if (updateError) return { error: "Erreur lors de la récupération du bonus." }
+  if (!updatedRows || updatedRows.length === 0) return { error: "Bonus déjà récupéré. Rafraîchis la page." }
   
   // Log transaction
   const description = isJackpot 

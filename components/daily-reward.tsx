@@ -195,7 +195,7 @@ export function DailyReward({ onClaim }: DailyRewardProps) {
             </p>
           </div>
           
-          <p className="text-sm text-muted-foreground">🎰 Jackpot Jour 7 !</p>
+          <p className="text-sm text-muted-foreground">Jackpot Jour 7</p>
         </div>
       </div>
     )
