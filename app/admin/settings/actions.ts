@@ -628,14 +628,25 @@ export async function getPastSeason(id: string) {
 }
 
 export async function getAllPastSeasons() {
-  // Use admin client to ensure visibility
+  // Get all inactive seasons from the 'seasons' table (unified source)
   const { data, error } = await supabaseAdmin
-    .from('past_seasons')
-    .select('id, title, end_date')
+    .from('seasons')
+    .select('id, name, start_date, end_date')
+    .eq('is_active', false)
     .order('end_date', { ascending: false })
 
-  if (error) return []
-  return data
+  if (error) {
+    console.error('Error fetching past seasons:', error)
+    return []
+  }
+  
+  // Map to expected format (title instead of name for backward compatibility)
+  return (data || []).map(s => ({
+    id: s.id,
+    title: s.name,
+    start_date: s.start_date,
+    end_date: s.end_date
+  }))
 }
 
 export async function deletePastSeason(id: string) {
