@@ -142,18 +142,18 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           <div className="grid grid-cols-3 gap-4">
             {/* 2nd Place */}
             <div className="text-center order-1">
-              <div className="w-16 h-16 mx-auto rounded-full bg-gray-400/20 border-2 border-gray-400 flex items-center justify-center text-2xl mb-2">
-                🥈
+              <div className="w-16 h-16 mx-auto rounded-full bg-zinc-400/20 border-2 border-zinc-400 flex items-center justify-center mb-2">
+                <span className="text-2xl font-black text-zinc-300">#2</span>
               </div>
               <p className="font-bold">{leaderboard[1]?.profiles?.username}</p>
-              <p className="text-sm text-gray-400 font-mono">
+              <p className="text-sm text-zinc-400 font-mono">
                 {leaderboard[1]?.points >= 0 ? '+' : ''}{leaderboard[1]?.points?.toLocaleString()}
               </p>
             </div>
             {/* 1st Place */}
             <div className="text-center order-0 md:order-1 -mt-4">
-              <div className="w-20 h-20 mx-auto rounded-full bg-amber-400/20 border-2 border-amber-400 flex items-center justify-center text-3xl mb-2">
-                🥇
+              <div className="w-20 h-20 mx-auto rounded-full bg-amber-400/20 border-2 border-amber-400 flex items-center justify-center mb-2">
+                <span className="text-3xl font-black text-amber-400">#1</span>
               </div>
               <p className="font-bold text-lg text-amber-400">{leaderboard[0]?.profiles?.username}</p>
               <p className="text-sm text-amber-400 font-mono font-bold">
@@ -162,11 +162,11 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             </div>
             {/* 3rd Place */}
             <div className="text-center order-2">
-              <div className="w-16 h-16 mx-auto rounded-full bg-amber-700/20 border-2 border-amber-700 flex items-center justify-center text-2xl mb-2">
-                🥉
+              <div className="w-16 h-16 mx-auto rounded-full bg-orange-600/20 border-2 border-orange-600 flex items-center justify-center mb-2">
+                <span className="text-2xl font-black text-orange-400">#3</span>
               </div>
               <p className="font-bold">{leaderboard[2]?.profiles?.username}</p>
-              <p className="text-sm text-amber-700 font-mono">
+              <p className="text-sm text-orange-400 font-mono">
                 {leaderboard[2]?.points >= 0 ? '+' : ''}{leaderboard[2]?.points?.toLocaleString()}
               </p>
             </div>

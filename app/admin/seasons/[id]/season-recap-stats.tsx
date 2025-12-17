@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Trophy, Target, Flame, TrendingUp, TrendingDown, Zap, BarChart3, Medal, Percent, Star } from 'lucide-react'
+import { Trophy, Target, TrendingUp, TrendingDown, Zap, BarChart3, Medal, Percent, Clock } from 'lucide-react'
 import { CurrencySymbol } from '@/components/ui/currency-symbol'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts'
 
@@ -63,6 +63,23 @@ type SeasonRecapStatsProps = {
 
 const COLORS = ['#f59e0b', '#6366f1', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16']
 
+// Rank badge component
+function RankBadge({ rank, size = 'sm' }: { rank: number; size?: 'sm' | 'md' }) {
+  const colors = {
+    1: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    2: 'bg-zinc-400/20 text-zinc-300 border-zinc-400/30',
+    3: 'bg-orange-600/20 text-orange-400 border-orange-600/30',
+  }
+  const cls = colors[rank as 1 | 2 | 3] || 'bg-white/5 text-muted-foreground border-white/10'
+  const sizeClass = size === 'md' ? 'w-7 h-7 text-xs' : 'w-5 h-5 text-[10px]'
+  
+  return (
+    <span className={`inline-flex items-center justify-center ${sizeClass} rounded border font-mono font-bold ${cls}`}>
+      {rank}
+    </span>
+  )
+}
+
 export function SeasonRecapStats({ 
   seasonId, 
   leaderboard, 
@@ -75,10 +92,7 @@ export function SeasonRecapStats({
     // Top 3 by WR (min 3 bets)
     const topWR = leaderboard
       .filter(e => (e.wins + e.losses) >= 3)
-      .map(e => ({
-        ...e,
-        wr: e.wins / (e.wins + e.losses) * 100
-      }))
+      .map(e => ({ ...e, wr: e.wins / (e.wins + e.losses) * 100 }))
       .sort((a, b) => b.wr - a.wr)
       .slice(0, 3)
 
@@ -105,27 +119,21 @@ export function SeasonRecapStats({
       .sort((a, b) => b.total_bet_amount - a.total_bet_amount)
       .slice(0, 3)
 
-    // Top 3 by ROI % (PnL / total_bet_amount * 100)
+    // Top 3 by ROI %
     const topROI = leaderboard
       .filter(e => e.total_bet_amount > 0 && (e.wins + e.losses) >= 3)
-      .map(e => ({
-        ...e,
-        roi: (e.points / e.total_bet_amount) * 100
-      }))
+      .map(e => ({ ...e, roi: (e.points / e.total_bet_amount) * 100 }))
       .sort((a, b) => b.roi - a.roi)
       .slice(0, 3)
 
     // Worst ROI %
     const worstROI = leaderboard
       .filter(e => e.total_bet_amount > 0 && (e.wins + e.losses) >= 3)
-      .map(e => ({
-        ...e,
-        roi: (e.points / e.total_bet_amount) * 100
-      }))
+      .map(e => ({ ...e, roi: (e.points / e.total_bet_amount) * 100 }))
       .sort((a, b) => a.roi - b.roi)
       .slice(0, 3)
 
-    // Top 3 most active (by number of bets)
+    // Top 3 most active
     const betCountByUser = bets.reduce((acc, bet) => {
       acc[bet.user_id] = (acc[bet.user_id] || 0) + 1
       return acc
@@ -146,7 +154,7 @@ export function SeasonRecapStats({
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5)
 
-    // Biggest single WIN (potential_payout on won bets)
+    // Biggest single WIN
     const biggestWins = [...bets]
       .filter(b => b.status === 'won' && b.potential_payout)
       .sort((a, b) => (b.potential_payout || 0) - (a.potential_payout || 0))
@@ -161,12 +169,9 @@ export function SeasonRecapStats({
       return acc
     }, {} as Record<string, number>)
 
-    // Most popular events (by bet count)
+    // Most popular events
     const popularEvents = events
-      .map(e => ({
-        ...e,
-        betCount: eventBetCounts[e.id] || 0
-      }))
+      .map(e => ({ ...e, betCount: eventBetCounts[e.id] || 0 }))
       .sort((a, b) => b.betCount - a.betCount)
       .slice(0, 3)
 
@@ -176,22 +181,10 @@ export function SeasonRecapStats({
       .slice(0, 3)
 
     return {
-      topWR,
-      topWins,
-      topGainers,
-      topLosers,
-      topWhales,
-      topROI,
-      worstROI,
-      topActive,
-      biggestBets,
-      biggestWins,
-      popularEvents,
-      highVolumeEvents,
+      topWR, topWins, topGainers, topLosers, topWhales, topROI, worstROI,
+      topActive, biggestBets, biggestWins, popularEvents, highVolumeEvents,
       totalVolume: events.reduce((sum, e) => sum + (e.volume || 0), 0),
-      avgBetSize: bets.length > 0 
-        ? Math.round(bets.reduce((sum, b) => sum + b.amount, 0) / bets.length)
-        : 0,
+      avgBetSize: bets.length > 0 ? Math.round(bets.reduce((sum, b) => sum + b.amount, 0) / bets.length) : 0,
       totalBets: bets.length,
       uniqueBettors: new Set(bets.map(b => b.user_id)).size
     }
@@ -200,16 +193,11 @@ export function SeasonRecapStats({
   // Position history chart data
   const positionChartData = useMemo(() => {
     if (positionHistory.length === 0) return []
-
-    const topUsers = new Set(
-      leaderboard.slice(0, 10).map(l => l.user_id)
-    )
-
+    const topUsers = new Set(leaderboard.slice(0, 10).map(l => l.user_id))
     const dates = [...new Set(positionHistory.map(h => h.captured_at.split('T')[0]))].sort()
     
     return dates.map(date => {
       const dayData: any = { date: new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }
-      
       positionHistory
         .filter(h => h.captured_at.startsWith(date) && topUsers.has(h.user_id) && h.profiles?.username)
         .forEach(h => {
@@ -217,7 +205,6 @@ export function SeasonRecapStats({
             dayData[h.profiles.username] = h.position
           }
         })
-      
       return dayData
     })
   }, [positionHistory, leaderboard])
@@ -232,19 +219,16 @@ export function SeasonRecapStats({
       { name: '1K/10K', min: 1000, max: 10000 },
       { name: '>10K', min: 10000, max: Infinity },
     ]
-
     return ranges.map(range => ({
       name: range.name,
       count: leaderboard.filter(l => l.points > range.min && l.points <= range.max).length
     }))
   }, [leaderboard])
 
-  // Podium duration (who stayed longest in top 3)
+  // Podium duration
   const podiumDuration = useMemo(() => {
     if (positionHistory.length === 0) return []
-
     const podiumCounts: Record<string, { count: number; username: string }> = {}
-    
     positionHistory.forEach(h => {
       if (h.position <= 3 && h.profiles?.username) {
         if (!podiumCounts[h.user_id]) {
@@ -253,7 +237,6 @@ export function SeasonRecapStats({
         podiumCounts[h.user_id].count++
       }
     })
-
     return Object.entries(podiumCounts)
       .map(([userId, data]) => ({ userId, ...data }))
       .sort((a, b) => b.count - a.count)
@@ -261,35 +244,33 @@ export function SeasonRecapStats({
   }, [positionHistory])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Position Evolution Chart */}
       {positionChartData.length > 0 ? (
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">
-            Évolution des Positions (Course au Titre)
-          </h4>
-          <div className="h-72">
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Position Evolution (Top 10)</h4>
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={positionChartData}>
-                <XAxis dataKey="date" tick={{ fill: '#888', fontSize: 10 }} />
+                <XAxis dataKey="date" tick={{ fill: '#666', fontSize: 9 }} />
                 <YAxis 
                   reversed 
                   domain={[1, 10]} 
-                  tick={{ fill: '#888', fontSize: 10 }}
+                  tick={{ fill: '#666', fontSize: 9 }}
                   tickFormatter={(v) => `#${v}`}
                 />
                 <Tooltip 
-                  contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                  contentStyle={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: '4px', fontSize: '11px' }}
                   labelStyle={{ color: '#fff' }}
                 />
-                <Legend wrapperStyle={{ fontSize: '10px' }} />
+                <Legend wrapperStyle={{ fontSize: '9px' }} />
                 {leaderboard.slice(0, 10).map((entry, i) => (
                   <Line
                     key={entry.user_id}
                     type="monotone"
                     dataKey={entry.profiles?.username}
                     stroke={COLORS[i]}
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                     dot={{ r: 2 }}
                     connectNulls
                   />
@@ -299,29 +280,27 @@ export function SeasonRecapStats({
           </div>
         </div>
       ) : (
-        <div className="p-6 rounded-xl bg-card border border-border text-center">
-          <TrendingUp className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-          <h4 className="font-bold text-sm">Pas d'historique de positions</h4>
-          <p className="text-xs text-muted-foreground mt-1">
-            Les snapshots sont créés après chaque résolution d'event.
-          </p>
+        <div className="p-6 rounded-lg bg-black/20 border border-border text-center">
+          <TrendingUp className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+          <h4 className="font-bold text-sm mb-1">No Position History</h4>
+          <p className="text-xs text-muted-foreground">Snapshots are created after each event resolution.</p>
         </div>
       )}
 
       {/* Podium Duration */}
       {podiumDuration.length > 0 && (
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-amber-400" /> Plus Longtemps sur le Podium
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Clock className="w-3 h-3" /> Podium Duration
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {podiumDuration.map((p, i) => (
-              <div key={p.userId} className="flex items-center justify-between">
+              <div key={p.userId} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{p.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.username}</span>
                 </span>
-                <span className="font-bold text-amber-400">{p.count} jour{p.count > 1 ? 's' : ''}</span>
+                <span className="font-mono text-amber-400">{p.count}d</span>
               </div>
             ))}
           </div>
@@ -329,78 +308,78 @@ export function SeasonRecapStats({
       )}
 
       {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {/* Top WR */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-blue-400" /> Meilleur Win Rate
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Target className="w-3 h-3 text-blue-400" /> Win Rate
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topWR.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-blue-400">{p.wr.toFixed(1)}%</span>
+                <span className="font-mono font-bold text-blue-400">{p.wr.toFixed(1)}%</span>
               </div>
             ))}
-            {stats.topWR.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
+            {stats.topWR.length === 0 && <p className="text-xs text-muted-foreground">Min. 3 bets</p>}
           </div>
         </div>
 
-        {/* Top ROI % */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Percent className="w-4 h-4 text-emerald-400" /> Meilleur ROI
+        {/* Top ROI */}
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Percent className="w-3 h-3 text-emerald-400" /> Best ROI
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topROI.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-emerald-400">+{p.roi.toFixed(1)}%</span>
+                <span className="font-mono font-bold text-emerald-400">+{p.roi.toFixed(1)}%</span>
               </div>
             ))}
-            {stats.topROI.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
+            {stats.topROI.length === 0 && <p className="text-xs text-muted-foreground">Min. 3 bets</p>}
           </div>
         </div>
 
-        {/* Worst ROI % */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <TrendingDown className="w-4 h-4 text-rose-400" /> Pire ROI
+        {/* Worst ROI */}
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <TrendingDown className="w-3 h-3 text-rose-400" /> Worst ROI
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.worstROI.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '💀'}{i === 1 && '😵'}{i === 2 && '😢'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-rose-400">{p.roi.toFixed(1)}%</span>
+                <span className="font-mono font-bold text-rose-400">{p.roi.toFixed(1)}%</span>
               </div>
             ))}
-            {stats.worstROI.length === 0 && <p className="text-sm text-muted-foreground">Min. 3 paris requis</p>}
+            {stats.worstROI.length === 0 && <p className="text-xs text-muted-foreground">Min. 3 bets</p>}
           </div>
         </div>
 
         {/* Top Gainers */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-emerald-400" /> Meilleurs Gains
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <TrendingUp className="w-3 h-3 text-emerald-400" /> Top Gainers
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topGainers.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-emerald-400 flex items-center gap-0.5">
-                  +{p.points.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                <span className="font-mono font-bold text-emerald-400 flex items-center gap-0.5">
+                  +{p.points.toLocaleString()}<CurrencySymbol className="w-2.5 h-2.5" />
                 </span>
               </div>
             ))}
@@ -408,40 +387,40 @@ export function SeasonRecapStats({
         </div>
 
         {/* Top Losers */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <TrendingDown className="w-4 h-4 text-rose-400" /> Pires Pertes
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <TrendingDown className="w-3 h-3 text-rose-400" /> Top Losers
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topLosers.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '💀'}{i === 1 && '😵'}{i === 2 && '😢'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-rose-400 flex items-center gap-0.5">
-                  {p.points.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                <span className="font-mono font-bold text-rose-400 flex items-center gap-0.5">
+                  {p.points.toLocaleString()}<CurrencySymbol className="w-2.5 h-2.5" />
                 </span>
               </div>
             ))}
-            {stats.topLosers.length === 0 && <p className="text-sm text-muted-foreground">Aucune perte</p>}
+            {stats.topLosers.length === 0 && <p className="text-xs text-muted-foreground">No losses</p>}
           </div>
         </div>
 
         {/* Top Whales */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Zap className="w-4 h-4 text-purple-400" /> Plus Gros Volumes
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Zap className="w-3 h-3 text-purple-400" /> Volume Leaders
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topWhales.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🐋'}{i === 1 && '🦈'}{i === 2 && '🐠'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-purple-400 flex items-center gap-0.5">
-                  {p.total_bet_amount.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
+                <span className="font-mono font-bold text-purple-400 flex items-center gap-0.5">
+                  {(p.total_bet_amount / 1000).toFixed(1)}K<CurrencySymbol className="w-2.5 h-2.5" />
                 </span>
               </div>
             ))}
@@ -449,36 +428,36 @@ export function SeasonRecapStats({
         </div>
 
         {/* Most Active */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Flame className="w-4 h-4 text-orange-400" /> Plus Actifs
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <BarChart3 className="w-3 h-3 text-orange-400" /> Most Active
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topActive.map((p, i) => (
-              <div key={p.userId} className="flex items-center justify-between">
+              <div key={p.userId} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🔥'}{i === 1 && '⚡'}{i === 2 && '💪'}
-                  <span className="font-medium text-sm">{p.profile?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profile?.username}</span>
                 </span>
-                <span className="font-bold text-orange-400">{p.count} paris</span>
+                <span className="font-mono font-bold text-orange-400">{p.count} bets</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Top Wins */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Medal className="w-4 h-4 text-amber-400" /> Plus de Victoires
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Medal className="w-3 h-3 text-amber-400" /> Most Wins
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {stats.topWins.map((p, i) => (
-              <div key={p.user_id} className="flex items-center justify-between">
+              <div key={p.user_id} className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-2">
-                  {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                  <span className="font-medium text-sm">{p.profiles?.username}</span>
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium">{p.profiles?.username}</span>
                 </span>
-                <span className="font-bold text-amber-400">{p.wins} wins</span>
+                <span className="font-mono font-bold text-amber-400">{p.wins}W</span>
               </div>
             ))}
           </div>
@@ -487,136 +466,119 @@ export function SeasonRecapStats({
 
       {/* Biggest Single Wins */}
       {stats.biggestWins.length > 0 && (
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-amber-400" /> Plus Gros Gains (single bet)
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Trophy className="w-3 h-3 text-amber-400" /> Biggest Wins (Single Bet)
           </h4>
-          <div className="space-y-2">
-            {stats.biggestWins.map((bet, i) => {
-              const question = bet.markets?.question || ''
-              const truncatedQuestion = question.length > 35 ? question.substring(0, 35) + '...' : question
-              return (
-                <div key={bet.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
-                  <div className="min-w-0 flex-1">
-                    <span className="font-medium text-sm">{bet.profiles?.username}</span>
-                    <p className="text-[10px] text-muted-foreground truncate">{truncatedQuestion}</p>
-                  </div>
-                  <span className="font-bold font-mono text-emerald-400 flex items-center gap-0.5 ml-2">
-                    +{(bet.potential_payout || 0).toLocaleString()}<CurrencySymbol className="w-3 h-3" />
-                  </span>
+          <div className="space-y-1.5">
+            {stats.biggestWins.map((bet) => (
+              <div key={bet.id} className="flex items-center justify-between text-xs py-1 border-b border-border last:border-0">
+                <div className="min-w-0 flex-1">
+                  <span className="font-medium">{bet.profiles?.username}</span>
+                  <p className="text-[10px] text-muted-foreground truncate">{bet.markets?.question || ''}</p>
                 </div>
-              )
-            })}
+                <span className="font-mono font-bold text-emerald-400 flex items-center gap-0.5 ml-2">
+                  +{(bet.potential_payout || 0).toLocaleString()}<CurrencySymbol className="w-2.5 h-2.5" />
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {/* Event Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Most Popular Events */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <Flame className="w-4 h-4 text-orange-400" /> Events les Plus Populaires
-          </h4>
-          <div className="space-y-2">
-            {stats.popularEvents.map((event, i) => {
-              const truncatedQuestion = event.question.length > 40 ? event.question.substring(0, 40) + '...' : event.question
-              return (
-                <div key={event.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                    <span className="font-medium text-sm truncate">{truncatedQuestion}</span>
-                  </div>
-                  <span className="font-bold text-orange-400 ml-2">{event.betCount} paris</span>
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Most Popular Events</h4>
+          <div className="space-y-1.5">
+            {stats.popularEvents.map((event, i) => (
+              <div key={event.id} className="flex items-center justify-between text-xs py-1 border-b border-border last:border-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium truncate">{event.question}</span>
                 </div>
-              )
-            })}
+                <span className="font-mono text-orange-400 ml-2">{event.betCount} bets</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Highest Volume Events */}
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <h4 className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
-            <BarChart3 className="w-4 h-4 text-primary" /> Events Plus Gros Volume
-          </h4>
-          <div className="space-y-2">
-            {stats.highVolumeEvents.map((event, i) => {
-              const truncatedQuestion = event.question.length > 40 ? event.question.substring(0, 40) + '...' : event.question
-              return (
-                <div key={event.id} className="flex items-center justify-between py-1 border-b border-border last:border-0">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    {i === 0 && '🥇'}{i === 1 && '🥈'}{i === 2 && '🥉'}
-                    <span className="font-medium text-sm truncate">{truncatedQuestion}</span>
-                  </div>
-                  <span className="font-bold font-mono text-primary flex items-center gap-0.5 ml-2">
-                    {event.volume.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
-                  </span>
+        <div className="p-3 rounded-lg bg-black/20 border border-border">
+          <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Highest Volume</h4>
+          <div className="space-y-1.5">
+            {stats.highVolumeEvents.map((event, i) => (
+              <div key={event.id} className="flex items-center justify-between text-xs py-1 border-b border-border last:border-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <RankBadge rank={i + 1} />
+                  <span className="font-medium truncate">{event.question}</span>
                 </div>
-              )
-            })}
+                <span className="font-mono text-primary flex items-center gap-0.5 ml-2">
+                  {(event.volume / 1000).toFixed(1)}K<CurrencySymbol className="w-2.5 h-2.5" />
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* PnL Distribution */}
-      <div className="p-4 rounded-xl bg-card border border-border">
-        <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-4">Distribution des PnL</h4>
-        <div className="h-48">
+      <div className="p-3 rounded-lg bg-black/20 border border-border">
+        <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">PnL Distribution</h4>
+        <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={pnlDistribution}>
-              <XAxis dataKey="name" tick={{ fill: '#888', fontSize: 9 }} />
-              <YAxis tick={{ fill: '#888', fontSize: 10 }} />
+              <XAxis dataKey="name" tick={{ fill: '#666', fontSize: 9 }} />
+              <YAxis tick={{ fill: '#666', fontSize: 9 }} />
               <Tooltip 
-                contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                contentStyle={{ background: '#0a0a0a', border: '1px solid #222', borderRadius: '4px', fontSize: '11px' }}
                 labelStyle={{ color: '#fff' }}
               />
-              <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#f59e0b" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Full Leaderboard */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
-        <div className="px-4 py-3 bg-white/5 border-b border-border">
-          <h3 className="font-bold text-sm">Classement Final Complet</h3>
+      <div className="rounded-lg bg-black/20 border border-border overflow-hidden">
+        <div className="px-3 py-2 bg-white/5 border-b border-border">
+          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+            Final Leaderboard
+          </span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-white/5 text-muted-foreground text-xs uppercase">
+          <table className="w-full text-xs">
+            <thead className="bg-white/5 text-muted-foreground uppercase tracking-wider">
               <tr>
-                <th className="px-4 py-2 text-left">#</th>
-                <th className="px-4 py-2 text-left">Joueur</th>
-                <th className="px-4 py-2 text-right">PnL</th>
-                <th className="px-4 py-2 text-right">ROI</th>
-                <th className="px-4 py-2 text-right">W/L</th>
-                <th className="px-4 py-2 text-right">WR</th>
+                <th className="px-3 py-2 text-left w-12">#</th>
+                <th className="px-3 py-2 text-left">Player</th>
+                <th className="px-3 py-2 text-right">PnL</th>
+                <th className="px-3 py-2 text-right">ROI</th>
+                <th className="px-3 py-2 text-right">W/L</th>
+                <th className="px-3 py-2 text-right">WR</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border font-mono">
               {leaderboard.map((entry, i) => {
                 const roi = entry.total_bet_amount > 0 ? (entry.points / entry.total_bet_amount) * 100 : 0
                 return (
                   <tr key={entry.user_id} className="hover:bg-white/5">
-                    <td className="px-4 py-2">
-                      {i === 0 && <span className="text-amber-400">🥇</span>}
-                      {i === 1 && <span className="text-gray-400">🥈</span>}
-                      {i === 2 && <span className="text-amber-700">🥉</span>}
-                      {i > 2 && <span className="text-muted-foreground">{i + 1}</span>}
+                    <td className="px-3 py-2">
+                      <RankBadge rank={i + 1} />
                     </td>
-                    <td className="px-4 py-2 font-medium">{entry.profiles?.username || 'Unknown'}</td>
-                    <td className={`px-4 py-2 text-right font-mono font-bold ${entry.points >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <td className="px-3 py-2 font-sans font-medium">{entry.profiles?.username || 'Unknown'}</td>
+                    <td className={`px-3 py-2 text-right font-bold ${entry.points >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {entry.points >= 0 ? '+' : ''}{entry.points.toLocaleString()}
                     </td>
-                    <td className={`px-4 py-2 text-right font-mono text-xs ${roi >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <td className={`px-3 py-2 text-right ${roi >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
                     </td>
-                    <td className="px-4 py-2 text-right text-muted-foreground">
-                      <span className="text-emerald-400">{entry.wins}</span>
-                      /
-                      <span className="text-rose-400">{entry.losses}</span>
+                    <td className="px-3 py-2 text-right text-muted-foreground">
+                      <span className="text-emerald-400">{entry.wins}</span>/<span className="text-rose-400">{entry.losses}</span>
                     </td>
-                    <td className="px-4 py-2 text-right">
+                    <td className="px-3 py-2 text-right">
                       {entry.wins + entry.losses > 0 
                         ? `${Math.round(entry.wins / (entry.wins + entry.losses) * 100)}%`
                         : '-'

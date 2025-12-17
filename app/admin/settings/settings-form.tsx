@@ -381,7 +381,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <p className="text-xs text-muted-foreground mb-4">Ces prix sont à distribuer manuellement par l'admin.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-yellow-500 uppercase tracking-wider">🥇 1ère Place</label>
+              <label className="text-xs font-bold text-amber-400 uppercase tracking-wider">#1 - 1ère Place</label>
               <input
                 type="text"
                 name="top1_prize"
@@ -391,7 +391,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">🥈 2ème Place</label>
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">#2 - 2ème Place</label>
               <input
                 type="text"
                 name="top2_prize"
@@ -401,7 +401,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-orange-500 uppercase tracking-wider">🥉 3ème Place</label>
+              <label className="text-xs font-bold text-orange-400 uppercase tracking-wider">#3 - 3ème Place</label>
               <input
                 type="text"
                 name="top3_prize"
@@ -429,7 +429,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                 <label className={`text-[10px] font-medium uppercase ${
                   i === 0 ? 'text-yellow-500' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-500' : 'text-muted-foreground'
                 }`}>
-                  {i < 3 ? ['🥇', '🥈', '🥉'][i] : ''} Rang #{i + 1}
+                  #{i + 1}
                 </label>
                 <input
                   type="number"
