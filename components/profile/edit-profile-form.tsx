@@ -9,6 +9,7 @@ import { deleteAccount } from "@/app/auth/actions"
 import { useRouter } from "next/navigation"
 import { SuccessPopup } from "@/components/ui/success-popup"
 import { getAvatarUrl } from "@/lib/utils/avatar"
+import { checkVerifiedBadge } from "@/app/actions/badges"
 
 export function EditProfileForm({ onClose }: { onClose: () => void }) {
   const { profile, user, setUser } = useUser()
@@ -89,6 +90,9 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
           avatar: avatarUrl || user.avatar
         })
       }
+
+      // 4. Check for VERIFIED badge (non-blocking)
+      checkVerifiedBadge(user.id).catch(() => {})
 
       // Show success popup instead of toast
       setShowSuccessPopup(true)

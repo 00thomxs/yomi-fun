@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { getAvatarUrl } from '@/lib/utils/avatar'
-import { checkSeasonWinRateBadges } from '@/app/actions/badges'
+import { checkSeasonWinRateBadges, checkSeasonPlacementBadges, checkLegacyBadges } from '@/app/actions/badges'
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -560,9 +560,22 @@ async function endSeasonInternal(settings: any) {
     }
   }
 
-  // Check and award season-based win rate badges for all participants
+  // Check and award badges for all participants
   if (activeSeason?.id) {
     try {
+      // Award CHAMPION and PODIUM badges to top 3
+      for (let i = 0; i < Math.min(top10Data.length, 3); i++) {
+        const player = top10Data[i]
+        const rank = i + 1
+        await checkSeasonPlacementBadges(player.id, rank)
+        console.log(`[endSeasonInternal] Awarded placement badges for rank #${rank}: ${player.username}`)
+      }
+      
+      // Check legacy badges for top 3 (G.O.A.T, MVP)
+      for (let i = 0; i < Math.min(top10Data.length, 3); i++) {
+        await checkLegacyBadges(top10Data[i].id)
+      }
+      
       // Get all unique participants in this season
       const { data: allParticipants } = await supabaseAdmin
         .from('season_leaderboards')
@@ -570,7 +583,7 @@ async function endSeasonInternal(settings: any) {
         .eq('season_id', activeSeason.id)
       
       if (allParticipants) {
-        console.log(`[endSeasonInternal] Checking season badges for ${allParticipants.length} participants`)
+        console.log(`[endSeasonInternal] Checking season win rate badges for ${allParticipants.length} participants`)
         for (const participant of allParticipants) {
           await checkSeasonWinRateBadges(participant.user_id, activeSeason.id)
         }

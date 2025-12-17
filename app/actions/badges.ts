@@ -420,6 +420,178 @@ export async function checkSpecialBetBadge(
 }
 
 /**
+ * Check and award VERIFIED badge
+ * Called when a user updates their profile
+ */
+export async function checkVerifiedBadge(userId: string): Promise<string[]> {
+  const awardedBadges: string[] = []
+  
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', userId)
+      .single()
+    
+    if (!profile) return awardedBadges
+    
+    // Check if profile is complete (has custom username and avatar)
+    const hasUsername = profile.username && !profile.username.startsWith('user_')
+    const hasAvatar = profile.avatar_url && profile.avatar_url.length > 0
+    
+    if (hasUsername && hasAvatar) {
+      const result = await awardBadge(userId, 'verified')
+      if (result.success && result.userBadgeId) awardedBadges.push('verified')
+    }
+  } catch (error) {
+    console.error('Error checking verified badge:', error)
+  }
+  
+  return awardedBadges
+}
+
+/**
+ * Check and award legacy badges (G.O.A.T, MVP)
+ * Called periodically or when leaderboard changes significantly
+ */
+export async function checkLegacyBadges(userId: string): Promise<string[]> {
+  const awardedBadges: string[] = []
+  
+  try {
+    // Get user's global rank
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('total_won')
+      .eq('id', userId)
+      .single()
+    
+    if (!profile) return awardedBadges
+    
+    // Count how many non-admin users have more PnL
+    const { count } = await supabaseAdmin
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .neq('role', 'admin')
+      .gt('total_won', profile.total_won || 0)
+    
+    const rank = (count || 0) + 1
+    
+    // G.O.A.T: Top 1 Global
+    if (rank === 1) {
+      const result = await awardBadge(userId, 'goat')
+      if (result.success && result.userBadgeId) awardedBadges.push('goat')
+    }
+    
+    // MVP: Top 3 Global
+    if (rank <= 3) {
+      const result = await awardBadge(userId, 'mvp')
+      if (result.success && result.userBadgeId) awardedBadges.push('mvp')
+    }
+  } catch (error) {
+    console.error('Error checking legacy badges:', error)
+  }
+  
+  return awardedBadges
+}
+
+/**
+ * Check and award CHAMPION and PODIUM badges
+ * Called when a season ends, for each user in the top 3
+ */
+export async function checkSeasonPlacementBadges(
+  userId: string,
+  seasonRank: number // 1, 2, or 3
+): Promise<string[]> {
+  const awardedBadges: string[] = []
+  
+  if (seasonRank < 1 || seasonRank > 3) return awardedBadges
+  
+  try {
+    // Get current badge counts for this user
+    const { data: existingBadges } = await supabaseAdmin
+      .from('user_badges')
+      .select('badge_id')
+      .eq('user_id', userId)
+    
+    const badgeIds = (existingBadges || []).map(ub => ub.badge_id)
+    
+    // Get slugs for champion and podium badges
+    const { data: championPodiumBadges } = await supabaseAdmin
+      .from('badges')
+      .select('id, slug')
+      .in('slug', ['champion-1', 'champion-2', 'champion-3', 'champion-4', 'podium-1', 'podium-2', 'podium-3', 'podium-4'])
+    
+    if (!championPodiumBadges) return awardedBadges
+    
+    const ownedSlugs = new Set<string>()
+    for (const cb of championPodiumBadges) {
+      if (badgeIds.includes(cb.id)) {
+        ownedSlugs.add(cb.slug)
+      }
+    }
+    
+    // Count current champion wins (how many champion badges user already has)
+    let championWins = 0
+    if (ownedSlugs.has('champion-1')) championWins = 1
+    if (ownedSlugs.has('champion-2')) championWins = 2
+    if (ownedSlugs.has('champion-3')) championWins = 3
+    if (ownedSlugs.has('champion-4')) championWins = 4
+    
+    // Count current podiums
+    let podiumCount = 0
+    if (ownedSlugs.has('podium-1')) podiumCount = 1
+    if (ownedSlugs.has('podium-2')) podiumCount = 2
+    if (ownedSlugs.has('podium-3')) podiumCount = 3
+    if (ownedSlugs.has('podium-4')) podiumCount = 4
+    
+    // Award CHAMPION badges (only for rank 1)
+    if (seasonRank === 1) {
+      const newChampionWins = championWins + 1
+      if (newChampionWins >= 1 && !ownedSlugs.has('champion-1')) {
+        const result = await awardBadge(userId, 'champion-1')
+        if (result.success && result.userBadgeId) awardedBadges.push('champion-1')
+      }
+      if (newChampionWins >= 2 && !ownedSlugs.has('champion-2')) {
+        const result = await awardBadge(userId, 'champion-2')
+        if (result.success && result.userBadgeId) awardedBadges.push('champion-2')
+      }
+      if (newChampionWins >= 3 && !ownedSlugs.has('champion-3')) {
+        const result = await awardBadge(userId, 'champion-3')
+        if (result.success && result.userBadgeId) awardedBadges.push('champion-3')
+      }
+      if (newChampionWins >= 4 && !ownedSlugs.has('champion-4')) {
+        const result = await awardBadge(userId, 'champion-4')
+        if (result.success && result.userBadgeId) awardedBadges.push('champion-4')
+      }
+    }
+    
+    // Award PODIUM badges (for rank 1, 2, or 3)
+    const newPodiumCount = podiumCount + 1
+    if (newPodiumCount >= 1 && !ownedSlugs.has('podium-1')) {
+      const result = await awardBadge(userId, 'podium-1')
+      if (result.success && result.userBadgeId) awardedBadges.push('podium-1')
+    }
+    if (newPodiumCount >= 2 && !ownedSlugs.has('podium-2')) {
+      const result = await awardBadge(userId, 'podium-2')
+      if (result.success && result.userBadgeId) awardedBadges.push('podium-2')
+    }
+    if (newPodiumCount >= 3 && !ownedSlugs.has('podium-3')) {
+      const result = await awardBadge(userId, 'podium-3')
+      if (result.success && result.userBadgeId) awardedBadges.push('podium-3')
+    }
+    if (newPodiumCount >= 4 && !ownedSlugs.has('podium-4')) {
+      const result = await awardBadge(userId, 'podium-4')
+      if (result.success && result.userBadgeId) awardedBadges.push('podium-4')
+    }
+    
+  } catch (error) {
+    console.error('Error checking season placement badges:', error)
+  }
+  
+  return awardedBadges
+}
+
+/**
  * Check and award season-based win rate badges
  * Called when a season ends or when a user participates in enough events
  * Requirements: 

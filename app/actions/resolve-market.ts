@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
-import { checkAndAwardBadges, checkWinStreakBadge, checkSpecialBetBadge } from './badges'
+import { checkAndAwardBadges, checkWinStreakBadge, checkLegacyBadges } from './badges'
 
 // Init Admin Client
 const supabaseAdmin = createAdminClient(
@@ -243,6 +243,8 @@ export async function resolveMarket(
       
       if (hasWin) {
         await checkWinStreakBadge(userId)
+        // Check legacy badges (G.O.A.T, MVP) - only for winners
+        await checkLegacyBadges(userId)
       }
     } catch (badgeError) {
       console.error(`[RESOLVE] Badge check failed for user ${userId} (non-blocking):`, badgeError)
@@ -461,6 +463,8 @@ export async function resolveMarketMulti(
       
       if (hasWin) {
         await checkWinStreakBadge(userId)
+        // Check legacy badges (G.O.A.T, MVP) - only for winners
+        await checkLegacyBadges(userId)
       }
     } catch (badgeError) {
       console.error(`[RESOLVE_MULTI] Badge check failed for user ${userId} (non-blocking):`, badgeError)

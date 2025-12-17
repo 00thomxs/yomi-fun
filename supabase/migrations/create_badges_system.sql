@@ -61,12 +61,12 @@ CREATE POLICY "Users can update their own badges"
   ON public.user_badges FOR UPDATE
   USING (auth.uid() = user_id);
 
--- Admin can insert badges to users
-CREATE POLICY "Admin can insert user badges"
+-- Only system (via SECURITY DEFINER functions) or admin can insert badges
+-- Users should NOT be able to insert badges for themselves
+CREATE POLICY "Only admin can insert user badges"
   ON public.user_badges FOR INSERT
   WITH CHECK (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-    OR auth.uid() = user_id
   );
 
 -- =============================================

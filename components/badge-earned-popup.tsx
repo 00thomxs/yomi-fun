@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Sparkles, Check } from 'lucide-react'
+import { X, Sparkles, Check, Loader2 } from 'lucide-react'
 import { BadgeDisplay } from '@/components/ui/badge-display'
 import { markBadgeAsSeen, toggleEquipBadge, getUnseenBadges } from '@/app/actions/badges'
 import type { UserBadgeWithDetails } from '@/lib/types'
@@ -194,7 +194,7 @@ export function BadgeEarnedPopup() {
               )}
             >
               {isEquipping ? (
-                <span className="animate-spin">⏳</span>
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <Check className="w-4 h-4" />
               )}
