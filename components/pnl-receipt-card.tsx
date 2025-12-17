@@ -58,6 +58,11 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
         quality: 1,
         pixelRatio: 2,
         cacheBust: true,
+        backgroundColor: '#000000',
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left',
+        }
       })
       const link = document.createElement("a")
       link.download = `yomi-pnl-${Date.now()}.png`

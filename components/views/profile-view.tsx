@@ -632,12 +632,11 @@ export function ProfileView() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-white/5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-1 px-3 py-3 bg-white/5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
               <span className="col-span-3">Date</span>
               <span className="col-span-4">Event</span>
               <span className="col-span-2">Status</span>
-              <span className="col-span-2 text-right">Gain/Perte</span>
-              <span className="col-span-1 text-right"></span>
+              <span className="col-span-3 text-right">Gain</span>
             </div>
             <div className="divide-y divide-border">
               {history.map((tx, idx) => {
@@ -647,43 +646,40 @@ export function ProfileView() {
                 const isPending = tx.status === 'pending'
                 
                 return (
-                  <div key={tx.id} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
-                    <span className="col-span-3 font-mono text-muted-foreground text-xs flex items-center">{date}</span>
-                    <div className="col-span-4 flex flex-col justify-center">
-                      <span className="font-medium truncate text-xs">{tx.market_question}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        Choix: <span className={tx.direction === 'NO' ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
-                          {tx.direction === 'NO' ? "NON " : tx.direction === 'YES' && tx.outcome_name !== 'OUI' && tx.outcome_name !== 'NON' ? "OUI " : ""}
+                  <div key={tx.id} className={`grid grid-cols-12 gap-1 px-3 py-2.5 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
+                    <span className="col-span-3 font-mono text-muted-foreground text-[10px] flex items-center">{date}</span>
+                    <div className="col-span-4 flex flex-col justify-center min-w-0">
+                      <span className="font-medium truncate text-[11px]">{tx.market_question}</span>
+                      <span className="text-[9px] text-muted-foreground truncate">
+                        <span className={tx.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}>
+                          {tx.direction === 'NO' ? "NON" : "OUI"}
                         </span>
-                        {tx.outcome_name} • Mise: {tx.amount}
+                        {" "}• {tx.amount}Z
                       </span>
                     </div>
                     <span className="col-span-2 flex items-center">
                       {isWin && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          <ArrowUpRight className="w-3 h-3" />
-                          GAGNÉ
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400">
+                          <ArrowUpRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                          <ArrowDownRight className="w-3 h-3" />
-                          PERDU
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-400">
+                          <ArrowDownRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                          <Clock className="w-3 h-3" />
-                          EN COURS
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-500/20 text-yellow-400">
+                          <Clock className="w-2.5 h-2.5" />
                         </span>
                       )}
                     </span>
-                    <span className={`col-span-2 text-right font-mono font-bold text-xs flex items-center justify-end whitespace-nowrap ${
-                      isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
-                    }`}>
-                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}<CurrencySymbol className="w-2.5 h-2.5 ml-0.5" />
-                    </span>
-                    <span className="col-span-1 flex items-center justify-end">
+                    <div className="col-span-3 flex items-center justify-end gap-1">
+                      <span className={`font-mono font-bold text-[11px] ${
+                        isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
+                      }`}>
+                        {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}
+                      </span>
                       {isWin && (
                         <button
                           onClick={() => {
@@ -698,13 +694,13 @@ export function ProfileView() {
                               date: new Date(tx.created_at).toLocaleDateString('fr-FR')
                             })
                           }}
-                          className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all"
+                          className="p-1 rounded bg-emerald-500/20 text-emerald-400"
                           title="Générer ma PNL Card"
                         >
-                          <ImageIcon className="w-3.5 h-3.5" />
+                          <ImageIcon className="w-3 h-3" />
                         </button>
                       )}
-                    </span>
+                    </div>
                   </div>
                 )
               })}
