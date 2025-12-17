@@ -147,3 +147,33 @@ export type SeasonLeaderboardEntry = {
     avatar_url: string | null
   }
 }
+
+// Badge Types
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary'
+
+export type Badge = {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  category: string
+  level: number | null
+  icon_name: string
+  rarity: BadgeRarity
+  created_at: string
+}
+
+export type UserBadge = {
+  id: string
+  user_id: string
+  badge_id: string
+  is_equipped: boolean
+  is_seen: boolean
+  obtained_at: string
+  // Joined data
+  badge?: Badge
+}
+
+export type UserBadgeWithDetails = UserBadge & {
+  badge: Badge
+}

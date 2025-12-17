@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { checkAndAwardBadges, checkWinStreakBadge, checkSpecialBetBadge } from './badges'
 
 // Init Admin Client
 const supabaseAdmin = createAdminClient(
@@ -224,6 +225,30 @@ export async function resolveMarket(
     }
   }
 
+  // Check and award badges for all affected users (non-blocking)
+  const uniqueUserIds = [...new Set(bets.map(b => b.user_id))]
+  for (const userId of uniqueUserIds) {
+    try {
+      // Check general stat-based badges
+      await checkAndAwardBadges(userId)
+      
+      // Check win streak badges for users who won
+      const userBets = bets.filter(b => b.user_id === userId)
+      const hasWin = userBets.some(b => {
+        if (b.direction === 'NO') {
+          return b.outcome_id !== winningOutcomeId
+        }
+        return b.outcome_id === winningOutcomeId
+      })
+      
+      if (hasWin) {
+        await checkWinStreakBadge(userId)
+      }
+    } catch (badgeError) {
+      console.error(`[RESOLVE] Badge check failed for user ${userId} (non-blocking):`, badgeError)
+    }
+  }
+
   revalidatePath(`/market/${marketId}`)
   revalidatePath('/admin')
 
@@ -413,6 +438,32 @@ export async function resolveMarketMulti(
     })
     if (snapshotError) {
       console.error(`[RESOLVE_MULTI] Season snapshot failed (non-blocking):`, snapshotError)
+    }
+  }
+
+  // Check and award badges for all affected users (non-blocking)
+  const winningOutcomeIds = results.filter(r => r.isWinner).map(r => r.outcomeId)
+  const uniqueUserIds = [...new Set(bets.map(b => b.user_id))]
+  
+  for (const userId of uniqueUserIds) {
+    try {
+      // Check general stat-based badges
+      await checkAndAwardBadges(userId)
+      
+      // Check win streak badges for users who won
+      const userBets = bets.filter(b => b.user_id === userId)
+      const hasWin = userBets.some(b => {
+        if (b.direction === 'NO') {
+          return !winningOutcomeIds.includes(b.outcome_id)
+        }
+        return winningOutcomeIds.includes(b.outcome_id)
+      })
+      
+      if (hasWin) {
+        await checkWinStreakBadge(userId)
+      }
+    } catch (badgeError) {
+      console.error(`[RESOLVE_MULTI] Badge check failed for user ${userId} (non-blocking):`, badgeError)
     }
   }
 

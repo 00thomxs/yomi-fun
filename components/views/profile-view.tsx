@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X, Trophy, ImageIcon } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, UserCog, X, Trophy, ImageIcon, Check, Loader2 } from "lucide-react"
 import { PnlCardModal } from "@/components/pnl-card-modal"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -11,6 +11,10 @@ import { EditProfileForm } from "@/components/profile/edit-profile-form"
 import { ChangePasswordForm } from "@/components/profile/change-password-form"
 import { DailyRewardWidget } from "@/components/daily-reward-widget"
 import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
+import { BadgeDisplay, BadgeDisplayCompact } from "@/components/ui/badge-display"
+import { getUserBadges, toggleEquipBadge } from "@/app/actions/badges"
+import type { UserBadgeWithDetails } from "@/lib/types"
+import { toast } from "sonner"
 
 // Helper to abbreviate large numbers (e.g., 2420000 → 2.4M)
 function formatCompactNumber(num: number): string {
@@ -56,6 +60,9 @@ export function ProfileView() {
     mise: number
     date: string
   } | null>(null)
+  const [userBadges, setUserBadges] = useState<UserBadgeWithDetails[]>([])
+  const [loadingBadges, setLoadingBadges] = useState(true)
+  const [togglingBadge, setTogglingBadge] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -151,6 +158,46 @@ export function ProfileView() {
 
     loadData()
   }, [user, profile])
+
+  // Fetch user badges
+  useEffect(() => {
+    const loadBadges = async () => {
+      if (!user) {
+        setLoadingBadges(false)
+        return
+      }
+      
+      const badges = await getUserBadges(user.id)
+      setUserBadges(badges)
+      setLoadingBadges(false)
+    }
+    
+    loadBadges()
+  }, [user])
+
+  // Handler for toggling badge equip
+  const handleToggleBadge = async (userBadgeId: string) => {
+    setTogglingBadge(userBadgeId)
+    
+    const result = await toggleEquipBadge(userBadgeId)
+    
+    if (result.success) {
+      // Update local state
+      setUserBadges(prev => prev.map(ub => 
+        ub.id === userBadgeId 
+          ? { ...ub, is_equipped: result.isEquipped ?? !ub.is_equipped }
+          : ub
+      ))
+      toast.success(result.isEquipped ? 'Badge équipé' : 'Badge retiré')
+    } else {
+      toast.error(result.error || 'Erreur')
+    }
+    
+    setTogglingBadge(null)
+  }
+
+  // Get equipped badges (max 2)
+  const equippedBadges = userBadges.filter(ub => ub.is_equipped).slice(0, 2)
 
   // Prepare Chart Data with timeframe filtering
   const now = new Date()
@@ -344,10 +391,6 @@ export function ProfileView() {
     level: profile?.level ?? 1,
   }
 
-  const badges = profile?.level && profile.level >= 5 
-    ? [{ icon: <Star className="w-3 h-3 text-yellow-400" />, label: `Niveau ${profile.level}` }]
-    : []
-
   const toggleSettings = () => {
     setShowSettings(!showSettings)
     setActiveSettingsTab('menu')
@@ -432,7 +475,17 @@ export function ProfileView() {
           <div className="flex-1 space-y-4 w-full">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
-                <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
+                  <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
+                  {/* Equipped Badges */}
+                  {equippedBadges.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      {equippedBadges.map(ub => (
+                        <BadgeDisplayCompact key={ub.id} badge={ub.badge} />
+                      ))}
+                    </div>
+                  )}
+                </div>
                 
                 {/* Level & XP Progress */}
                 <div className="mt-2 space-y-1.5 min-w-[180px] sm:min-w-[200px]">
@@ -456,20 +509,6 @@ export function ProfileView() {
                 </p>
               </div>
             </div>
-
-            {badges.length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                {badges.map((badge, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 border border-border text-sm font-medium flex items-center gap-1.5"
-                  >
-                    <span>{badge.icon}</span>
-                    <span>{badge.label}</span>
-                  </span>
-                ))}
-              </div>
-            )}
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
@@ -516,6 +555,74 @@ export function ProfileView() {
       {/* Daily Reward Widget - Mobile Only (sidebar hidden on mobile) */}
       <div className="lg:hidden">
         <DailyRewardWidget />
+      </div>
+
+      {/* Mes Badges Section */}
+      <div className="rounded-xl bg-card border border-border overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <p className="text-sm font-bold tracking-tight uppercase">Mes Badges</p>
+          <span className="text-xs text-muted-foreground">
+            {equippedBadges.length}/2 équipés
+          </span>
+        </div>
+        
+        {loadingBadges ? (
+          <div className="p-8 text-center">
+            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          </div>
+        ) : userBadges.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-muted-foreground">Aucun badge obtenu</p>
+            <p className="text-sm text-muted-foreground mt-1">Continue à jouer pour débloquer des badges !</p>
+          </div>
+        ) : (
+          <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {userBadges.map(ub => {
+              const isEquipped = ub.is_equipped
+              const isToggling = togglingBadge === ub.id
+              const canEquip = equippedBadges.length < 2 || isEquipped
+              
+              return (
+                <button
+                  key={ub.id}
+                  onClick={() => canEquip && handleToggleBadge(ub.id)}
+                  disabled={isToggling || (!canEquip && !isEquipped)}
+                  className={`
+                    relative p-3 rounded-xl border transition-all text-left
+                    ${isEquipped 
+                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
+                      : canEquip 
+                        ? 'bg-white/5 border-border hover:bg-white/10 hover:border-white/20' 
+                        : 'bg-white/5 border-border opacity-50 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {/* Equipped indicator */}
+                  {isEquipped && (
+                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  )}
+                  
+                  {/* Loading state */}
+                  {isToggling && (
+                    <div className="absolute inset-0 rounded-xl bg-black/50 flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    </div>
+                  )}
+                  
+                  {/* Badge display */}
+                  <div className="space-y-2">
+                    <BadgeDisplay badge={ub.badge} size="md" />
+                    <p className="text-[10px] text-muted-foreground line-clamp-2">
+                      {ub.badge.description}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* P&L Chart */}
