@@ -312,7 +312,7 @@ export function SeasonRecapStats({
         {/* Top WR */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
           <h4 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-            <Target className="w-3 h-3 text-blue-400" /> Taux de Victoire
+            <Target className="w-3 h-3 text-blue-400" /> Win Rate
           </h4>
           <div className="space-y-1.5">
             {stats.topWR.map((p, i) => (
