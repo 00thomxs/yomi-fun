@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X, Trophy } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, Star, UserCog, X, Trophy, ImageIcon } from "lucide-react"
+import { PnlCardModal } from "@/components/pnl-card-modal"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
@@ -47,6 +48,14 @@ export function ProfileView() {
   const [pnlHistory, setPnlHistory] = useState<PnlPoint[]>([])
   const [globalRank, setGlobalRank] = useState<number | null>(null)
   const [seasonRank, setSeasonRank] = useState<number | null>(null)
+  const [pnlCardData, setPnlCardData] = useState<{
+    pnlPercentage: number
+    pnlAmount: number
+    event: string
+    sens: string
+    mise: number
+    date: string
+  } | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -627,7 +636,8 @@ export function ProfileView() {
               <span className="col-span-3">Date</span>
               <span className="col-span-4">Event</span>
               <span className="col-span-2">Status</span>
-              <span className="col-span-3 text-right">Gain/Perte</span>
+              <span className="col-span-2 text-right">Gain/Perte</span>
+              <span className="col-span-1 text-right"></span>
             </div>
             <div className="divide-y divide-border">
               {history.map((tx, idx) => {
@@ -668,10 +678,32 @@ export function ProfileView() {
                         </span>
                       )}
                     </span>
-                    <span className={`col-span-3 text-right font-mono font-bold flex items-center justify-end ${
+                    <span className={`col-span-2 text-right font-mono font-bold flex items-center justify-end ${
                       isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
                     }`}>
                       {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
+                    </span>
+                    <span className="col-span-1 flex items-center justify-end">
+                      {isWin && (
+                        <button
+                          onClick={() => {
+                            const pnlAmount = Math.round(tx.potential_payout - tx.amount)
+                            const pnlPercentage = Math.round((pnlAmount / tx.amount) * 100)
+                            setPnlCardData({
+                              pnlPercentage,
+                              pnlAmount,
+                              event: tx.market_question,
+                              sens: tx.direction === 'NO' ? `NON ${tx.outcome_name}` : tx.outcome_name,
+                              mise: tx.amount,
+                              date: new Date(tx.created_at).toLocaleDateString('fr-FR')
+                            })
+                          }}
+                          className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all"
+                          title="Générer ma PNL Card"
+                        >
+                          <ImageIcon className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </span>
                   </div>
                 )
@@ -680,6 +712,15 @@ export function ProfileView() {
           </>
         )}
       </div>
+
+      {/* PNL Card Modal */}
+      {pnlCardData && (
+        <PnlCardModal
+          isOpen={!!pnlCardData}
+          onClose={() => setPnlCardData(null)}
+          data={pnlCardData}
+        />
+      )}
     </div>
   )
 }
