@@ -55,6 +55,7 @@ export function ProfileView() {
     sens: string
     mise: number
     date: string
+    username?: string
   } | null>(null)
 
   useEffect(() => {
@@ -695,7 +696,8 @@ export function ProfileView() {
                               event: tx.market_question,
                               sens: tx.direction === 'NO' ? `NON ${tx.outcome_name}` : tx.outcome_name,
                               mise: tx.amount,
-                              date: new Date(tx.created_at).toLocaleDateString('fr-FR')
+                              date: new Date(tx.created_at).toLocaleDateString('fr-FR'),
+                              username: profile?.username
                             })
                           }}
                           className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all"
