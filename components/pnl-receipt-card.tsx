@@ -5,6 +5,7 @@ import type React from "react"
 import { useRef, useState } from "react"
 import { Upload, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { YomiLogo } from "@/components/ui/yomi-logo"
 
 interface PnlData {
   pnlPercentage: number
@@ -29,7 +30,7 @@ const defaultData: PnlData = {
 }
 
 export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
-  const [backgroundImage, setBackgroundImage] = useState<string>("/dark-abstract-cyberpunk-city-neon.jpg")
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -75,13 +76,22 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
         className="relative w-[400px] overflow-hidden rounded-lg border border-red-600/30"
         style={{ aspectRatio: "4/5" }}
       >
-        {/* Layer 0: Background Image with Heavy Filter - Lightened more (0.55) */}
+        {/* Layer 0: Background - Image or Gradient */}
         <div className="absolute inset-0">
-          <img
-            src={backgroundImage || "/placeholder.svg"}
-            alt="Background"
-            className="h-full w-full object-cover brightness-[0.55] contrast-125 grayscale-[0.4]"
-          />
+          {backgroundImage ? (
+            <img
+              src={backgroundImage}
+              alt="Background"
+              className="h-full w-full object-cover brightness-[0.55] contrast-125 grayscale-[0.4]"
+            />
+          ) : (
+            <div 
+              className="h-full w-full"
+              style={{
+                background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%)"
+              }}
+            />
+          )}
         </div>
 
         {/* Tactical Grid Overlay */}
@@ -134,11 +144,9 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
               </div>
 
               <div className="mt-auto flex w-full items-end justify-center pt-8">
-                <img
-                  src="/images/logo.png"
-                  alt="YOMI"
-                  className="h-16 w-auto drop-shadow-[0_0_15px_rgba(220,38,38,0.6)]"
-                />
+                <div className="scale-150">
+                  <YomiLogo />
+                </div>
               </div>
             </div>
           </div>
