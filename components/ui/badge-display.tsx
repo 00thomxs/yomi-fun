@@ -108,7 +108,7 @@ const LEVEL_STYLES: Record<number, Partial<typeof RARITY_STYLES['common']>> = {
 
 type BadgeDisplayProps = {
   badge: Badge
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   showName?: boolean
   className?: string
 }
@@ -131,6 +131,10 @@ export function BadgeDisplay({
   
   // Size configurations
   const sizeConfig = {
+    xs: {
+      container: 'px-1 py-0.5 gap-0.5 text-[8px]',
+      icon: 'w-2.5 h-2.5',
+    },
     sm: {
       container: 'px-1.5 py-0.5 gap-1 text-[10px]',
       icon: 'w-3 h-3',
@@ -167,12 +171,12 @@ export function BadgeDisplay({
   )
 }
 
-// Compact version for leaderboards/headers
+// Compact version for leaderboards/headers (extra small)
 export function BadgeDisplayCompact({ badge, className }: { badge: Badge; className?: string }) {
   return (
     <BadgeDisplay 
       badge={badge} 
-      size="sm" 
+      size="xs" 
       showName={true}
       className={className}
     />

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, UserCog, X, Trophy, ImageIcon, Check, Loader2 } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, UserCog, X, Trophy, ImageIcon, Loader2 } from "lucide-react"
 import { PnlCardModal } from "@/components/pnl-card-modal"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -11,8 +11,9 @@ import { EditProfileForm } from "@/components/profile/edit-profile-form"
 import { ChangePasswordForm } from "@/components/profile/change-password-form"
 import { DailyRewardWidget } from "@/components/daily-reward-widget"
 import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
-import { BadgeDisplay, BadgeDisplayCompact } from "@/components/ui/badge-display"
-import { getUserBadges, toggleEquipBadge } from "@/app/actions/badges"
+import { BadgeDisplayCompact } from "@/components/ui/badge-display"
+import { getUserBadges, getEquippedBadges } from "@/app/actions/badges"
+import { BadgesModal } from "@/components/profile/badges-modal"
 import type { UserBadgeWithDetails } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -60,9 +61,9 @@ export function ProfileView() {
     mise: number
     date: string
   } | null>(null)
-  const [userBadges, setUserBadges] = useState<UserBadgeWithDetails[]>([])
+  const [equippedBadges, setEquippedBadges] = useState<UserBadgeWithDetails[]>([])
   const [loadingBadges, setLoadingBadges] = useState(true)
-  const [togglingBadge, setTogglingBadge] = useState<string | null>(null)
+  const [showBadgesModal, setShowBadgesModal] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -159,7 +160,7 @@ export function ProfileView() {
     loadData()
   }, [user, profile])
 
-  // Fetch user badges
+  // Fetch equipped badges for display
   useEffect(() => {
     const loadBadges = async () => {
       if (!user) {
@@ -167,37 +168,13 @@ export function ProfileView() {
         return
       }
       
-      const badges = await getUserBadges(user.id)
-      setUserBadges(badges)
+      const badges = await getEquippedBadges(user.id)
+      setEquippedBadges(badges)
       setLoadingBadges(false)
     }
     
     loadBadges()
-  }, [user])
-
-  // Handler for toggling badge equip
-  const handleToggleBadge = async (userBadgeId: string) => {
-    setTogglingBadge(userBadgeId)
-    
-    const result = await toggleEquipBadge(userBadgeId)
-    
-    if (result.success) {
-      // Update local state
-      setUserBadges(prev => prev.map(ub => 
-        ub.id === userBadgeId 
-          ? { ...ub, is_equipped: result.isEquipped ?? !ub.is_equipped }
-          : ub
-      ))
-      toast.success(result.isEquipped ? 'Badge équipé' : 'Badge retiré')
-    } else {
-      toast.error(result.error || 'Erreur')
-    }
-    
-    setTogglingBadge(null)
-  }
-
-  // Get equipped badges (max 2)
-  const equippedBadges = userBadges.filter(ub => ub.is_equipped).slice(0, 2)
+  }, [user, showBadgesModal]) // Refresh when modal closes
 
   // Prepare Chart Data with timeframe filtering
   const now = new Date()
@@ -557,73 +534,42 @@ export function ProfileView() {
         <DailyRewardWidget />
       </div>
 
-      {/* Mes Badges Section */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <p className="text-sm font-bold tracking-tight uppercase">Mes Badges</p>
-          <span className="text-xs text-muted-foreground">
-            {equippedBadges.length}/2 équipés
-          </span>
+      {/* Badges Button */}
+      <button
+        onClick={() => setShowBadgesModal(true)}
+        className="w-full rounded-xl bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/20 transition-all group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-amber-400" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-bold">Mes Badges</p>
+            <p className="text-xs text-muted-foreground">
+              {equippedBadges.length}/2 équipés
+            </p>
+          </div>
         </div>
-        
-        {loadingBadges ? (
-          <div className="p-8 text-center">
-            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
-          </div>
-        ) : userBadges.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground">Aucun badge obtenu</p>
-            <p className="text-sm text-muted-foreground mt-1">Continue à jouer pour débloquer des badges !</p>
-          </div>
-        ) : (
-          <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {userBadges.map(ub => {
-              const isEquipped = ub.is_equipped
-              const isToggling = togglingBadge === ub.id
-              const canEquip = equippedBadges.length < 2 || isEquipped
-              
-              return (
-                <button
-                  key={ub.id}
-                  onClick={() => canEquip && handleToggleBadge(ub.id)}
-                  disabled={isToggling || (!canEquip && !isEquipped)}
-                  className={`
-                    relative p-3 rounded-xl border transition-all text-left
-                    ${isEquipped 
-                      ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' 
-                      : canEquip 
-                        ? 'bg-white/5 border-border hover:bg-white/10 hover:border-white/20' 
-                        : 'bg-white/5 border-border opacity-50 cursor-not-allowed'
-                    }
-                  `}
-                >
-                  {/* Equipped indicator */}
-                  {isEquipped && (
-                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                      <Check className="w-3 h-3 text-primary-foreground" />
-                    </div>
-                  )}
-                  
-                  {/* Loading state */}
-                  {isToggling && (
-                    <div className="absolute inset-0 rounded-xl bg-black/50 flex items-center justify-center">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    </div>
-                  )}
-                  
-                  {/* Badge display */}
-                  <div className="space-y-2">
-                    <BadgeDisplay badge={ub.badge} size="md" />
-                    <p className="text-[10px] text-muted-foreground line-clamp-2">
-                      {ub.badge.description}
-                    </p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </div>
+        <div className="flex items-center gap-2">
+          {!loadingBadges && equippedBadges.length > 0 && (
+            <div className="flex -space-x-1">
+              {equippedBadges.map(ub => (
+                <BadgeDisplayCompact key={ub.id} badge={ub.badge} />
+              ))}
+            </div>
+          )}
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors" />
+        </div>
+      </button>
+
+      {/* Badges Modal */}
+      {user && (
+        <BadgesModal
+          isOpen={showBadgesModal}
+          onClose={() => setShowBadgesModal(false)}
+          userId={user.id}
+        />
+      )}
 
       {/* P&L Chart */}
       <div className="rounded-xl bg-card border border-border p-5">
