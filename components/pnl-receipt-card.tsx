@@ -14,7 +14,6 @@ interface PnlData {
   sens: string
   mise: number
   date: string
-  username?: string
 }
 
 interface PnlReceiptCardProps {
@@ -28,7 +27,6 @@ const defaultData: PnlData = {
   sens: "OUI",
   mise: 25000,
   date: "12/12/2024",
-  username: "Player",
 }
 
 export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
@@ -150,15 +148,10 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
                 <DataRow label="DATE" value={data.date} />
               </div>
 
-              <div className="mt-auto flex w-full items-center justify-center pt-6 gap-2">
+              <div className="mt-auto flex w-full items-center justify-center pt-6">
                 <div className="scale-90">
                   <YomiLogo />
                 </div>
-                {data.username && (
-                  <span className="text-zinc-500 font-mono text-xs">
-                    • @{data.username}
-                  </span>
-                )}
               </div>
             </div>
           </div>
