@@ -76,7 +76,7 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
         className="relative w-[400px] overflow-hidden rounded-lg border border-red-600/30"
         style={{ aspectRatio: "4/5" }}
       >
-        {/* Layer 0: Background - Image or Gradient */}
+        {/* Layer 0: Background - Image or Grid */}
         <div className="absolute inset-0">
           {backgroundImage ? (
             <img
@@ -86,9 +86,13 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
             />
           ) : (
             <div 
-              className="h-full w-full"
+              className="h-full w-full bg-black"
               style={{
-                background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%)"
+                backgroundImage: `
+                  linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+                `,
+                backgroundSize: "40px 40px"
               }}
             />
           )}
