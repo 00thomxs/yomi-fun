@@ -41,10 +41,10 @@ export async function awardBadgesToExistingUsers(): Promise<{
   const details: string[] = []
   
   try {
-    // 1. Get all non-admin users
+    // 1. Get all non-admin users (only need id and username for logging)
     const { data: users, error: usersError } = await supabaseAdmin
       .from('profiles')
-      .select('id, username, total_bets, wins, losses, total_won, balance, avatar_url')
+      .select('id, username')
       .neq('role', 'admin')
     
     if (usersError || !users) {
