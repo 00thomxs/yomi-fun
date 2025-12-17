@@ -6,9 +6,16 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =============================================
+-- CLEAN SLATE: Drop existing tables if they exist
+-- (Safe to run multiple times)
+-- =============================================
+DROP TABLE IF EXISTS public.user_badges CASCADE;
+DROP TABLE IF EXISTS public.badges CASCADE;
+
+-- =============================================
 -- TABLE 1: badges (Catalogue)
 -- =============================================
-CREATE TABLE IF NOT EXISTS public.badges (
+CREATE TABLE public.badges (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
@@ -23,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.badges (
 -- =============================================
 -- TABLE 2: user_badges (Inventaire)
 -- =============================================
-CREATE TABLE IF NOT EXISTS public.user_badges (
+CREATE TABLE public.user_badges (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   badge_id UUID REFERENCES public.badges(id) ON DELETE CASCADE NOT NULL,
@@ -36,9 +43,9 @@ CREATE TABLE IF NOT EXISTS public.user_badges (
 );
 
 -- Index for fast lookups
-CREATE INDEX IF NOT EXISTS idx_user_badges_user_id ON public.user_badges(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_badges_equipped ON public.user_badges(user_id, is_equipped) WHERE is_equipped = true;
-CREATE INDEX IF NOT EXISTS idx_user_badges_unseen ON public.user_badges(user_id, is_seen) WHERE is_seen = false;
+CREATE INDEX idx_user_badges_user_id ON public.user_badges(user_id);
+CREATE INDEX idx_user_badges_equipped ON public.user_badges(user_id, is_equipped) WHERE is_equipped = true;
+CREATE INDEX idx_user_badges_unseen ON public.user_badges(user_id, is_seen) WHERE is_seen = false;
 
 -- =============================================
 -- RLS POLICIES
