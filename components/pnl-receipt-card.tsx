@@ -148,8 +148,10 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
                 <DataRow label="DATE" value={data.date} />
               </div>
 
-              <div className="mt-auto flex w-full items-end justify-center pt-6">
-                <YomiLogo />
+              <div className="mt-auto flex w-full items-center justify-center pt-6">
+                <div className="scale-90">
+                  <YomiLogo />
+                </div>
               </div>
             </div>
           </div>
