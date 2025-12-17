@@ -127,10 +127,11 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
 
               {/* Data Table */}
               <div className="mt-4 w-full space-y-3 font-mono text-sm">
-                <DataRow label="EVENT" value={data.event} isEvent />
+                <DataRow label="EVENT" value={data.event} isEvent maxLength={60} />
                 <DataRow
                   label="CHOIX"
                   value={data.sens}
+                  maxLength={22}
                   valueColor={
                     data.sens.toUpperCase().startsWith("OUI")
                       ? "text-emerald-400"
@@ -143,10 +144,8 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
                 <DataRow label="DATE" value={data.date} />
               </div>
 
-              <div className="mt-auto flex w-full items-end justify-center pt-8">
-                <div className="scale-150">
-                  <YomiLogo />
-                </div>
+              <div className="mt-auto flex w-full items-end justify-center pt-6">
+                <YomiLogo />
               </div>
             </div>
           </div>
@@ -182,13 +181,20 @@ function DataRow({
   value,
   valueColor = "text-white",
   isEvent = false,
+  maxLength = 25,
 }: {
   label: string
   value: string
   valueColor?: string
   isEvent?: boolean
+  maxLength?: number
 }) {
   const labelColor = isEvent ? "text-red-600" : "text-zinc-400"
+  
+  // Truncate value if too long
+  const displayValue = value.length > maxLength 
+    ? value.substring(0, maxLength) + "..." 
+    : value
 
   return (
     <div className={`flex ${isEvent ? "flex-col gap-1" : "items-center gap-2"}`}>
@@ -196,7 +202,7 @@ function DataRow({
         <>
           <span className={labelColor}>{label}</span>
           <span className={`${valueColor} text-sm leading-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]`}>
-            {value}
+            {displayValue}
           </span>
         </>
       ) : (
@@ -204,7 +210,7 @@ function DataRow({
           <span className={`w-14 shrink-0 ${labelColor}`}>{label}</span>
           <span className="flex-1 overflow-hidden whitespace-nowrap text-zinc-600">{"·".repeat(50)}</span>
           <span className={`${valueColor} shrink-0 text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]`}>
-            {value}
+            {displayValue}
           </span>
         </>
       )}
