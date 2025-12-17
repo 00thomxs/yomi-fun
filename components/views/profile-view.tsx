@@ -550,15 +550,15 @@ export function ProfileView() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {!loadingBadges && equippedBadges.length > 0 && (
-            <div className="flex -space-x-1">
+            <div className="flex items-center gap-1.5">
               {equippedBadges.map(ub => (
                 <BadgeDisplayCompact key={ub.id} badge={ub.badge} />
               ))}
             </div>
           )}
-          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors" />
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors shrink-0" />
         </div>
       </button>
 

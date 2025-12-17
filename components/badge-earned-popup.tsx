@@ -201,9 +201,7 @@ export function BadgeEarnedPopup() {
 
           {/* Badge Display - Centered */}
           <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <BadgeDisplay badge={badge} size="lg" />
-            </div>
+            <BadgeDisplay badge={badge} size="lg" />
           </div>
 
           {/* Badge Info */}
