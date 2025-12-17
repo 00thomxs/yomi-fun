@@ -28,23 +28,23 @@ export function PnlCardModal({ isOpen, onClose, data }: PnlCardModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-zinc-950 border border-zinc-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-zinc-950 border border-zinc-800 rounded-2xl p-4 sm:p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 max-h-[85vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors z-10"
+          className="absolute top-3 right-3 text-zinc-500 hover:text-white transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="text-center mb-4">
-          <h2 className="text-lg font-bold text-white">Génère ta PNL Card</h2>
-          <p className="text-sm text-zinc-500">Personnalise le fond et télécharge ton image</p>
+        <div className="text-center mb-3">
+          <h2 className="text-base sm:text-lg font-bold text-white">Génère ta PNL Card</h2>
+          <p className="text-xs sm:text-sm text-zinc-500">Personnalise le fond et télécharge</p>
         </div>
 
         {/* PNL Card */}
-        <div className="flex justify-center">
+        <div className="flex justify-center pb-4">
           <PnlReceiptCard data={data} />
         </div>
       </div>

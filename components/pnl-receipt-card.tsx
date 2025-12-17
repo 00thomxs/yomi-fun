@@ -69,11 +69,11 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-4">
       {/* The Receipt Card - 4:5 Aspect Ratio */}
       <div
         ref={cardRef}
-        className="relative w-[400px] overflow-hidden rounded-lg border border-red-600/30"
+        className="relative w-[320px] sm:w-[400px] overflow-hidden rounded-lg border border-red-600/30"
         style={{ aspectRatio: "4/5" }}
       >
         {/* Layer 0: Background - Image or Grid */}
@@ -110,22 +110,22 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
           }}
         />
 
-        <div className="absolute inset-0 flex flex-col p-6">
-          <div className="relative flex h-full w-full flex-col items-center px-4 py-6">
+        <div className="absolute inset-0 flex flex-col p-4 sm:p-6">
+          <div className="relative flex h-full w-full flex-col items-center px-2 sm:px-4 py-4 sm:py-6">
             {/* Layer 2: Content */}
             <div className="relative z-10 flex h-full w-full flex-col items-center">
               <div className="flex flex-col items-center justify-center py-4">
                 <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">Gains</span>
                 <span
-                  className="mt-1 font-mono text-6xl font-extrabold leading-none tracking-tight text-emerald-400"
+                  className="mt-1 font-mono text-5xl sm:text-6xl font-extrabold leading-none tracking-tight text-emerald-400"
                   style={{
                     textShadow: "0 0 30px rgba(52, 211, 153, 0.5), 0 0 60px rgba(52, 211, 153, 0.3)",
                   }}
                 >
                   {pnlDisplay}
                 </span>
-                <span className="mt-1 font-mono text-sm text-zinc-400">
-                  PnL : <span className="text-emerald-400">{pnlAmountDisplay}</span>
+                <span className="mt-1 font-mono text-sm text-zinc-400 whitespace-nowrap">
+                  PnL : <span className="text-emerald-400 whitespace-nowrap">{pnlAmountDisplay}</span>
                 </span>
               </div>
 
@@ -159,12 +159,12 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
         <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
         <Button
           variant="outline"
           onClick={() => fileInputRef.current?.click()}
-          className="gap-2 border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+          className="gap-2 border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800 text-sm"
         >
           <Upload className="h-4 w-4" />
           Changer le fond
@@ -172,10 +172,10 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
         <Button
           variant="outline"
           onClick={handleDownload}
-          className="gap-2 border-red-600 bg-zinc-950 text-red-600 hover:bg-red-600/10"
+          className="gap-2 border-red-600 bg-zinc-950 text-red-600 hover:bg-red-600/10 text-sm"
         >
           <Download className="h-4 w-4" />
-          Télécharger l'image
+          Télécharger
         </Button>
       </div>
     </div>

@@ -678,10 +678,10 @@ export function ProfileView() {
                         </span>
                       )}
                     </span>
-                    <span className={`col-span-2 text-right font-mono font-bold flex items-center justify-end ${
+                    <span className={`col-span-2 text-right font-mono font-bold text-xs flex items-center justify-end whitespace-nowrap ${
                       isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
                     }`}>
-                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."} <CurrencySymbol className="w-3 h-3 ml-1" />
+                      {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}<CurrencySymbol className="w-2.5 h-2.5 ml-0.5" />
                     </span>
                     <span className="col-span-1 flex items-center justify-end">
                       {isWin && (
