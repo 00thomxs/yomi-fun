@@ -146,47 +146,47 @@ ON CONFLICT (slug) DO NOTHING;
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
   ('trader-1', 'TRADER I', '+10K PnL total', 'pnl', 1, 'TrendingUp', 'common'),
   ('trader-2', 'TRADER II', '+50K PnL total', 'pnl', 2, 'TrendingUp', 'rare'),
-  ('trader-3', 'TRADER III', '+200K PnL total', 'pnl', 3, 'TrendingUp', 'epic'),
+  ('trader-3', 'TRADER III', '+100K PnL total', 'pnl', 3, 'TrendingUp', 'epic'),
   ('trader-4', 'TRADER IV', '+1M PnL total', 'pnl', 4, 'TrendingUp', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
 -- SÉRIE "CHAMPION" (Victoires Saison) - Trophy icon
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
   ('champion-1', 'CHAMPION I', '1 victoire de saison', 'season', 1, 'Trophy', 'rare'),
-  ('champion-2', 'CHAMPION II', '3 victoires de saison', 'season', 2, 'Trophy', 'epic'),
-  ('champion-3', 'CHAMPION III', '5 victoires de saison', 'season', 3, 'Trophy', 'epic'),
-  ('champion-4', 'CHAMPION IV', '10 victoires de saison', 'season', 4, 'Trophy', 'legendary')
+  ('champion-2', 'CHAMPION II', '2 victoires de saison', 'season', 2, 'Trophy', 'epic'),
+  ('champion-3', 'CHAMPION III', '3 victoires de saison', 'season', 3, 'Trophy', 'epic'),
+  ('champion-4', 'CHAMPION IV', '4 victoires de saison', 'season', 4, 'Trophy', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
 -- SÉRIE "PODIUM" (Podiums Saison) - Medal icon
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
   ('podium-1', 'PODIUM I', '1 podium de saison', 'season', 1, 'Medal', 'common'),
-  ('podium-2', 'PODIUM II', '3 podiums de saison', 'season', 2, 'Medal', 'rare'),
-  ('podium-3', 'PODIUM III', '10 podiums de saison', 'season', 3, 'Medal', 'epic'),
-  ('podium-4', 'PODIUM IV', '25 podiums de saison', 'season', 4, 'Medal', 'legendary')
+  ('podium-2', 'PODIUM II', '2 podiums de saison', 'season', 2, 'Medal', 'rare'),
+  ('podium-3', 'PODIUM III', '3 podiums de saison', 'season', 3, 'Medal', 'epic'),
+  ('podium-4', 'PODIUM IV', '4 podiums de saison', 'season', 4, 'Medal', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
--- SÉRIE "WHALE" (Balance) - Diamond icon (was Gem, using Diamond)
+-- SÉRIE "WHALE" (Balance) - Diamond icon
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
-  ('whale-1', 'WHALE I', '50K balance atteinte', 'pnl', 1, 'Diamond', 'common'),
-  ('whale-2', 'WHALE II', '200K balance atteinte', 'pnl', 2, 'Diamond', 'rare'),
-  ('whale-3', 'WHALE III', '500K balance atteinte', 'pnl', 3, 'Diamond', 'epic'),
+  ('whale-1', 'WHALE I', '25K balance atteinte', 'pnl', 1, 'Diamond', 'common'),
+  ('whale-2', 'WHALE II', '50K balance atteinte', 'pnl', 2, 'Diamond', 'rare'),
+  ('whale-3', 'WHALE III', '100K balance atteinte', 'pnl', 3, 'Diamond', 'epic'),
   ('whale-4', 'WHALE IV', '1M balance atteinte', 'pnl', 4, 'Diamond', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
 -- SÉRIE "SENSEI" (Volume Paris) - Swords icon
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
-  ('sensei-1', 'SENSEI I', '50 paris placés', 'volume', 1, 'Swords', 'common'),
-  ('sensei-2', 'SENSEI II', '200 paris placés', 'volume', 2, 'Swords', 'rare'),
-  ('sensei-3', 'SENSEI III', '500 paris placés', 'volume', 3, 'Swords', 'epic'),
-  ('sensei-4', 'SENSEI IV', '1000 paris placés', 'volume', 4, 'Swords', 'legendary')
+  ('sensei-1', 'SENSEI I', '10 paris placés', 'volume', 1, 'Swords', 'common'),
+  ('sensei-2', 'SENSEI II', '25 paris placés', 'volume', 2, 'Swords', 'rare'),
+  ('sensei-3', 'SENSEI III', '50 paris placés', 'volume', 3, 'Swords', 'epic'),
+  ('sensei-4', 'SENSEI IV', '100 paris placés', 'volume', 4, 'Swords', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
--- BADGES UNIQUES - SKILL
+-- BADGES UNIQUES - SKILL (Season Win Rate, requires 50%+ events participation)
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
-  ('cheat-code', 'CHEAT CODE', '100% Win Rate (min 10 paris)', 'skill', NULL, 'Gamepad2', 'legendary'),
-  ('aim-bot', 'AIM BOT', '>80% Win Rate (min 20 paris)', 'skill', NULL, 'Crosshair', 'epic'),
-  ('smart-money', 'SMART MONEY', '>60% Win Rate (min 30 paris)', 'skill', NULL, 'Brain', 'rare')
+  ('cheat-code', 'CHEAT CODE', '100% Win Rate saison (50%+ events)', 'skill', NULL, 'Gamepad2', 'legendary'),
+  ('aim-bot', 'AIM BOT', '>80% Win Rate saison (50%+ events)', 'skill', NULL, 'Crosshair', 'epic'),
+  ('smart-money', 'SMART MONEY', '>60% Win Rate saison (50%+ events)', 'skill', NULL, 'Brain', 'rare')
 ON CONFLICT (slug) DO NOTHING;
 
 -- BADGES UNIQUES - LEGACY
@@ -197,7 +197,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- BADGES UNIQUES - FUN / RISK
 INSERT INTO public.badges (slug, name, description, category, level, icon_name, rarity) VALUES
-  ('all-in', 'ALL IN', 'Tout miser sur un seul pari', 'fun', NULL, 'Skull', 'rare'),
+  ('all-in', 'ALL IN', 'Miser 100% de son solde', 'fun', NULL, 'Skull', 'rare'),
   ('dieu', 'DIEU', 'Gagner un pari à 1% de probabilité', 'fun', NULL, 'Zap', 'legendary'),
   ('risk-taker', 'RISK TAKER', 'Gagner un pari à ≤10% de probabilité', 'fun', NULL, 'Rocket', 'epic'),
   ('clown', 'CLOWN', 'Perdre ≥90% de ses paris', 'fun', NULL, 'Drama', 'rare'),

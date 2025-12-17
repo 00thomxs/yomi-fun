@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { getAvatarUrl } from '@/lib/utils/avatar'
+import { checkSeasonWinRateBadges } from '@/app/actions/badges'
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -556,6 +557,26 @@ async function endSeasonInternal(settings: any) {
 
       totalDistributed += reward
       playersRewarded++
+    }
+  }
+
+  // Check and award season-based win rate badges for all participants
+  if (activeSeason?.id) {
+    try {
+      // Get all unique participants in this season
+      const { data: allParticipants } = await supabaseAdmin
+        .from('season_leaderboards')
+        .select('user_id')
+        .eq('season_id', activeSeason.id)
+      
+      if (allParticipants) {
+        console.log(`[endSeasonInternal] Checking season badges for ${allParticipants.length} participants`)
+        for (const participant of allParticipants) {
+          await checkSeasonWinRateBadges(participant.user_id, activeSeason.id)
+        }
+      }
+    } catch (badgeError) {
+      console.error('[endSeasonInternal] Badge check failed (non-blocking):', badgeError)
     }
   }
 

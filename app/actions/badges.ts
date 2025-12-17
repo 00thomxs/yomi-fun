@@ -310,30 +310,25 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
   // NOOB: First bet
   if (totalBets >= 1) await maybeAward('noob')
   
-  // SENSEI series (bet volume)
-  if (totalBets >= 50) await maybeAward('sensei-1')
-  if (totalBets >= 200) await maybeAward('sensei-2')
-  if (totalBets >= 500) await maybeAward('sensei-3')
-  if (totalBets >= 1000) await maybeAward('sensei-4')
+  // SENSEI series (bet volume) - 10/25/50/100
+  if (totalBets >= 10) await maybeAward('sensei-1')
+  if (totalBets >= 25) await maybeAward('sensei-2')
+  if (totalBets >= 50) await maybeAward('sensei-3')
+  if (totalBets >= 100) await maybeAward('sensei-4')
   
-  // TRADER series (PnL)
+  // TRADER series (PnL) - 10K/50K/100K/1M
   if (pnl >= 10000) await maybeAward('trader-1')
   if (pnl >= 50000) await maybeAward('trader-2')
-  if (pnl >= 200000) await maybeAward('trader-3')
+  if (pnl >= 100000) await maybeAward('trader-3')
   if (pnl >= 1000000) await maybeAward('trader-4')
   
-  // WHALE series (balance)
-  if (balance >= 50000) await maybeAward('whale-1')
-  if (balance >= 200000) await maybeAward('whale-2')
-  if (balance >= 500000) await maybeAward('whale-3')
+  // WHALE series (balance) - 25K/50K/100K/1M
+  if (balance >= 25000) await maybeAward('whale-1')
+  if (balance >= 50000) await maybeAward('whale-2')
+  if (balance >= 100000) await maybeAward('whale-3')
   if (balance >= 1000000) await maybeAward('whale-4')
   
-  // SKILL badges (win rate)
-  if (totalResolved >= 30 && winRate > 0.6) await maybeAward('smart-money')
-  if (totalResolved >= 20 && winRate > 0.8) await maybeAward('aim-bot')
-  if (totalResolved >= 10 && winRate >= 1.0) await maybeAward('cheat-code')
-  
-  // CLOWN badge (losing)
+  // CLOWN badge (losing) - global stat
   if (totalResolved >= 10 && winRate <= 0.1) await maybeAward('clown')
   
   return awardedBadges
@@ -403,8 +398,8 @@ export async function checkSpecialBetBadge(
   
   if (!betWon) return awardedBadges
   
-  // ALL IN: bet was >= 90% of balance
-  if (betAmount >= userBalanceBeforeBet * 0.9) {
+  // ALL IN: bet was 100% of balance (user had exactly betAmount as balance)
+  if (betAmount >= userBalanceBeforeBet) {
     const result = await awardBadge(userId, 'all-in')
     if (result.success && result.userBadgeId) awardedBadges.push('all-in')
   }
@@ -419,6 +414,95 @@ export async function checkSpecialBetBadge(
   if (probabilityAtBet <= 0.10) {
     const result = await awardBadge(userId, 'risk-taker')
     if (result.success && result.userBadgeId) awardedBadges.push('risk-taker')
+  }
+  
+  return awardedBadges
+}
+
+/**
+ * Check and award season-based win rate badges
+ * Called when a season ends or when a user participates in enough events
+ * Requirements: 
+ * - User must have participated in at least 50% of season events
+ * - Win rate is calculated only for that season
+ */
+export async function checkSeasonWinRateBadges(
+  userId: string,
+  seasonId: string
+): Promise<string[]> {
+  const awardedBadges: string[] = []
+  
+  try {
+    // 1. Count total events in the season
+    const { count: totalSeasonEvents } = await supabaseAdmin
+      .from('markets')
+      .select('*', { count: 'exact', head: true })
+      .eq('season_id', seasonId)
+      .eq('status', 'resolved')
+    
+    if (!totalSeasonEvents || totalSeasonEvents === 0) return awardedBadges
+    
+    // 2. Get user's season stats
+    const { data: seasonStats } = await supabaseAdmin
+      .from('season_leaderboards')
+      .select('wins, losses')
+      .eq('user_id', userId)
+      .eq('season_id', seasonId)
+      .single()
+    
+    if (!seasonStats) return awardedBadges
+    
+    const seasonWins = seasonStats.wins || 0
+    const seasonLosses = seasonStats.losses || 0
+    const totalUserBets = seasonWins + seasonLosses
+    
+    // 3. Check if user participated in at least 50% of season events
+    // Each "bet resolved" counts as participation - we need unique markets
+    const { data: userBets } = await supabaseAdmin
+      .from('bets')
+      .select('market_id')
+      .eq('user_id', userId)
+      .in('status', ['won', 'lost'])
+    
+    if (!userBets) return awardedBadges
+    
+    // Get unique markets the user bet on in this season
+    const uniqueMarketIds = [...new Set(userBets.map(b => b.market_id))]
+    
+    // Check how many of those are in this season
+    const { count: userSeasonEventCount } = await supabaseAdmin
+      .from('markets')
+      .select('*', { count: 'exact', head: true })
+      .eq('season_id', seasonId)
+      .in('id', uniqueMarketIds)
+    
+    const participationRate = (userSeasonEventCount || 0) / totalSeasonEvents
+    
+    // Require at least 50% participation
+    if (participationRate < 0.5) return awardedBadges
+    
+    // 4. Calculate season win rate
+    const seasonWinRate = totalUserBets > 0 ? seasonWins / totalUserBets : 0
+    
+    // 5. Award badges based on win rate
+    if (seasonWinRate > 0.6) {
+      const result = await awardBadge(userId, 'smart-money')
+      if (result.success && result.userBadgeId) awardedBadges.push('smart-money')
+    }
+    
+    if (seasonWinRate > 0.8) {
+      const result = await awardBadge(userId, 'aim-bot')
+      if (result.success && result.userBadgeId) awardedBadges.push('aim-bot')
+    }
+    
+    if (seasonWinRate >= 1.0 && totalUserBets >= 3) {
+      // 100% win rate with at least 3 bets
+      const result = await awardBadge(userId, 'cheat-code')
+      if (result.success && result.userBadgeId) awardedBadges.push('cheat-code')
+    }
+    
+  } catch (error) {
+    console.error('Error checking season win rate badges:', error)
   }
   
   return awardedBadges
