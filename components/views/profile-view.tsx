@@ -650,11 +650,11 @@ export function ProfileView() {
                     <span className="col-span-3 font-mono text-muted-foreground text-[10px] flex items-center">{date}</span>
                     <div className="col-span-4 flex flex-col justify-center min-w-0">
                       <span className="font-medium truncate text-[11px]">{tx.market_question}</span>
-                      <span className="text-[9px] text-muted-foreground truncate">
+                      <span className="text-[9px] text-muted-foreground truncate flex items-center gap-0.5">
                         <span className={tx.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}>
                           {tx.direction === 'NO' ? "NON" : "OUI"}
                         </span>
-                        {" "}• {tx.amount}Z
+                        {" "}• {tx.amount}<CurrencySymbol className="w-2 h-2" />
                       </span>
                     </div>
                     <span className="col-span-2 flex items-center">
@@ -675,10 +675,10 @@ export function ProfileView() {
                       )}
                     </span>
                     <div className="col-span-3 flex items-center justify-end gap-1">
-                      <span className={`font-mono font-bold text-[11px] ${
+                      <span className={`font-mono font-bold text-[11px] flex items-center ${
                         isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
                       }`}>
-                        {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}
+                        {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}<CurrencySymbol className="w-2.5 h-2.5 ml-0.5" />
                       </span>
                       {isWin && (
                         <button
