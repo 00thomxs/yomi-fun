@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Sparkles, Check, Loader2 } from 'lucide-react'
+import { X, Sparkles, Check, Loader2, Trophy } from 'lucide-react'
 import { BadgeDisplay } from '@/components/ui/badge-display'
 import { markBadgeAsSeen, toggleEquipBadge, getUnseenBadges } from '@/app/actions/badges'
 import type { UserBadgeWithDetails } from '@/lib/types'
@@ -19,19 +19,32 @@ const CATEGORY_LABELS: Record<string, string> = {
   fun: 'Accomplissement',
 }
 
-// Rarity colors for background effects
-const RARITY_COLORS: Record<string, string> = {
-  common: 'from-zinc-500/20 to-zinc-600/10',
-  rare: 'from-blue-500/30 to-blue-600/10',
-  epic: 'from-purple-500/40 to-purple-600/10',
-  legendary: 'from-amber-500/50 to-amber-600/10',
-}
-
-const RARITY_GLOW: Record<string, string> = {
-  common: '',
-  rare: 'shadow-[0_0_30px_rgba(59,130,246,0.2)]',
-  epic: 'shadow-[0_0_40px_rgba(168,85,247,0.3)]',
-  legendary: 'shadow-[0_0_60px_rgba(245,158,11,0.4)]',
+// Rarity accent colors
+const RARITY_ACCENT: Record<string, { border: string; glow: string; text: string; bg: string }> = {
+  common: { 
+    border: 'border-zinc-600', 
+    glow: '', 
+    text: 'text-zinc-400',
+    bg: 'from-zinc-800/50 via-zinc-900/80 to-black'
+  },
+  rare: { 
+    border: 'border-blue-500/50', 
+    glow: 'shadow-[0_0_80px_rgba(59,130,246,0.3)]', 
+    text: 'text-blue-400',
+    bg: 'from-blue-950/50 via-zinc-900/80 to-black'
+  },
+  epic: { 
+    border: 'border-purple-500/50', 
+    glow: 'shadow-[0_0_80px_rgba(168,85,247,0.4)]', 
+    text: 'text-purple-400',
+    bg: 'from-purple-950/50 via-zinc-900/80 to-black'
+  },
+  legendary: { 
+    border: 'border-amber-500/60', 
+    glow: 'shadow-[0_0_100px_rgba(245,158,11,0.5)]', 
+    text: 'text-amber-400',
+    bg: 'from-amber-950/40 via-zinc-900/80 to-black'
+  },
 }
 
 export function BadgeEarnedPopup() {
@@ -39,16 +52,19 @@ export function BadgeEarnedPopup() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isEquipping, setIsEquipping] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   // Fetch unseen badges on mount
   useEffect(() => {
-    // Initial fetch after small delay to not block page load
     const timer = setTimeout(async () => {
       try {
         const badges = await getUnseenBadges()
-        setUnseenBadges(badges)
+        if (badges.length > 0) {
+          setUnseenBadges(badges)
+          setTimeout(() => setIsVisible(true), 100)
+        }
       } catch {
-        // Silently fail - not critical
+        // Silently fail
       }
     }, 1500)
 
@@ -62,19 +78,18 @@ export function BadgeEarnedPopup() {
   const badge = currentBadge.badge
   const rarity = badge.rarity
   const categoryLabel = CATEGORY_LABELS[badge.category] || badge.category
+  const accent = RARITY_ACCENT[rarity] || RARITY_ACCENT.common
 
   const handleClose = async () => {
-    setIsClosing(true)
-    
-    // Mark as seen
+    setIsVisible(false)
     await markBadgeAsSeen(currentBadge.id)
     
-    // Small delay for animation
     setTimeout(() => {
-      setIsClosing(false)
       if (currentIndex < unseenBadges.length - 1) {
         setCurrentIndex(currentIndex + 1)
+        setTimeout(() => setIsVisible(true), 100)
       } else {
+        setIsClosing(true)
         setUnseenBadges([])
         setCurrentIndex(0)
       }
@@ -98,88 +113,129 @@ export function BadgeEarnedPopup() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop with blur */}
+      {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
+        className={cn(
+          "absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity duration-300",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
         onClick={handleClose}
       />
 
       {/* Popup */}
       <div 
         className={cn(
-          'relative max-w-sm w-full rounded-2xl border overflow-hidden',
-          'bg-zinc-950 border-zinc-800',
-          'animate-in zoom-in-95 slide-in-from-bottom-4 duration-500',
-          RARITY_GLOW[rarity]
+          'relative max-w-[340px] w-full rounded-2xl border-2 overflow-hidden transition-all duration-500',
+          accent.border,
+          accent.glow,
+          isVisible 
+            ? "opacity-100 scale-100 translate-y-0" 
+            : "opacity-0 scale-95 translate-y-4"
         )}
       >
-        {/* Gradient background */}
+        {/* Background gradient */}
         <div className={cn(
-          'absolute inset-0 bg-gradient-to-b opacity-50',
-          RARITY_COLORS[rarity]
+          'absolute inset-0 bg-gradient-to-b',
+          accent.bg
         )} />
+        
+        {/* Tactical grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '20px 20px'
+          }}
+        />
 
-        {/* Sparkle effects for legendary */}
-        {rarity === 'legendary' && (
+        {/* Sparkle effects for legendary/epic */}
+        {(rarity === 'legendary' || rarity === 'epic') && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <Sparkles className="absolute top-4 left-4 w-4 h-4 text-amber-400 animate-pulse" />
-            <Sparkles className="absolute top-8 right-8 w-3 h-3 text-amber-300 animate-pulse delay-100" />
-            <Sparkles className="absolute bottom-12 left-8 w-5 h-5 text-amber-400 animate-pulse delay-200" />
-            <Sparkles className="absolute bottom-8 right-4 w-4 h-4 text-amber-300 animate-pulse delay-300" />
+            <div className={cn(
+              "absolute top-6 left-6 w-1 h-1 rounded-full animate-ping",
+              rarity === 'legendary' ? "bg-amber-400" : "bg-purple-400"
+            )} />
+            <div className={cn(
+              "absolute top-12 right-10 w-1.5 h-1.5 rounded-full animate-ping delay-300",
+              rarity === 'legendary' ? "bg-amber-300" : "bg-purple-300"
+            )} />
+            <div className={cn(
+              "absolute bottom-20 left-10 w-1 h-1 rounded-full animate-ping delay-700",
+              rarity === 'legendary' ? "bg-amber-400" : "bg-purple-400"
+            )} />
           </div>
         )}
 
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 z-10 text-zinc-500 hover:text-white transition-colors"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white transition-all"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Content */}
-        <div className="relative p-8 text-center space-y-6">
-          {/* Header */}
-          <div className="space-y-1">
-            <p className="text-xs uppercase tracking-widest text-zinc-500 font-medium">
-              Nouveau Badge Débloqué
-            </p>
-            <div className="flex items-center justify-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary animate-bounce" />
-              <span className="text-lg font-bold text-primary">Félicitations !</span>
-              <Sparkles className="w-5 h-5 text-primary animate-bounce delay-100" />
-            </div>
+        <div className="relative p-6 text-center">
+          {/* Trophy icon */}
+          <div className={cn(
+            "w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center",
+            rarity === 'legendary' ? "bg-amber-500/20" : 
+            rarity === 'epic' ? "bg-purple-500/20" :
+            rarity === 'rare' ? "bg-blue-500/20" : "bg-zinc-800"
+          )}>
+            <Trophy className={cn("w-6 h-6", accent.text)} />
           </div>
 
-          {/* Badge Display - Large */}
-          <div className="flex justify-center py-4">
-            <div className="transform scale-150">
+          {/* Header */}
+          <div className="space-y-1 mb-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium">
+              Badge Débloqué
+            </p>
+            <p className={cn("text-xl font-black tracking-tight", accent.text)}>
+              {badge.name}
+            </p>
+          </div>
+
+          {/* Badge Display - Centered */}
+          <div className="flex justify-center mb-6">
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
               <BadgeDisplay badge={badge} size="lg" />
             </div>
           </div>
 
           {/* Badge Info */}
-          <div className="space-y-2">
-            <p className="text-sm text-zinc-400">
+          <div className="space-y-1 mb-6">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
               {categoryLabel}
             </p>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-zinc-400">
               {badge.description}
             </p>
           </div>
 
           {/* Counter if multiple */}
           {unseenBadges.length > 1 && (
-            <p className="text-xs text-zinc-600">
-              {currentIndex + 1} / {unseenBadges.length}
-            </p>
+            <div className="flex justify-center gap-1 mb-4">
+              {unseenBadges.map((_, i) => (
+                <div 
+                  key={i}
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full transition-all",
+                    i === currentIndex ? accent.text.replace('text-', 'bg-') : "bg-zinc-700"
+                  )}
+                />
+              ))}
+            </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-2">
             <button
               onClick={handleClose}
-              className="flex-1 py-3 px-4 rounded-xl font-bold transition-all bg-zinc-800 hover:bg-zinc-700 text-white"
+              className="flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10"
             >
               Fermer
             </button>
@@ -187,9 +243,10 @@ export function BadgeEarnedPopup() {
               onClick={handleEquip}
               disabled={isEquipping}
               className={cn(
-                'flex-1 py-3 px-4 rounded-xl font-bold transition-all',
-                'bg-primary hover:bg-primary/90 text-primary-foreground',
+                'flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all',
+                'bg-primary hover:bg-primary/90 text-white',
                 'flex items-center justify-center gap-2',
+                'shadow-lg shadow-primary/20',
                 isEquipping && 'opacity-50 cursor-not-allowed'
               )}
             >
@@ -206,4 +263,3 @@ export function BadgeEarnedPopup() {
     </div>
   )
 }
-
