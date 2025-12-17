@@ -452,7 +452,7 @@ export function ProfileView() {
           <div className="flex-1 space-y-4 w-full">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
+                <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
                   <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
                   {/* Equipped Badges */}
                   {equippedBadges.length > 0 && (

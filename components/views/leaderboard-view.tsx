@@ -599,7 +599,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
                 {equippedBadges[top2.id]?.length > 0 && (
-                  <div className="hidden sm:flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
                     {equippedBadges[top2.id].slice(0, 2).map(badge => (
                       <BadgeDisplayCompact key={badge.id} badge={badge} />
                     ))}
@@ -647,7 +647,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
                 {equippedBadges[top1.id]?.length > 0 && (
-                  <div className="hidden sm:flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
                     {equippedBadges[top1.id].slice(0, 2).map(badge => (
                       <BadgeDisplayCompact key={badge.id} badge={badge} />
                     ))}
@@ -691,7 +691,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
                 {equippedBadges[top3.id]?.length > 0 && (
-                  <div className="hidden sm:flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
                     {equippedBadges[top3.id].slice(0, 2).map(badge => (
                       <BadgeDisplayCompact key={badge.id} badge={badge} />
                     ))}
@@ -751,7 +751,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                         {player.username}
                       </span>
                       {equippedBadges[player.id]?.slice(0, 2).map(badge => (
-                        <BadgeDisplayCompact key={badge.id} badge={badge} className="hidden sm:inline-flex" />
+                        <BadgeDisplayCompact key={badge.id} badge={badge} />
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
