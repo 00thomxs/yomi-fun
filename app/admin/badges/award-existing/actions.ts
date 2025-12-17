@@ -6,7 +6,8 @@ import {
   checkAndAwardBadges, 
   checkWinStreakBadge, 
   checkVerifiedBadge,
-  checkLegacyBadges 
+  checkLegacyBadges,
+  awardBadge
 } from '@/app/actions/badges'
 
 const supabaseAdmin = createAdminClient(
@@ -92,6 +93,85 @@ export async function awardBadgesToExistingUsers(): Promise<{
     return {
       success: false,
       message: 'Erreur lors de l\'attribution',
+      details: [String(error)]
+    }
+  }
+}
+
+/**
+ * Award Beta Testeur badge to the first 14 accounts
+ */
+export async function awardBetaTesterBadges(): Promise<{
+  success: boolean
+  message: string
+  details?: string[]
+}> {
+  const supabase = await createClient()
+  
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, message: 'Non authentifié' }
+  }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  
+  if (profile?.role !== 'admin') {
+    return { success: false, message: 'Accès refusé' }
+  }
+
+  const details: string[] = []
+  
+  try {
+    // Get the first 14 accounts by creation date
+    const { data: firstUsers, error } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username, created_at')
+      .order('created_at', { ascending: true })
+      .limit(14)
+    
+    if (error || !firstUsers) {
+      return { success: false, message: 'Erreur récupération utilisateurs', details: [error?.message || ''] }
+    }
+    
+    details.push(`Les 14 premiers comptes (par date de création):`)
+    details.push(`---`)
+    
+    let awarded = 0
+    
+    for (let i = 0; i < firstUsers.length; i++) {
+      const u = firstUsers[i]
+      const result = await awardBadge(u.id, 'beta-tester')
+      
+      const date = new Date(u.created_at).toLocaleDateString('fr-FR')
+      
+      if (result.success && result.userBadgeId) {
+        details.push(`#${i + 1} @${u.username || u.id.slice(0, 8)} (${date}) ✓ BETA TESTEUR attribué`)
+        awarded++
+      } else if (result.error?.includes('déjà')) {
+        details.push(`#${i + 1} @${u.username || u.id.slice(0, 8)} (${date}) - déjà obtenu`)
+      } else {
+        details.push(`#${i + 1} @${u.username || u.id.slice(0, 8)} (${date}) ✗ ${result.error}`)
+      }
+    }
+    
+    details.push(`---`)
+    details.push(`${awarded} nouveaux badges BETA TESTEUR attribués`)
+    
+    return {
+      success: true,
+      message: 'Attribution terminée !',
+      details
+    }
+    
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Erreur',
       details: [String(error)]
     }
   }

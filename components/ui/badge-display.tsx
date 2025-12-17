@@ -18,6 +18,7 @@ import {
   Drama,
   Sprout,
   BadgeCheck,
+  Star,
   HelpCircle
 } from 'lucide-react'
 import type { Badge, BadgeRarity } from '@/lib/types'
@@ -42,6 +43,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Drama,
   Sprout,
   BadgeCheck,
+  Star,
 }
 
 // Style configurations by rarity/level

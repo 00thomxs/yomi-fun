@@ -209,7 +209,8 @@ INSERT INTO public.badges (slug, name, description, category, level, icon_name, 
   ('risk-taker', 'RISK TAKER', 'Gagner un pari à ≤10% de probabilité', 'fun', NULL, 'Rocket', 'epic'),
   ('clown', 'CLOWN', 'Perdre ≥90% de ses paris', 'fun', NULL, 'Drama', 'rare'),
   ('noob', 'NOOB', 'Premier pari placé', 'fun', NULL, 'Sprout', 'common'),
-  ('verified', 'VERIFIED', 'Profil complet (avatar + pseudo)', 'fun', NULL, 'BadgeCheck', 'common')
+  ('verified', 'VERIFIED', 'Profil complet (avatar + pseudo)', 'fun', NULL, 'BadgeCheck', 'common'),
+  ('beta-tester', 'BETA TESTEUR', 'Parmi les 14 premiers joueurs', 'legacy', NULL, 'Star', 'legendary')
 ON CONFLICT (slug) DO NOTHING;
 
 -- =============================================
