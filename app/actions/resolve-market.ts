@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
-import { checkAndAwardBadges, checkWinStreakBadge, checkLegacyBadges } from './badges'
+import { checkAndAwardBadges, checkWinStreakBadge, checkLegacyBadges, checkSpecialBetBadge } from './badges'
 
 // Init Admin Client
 const supabaseAdmin = createAdminClient(
@@ -64,10 +64,10 @@ export async function resolveMarket(
   // Get season_id for season leaderboard updates
   const seasonId = updatedMarket?.season_id as string | null
 
-  // 3. Fetch all pending bets for this market
+  // 3. Fetch all pending bets for this market (including probability/balance for special badges)
   const { data: bets, error: betsError } = await supabase
     .from('bets')
-    .select('id, user_id, outcome_id, amount, potential_payout, status, direction')
+    .select('id, user_id, outcome_id, amount, potential_payout, status, direction, probability_at_bet, user_balance_before')
     .eq('market_id', marketId)
     .eq('status', 'pending')
 
@@ -234,17 +234,30 @@ export async function resolveMarket(
       
       // Check win streak badges for users who won
       const userBets = bets.filter(b => b.user_id === userId)
-      const hasWin = userBets.some(b => {
+      const winningBets = userBets.filter(b => {
         if (b.direction === 'NO') {
           return b.outcome_id !== winningOutcomeId
         }
         return b.outcome_id === winningOutcomeId
       })
       
-      if (hasWin) {
+      if (winningBets.length > 0) {
         await checkWinStreakBadge(userId)
         // Check legacy badges (G.O.A.T, MVP) - only for winners
         await checkLegacyBadges(userId)
+        
+        // Check special bet badges (DIEU, RISK TAKER, ALL IN) for each winning bet
+        for (const bet of winningBets) {
+          if (bet.probability_at_bet !== null && bet.user_balance_before !== null) {
+            await checkSpecialBetBadge(
+              userId,
+              true, // betWon
+              bet.probability_at_bet,
+              bet.amount,
+              bet.user_balance_before
+            )
+          }
+        }
       }
     } catch (badgeError) {
       console.error(`[RESOLVE] Badge check failed for user ${userId} (non-blocking):`, badgeError)
@@ -304,7 +317,7 @@ export async function resolveMarketMulti(
   // 4. Fetch Bets
   const { data: bets, error: betsError } = await supabase
     .from('bets')
-    .select('id, user_id, outcome_id, amount, potential_payout, status, direction')
+    .select('id, user_id, outcome_id, amount, potential_payout, status, direction, probability_at_bet, user_balance_before')
     .eq('market_id', marketId)
     .eq('status', 'pending')
 
@@ -454,17 +467,30 @@ export async function resolveMarketMulti(
       
       // Check win streak badges for users who won
       const userBets = bets.filter(b => b.user_id === userId)
-      const hasWin = userBets.some(b => {
+      const winningBets = userBets.filter(b => {
         if (b.direction === 'NO') {
           return !winningOutcomeIds.includes(b.outcome_id)
         }
         return winningOutcomeIds.includes(b.outcome_id)
       })
       
-      if (hasWin) {
+      if (winningBets.length > 0) {
         await checkWinStreakBadge(userId)
         // Check legacy badges (G.O.A.T, MVP) - only for winners
         await checkLegacyBadges(userId)
+        
+        // Check special bet badges (DIEU, RISK TAKER, ALL IN) for each winning bet
+        for (const bet of winningBets) {
+          if (bet.probability_at_bet !== null && bet.user_balance_before !== null) {
+            await checkSpecialBetBadge(
+              userId,
+              true, // betWon
+              bet.probability_at_bet,
+              bet.amount,
+              bet.user_balance_before
+            )
+          }
+        }
       }
     } catch (badgeError) {
       console.error(`[RESOLVE_MULTI] Badge check failed for user ${userId} (non-blocking):`, badgeError)

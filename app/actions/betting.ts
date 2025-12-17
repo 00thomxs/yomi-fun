@@ -316,6 +316,9 @@ export async function placeBet(
   }
 
   // C. Create Bet Record
+  // Store probability and balance for special badges (DIEU, RISK TAKER, ALL IN)
+  const probabilityAtBet = direction === 'YES' ? safeProb : (1 - safeProb)
+  
   const { error: betError } = await supabase
     .from('bets')
     .insert({
@@ -328,7 +331,9 @@ export async function placeBet(
       potential_payout: potentialPayout,
       odds_at_bet: currentOdds,
       status: 'pending',
-      direction: direction // 'YES' or 'NO'
+      direction: direction, // 'YES' or 'NO'
+      probability_at_bet: probabilityAtBet, // For DIEU, RISK TAKER badges
+      user_balance_before: profile.balance // For ALL IN badge
     })
 
   if (betError) {

@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Target, Clock, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { BadgeDisplayCompact } from "@/components/ui/badge-display"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
 import { getSeasonSettings, checkAndDistributeRewards, type SeasonSettings } from "@/app/admin/settings/actions"
 import { toast } from "sonner"
 import { getAvatarUrl } from "@/lib/utils/avatar"
+import type { Badge } from "@/lib/types"
 
 type LeaderboardViewProps = {
   onBack: () => void
@@ -32,6 +34,9 @@ type SeasonEvent = {
   volume: number
 }
 
+// Equipped badges by user ID
+type EquippedBadgesMap = Record<string, Badge[]>
+
 export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
@@ -42,6 +47,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const [activeSeasonId, setActiveSeasonId] = useState<string | null>(null)
   const [seasonEvents, setSeasonEvents] = useState<SeasonEvent[]>([])
   const [eventsExpanded, setEventsExpanded] = useState(false)
+  const [equippedBadges, setEquippedBadges] = useState<EquippedBadgesMap>({})
   const rewardsCheckedRef = useRef(false)
 
   // Fetch season settings on mount
@@ -229,6 +235,45 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
     
     fetchLeaderboard()
   }, [viewMode, activeSeasonId, seasonSettings?.is_active, isMetaLoading])
+
+  // Fetch equipped badges for all players
+  useEffect(() => {
+    const fetchBadges = async () => {
+      if (players.length === 0) return
+      
+      const supabase = createClient()
+      const playerIds = players.map(p => p.id)
+      
+      const { data } = await supabase
+        .from('user_badges')
+        .select(`
+          user_id,
+          badge:badges(*)
+        `)
+        .in('user_id', playerIds)
+        .eq('is_equipped', true)
+      
+      if (data) {
+        const badgesMap: EquippedBadgesMap = {}
+        for (const entry of data as any[]) {
+          const badge = entry.badge
+          if (!badge) continue
+          if (!badgesMap[entry.user_id]) {
+            badgesMap[entry.user_id] = []
+          }
+          // Handle both single object and array cases from Supabase
+          if (Array.isArray(badge)) {
+            badgesMap[entry.user_id].push(...badge)
+          } else {
+            badgesMap[entry.user_id].push(badge)
+          }
+        }
+        setEquippedBadges(badgesMap)
+      }
+    }
+    
+    fetchBadges()
+  }, [players])
 
   const top1 = players[0]
   const top2 = players[1]
@@ -553,6 +598,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
+                {equippedBadges[top2.id]?.length > 0 && (
+                  <div className="flex justify-center gap-1 mt-1">
+                    {equippedBadges[top2.id].slice(0, 2).map(badge => (
+                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                )}
                 <p className="text-[10px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
               </div>
               
@@ -594,6 +646,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="text-center w-full relative z-10">
                 <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
+                {equippedBadges[top1.id]?.length > 0 && (
+                  <div className="flex justify-center gap-1 mt-1">
+                    {equippedBadges[top1.id].slice(0, 2).map(badge => (
+                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-amber-500/80 font-mono mt-1 font-bold">{top1.winRate}% WR</p>
               </div>
               
@@ -631,6 +690,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
+                {equippedBadges[top3.id]?.length > 0 && (
+                  <div className="flex justify-center gap-1 mt-1">
+                    {equippedBadges[top3.id].slice(0, 2).map(badge => (
+                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                )}
                 <p className="text-[10px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
               </div>
               
@@ -679,14 +745,19 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 <span className="col-span-1 font-mono text-sm font-bold text-muted-foreground/50">#{actualRank}</span>
                 <div className="col-span-5 flex items-center gap-3 min-w-0">
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
-                  <div className="flex flex-col min-w-0">
-                    <span className={`font-bold text-sm truncate ${isMe ? "text-primary" : "text-foreground"}`}>
-                      {player.username}
-                    </span>
+                  <div className="flex flex-col min-w-0 gap-0.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={`font-bold text-sm truncate ${isMe ? "text-primary" : "text-foreground"}`}>
+                        {player.username}
+                      </span>
+                      {equippedBadges[player.id]?.slice(0, 2).map(badge => (
+                        <BadgeDisplayCompact key={badge.id} badge={badge} className="hidden sm:inline-flex" />
+                      ))}
+                    </div>
                     {hasSeason && reward > 0 && (
                       <span className="text-[9px] font-bold text-primary flex items-center gap-0.5">
                         +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
-                  </span>
+                      </span>
                     )}
                   </div>
                 </div>
