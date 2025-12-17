@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar, Sparkles, Medal, Target, Clock, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { BadgeDisplayCompact } from "@/components/ui/badge-display"
+import { BadgeDisplayCompact, BadgeIcon } from "@/components/ui/badge-display"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
 import { getSeasonSettings, checkAndDistributeRewards, type SeasonSettings } from "@/app/admin/settings/actions"
@@ -599,9 +599,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
                 {equippedBadges[top2.id]?.length > 0 && (
-                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top2.id].slice(0, 2).map(badge => (
-                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                      <span key={badge.id}>
+                        <BadgeIcon badge={badge} className="sm:hidden w-5 h-5" />
+                        <BadgeDisplayCompact badge={badge} className="hidden sm:inline-flex" />
+                      </span>
                     ))}
                   </div>
                 )}
@@ -647,9 +650,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
                 {equippedBadges[top1.id]?.length > 0 && (
-                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top1.id].slice(0, 2).map(badge => (
-                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                      <span key={badge.id}>
+                        <BadgeIcon badge={badge} className="sm:hidden w-5 h-5" />
+                        <BadgeDisplayCompact badge={badge} className="hidden sm:inline-flex" />
+                      </span>
                     ))}
                   </div>
                 )}
@@ -691,9 +697,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div className="text-center w-full relative z-10">
                 <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
                 {equippedBadges[top3.id]?.length > 0 && (
-                  <div className="flex justify-center gap-1 mt-1 flex-wrap max-w-full">
+                  <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top3.id].slice(0, 2).map(badge => (
-                      <BadgeDisplayCompact key={badge.id} badge={badge} />
+                      <span key={badge.id}>
+                        <BadgeIcon badge={badge} className="sm:hidden w-5 h-5" />
+                        <BadgeDisplayCompact badge={badge} className="hidden sm:inline-flex" />
+                      </span>
                     ))}
                   </div>
                 )}
@@ -751,7 +760,10 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                         {player.username}
                       </span>
                       {equippedBadges[player.id]?.slice(0, 2).map(badge => (
-                        <BadgeDisplayCompact key={badge.id} badge={badge} />
+                        <span key={badge.id}>
+                          <BadgeIcon badge={badge} className="sm:hidden w-5 h-5" />
+                          <BadgeDisplayCompact badge={badge} className="hidden sm:inline-flex" />
+                        </span>
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
