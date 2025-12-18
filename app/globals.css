@@ -141,3 +141,116 @@
 html {
   scrollbar-width: none;
 }
+
+/* ===== YOMI TCG Card Animations ===== */
+
+/* Shimmer effect for holographic cards */
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Pulse glow for avatar */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Flame wave effect */
+@keyframes flameWave {
+  0%, 100% { d: path("M0,100 Q50,60 80,80 Q110,40 140,70 Q170,30 200,55 Q230,25 260,60 Q290,35 320,75 Q350,50 380,85 Q400,70 400,100 Z"); }
+  50% { d: path("M0,100 Q50,70 80,90 Q110,50 140,60 Q170,40 200,65 Q230,35 260,50 Q290,45 320,65 Q350,60 380,75 Q400,80 400,100 Z"); }
+}
+
+/* Card reveal animation */
+@keyframes cardReveal {
+  0% { opacity: 0; transform: scale(0.8) rotateY(180deg); }
+  100% { opacity: 1; transform: scale(1) rotateY(0deg); }
+}
+
+.animate-card-reveal {
+  animation: cardReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Pack charge animation */
+@keyframes packCharge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-pack-charge {
+  animation: packCharge 0.3s ease-in-out infinite;
+}
+
+/* Pack shake animation */
+@keyframes packShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-3px) rotate(-1deg); }
+  75% { transform: translateX(3px) rotate(1deg); }
+}
+
+.animate-pack-shake {
+  animation: packShake 0.08s ease-in-out infinite;
+}
+
+/* Particle converge animation */
+@keyframes particleConverge {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+}
+
+.animate-particle-converge {
+  animation: particleConverge 0.5s ease-in forwards;
+}
+
+/* Crack expand animation */
+@keyframes crackExpand {
+  0% { stroke-dasharray: 0 100; opacity: 0; }
+  100% { stroke-dasharray: 100 0; opacity: 1; }
+}
+
+.animate-crack-expand {
+  animation: crackExpand 0.4s ease-out forwards;
+}
+
+/* Shard fly animation */
+@keyframes shardFly {
+  0% { 
+    opacity: 1; 
+    transform: translate(0, 0) rotate(0deg) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(var(--shard-x, 100px), var(--shard-y, 100px)) rotate(var(--shard-rotate, 180deg)) scale(0.5); 
+  }
+}
+
+.animate-shard-fly {
+  animation: shardFly 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Spark burst animation */
+@keyframes sparkBurst {
+  0% { 
+    opacity: 1; 
+    transform: translate(0, 0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(var(--spark-x, 50px), var(--spark-y, 50px)) scale(0); 
+  }
+}
+
+.animate-spark-burst {
+  animation: sparkBurst 0.5s ease-out forwards;
+}
+
+/* Flash burst animation */
+@keyframes flashBurst {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+.animate-flash-burst {
+  animation: flashBurst 0.4s ease-out forwards;
+}

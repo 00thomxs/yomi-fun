@@ -14,6 +14,9 @@ import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 import { BadgeDisplayCompact } from "@/components/ui/badge-display"
 import { getUserBadges, getEquippedBadges } from "@/app/actions/badges"
 import { BadgesModal } from "@/components/profile/badges-modal"
+import { ProfileCardGenerator, NewTierUnlockedPopup } from "@/components/profile-card-generator"
+import { getUserSeasonCard, checkAndUpdateCardTier, type UserSeasonCard } from "@/app/actions/profile-cards"
+import type { CardRank } from "@/components/yomi-tcg-card"
 import type { UserBadgeWithDetails } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -64,6 +67,12 @@ export function ProfileView() {
   const [equippedBadges, setEquippedBadges] = useState<UserBadgeWithDetails[]>([])
   const [loadingBadges, setLoadingBadges] = useState(true)
   const [showBadgesModal, setShowBadgesModal] = useState(false)
+  
+  // Profile Card state
+  const [seasonCard, setSeasonCard] = useState<UserSeasonCard | null>(null)
+  const [showNewTierPopup, setShowNewTierPopup] = useState(false)
+  const [newTier, setNewTier] = useState<CardRank | null>(null)
+  const [showCardGenerator, setShowCardGenerator] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -175,6 +184,32 @@ export function ProfileView() {
     
     loadBadges()
   }, [user, showBadgesModal]) // Refresh when modal closes
+
+  // Fetch season card data
+  useEffect(() => {
+    const loadSeasonCard = async () => {
+      if (!user) return
+      
+      // Check and update card tier (this will also check for new tiers)
+      const result = await checkAndUpdateCardTier(user.id)
+      
+      if (result) {
+        setSeasonCard(result.card)
+        
+        // Show popup if new tier unlocked
+        if (result.isNewTier && result.card.tier !== 'iron') {
+          setNewTier(result.card.tier)
+          setShowNewTierPopup(true)
+        }
+      } else {
+        // Fallback to getting existing card
+        const card = await getUserSeasonCard(user.id)
+        setSeasonCard(card)
+      }
+    }
+    
+    loadSeasonCard()
+  }, [user])
 
   // Prepare Chart Data with timeframe filtering
   const now = new Date()
@@ -568,6 +603,37 @@ export function ProfileView() {
           isOpen={showBadgesModal}
           onClose={() => setShowBadgesModal(false)}
           userId={user.id}
+        />
+      )}
+
+      {/* Profile Card Generator */}
+      {user && profile && seasonCard && (
+        <ProfileCardGenerator
+          username={user.username || 'Joueur'}
+          level={userStats.level}
+          pnl={profile.total_won || 0}
+          totalBets={profile.total_bets || 0}
+          streak={profile.streak || 0}
+          avatarUrl={profile.avatar_url || '/placeholder-avatar.png'}
+          equippedBadges={equippedBadges.map(ub => ({
+            name: ub.badge.name,
+            description: ub.badge.description || '',
+            iconName: ub.badge.icon_name,
+          }))}
+          seasonNumber={seasonCard.seasonNumber.toString()}
+          seasonTitle={seasonCard.seasonName}
+          cardTier={seasonCard.tier}
+          highestTier={seasonCard.highestTierAchieved}
+        />
+      )}
+
+      {/* New Tier Unlocked Popup */}
+      {newTier && (
+        <NewTierUnlockedPopup
+          tier={newTier}
+          isOpen={showNewTierPopup}
+          onClose={() => setShowNewTierPopup(false)}
+          onGenerateCard={() => setShowCardGenerator(true)}
         />
       )}
 
