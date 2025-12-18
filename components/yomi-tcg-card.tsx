@@ -26,6 +26,7 @@ export interface YomiTCGCardProps {
   streak: number
   equippedBadges: CardBadge[]
   avatarUrl?: string
+  isCapturing?: boolean // Disable effects when capturing image
 }
 
 // Icon mapping for badges
@@ -161,6 +162,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   streak,
   equippedBadges,
   avatarUrl = "/placeholder-avatar.png",
+  isCapturing = false,
 }, ref) => {
   const cardRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState("")
@@ -298,6 +300,9 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
     }
   }
 
+  // When capturing, disable all transforms to get a straight card
+  const effectiveTransform = isCapturing ? "" : transform
+
   return (
     <div
       ref={ref || cardRef}
@@ -305,7 +310,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
       onMouseLeave={handleMouseLeave}
       onClick={handleTap}
       className="relative cursor-pointer transition-transform duration-200 ease-out group"
-      style={{ transform, transformStyle: "preserve-3d" }}
+      style={{ transform: effectiveTransform, transformStyle: "preserve-3d" }}
     >
       {/* Super Saiyan Aura Effect - excluded from download */}
       <div className="aura-effect absolute -inset-3 z-0 pointer-events-none overflow-visible">
@@ -489,18 +494,22 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
               </div>
               {/* Season tag */}
               <div
-                className="mt-1 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider"
+                className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider whitespace-nowrap"
                 style={{
                   background: rank === 'beta' ? 'rgba(234, 179, 8, 0.15)' : `${styles.accentColor}15`,
                   border: rank === 'beta' ? '1px solid rgba(234, 179, 8, 0.5)' : `1px solid ${styles.accentColor}40`,
                   color: rank === 'beta' ? '#facc15' : styles.accentColor,
                 }}
               >
-                {rank === 'beta' 
-                  ? '⭐ BETA TESTEUR ⭐' 
-                  : seasonNumber === '0' 
-                    ? 'HORS SAISON'
-                    : `Saison ${seasonNumber} : ${seasonTitle}`}
+                {rank === 'beta' && <Star className="w-2.5 h-2.5" style={{ color: '#facc15' }} />}
+                <span>
+                  {rank === 'beta' 
+                    ? 'BETA TESTEUR' 
+                    : seasonNumber === '0' 
+                      ? 'HORS SAISON'
+                      : `S${seasonNumber} : ${seasonTitle}`}
+                </span>
+                {rank === 'beta' && <Star className="w-2.5 h-2.5" style={{ color: '#facc15' }} />}
               </div>
             </div>
             <div className="flex flex-col items-end" style={{ filter: `drop-shadow(0 0 10px ${styles.glowColor})` }}>

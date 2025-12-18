@@ -59,24 +59,51 @@ export function ProfileCardGenerator({
   const [selectedCard, setSelectedCard] = useState<UserSeasonCard>(currentCard)
   const [adminOptions, setAdminOptions] = useState<{ seasons: { id: string; name: string; number: number }[]; tiers: CardRank[] } | null>(null)
   const [avatarBase64, setAvatarBase64] = useState<string>(avatarUrl)
+  const [avatarReady, setAvatarReady] = useState(false)
+  const [isCapturing, setIsCapturing] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   // Convert avatar to base64 for download compatibility
   useEffect(() => {
     const convertToBase64 = async () => {
-      if (!avatarUrl || avatarUrl.startsWith('data:')) return
+      // If already base64, mark as ready
+      if (!avatarUrl) {
+        setAvatarReady(true)
+        return
+      }
+      if (avatarUrl.startsWith('data:')) {
+        setAvatarBase64(avatarUrl)
+        setAvatarReady(true)
+        return
+      }
+      
       try {
-        const response = await fetch(avatarUrl)
-        const blob = await response.blob()
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          if (typeof reader.result === 'string') {
-            setAvatarBase64(reader.result)
+        // Use Image element to ensure proper loading
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          canvas.width = img.naturalWidth
+          canvas.height = img.naturalHeight
+          const ctx = canvas.getContext('2d')
+          if (ctx) {
+            ctx.drawImage(img, 0, 0)
+            const dataUrl = canvas.toDataURL('image/png')
+            setAvatarBase64(dataUrl)
           }
+          setAvatarReady(true)
         }
-        reader.readAsDataURL(blob)
+        
+        img.onerror = () => {
+          console.log('Could not load avatar for base64 conversion')
+          setAvatarReady(true) // Still mark ready, will use original URL
+        }
+        
+        img.src = avatarUrl
       } catch (err) {
-        console.log('Could not convert avatar to base64')
+        console.log('Could not convert avatar to base64:', err)
+        setAvatarReady(true)
       }
     }
     convertToBase64()
@@ -108,8 +135,14 @@ export function ProfileCardGenerator({
   const handleDownload = async () => {
     if (!cardRef.current) return
     setIsDownloading(true)
+    
+    // Set capturing mode to disable transforms and effects
+    setIsCapturing(true)
+    
+    // Wait for React to re-render with isCapturing=true
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
     try {
-      // Convert all images to data URLs to avoid CORS issues
       const dataUrl = await toPng(cardRef.current, { 
         quality: 1, 
         pixelRatio: 2,
@@ -117,6 +150,7 @@ export function ProfileCardGenerator({
         skipFonts: true,
         cacheBust: true,
         filter: (node) => {
+          // Exclude aura effects from the image
           if (node instanceof HTMLElement && node.classList?.contains('aura-effect')) {
             return false
           }
@@ -140,6 +174,7 @@ export function ProfileCardGenerator({
       console.error('Download error:', err)
       toast.error('Erreur lors du téléchargement')
     } finally {
+      setIsCapturing(false)
       setIsDownloading(false)
     }
   }
@@ -221,6 +256,7 @@ export function ProfileCardGenerator({
                 streak={streak}
                 equippedBadges={equippedBadges}
                 avatarUrl={avatarBase64}
+                isCapturing={isCapturing}
               />
             </YomiCardPack>
           ) : (
@@ -236,6 +272,7 @@ export function ProfileCardGenerator({
               streak={streak}
               equippedBadges={equippedBadges}
               avatarUrl={avatarBase64}
+              isCapturing={isCapturing}
             />
           )}
 
