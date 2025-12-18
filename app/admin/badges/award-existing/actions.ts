@@ -177,3 +177,89 @@ export async function awardBetaTesterBadges(): Promise<{
   }
 }
 
+/**
+ * Award ALL badges to admin users
+ */
+export async function awardAllBadgesToAdmins(): Promise<{
+  success: boolean
+  message: string
+  details?: string[]
+}> {
+  const supabase = await createClient()
+  
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, message: 'Non authentifié' }
+  }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  
+  if (profile?.role !== 'admin') {
+    return { success: false, message: 'Accès refusé' }
+  }
+
+  const details: string[] = []
+  
+  try {
+    // 1. Get all badges
+    const { data: allBadges, error: badgesError } = await supabaseAdmin
+      .from('badges')
+      .select('id, slug, name')
+    
+    if (badgesError || !allBadges) {
+      return { success: false, message: 'Erreur récupération badges', details: [badgesError?.message || ''] }
+    }
+    
+    // 2. Get all admin users
+    const { data: admins, error: adminsError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username')
+      .eq('role', 'admin')
+    
+    if (adminsError || !admins) {
+      return { success: false, message: 'Erreur récupération admins', details: [adminsError?.message || ''] }
+    }
+    
+    details.push(`${allBadges.length} badges disponibles`)
+    details.push(`${admins.length} admin(s) trouvé(s)`)
+    details.push(`---`)
+    
+    let totalAwarded = 0
+    
+    for (const admin of admins) {
+      let adminAwarded = 0
+      
+      for (const badge of allBadges) {
+        const result = await awardBadge(admin.id, badge.slug)
+        
+        if (result.success && result.userBadgeId) {
+          adminAwarded++
+          totalAwarded++
+        }
+      }
+      
+      details.push(`@${admin.username || admin.id.slice(0, 8)}: +${adminAwarded} badges`)
+    }
+    
+    details.push(`---`)
+    details.push(`Total: ${totalAwarded} badges attribués`)
+    
+    return {
+      success: true,
+      message: 'Tous les badges attribués aux admins !',
+      details
+    }
+    
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Erreur',
+      details: [String(error)]
+    }
+  }
+}

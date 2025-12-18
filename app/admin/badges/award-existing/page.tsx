@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Trophy, CheckCircle2, AlertCircle } from 'lucide-react'
-import { awardBadgesToExistingUsers } from './actions'
+import { Loader2, Trophy, CheckCircle2, AlertCircle, Shield } from 'lucide-react'
+import { awardBadgesToExistingUsers, awardAllBadgesToAdmins } from './actions'
 
 type Result = { success: boolean; message: string; details?: string[] }
 
 export default function AwardExistingBadgesPage() {
   const [isProcessing, setIsProcessing] = useState(false)
+  const [processingAdmin, setProcessingAdmin] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
 
   const handleAwardStats = async () => {
@@ -21,6 +22,20 @@ export default function AwardExistingBadgesPage() {
       setResult({ success: false, message: 'Erreur inattendue', details: [String(error)] })
     } finally {
       setIsProcessing(false)
+    }
+  }
+
+  const handleAwardAdmins = async () => {
+    setProcessingAdmin(true)
+    setResult(null)
+    
+    try {
+      const res = await awardAllBadgesToAdmins()
+      setResult(res)
+    } catch (error) {
+      setResult({ success: false, message: 'Erreur inattendue', details: [String(error)] })
+    } finally {
+      setProcessingAdmin(false)
     }
   }
 
@@ -46,7 +61,7 @@ export default function AwardExistingBadgesPage() {
         
         <button
           onClick={handleAwardStats}
-          disabled={isProcessing}
+          disabled={isProcessing || processingAdmin}
           className="w-full py-3 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isProcessing ? (
@@ -58,6 +73,35 @@ export default function AwardExistingBadgesPage() {
             <>
               <Trophy className="w-5 h-5" />
               Attribuer les badges
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* All badges to admins */}
+      <div className="bg-card border border-amber-500/30 rounded-xl p-6 space-y-4">
+        <h2 className="font-bold text-lg flex items-center gap-2">
+          <Shield className="w-5 h-5 text-amber-400" />
+          Badges Admin
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Attribue TOUS les badges aux comptes admin (pour test/preview)
+        </p>
+        
+        <button
+          onClick={handleAwardAdmins}
+          disabled={isProcessing || processingAdmin}
+          className="w-full py-3 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-black font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {processingAdmin ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Attribution en cours...
+            </>
+          ) : (
+            <>
+              <Shield className="w-5 h-5" />
+              Donner tous les badges aux admins
             </>
           )}
         </button>
