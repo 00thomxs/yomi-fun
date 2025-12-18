@@ -102,6 +102,8 @@ export function ProfileCardGenerator({
     setAnimationKey(prev => prev + 1)
   }
 
+  const [downloadImageUrl, setDownloadImageUrl] = useState<string | null>(null)
+
   const handleDownload = async () => {
     if (!cardRef.current) return
     setIsDownloading(true)
@@ -109,38 +111,22 @@ export function ProfileCardGenerator({
       // Convert all images to data URLs to avoid CORS issues
       const dataUrl = await toPng(cardRef.current, { 
         quality: 1, 
-        pixelRatio: 3, // Higher quality for mobile
+        pixelRatio: 2,
         backgroundColor: undefined, // Transparent background
-        skipFonts: true, // Skip fonts to avoid issues
-        cacheBust: true, // Bypass cache
-        includeQueryParams: true,
-        // Fetch images with CORS bypass
-        fetchRequestInit: {
-          mode: 'cors',
-          cache: 'no-cache',
-        },
-        // Filter to handle external images
+        skipFonts: true,
+        cacheBust: true,
         filter: (node) => {
-          // Skip elements that might cause issues
           if (node instanceof HTMLElement && node.classList?.contains('aura-effect')) {
-            return false // Skip animated aura effects
+            return false
           }
           return true
         }
       })
       
-      // For mobile, use different download method
+      // For mobile, show image in modal for long-press save
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Open image in new tab for mobile (easier to save)
-        const newTab = window.open()
-        if (newTab) {
-          newTab.document.body.innerHTML = `
-            <style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000;}</style>
-            <img src="${dataUrl}" style="max-width:100%;height:auto;" />
-          `
-          newTab.document.title = `YOMI Card - ${username}`
-          toast.success('Image ouverte ! Maintenez pour sauvegarder')
-        }
+        setDownloadImageUrl(dataUrl)
+        toast.success('Maintenez l\'image pour sauvegarder')
       } else {
         // Desktop: direct download
         const link = document.createElement('a')
@@ -368,6 +354,31 @@ export function ProfileCardGenerator({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Mobile Download Image Modal */}
+      {downloadImageUrl && (
+        <div 
+          className="fixed inset-0 z-[120] flex flex-col items-center justify-center p-4 bg-black/95"
+          onClick={() => setDownloadImageUrl(null)}
+        >
+          <div className="text-center mb-4">
+            <p className="text-white font-bold text-lg">Maintenez l'image pour sauvegarder</p>
+            <p className="text-zinc-400 text-sm">Puis "Enregistrer l'image"</p>
+          </div>
+          <img 
+            src={downloadImageUrl} 
+            alt="YOMI Card" 
+            className="max-w-full max-h-[70vh] rounded-xl shadow-2xl"
+            style={{ touchAction: 'none' }}
+          />
+          <button 
+            onClick={() => setDownloadImageUrl(null)}
+            className="mt-6 px-6 py-3 rounded-xl bg-zinc-800 text-white font-bold hover:bg-zinc-700 active:bg-zinc-600"
+          >
+            Fermer
+          </button>
         </div>
       )}
     </>
