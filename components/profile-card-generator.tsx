@@ -135,19 +135,26 @@ export function ProfileCardGenerator({
             {hasMultipleCards && isRevealed && (
               <button
                 onClick={() => setShowSelector(true)}
-                className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white text-sm font-bold hover:bg-zinc-800 hover:border-white/30 transition-all shadow-xl"
+                onTouchEnd={(e) => { e.preventDefault(); setShowSelector(true) }}
+                className="flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white text-xs sm:text-sm font-bold hover:bg-zinc-800 hover:border-white/30 active:bg-zinc-700 transition-all shadow-xl"
+                style={{ touchAction: 'manipulation' }}
               >
-                <div className="w-4 h-4 rounded-full ring-2 ring-white/20" style={{ background: tierInfo.color, boxShadow: `0 0 10px ${tierInfo.color}` }}/>
+                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full ring-2 ring-white/20" style={{ background: tierInfo.color, boxShadow: `0 0 10px ${tierInfo.color}` }}/>
                 <div className="flex flex-col items-start">
-                  <span className="text-xs text-zinc-400">Carte actuelle</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-400">Carte</span>
                   <span className="font-bold">{tierInfo.label} <span className="font-normal text-zinc-500">• S{selectedCard.seasonNumber}</span></span>
                 </div>
-                <ChevronDown className="w-5 h-5 text-zinc-400 ml-1"/>
+                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400"/>
               </button>
             )}
             
             {/* Close */}
-            <button onClick={handleClose} className="p-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white hover:bg-zinc-800 transition-all shadow-xl">
+            <button 
+              onClick={handleClose} 
+              onTouchEnd={(e) => { e.preventDefault(); handleClose() }}
+              className="p-2 sm:p-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white hover:bg-zinc-800 active:bg-zinc-700 transition-all shadow-xl"
+              style={{ touchAction: 'manipulation' }}
+            >
               <X className="w-5 h-5"/>
             </button>
           </div>
@@ -188,11 +195,22 @@ export function ProfileCardGenerator({
           {/* Actions */}
           {isRevealed && (
             <div className="flex items-center gap-2">
-              <button onClick={handleReplay} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white font-bold text-sm hover:bg-zinc-800 hover:border-white/30 transition-all shadow-xl">
+              <button 
+                onClick={handleReplay} 
+                onTouchEnd={(e) => { e.preventDefault(); handleReplay() }}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white font-bold text-xs sm:text-sm hover:bg-zinc-800 hover:border-white/30 active:bg-zinc-700 transition-all shadow-xl"
+                style={{ touchAction: 'manipulation' }}
+              >
                 <RefreshCw className="w-4 h-4"/>
                 <span className="hidden sm:inline">Rejouer</span>
               </button>
-              <button onClick={handleDownload} disabled={isDownloading} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold text-sm hover:bg-primary/30 hover:border-primary transition-all shadow-xl disabled:opacity-50">
+              <button 
+                onClick={handleDownload} 
+                onTouchEnd={(e) => { e.preventDefault(); handleDownload() }}
+                disabled={isDownloading} 
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold text-xs sm:text-sm hover:bg-primary/30 hover:border-primary active:bg-primary/40 transition-all shadow-xl disabled:opacity-50"
+                style={{ touchAction: 'manipulation' }}
+              >
                 {isDownloading ? <Loader2 className="w-4 h-4 animate-spin"/> : <Download className="w-4 h-4"/>}
                 Télécharger
               </button>
@@ -203,19 +221,31 @@ export function ProfileCardGenerator({
 
       {/* Card Selector Modal */}
       {showSelector && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" onClick={() => setShowSelector(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50" 
+          onClick={() => setShowSelector(false)}
+          onTouchEnd={(e) => { if (e.target === e.currentTarget) setShowSelector(false) }}
+        >
+          <div 
+            className="w-full max-w-md rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden shadow-2xl" 
+            onClick={e => e.stopPropagation()}
+            onTouchEnd={e => e.stopPropagation()}
+          >
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold">Changer de carte</h3>
                 <p className="text-sm text-muted-foreground">Sélectionne la carte à afficher</p>
               </div>
-              <button onClick={() => setShowSelector(false)} className="p-2 rounded-lg hover:bg-white/5">
+              <button 
+                onClick={() => setShowSelector(false)} 
+                onTouchEnd={(e) => { e.preventDefault(); setShowSelector(false) }}
+                className="p-2 rounded-lg hover:bg-white/5 active:bg-white/10"
+              >
                 <X className="w-5 h-5"/>
               </button>
             </div>
             
-            <div className="p-4 max-h-[50vh] overflow-y-auto space-y-2">
+            <div className="p-4 max-h-[50vh] overflow-y-auto space-y-2 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
               {cardCollection.map((card) => {
                 const info = TIER_INFO[card.tier]
                 const isSelected = card.id === selectedCard.id
@@ -223,12 +253,14 @@ export function ProfileCardGenerator({
                   <button
                     key={card.id}
                     onClick={() => handleSelectCard(card)}
+                    onTouchEnd={(e) => { e.preventDefault(); handleSelectCard(card) }}
                     className={cn(
-                      "w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left cursor-pointer",
+                      "w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left",
                       isSelected 
                         ? "bg-primary/20 border-2 border-primary" 
-                        : "bg-white/5 border border-transparent hover:bg-white/15 hover:border-white/20 hover:scale-[1.02] active:scale-[0.98]"
+                        : "bg-white/5 border border-transparent hover:bg-white/15 hover:border-white/20 active:bg-white/20"
                     )}
+                    style={{ touchAction: 'manipulation' }}
                   >
                     <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${info.color}20`, border: `2px solid ${info.color}` }}>
                       <Sparkles className="w-6 h-6" style={{ color: info.color }}/>
@@ -260,8 +292,9 @@ export function ProfileCardGenerator({
                             <button
                               key={`${season.id}-${tier}`}
                               onClick={() => handleAdminSelectCard(season.id, tier)}
-                              className="p-3 rounded-lg transition-all hover:scale-110 hover:brightness-125 active:scale-95 text-center cursor-pointer"
-                              style={{ background: `${info.color}15`, border: `1px solid ${info.color}40` }}
+                              onTouchEnd={(e) => { e.preventDefault(); handleAdminSelectCard(season.id, tier) }}
+                              className="p-3 rounded-lg transition-all hover:scale-110 hover:brightness-125 active:scale-95 text-center"
+                              style={{ background: `${info.color}15`, border: `1px solid ${info.color}40`, touchAction: 'manipulation' }}
                             >
                               <Sparkles className="w-5 h-5 mx-auto" style={{ color: info.color }}/>
                               <p className="text-[10px] mt-1 font-medium" style={{ color: info.color }}>{info.label}</p>

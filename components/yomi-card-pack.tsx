@@ -88,25 +88,26 @@ export function YomiCardPack({
         }}
       />
 
-      {/* Cracks */}
+      {/* Cracks - Glass/ice style */}
       {(stage === "crack" || stage === "shatter") && (
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-20 overflow-visible">
-          <defs>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
           {cracks.map((c) => {
             const cx = 160, cy = 240
             const ex = cx + Math.cos((c.angle * Math.PI) / 180) * c.length * 3
             const ey = cy + Math.sin((c.angle * Math.PI) / 180) * c.length * 4
+            // Sub-cracks branching off
+            const branch1 = {
+              x: cx + (ex - cx) * 0.5 + (Math.random() - 0.5) * 30,
+              y: cy + (ey - cy) * 0.5 + (Math.random() - 0.5) * 40,
+            }
             return (
               <g key={c.id}>
-                <line x1={cx} y1={cy} x2={ex} y2={ey} stroke="#ef4444" strokeWidth="4" filter="url(#glow)"
-                  style={{ strokeDasharray: 200, strokeDashoffset: 200, animation: `crack 0.15s ease-out forwards ${c.delay}s` }}/>
-                <line x1={cx} y1={cy} x2={ex} y2={ey} stroke="white" strokeWidth="1.5"
-                  style={{ strokeDasharray: 200, strokeDashoffset: 200, animation: `crack 0.15s ease-out forwards ${c.delay}s` }}/>
+                {/* Main crack - white/silver */}
+                <line x1={cx} y1={cy} x2={ex} y2={ey} stroke="rgba(255,255,255,0.9)" strokeWidth="2"
+                  style={{ strokeDasharray: 200, strokeDashoffset: 200, animation: `crack 0.12s ease-out forwards ${c.delay}s` }}/>
+                {/* Branch crack */}
+                <line x1={branch1.x} y1={branch1.y} x2={branch1.x + (Math.random() - 0.5) * 40} y2={branch1.y + (Math.random() - 0.5) * 50} stroke="rgba(255,255,255,0.6)" strokeWidth="1"
+                  style={{ strokeDasharray: 100, strokeDashoffset: 100, animation: `crack 0.1s ease-out forwards ${c.delay + 0.05}s` }}/>
               </g>
             )
           })}
@@ -172,7 +173,7 @@ export function YomiCardPack({
         {/* Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
           <div className="flex items-baseline">
-            <span className="font-black text-5xl tracking-tighter italic text-primary" style={{ textShadow: '0 0 40px rgba(239,68,68,0.8)' }}>YOMI</span>
+            <span className="font-black text-5xl tracking-tighter text-primary" style={{ textShadow: '0 0 40px rgba(239,68,68,0.8)' }}>YOMI</span>
             <span className="font-semibold text-2xl text-white">.fun</span>
           </div>
           <div className="w-20 h-20 rounded-xl border-2 border-primary/50 flex items-center justify-center"

@@ -482,7 +482,17 @@ export function ProfileView() {
       </div>
 
       {/* Profile Header */}
-      <div className="rounded-xl bg-card border border-border p-4 sm:p-6">
+      <div className="relative rounded-xl bg-card border border-border p-4 sm:p-6">
+        {/* Card Button - Top right on mobile only */}
+        {seasonCard && (
+          <div className="absolute top-3 right-3 sm:hidden">
+            <ProfileCardButton 
+              tier={seasonCard.tier} 
+              onClick={() => setShowCardGenerator(true)} 
+            />
+          </div>
+        )}
+        
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           <img
             src={user?.avatar || "/images/default-avatar.svg"}
@@ -520,9 +530,9 @@ export function ProfileView() {
               </div>
               
               {/* Card Button + Balance */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 shrink-0">
-                {/* Card Button - ABOVE on mobile, LEFT on desktop */}
-                <div className="order-2 sm:order-1">
+              <div className="flex items-start gap-2 shrink-0">
+                {/* Card Button - Only visible on desktop (hidden on mobile, shown in top-right) */}
+                <div className="hidden sm:block">
                   {seasonCard && (
                     <ProfileCardButton 
                       tier={seasonCard.tier} 
@@ -530,7 +540,7 @@ export function ProfileView() {
                     />
                   )}
                 </div>
-                <div className="order-1 sm:order-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
+                <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
                   <p className="text-xl font-bold text-center">
                     <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
