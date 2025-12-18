@@ -87,11 +87,12 @@ export async function signOut(): Promise<void> {
 
 export async function signInWithGoogle(): Promise<{ url?: string; error?: string }> {
   const supabase = await createClient()
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://yomi-fun.vercel.app'
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/auth/callback`,
+      redirectTo: `${origin}/auth/callback`,
     },
   })
 

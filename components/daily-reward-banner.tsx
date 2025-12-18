@@ -20,6 +20,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isClaiming, setIsClaiming] = useState(false)
   const [claimResult, setClaimResult] = useState<DailyRewardResult | null>(null)
+  const [isWelcomeBonus, setIsWelcomeBonus] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,6 +40,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
     
     if (result.success && result.newBalance !== undefined) {
       onClaim?.(result.newBalance)
+      setIsWelcomeBonus(true)
       setClaimResult({ success: true, amount: result.amount })
       setTimeout(() => {
         setDismissed(true)
@@ -91,10 +93,21 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   // Success state (brief display before hiding)
   if (claimResult?.success) {
     const isJackpot = claimResult.isJackpot
+    
+    // Determine the label to show
+    let successLabel: string
+    if (isWelcomeBonus) {
+      successLabel = 'Bonus de bienvenue'
+    } else if (isJackpot) {
+      successLabel = `Jackpot ${claimResult.jackpotLabel}`
+    } else {
+      successLabel = `Jour ${claimResult.streakDay}`
+    }
+    
     return (
       <div 
         className={`flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all animate-in fade-in duration-300 ${
-          isJackpot 
+          isJackpot || isWelcomeBonus
             ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30' 
             : 'bg-emerald-500/10 border border-emerald-500/30'
         }`}
@@ -102,12 +115,12 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
         {isJackpot ? (
           <Trophy className="w-5 h-5 text-amber-400" />
         ) : (
-          <Gift className="w-5 h-5 text-emerald-400" />
+          <Gift className={`w-5 h-5 ${isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`} />
         )}
-        <span className={`font-bold ${isJackpot ? 'text-amber-400' : 'text-emerald-400'}`}>
-          {isJackpot ? `Jackpot ${claimResult.jackpotLabel}` : `Jour ${claimResult.streakDay}`} récupéré !
+        <span className={`font-bold ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`}>
+          {successLabel} récupéré !
         </span>
-        <span className={`font-mono font-bold flex items-center gap-1 ${isJackpot ? 'text-amber-400' : 'text-emerald-400'}`}>
+        <span className={`font-mono font-bold flex items-center gap-1 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`}>
           +{claimResult.amount?.toLocaleString()}<CurrencySymbol className="w-4 h-4" />
         </span>
       </div>
