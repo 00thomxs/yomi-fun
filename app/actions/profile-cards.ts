@@ -649,13 +649,17 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
   }
   
   // Check if beta season exists, create if not
-  let { data: betaSeason } = await supabaseAdmin
+  const { data: existingBetaSeason } = await supabaseAdmin
     .from('seasons')
     .select('id')
     .eq('name', 'Beta Testeur')
-    .single()
+    .maybeSingle() // Use maybeSingle to avoid error when not found
   
-  if (!betaSeason) {
+  let betaSeasonId: string
+  
+  if (existingBetaSeason) {
+    betaSeasonId = existingBetaSeason.id
+  } else {
     // Create a special "Beta Testeur" season
     const { data: newSeason, error: createError } = await supabaseAdmin
       .from('seasons')
@@ -668,14 +672,10 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
       .select('id')
       .single()
     
-    if (createError) {
-      return { success: false, count: 0, message: `Erreur création saison: ${createError.message}` }
+    if (createError || !newSeason) {
+      return { success: false, count: 0, message: `Erreur création saison: ${createError?.message}` }
     }
-    betaSeason = newSeason
-  }
-  
-  if (!betaSeason) {
-    return { success: false, count: 0, message: 'Impossible de créer la saison Beta' }
+    betaSeasonId = newSeason.id
   }
   
   // Get all existing users
@@ -687,37 +687,63 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
     return { success: false, count: 0, message: `Erreur récupération utilisateurs: ${usersError?.message}` }
   }
   
+  if (allUsers.length === 0) {
+    return { success: false, count: 0, message: 'Aucun utilisateur trouvé' }
+  }
+  
   let awardedCount = 0
+  let alreadyHadCount = 0
+  const errors: string[] = []
   
   // Award beta card to each user
   for (const u of allUsers) {
-    // Check if user already has beta card
-    const { data: existingCard } = await supabaseAdmin
+    // Check if user already has beta card (use maybeSingle to avoid errors)
+    const { data: existingCards } = await supabaseAdmin
       .from('user_season_cards')
       .select('id')
       .eq('user_id', u.id)
-      .eq('season_id', betaSeason.id)
-      .single()
+      .eq('season_id', betaSeasonId)
     
-    if (!existingCard) {
-      await supabaseAdmin
-        .from('user_season_cards')
-        .insert({
-          user_id: u.id,
-          season_id: betaSeason.id,
-          tier: 'beta',
-          highest_tier_achieved: 'beta',
-          is_selected: false,
-        })
+    // If user already has the card, skip
+    if (existingCards && existingCards.length > 0) {
+      alreadyHadCount++
+      continue
+    }
+    
+    // Insert new beta card
+    const { error: insertError } = await supabaseAdmin
+      .from('user_season_cards')
+      .insert({
+        user_id: u.id,
+        season_id: betaSeasonId,
+        tier: 'beta',
+        highest_tier_achieved: 'beta',
+        is_selected: false,
+      })
+    
+    if (insertError) {
+      errors.push(`User ${u.id}: ${insertError.message}`)
+    } else {
       awardedCount++
     }
   }
   
   revalidatePath('/admin/cards')
+  revalidatePath('/profile')
+  
+  let message = `Carte Beta attribuée à ${awardedCount} nouveaux utilisateurs`
+  if (alreadyHadCount > 0) {
+    message += ` (${alreadyHadCount} l'avaient déjà)`
+  }
+  if (errors.length > 0) {
+    message += ` | ${errors.length} erreurs`
+    console.error('[awardBetaCards] Errors:', errors)
+  }
+  
   return { 
     success: true, 
     count: awardedCount, 
-    message: `Carte Beta attribuée à ${awardedCount} utilisateurs` 
+    message
   }
 }
 
