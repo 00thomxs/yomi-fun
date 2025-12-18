@@ -216,6 +216,13 @@ export async function selectCard(cardId: string): Promise<{ success: boolean; er
 
 /**
  * Check and update user's card tier based on current season stats
+ * 
+ * DURING THE SEASON:
+ * - tier: current tier (volatile - diamond/holo can be lost)
+ * - highest_tier_achieved: highest permanent tier (iron/bronze/gold - cannot be lost)
+ * 
+ * Notifications only show for permanent tier upgrades (iron→bronze→gold)
+ * Diamond/Holo are shown based on current rank but not notified until season end
  */
 export async function checkAndUpdateCardTier(userId?: string): Promise<{
   card: UserSeasonCard
@@ -248,25 +255,31 @@ export async function checkAndUpdateCardTier(userId?: string): Promise<{
     .eq('season_id', activeSeason.id)
     .single()
   
-  const previousTier = existingCard?.highest_tier_achieved as CardRank | null
+  const previousHighestTier = existingCard?.highest_tier_achieved as CardRank | null
   
-  // Calculate new tier based on season stats
-  const newTier = await calculateUserTier(targetUserId, activeSeason.id)
+  // Calculate new tiers
+  const tierResult = await calculateUserTier(targetUserId, activeSeason.id)
   
-  // Determine highest tier achieved
-  let highestTier = newTier
-  if (previousTier) {
-    const prevIndex = TIER_ORDER.indexOf(previousTier)
-    const newIndex = TIER_ORDER.indexOf(newTier)
-    
-    // For diamond and holographic, tier is based on current rank (can go down)
-    // For others, keep the highest achieved
-    if (newIndex >= 3) {
-      highestTier = newTier
-    } else {
-      highestTier = newIndex > prevIndex ? newTier : previousTier
+  // User must have completed at least 1 event to get ANY card
+  if (!tierResult.hasCompletedEvent) {
+    // No card yet - they need to complete an event first
+    return null
+  }
+  
+  // Determine highest permanent tier achieved (iron/bronze/gold only - NEVER decreases)
+  let highestPermanentTier = tierResult.permanentTier
+  if (previousHighestTier) {
+    const prevIndex = TIER_ORDER.indexOf(previousHighestTier)
+    const newIndex = TIER_ORDER.indexOf(tierResult.permanentTier)
+    // Only consider iron/bronze/gold (indices 0, 1, 2) for permanent tier
+    if (prevIndex <= 2 && prevIndex > newIndex) {
+      highestPermanentTier = previousHighestTier
     }
   }
+  
+  // Current display tier = highest of (current volatile tier, highest permanent tier)
+  // This means if you're top 3, you see holo; if you drop, you see your permanent tier
+  const displayTier = tierResult.currentTier
   
   // Upsert the card
   const { data: upsertedCard } = await supabaseAdmin
@@ -274,8 +287,8 @@ export async function checkAndUpdateCardTier(userId?: string): Promise<{
     .upsert({
       user_id: targetUserId,
       season_id: activeSeason.id,
-      tier: newTier,
-      highest_tier_achieved: highestTier,
+      tier: displayTier, // Current tier (volatile)
+      highest_tier_achieved: highestPermanentTier, // Permanent tier (iron/bronze/gold only during season)
       is_selected: existingCard?.is_selected || false,
       updated_at: new Date().toISOString(),
     }, {
@@ -289,27 +302,56 @@ export async function checkAndUpdateCardTier(userId?: string): Promise<{
     .select('id', { count: 'exact', head: true })
     .lte('created_at', activeSeason.created_at)
   
-  const isNewTier = !previousTier || (TIER_ORDER.indexOf(highestTier) > TIER_ORDER.indexOf(previousTier) && newTier !== 'iron')
+  // Only notify for PERMANENT tier upgrades (iron→bronze→gold), not for volatile rank changes
+  const prevPermanentIndex = previousHighestTier ? TIER_ORDER.indexOf(previousHighestTier) : -1
+  const newPermanentIndex = TIER_ORDER.indexOf(highestPermanentTier)
+  const isNewPermanentTier = newPermanentIndex > prevPermanentIndex && newPermanentIndex <= 2 // Only iron/bronze/gold
   
   return {
     card: {
       id: upsertedCard?.id || existingCard?.id || '',
-      tier: newTier,
-      highestTierAchieved: highestTier,
+      tier: displayTier,
+      highestTierAchieved: highestPermanentTier,
       seasonId: activeSeason.id,
       seasonName: activeSeason.name || 'Saison',
       seasonNumber: count || 1,
       isSelected: existingCard?.is_selected || false,
     },
-    isNewTier,
-    previousTier,
+    isNewTier: isNewPermanentTier,
+    previousTier: previousHighestTier,
   }
 }
 
 /**
- * Calculate user's tier based on season leaderboard
+ * Calculate user's tier based on season stats
+ * Returns: { currentTier, permanentTier, hasCompletedEvent }
+ * 
+ * TIER LOGIC:
+ * - IRON: Must have completed ≥1 event in the season (permanent once achieved)
+ * - BRONZE: 10K+ PnL (permanent once achieved)
+ * - GOLD: 25K+ PnL (permanent once achieved)
+ * - DIAMOND: Top 10 rank (VOLATILE - lost if you drop out, permanent only at season end)
+ * - HOLO: Top 3 rank (VOLATILE - lost if you drop out, permanent only at season end)
  */
-async function calculateUserTier(userId: string, seasonId: string): Promise<CardRank> {
+async function calculateUserTier(userId: string, seasonId: string): Promise<{
+  currentTier: CardRank
+  permanentTier: CardRank
+  hasCompletedEvent: boolean
+  rank: number | null
+  pnl: number
+}> {
+  // Check if user has completed at least 1 event in this season
+  const { data: completedBets } = await supabaseAdmin
+    .from('bets')
+    .select('id, markets!inner(season_id, resolved)')
+    .eq('user_id', userId)
+    .eq('markets.season_id', seasonId)
+    .eq('markets.resolved', true)
+    .limit(1)
+  
+  const hasCompletedEvent: boolean = Boolean(completedBets && completedBets.length > 0)
+  
+  // Get leaderboard for ranking
   const { data: leaderboard } = await supabaseAdmin
     .from('season_leaderboards')
     .select('user_id, points')
@@ -317,28 +359,57 @@ async function calculateUserTier(userId: string, seasonId: string): Promise<Card
     .order('points', { ascending: false })
   
   if (!leaderboard || leaderboard.length === 0) {
-    return 'iron'
+    return { 
+      currentTier: 'iron', 
+      permanentTier: hasCompletedEvent ? 'iron' : 'iron',
+      hasCompletedEvent,
+      rank: null,
+      pnl: 0
+    }
   }
   
   const userIndex = leaderboard.findIndex(entry => entry.user_id === userId)
   
   if (userIndex === -1) {
-    return 'iron'
+    return { 
+      currentTier: 'iron', 
+      permanentTier: hasCompletedEvent ? 'iron' : 'iron',
+      hasCompletedEvent,
+      rank: null,
+      pnl: 0
+    }
   }
   
   const userRank = userIndex + 1
   const userPnL = leaderboard[userIndex].points
   
-  if (userRank <= 3) return 'holographic'
-  if (userRank <= 10) return 'diamond'
-  if (userPnL >= 25000) return 'gold'
-  if (userPnL >= 10000) return 'bronze'
+  // Calculate PERMANENT tier (iron/bronze/gold only - based on completed events and PnL)
+  let permanentTier: CardRank = 'iron'
+  if (!hasCompletedEvent) {
+    // No completed events = no card at all (but we still show iron as fallback)
+    permanentTier = 'iron'
+  } else if (userPnL >= 25000) {
+    permanentTier = 'gold'
+  } else if (userPnL >= 10000) {
+    permanentTier = 'bronze'
+  } else {
+    permanentTier = 'iron'
+  }
   
-  return 'iron'
+  // Calculate CURRENT tier (includes volatile diamond/holo based on rank)
+  let currentTier: CardRank = permanentTier
+  if (userRank <= 3) {
+    currentTier = 'holographic'
+  } else if (userRank <= 10) {
+    currentTier = 'diamond'
+  }
+  
+  return { currentTier, permanentTier, hasCompletedEvent, rank: userRank, pnl: userPnL }
 }
 
 /**
  * ADMIN: Award retroactive cards to all users for past seasons
+ * DEPRECATED: Use awardRetroactiveSeasonCards instead (which calls awardSeasonCards)
  */
 export async function awardRetroactiveCards(): Promise<{
   success: boolean
@@ -364,10 +435,11 @@ export async function awardRetroactiveCards(): Promise<{
   const details: string[] = []
   
   try {
-    // Get all seasons (including ended ones)
+    // Get all seasons (including ended ones, except Beta Testeur)
     const { data: seasons } = await supabaseAdmin
       .from('seasons')
-      .select('id, name')
+      .select('id, name, is_active')
+      .neq('name', 'Beta Testeur')
       .order('created_at', { ascending: true })
     
     if (!seasons || seasons.length === 0) {
@@ -379,6 +451,12 @@ export async function awardRetroactiveCards(): Promise<{
     let totalCardsAwarded = 0
     
     for (const season of seasons) {
+      // Skip active seasons
+      if (season.is_active) {
+        details.push(`${season.name}: Saison active (ignorée)`)
+        continue
+      }
+      
       // Get all users in this season's leaderboard
       const { data: leaderboard } = await supabaseAdmin
         .from('season_leaderboards')
@@ -396,6 +474,22 @@ export async function awardRetroactiveCards(): Promise<{
       for (let i = 0; i < leaderboard.length; i++) {
         const entry = leaderboard[i]
         const rank = i + 1
+        
+        // Check if user completed at least 1 event in this season
+        const { data: completedBets } = await supabaseAdmin
+          .from('bets')
+          .select('id, markets!inner(season_id, resolved)')
+          .eq('user_id', entry.user_id)
+          .eq('markets.season_id', season.id)
+          .eq('markets.resolved', true)
+          .limit(1)
+        
+        const hasCompletedEvent = (completedBets && completedBets.length > 0)
+        
+        if (!hasCompletedEvent) {
+          // No completed events = no card
+          continue
+        }
         
         // Calculate tier
         let tier: CardRank = 'iron'
@@ -624,8 +718,15 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
 }
 
 /**
- * Award cards to all participants of a season based on their final ranking
- * Called at end of season
+ * Award/finalize cards for all participants of a season based on their FINAL ranking
+ * Called at END of season - this is where diamond/holo become PERMANENT
+ * 
+ * IMPORTANT: At season end, the final ranking determines the PERMANENT tier:
+ * - Top 3 get HOLOGRAPHIC permanently
+ * - Top 4-10 get DIAMOND permanently
+ * - Others keep their highest permanent tier (gold/bronze/iron based on PnL)
+ * 
+ * A player on the podium automatically gets: Holo + Diamond + Gold + Bronze + Iron
  */
 export async function awardSeasonCards(seasonId: string): Promise<{ success: boolean; count: number }> {
   // Get season info
@@ -640,7 +741,7 @@ export async function awardSeasonCards(seasonId: string): Promise<{ success: boo
     return { success: false, count: 0 }
   }
   
-  // Get all participants with their points
+  // Get all participants with their points (sorted by points = final ranking)
   const { data: participants } = await supabaseAdmin
     .from('season_leaderboards')
     .select('user_id, points')
@@ -659,36 +760,63 @@ export async function awardSeasonCards(seasonId: string): Promise<{ success: boo
     const rank = i + 1
     const pnl = participant.points
     
-    // Calculate tier based on rank and PnL
-    let tier: CardRank
-    if (rank <= 3) {
-      tier = 'holographic'
-    } else if (rank <= 10) {
-      tier = 'diamond'
-    } else if (pnl >= 25000) {
-      tier = 'gold'
-    } else if (pnl >= 10000) {
-      tier = 'bronze'
-    } else {
-      tier = 'iron'
+    // Check if user completed at least 1 event
+    const { data: completedBets } = await supabaseAdmin
+      .from('bets')
+      .select('id, markets!inner(season_id, resolved)')
+      .eq('user_id', participant.user_id)
+      .eq('markets.season_id', seasonId)
+      .eq('markets.resolved', true)
+      .limit(1)
+    
+    const hasCompletedEvent = (completedBets && completedBets.length > 0)
+    
+    if (!hasCompletedEvent) {
+      // No completed events = no card (even if in leaderboard from open bets)
+      console.log(`[awardSeasonCards] User rank #${rank} has no completed events, skipping`)
+      continue
     }
     
-    // Upsert card for this user
+    // Calculate FINAL PERMANENT tier based on rank AND PnL
+    // At season end, rank-based tiers (diamond/holo) become permanent!
+    let finalTier: CardRank
+    if (rank <= 3) {
+      finalTier = 'holographic'
+    } else if (rank <= 10) {
+      finalTier = 'diamond'
+    } else if (pnl >= 25000) {
+      finalTier = 'gold'
+    } else if (pnl >= 10000) {
+      finalTier = 'bronze'
+    } else {
+      finalTier = 'iron'
+    }
+    
+    // Get existing card to preserve selection state
+    const { data: existingCard } = await supabaseAdmin
+      .from('user_season_cards')
+      .select('is_selected')
+      .eq('user_id', participant.user_id)
+      .eq('season_id', seasonId)
+      .single()
+    
+    // Upsert card with FINAL tier as both current and highest
     const { error } = await supabaseAdmin
       .from('user_season_cards')
       .upsert({
         user_id: participant.user_id,
         season_id: seasonId,
-        tier: tier,
-        highest_tier_achieved: tier,
-        is_selected: false,
+        tier: finalTier,
+        highest_tier_achieved: finalTier, // Now permanent!
+        is_selected: existingCard?.is_selected || false,
+        updated_at: new Date().toISOString(),
       }, {
         onConflict: 'user_id,season_id'
       })
     
     if (!error) {
       awardedCount++
-      console.log(`[awardSeasonCards] Awarded ${tier} card to user rank #${rank}`)
+      console.log(`[awardSeasonCards] Awarded ${finalTier} card to user rank #${rank} (PnL: ${pnl})`)
     }
   }
   
@@ -698,6 +826,7 @@ export async function awardSeasonCards(seasonId: string): Promise<{ success: boo
 
 /**
  * ADMIN: Retroactively award cards for all past seasons
+ * Uses the same logic as end-of-season card awarding
  */
 export async function awardRetroactiveSeasonCards(): Promise<{ success: boolean; message: string; details: string[] }> {
   const supabase = await createClient()
@@ -716,10 +845,10 @@ export async function awardRetroactiveSeasonCards(): Promise<{ success: boolean;
     return { success: false, message: 'Non autorisé', details: [] }
   }
   
-  // Get all seasons (except Beta Testeur)
+  // Get all seasons (except Beta Testeur and active seasons)
   const { data: seasons } = await supabaseAdmin
     .from('seasons')
-    .select('id, name')
+    .select('id, name, is_active')
     .neq('name', 'Beta Testeur')
   
   if (!seasons || seasons.length === 0) {
@@ -730,6 +859,12 @@ export async function awardRetroactiveSeasonCards(): Promise<{ success: boolean;
   let totalAwarded = 0
   
   for (const season of seasons) {
+    // Only process ended seasons (not active ones)
+    if (season.is_active) {
+      details.push(`${season.name}: Saison active (ignorée)`)
+      continue
+    }
+    
     const result = await awardSeasonCards(season.id)
     details.push(`${season.name}: ${result.count} cartes`)
     totalAwarded += result.count
