@@ -519,16 +519,18 @@ export function ProfileView() {
                 </div>
               </div>
               
-              {/* Card Button + Balance (HORIZONTAL - button LEFT, aligned top) */}
-              <div className="flex items-start gap-2 shrink-0">
-                {/* Profile Card Button - LEFT of balance, aligned with top */}
-                {seasonCard && (
-                  <ProfileCardButton 
-                    tier={seasonCard.tier} 
-                    onClick={() => setShowCardGenerator(true)} 
-                  />
-                )}
-                <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
+              {/* Card Button + Balance */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 shrink-0">
+                {/* Card Button - ABOVE on mobile, LEFT on desktop */}
+                <div className="order-2 sm:order-1">
+                  {seasonCard && (
+                    <ProfileCardButton 
+                      tier={seasonCard.tier} 
+                      onClick={() => setShowCardGenerator(true)} 
+                    />
+                  )}
+                </div>
+                <div className="order-1 sm:order-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
                   <p className="text-xl font-bold text-center">
                     <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}

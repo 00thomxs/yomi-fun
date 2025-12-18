@@ -172,7 +172,7 @@ export function YomiCardPack({
         {/* Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
           <div className="flex items-baseline">
-            <span className="font-black text-5xl tracking-tighter text-primary" style={{ textShadow: '0 0 40px rgba(239,68,68,0.8)' }}>YOMI</span>
+            <span className="font-black text-5xl tracking-tighter italic text-primary" style={{ textShadow: '0 0 40px rgba(239,68,68,0.8)' }}>YOMI</span>
             <span className="font-semibold text-2xl text-white">.fun</span>
           </div>
           <div className="w-20 h-20 rounded-xl border-2 border-primary/50 flex items-center justify-center"

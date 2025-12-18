@@ -188,11 +188,11 @@ export function ProfileCardGenerator({
           {/* Actions */}
           {isRevealed && (
             <div className="flex items-center gap-2">
-              <button onClick={handleReplay} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900/90 border border-white/10 text-white font-bold text-sm hover:bg-zinc-800 transition-all">
+              <button onClick={handleReplay} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white font-bold text-sm hover:bg-zinc-800 hover:border-white/30 transition-all shadow-xl">
                 <RefreshCw className="w-4 h-4"/>
                 <span className="hidden sm:inline">Rejouer</span>
               </button>
-              <button onClick={handleDownload} disabled={isDownloading} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all disabled:opacity-50">
+              <button onClick={handleDownload} disabled={isDownloading} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold text-sm hover:bg-primary/30 hover:border-primary transition-all shadow-xl disabled:opacity-50">
                 {isDownloading ? <Loader2 className="w-4 h-4 animate-spin"/> : <Download className="w-4 h-4"/>}
                 Télécharger
               </button>

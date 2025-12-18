@@ -163,54 +163,68 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   const [transform, setTransform] = useState("")
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 })
   const [gyroEnabled, setGyroEnabled] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [needsPermission, setNeedsPermission] = useState(false)
 
-  // Gyroscope effect for mobile
+  // Detect mobile on mount
   useEffect(() => {
-    // Check if device orientation is supported
-    if (typeof window === 'undefined' || !window.DeviceOrientationEvent) return
-    
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    if (!isMobile) return
-
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (e.gamma === null || e.beta === null) return
+    if (typeof window !== 'undefined') {
+      const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      setIsMobile(mobile)
       
-      // Clamp values to reasonable range
-      const gamma = Math.max(-30, Math.min(30, e.gamma)) // Left-right tilt
-      const beta = Math.max(-30, Math.min(30, e.beta - 45)) // Front-back tilt (offset for holding phone)
-      
-      const rotateY = gamma / 2 // -15 to 15 degrees
-      const rotateX = -beta / 2 // -15 to 15 degrees
-      
-      setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`)
-      setGlarePos({
-        x: 50 + gamma,
-        y: 50 + beta,
-        opacity: 0.2,
-      })
-    }
-
-    // Request permission on iOS 13+
-    const requestPermission = async () => {
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        try {
-          const permission = await (DeviceOrientationEvent as any).requestPermission()
-          if (permission === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation)
-            setGyroEnabled(true)
-          }
-        } catch (err) {
-          console.log('Gyro permission denied')
-        }
-      } else {
-        // Non-iOS or older iOS
-        window.addEventListener('deviceorientation', handleOrientation)
-        setGyroEnabled(true)
+      // Check if iOS needs permission request
+      if (mobile && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+        setNeedsPermission(true)
+      } else if (mobile && window.DeviceOrientationEvent) {
+        // Android or older iOS - auto-enable
+        enableGyroscope()
       }
     }
+  }, [])
 
-    requestPermission()
+  const handleOrientation = (e: DeviceOrientationEvent) => {
+    if (e.gamma === null || e.beta === null) return
+    
+    // Clamp values to reasonable range
+    const gamma = Math.max(-30, Math.min(30, e.gamma)) // Left-right tilt
+    const beta = Math.max(-30, Math.min(30, e.beta - 45)) // Front-back tilt (offset for holding phone)
+    
+    const rotateY = gamma / 2 // -15 to 15 degrees
+    const rotateX = -beta / 2 // -15 to 15 degrees
+    
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`)
+    setGlarePos({
+      x: 50 + gamma,
+      y: 50 + beta,
+      opacity: 0.2,
+    })
+  }
 
+  // Enable gyroscope (called on user tap for iOS)
+  const enableGyroscope = async () => {
+    if (typeof window === 'undefined' || !window.DeviceOrientationEvent) return
+    
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const permission = await (DeviceOrientationEvent as any).requestPermission()
+        if (permission === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation)
+          setGyroEnabled(true)
+          setNeedsPermission(false)
+        }
+      } catch (err) {
+        console.log('Gyro permission denied')
+        setNeedsPermission(false)
+      }
+    } else {
+      // Non-iOS or older iOS
+      window.addEventListener('deviceorientation', handleOrientation)
+      setGyroEnabled(true)
+    }
+  }
+
+  // Clean up listener on unmount
+  useEffect(() => {
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation)
     }
@@ -252,11 +266,19 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   // Get badges to display (max 2)
   const displayBadges = equippedBadges.slice(0, 2)
 
+  // Handle tap to enable gyroscope on iOS
+  const handleTap = () => {
+    if (isMobile && needsPermission) {
+      enableGyroscope()
+    }
+  }
+
   return (
     <div
       ref={ref || cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={handleTap}
       className="relative cursor-pointer transition-transform duration-200 ease-out group"
       style={{ transform, transformStyle: "preserve-3d" }}
     >
@@ -403,7 +425,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                 {isHolo ? (
                   <>
                     <span
-                      className="font-black text-xl tracking-tight"
+                      className="font-black text-xl tracking-tight italic"
                       style={{
                         background:
                           "linear-gradient(135deg, #ff3333 0%, #ff9500 15%, #00d4ff 35%, #ff00ff 55%, #0066ff 75%, #8b00ff 90%, #ff3333 100%)",
@@ -431,7 +453,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                 ) : (
                   <>
                     <span
-                      className="font-black text-xl tracking-tight"
+                      className="font-black text-xl tracking-tight italic"
                       style={{ color: "#ef4444", textShadow: "0 0 20px rgba(239, 68, 68, 0.9)" }}
                     >
                       YOMI
