@@ -146,40 +146,49 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
     targetUserId = user.id
   }
   
-  const { data: cards } = await supabase
+  // Use supabaseAdmin to bypass any potential RLS issues
+  const { data: cards, error: cardsError } = await supabaseAdmin
     .from('user_season_cards')
     .select(`
       id,
       tier,
       highest_tier_achieved,
       season_id,
-      is_selected,
-      seasons (id, name, created_at)
+      is_selected
     `)
     .eq('user_id', targetUserId)
-    .order('created_at', { ascending: false, referencedTable: 'seasons' })
   
-  if (!cards) return []
+  if (cardsError) {
+    console.error('[getUserCardCollection] Error fetching cards:', cardsError)
+    return []
+  }
   
-  // Calculate season numbers
-  const allSeasons = await supabase
+  if (!cards || cards.length === 0) {
+    return []
+  }
+  
+  // Get all seasons data separately (more reliable than join)
+  const { data: allSeasons } = await supabaseAdmin
     .from('seasons')
-    .select('id, created_at')
+    .select('id, name, created_at')
     .order('created_at', { ascending: true })
   
-  const seasonNumbers = new Map<string, number>()
-  allSeasons.data?.forEach((s, i) => seasonNumbers.set(s.id, i + 1))
+  const seasonMap = new Map<string, { name: string; number: number }>()
+  allSeasons?.forEach((s, i) => seasonMap.set(s.id, { name: s.name || 'Saison', number: i + 1 }))
   
   // Use 'tier' for display (current volatile tier for active season, final tier for past seasons)
-  return cards.map((card) => ({
-    id: card.id,
-    tier: card.tier as CardRank,
-    highestTierAchieved: card.highest_tier_achieved as CardRank,
-    seasonId: card.season_id,
-    seasonName: (card.seasons as any)?.name || 'Saison',
-    seasonNumber: seasonNumbers.get(card.season_id) || 1,
-    isSelected: card.is_selected || false,
-  }))
+  return cards.map((card) => {
+    const seasonInfo = seasonMap.get(card.season_id)
+    return {
+      id: card.id,
+      tier: card.tier as CardRank,
+      highestTierAchieved: card.highest_tier_achieved as CardRank,
+      seasonId: card.season_id,
+      seasonName: seasonInfo?.name || 'Saison',
+      seasonNumber: seasonInfo?.number || 1,
+      isSelected: card.is_selected || false,
+    }
+  })
 }
 
 /**
