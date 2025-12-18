@@ -5,6 +5,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { getAvatarUrl } from '@/lib/utils/avatar'
 import { checkSeasonWinRateBadges, checkSeasonPlacementBadges, checkLegacyBadges } from '@/app/actions/badges'
+import { awardSeasonCards } from '@/app/actions/profile-cards'
 
 const supabaseAdmin = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -590,6 +591,14 @@ async function endSeasonInternal(settings: any) {
       }
     } catch (badgeError) {
       console.error('[endSeasonInternal] Badge check failed (non-blocking):', badgeError)
+    }
+    
+    // Award season cards to all participants
+    try {
+      const cardResult = await awardSeasonCards(activeSeason.id)
+      console.log(`[endSeasonInternal] Awarded ${cardResult.count} season cards`)
+    } catch (cardError) {
+      console.error('[endSeasonInternal] Card awarding failed (non-blocking):', cardError)
     }
   }
 

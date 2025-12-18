@@ -622,3 +622,123 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
     message: `Carte Beta attribuée à ${awardedCount} utilisateurs` 
   }
 }
+
+/**
+ * Award cards to all participants of a season based on their final ranking
+ * Called at end of season
+ */
+export async function awardSeasonCards(seasonId: string): Promise<{ success: boolean; count: number }> {
+  // Get season info
+  const { data: season } = await supabaseAdmin
+    .from('seasons')
+    .select('id, name')
+    .eq('id', seasonId)
+    .single()
+  
+  if (!season) {
+    console.error('[awardSeasonCards] Season not found:', seasonId)
+    return { success: false, count: 0 }
+  }
+  
+  // Get all participants with their points
+  const { data: participants } = await supabaseAdmin
+    .from('season_leaderboards')
+    .select('user_id, points')
+    .eq('season_id', seasonId)
+    .order('points', { ascending: false })
+  
+  if (!participants || participants.length === 0) {
+    console.log('[awardSeasonCards] No participants found')
+    return { success: true, count: 0 }
+  }
+  
+  let awardedCount = 0
+  
+  for (let i = 0; i < participants.length; i++) {
+    const participant = participants[i]
+    const rank = i + 1
+    const pnl = participant.points
+    
+    // Calculate tier based on rank and PnL
+    let tier: CardRank
+    if (rank <= 3) {
+      tier = 'holographic'
+    } else if (rank <= 10) {
+      tier = 'diamond'
+    } else if (pnl >= 25000) {
+      tier = 'gold'
+    } else if (pnl >= 10000) {
+      tier = 'bronze'
+    } else {
+      tier = 'iron'
+    }
+    
+    // Upsert card for this user
+    const { error } = await supabaseAdmin
+      .from('user_season_cards')
+      .upsert({
+        user_id: participant.user_id,
+        season_id: seasonId,
+        tier: tier,
+        highest_tier_achieved: tier,
+        is_selected: false,
+      }, {
+        onConflict: 'user_id,season_id'
+      })
+    
+    if (!error) {
+      awardedCount++
+      console.log(`[awardSeasonCards] Awarded ${tier} card to user rank #${rank}`)
+    }
+  }
+  
+  console.log(`[awardSeasonCards] Awarded ${awardedCount} cards for season ${season.name}`)
+  return { success: true, count: awardedCount }
+}
+
+/**
+ * ADMIN: Retroactively award cards for all past seasons
+ */
+export async function awardRetroactiveSeasonCards(): Promise<{ success: boolean; message: string; details: string[] }> {
+  const supabase = await createClient()
+  
+  // Verify admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, message: 'Non connecté', details: [] }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  
+  if (profile?.role !== 'admin') {
+    return { success: false, message: 'Non autorisé', details: [] }
+  }
+  
+  // Get all seasons (except Beta Testeur)
+  const { data: seasons } = await supabaseAdmin
+    .from('seasons')
+    .select('id, name')
+    .neq('name', 'Beta Testeur')
+  
+  if (!seasons || seasons.length === 0) {
+    return { success: true, message: 'Aucune saison trouvée', details: [] }
+  }
+  
+  const details: string[] = []
+  let totalAwarded = 0
+  
+  for (const season of seasons) {
+    const result = await awardSeasonCards(season.id)
+    details.push(`${season.name}: ${result.count} cartes`)
+    totalAwarded += result.count
+  }
+  
+  revalidatePath('/admin/cards')
+  return {
+    success: true,
+    message: `${totalAwarded} cartes attribuées au total`,
+    details
+  }
+}

@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { CreditCard, Loader2, CheckCircle, AlertCircle, Star } from "lucide-react"
-import { awardRetroactiveCards, awardBetaCards } from "@/app/actions/profile-cards"
+import { CreditCard, Loader2, CheckCircle, AlertCircle, Star, Trophy } from "lucide-react"
+import { awardRetroactiveCards, awardBetaCards, awardRetroactiveSeasonCards } from "@/app/actions/profile-cards"
 
 export default function AdminCardsPage() {
   const [loading, setLoading] = useState(false)
   const [loadingBeta, setLoadingBeta] = useState(false)
+  const [loadingSeasonCards, setLoadingSeasonCards] = useState(false)
   const [result, setResult] = useState<{
     success: boolean
     message: string
@@ -16,6 +17,11 @@ export default function AdminCardsPage() {
     success: boolean
     count: number
     message: string
+  } | null>(null)
+  const [seasonCardsResult, setSeasonCardsResult] = useState<{
+    success: boolean
+    message: string
+    details: string[]
   } | null>(null)
 
   const handleAwardCards = async () => {
@@ -55,6 +61,26 @@ export default function AdminCardsPage() {
       })
     } finally {
       setLoadingBeta(false)
+    }
+  }
+
+  const handleAwardSeasonCards = async () => {
+    if (!confirm("Attribuer les cartes de saison (Holo/Diamond/Gold/etc.) à tous les participants des saisons passées ?")) return
+    
+    setLoadingSeasonCards(true)
+    setSeasonCardsResult(null)
+    
+    try {
+      const res = await awardRetroactiveSeasonCards()
+      setSeasonCardsResult(res)
+    } catch (error) {
+      setSeasonCardsResult({
+        success: false,
+        message: String(error),
+        details: []
+      })
+    } finally {
+      setLoadingSeasonCards(false)
     }
   }
 
@@ -163,6 +189,61 @@ export default function AdminCardsPage() {
                 {betaResult.message}
               </p>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Season Cards Section - Award Holo/Diamond/etc. based on ranking */}
+      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Trophy className="w-6 h-6 text-amber-500" />
+          </div>
+          <div>
+            <h2 className="font-bold">Cartes de Saison (Holo/Diamond/Gold...)</h2>
+            <p className="text-sm text-muted-foreground">
+              Attribue les cartes aux gagnants des saisons passées selon leur classement final
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleAwardSeasonCards}
+          disabled={loadingSeasonCards}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition-all disabled:opacity-50"
+        >
+          {loadingSeasonCards ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Attribution en cours...
+            </>
+          ) : (
+            <>
+              <Trophy className="w-5 h-5" />
+              Attribuer cartes de saison
+            </>
+          )}
+        </button>
+
+        {seasonCardsResult && (
+          <div className={`p-4 rounded-lg border ${seasonCardsResult.success ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              {seasonCardsResult.success ? (
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-rose-500" />
+              )}
+              <p className={`font-bold ${seasonCardsResult.success ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {seasonCardsResult.message}
+              </p>
+            </div>
+            {seasonCardsResult.details.length > 0 && (
+              <div className="mt-3 p-3 rounded-lg bg-black/20 font-mono text-xs space-y-1">
+                {seasonCardsResult.details.map((line, i) => (
+                  <p key={i} className="text-zinc-400">{line}</p>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
