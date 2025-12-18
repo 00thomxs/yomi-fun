@@ -31,6 +31,7 @@ const TIER_INFO: Record<CardRank, { label: string; color: string }> = {
   gold: { label: "Or", color: "#facc15" },
   diamond: { label: "Diamant", color: "#22d3ee" },
   holographic: { label: "Holo", color: "#ffffff" },
+  beta: { label: "Beta", color: "#ef4444" },
 }
 
 // Red button for profile banner (next to balance)

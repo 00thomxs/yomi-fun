@@ -1,15 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { CreditCard, Loader2, CheckCircle, AlertCircle } from "lucide-react"
-import { awardRetroactiveCards } from "@/app/actions/profile-cards"
+import { CreditCard, Loader2, CheckCircle, AlertCircle, Star } from "lucide-react"
+import { awardRetroactiveCards, awardBetaCards } from "@/app/actions/profile-cards"
 
 export default function AdminCardsPage() {
   const [loading, setLoading] = useState(false)
+  const [loadingBeta, setLoadingBeta] = useState(false)
   const [result, setResult] = useState<{
     success: boolean
     message: string
     details?: string[]
+  } | null>(null)
+  const [betaResult, setBetaResult] = useState<{
+    success: boolean
+    count: number
+    message: string
   } | null>(null)
 
   const handleAwardCards = async () => {
@@ -29,6 +35,26 @@ export default function AdminCardsPage() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAwardBetaCards = async () => {
+    if (!confirm("Attribuer la carte BETA TESTEUR à tous les utilisateurs actuels ?")) return
+    
+    setLoadingBeta(true)
+    setBetaResult(null)
+    
+    try {
+      const res = await awardBetaCards()
+      setBetaResult(res)
+    } catch (error) {
+      setBetaResult({
+        success: false,
+        count: 0,
+        message: String(error)
+      })
+    } finally {
+      setLoadingBeta(false)
     }
   }
 
@@ -93,15 +119,64 @@ export default function AdminCardsPage() {
         )}
       </div>
 
+      {/* Beta Cards Section */}
+      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <Star className="w-6 h-6 text-red-500" />
+          </div>
+          <div>
+            <h2 className="font-bold">Carte Beta Testeur</h2>
+            <p className="text-sm text-muted-foreground">
+              Attribue une carte spéciale rouge avec "Beta Testeur" en doré à tous les utilisateurs actuels
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleAwardBetaCards}
+          disabled={loadingBeta}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-all disabled:opacity-50"
+        >
+          {loadingBeta ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Attribution en cours...
+            </>
+          ) : (
+            <>
+              <Star className="w-5 h-5" />
+              Attribuer carte Beta Testeur
+            </>
+          )}
+        </button>
+
+        {betaResult && (
+          <div className={`p-4 rounded-lg border ${betaResult.success ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+            <div className="flex items-center gap-2">
+              {betaResult.success ? (
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-rose-500" />
+              )}
+              <p className={`font-bold ${betaResult.success ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {betaResult.message}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="rounded-xl bg-card border border-border p-6 space-y-4">
         <h3 className="font-bold">Informations sur les tiers</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
           {[
             { name: 'Fer', color: '#71717a', desc: '0-10K PnL' },
             { name: 'Bronze', color: '#f97316', desc: '10K-25K PnL' },
             { name: 'Or', color: '#facc15', desc: '25K+ PnL' },
             { name: 'Diamant', color: '#22d3ee', desc: 'Top 10' },
             { name: 'Holo', color: '#ffffff', desc: 'Top 3' },
+            { name: 'Beta', color: '#ef4444', desc: 'Spéciale' },
           ].map((tier) => (
             <div 
               key={tier.name}

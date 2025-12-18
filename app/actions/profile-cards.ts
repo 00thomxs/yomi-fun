@@ -21,8 +21,9 @@ export type UserSeasonCard = {
   isNewTier?: boolean
 }
 
-// Tier order for comparison
+// Tier order for comparison (beta is special, not in normal order)
 const TIER_ORDER: CardRank[] = ['iron', 'bronze', 'gold', 'diamond', 'holographic']
+const ALL_TIERS: CardRank[] = ['iron', 'bronze', 'gold', 'diamond', 'holographic', 'beta']
 
 /**
  * Get the user's selected card (or current season card if none selected)
@@ -483,7 +484,7 @@ export async function getAdminCardOptions(): Promise<{
       name: s.name || `Saison ${i + 1}`,
       number: i + 1,
     })),
-    tiers: TIER_ORDER,
+    tiers: ALL_TIERS,
   }
 }
 
@@ -528,4 +529,96 @@ export async function setAdminCard(seasonId: string, tier: CardRank): Promise<{ 
   
   revalidatePath('/profile')
   return { success: true }
+}
+
+/**
+ * ADMIN: Award Beta Tester card to all existing users
+ */
+export async function awardBetaCards(): Promise<{ success: boolean; count: number; message: string }> {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, count: 0, message: 'Non connecté' }
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  
+  if (profile?.role !== 'admin') {
+    return { success: false, count: 0, message: 'Non autorisé' }
+  }
+  
+  // Check if beta season exists, create if not
+  let { data: betaSeason } = await supabaseAdmin
+    .from('seasons')
+    .select('id')
+    .eq('name', 'Beta Testeur')
+    .single()
+  
+  if (!betaSeason) {
+    // Create a special "Beta Testeur" season
+    const { data: newSeason, error: createError } = await supabaseAdmin
+      .from('seasons')
+      .insert({
+        name: 'Beta Testeur',
+        start_date: new Date('2024-01-01').toISOString(),
+        end_date: new Date('2099-12-31').toISOString(),
+        is_active: false, // Not a real active season
+      })
+      .select('id')
+      .single()
+    
+    if (createError) {
+      return { success: false, count: 0, message: `Erreur création saison: ${createError.message}` }
+    }
+    betaSeason = newSeason
+  }
+  
+  if (!betaSeason) {
+    return { success: false, count: 0, message: 'Impossible de créer la saison Beta' }
+  }
+  
+  // Get all existing users
+  const { data: allUsers, error: usersError } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+  
+  if (usersError || !allUsers) {
+    return { success: false, count: 0, message: `Erreur récupération utilisateurs: ${usersError?.message}` }
+  }
+  
+  let awardedCount = 0
+  
+  // Award beta card to each user
+  for (const u of allUsers) {
+    // Check if user already has beta card
+    const { data: existingCard } = await supabaseAdmin
+      .from('user_season_cards')
+      .select('id')
+      .eq('user_id', u.id)
+      .eq('season_id', betaSeason.id)
+      .single()
+    
+    if (!existingCard) {
+      await supabaseAdmin
+        .from('user_season_cards')
+        .insert({
+          user_id: u.id,
+          season_id: betaSeason.id,
+          tier: 'beta',
+          highest_tier_achieved: 'beta',
+          is_selected: false,
+        })
+      awardedCount++
+    }
+  }
+  
+  revalidatePath('/admin/cards')
+  return { 
+    success: true, 
+    count: awardedCount, 
+    message: `Carte Beta attribuée à ${awardedCount} utilisateurs` 
+  }
 }

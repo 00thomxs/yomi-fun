@@ -7,7 +7,7 @@ import { Target, Crown, Zap, Trophy, Crosshair, Eye, TrendingUp, Medal, Diamond,
 import type { Badge } from "@/lib/types"
 
 // Types
-export type CardRank = "iron" | "bronze" | "gold" | "diamond" | "holographic"
+export type CardRank = "iron" | "bronze" | "gold" | "diamond" | "holographic" | "beta"
 
 export interface CardBadge {
   name: string
@@ -107,6 +107,15 @@ const rankStyles: Record<
     bgBase: "rgba(30, 30, 40, 0.9)",
     gridColor: "rgba(255, 255, 255, 0.08)",
     label: "HOLOGRAPHIQUE",
+  },
+  beta: {
+    borderColor: "#dc2626",
+    glowColor: "rgba(220, 38, 38, 0.6)",
+    accentColor: "#ef4444",
+    secondaryGlow: "rgba(239, 68, 68, 0.5)",
+    bgBase: "rgba(30, 15, 15, 0.95)",
+    gridColor: "rgba(220, 38, 38, 0.15)",
+    label: "BETA",
   },
 }
 
@@ -482,12 +491,12 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
               <div
                 className="mt-1 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider"
                 style={{
-                  background: `${styles.accentColor}15`,
-                  border: `1px solid ${styles.accentColor}40`,
-                  color: styles.accentColor,
+                  background: rank === 'beta' ? 'rgba(234, 179, 8, 0.15)' : `${styles.accentColor}15`,
+                  border: rank === 'beta' ? '1px solid rgba(234, 179, 8, 0.5)' : `1px solid ${styles.accentColor}40`,
+                  color: rank === 'beta' ? '#facc15' : styles.accentColor,
                 }}
               >
-                Saison {seasonNumber} : {seasonTitle}
+                {rank === 'beta' ? '⭐ BETA TESTEUR ⭐' : `Saison ${seasonNumber} : ${seasonTitle}`}
               </div>
             </div>
             <div className="flex flex-col items-end" style={{ filter: `drop-shadow(0 0 10px ${styles.glowColor})` }}>
