@@ -360,22 +360,29 @@ export function ProfileCardGenerator({
       {/* Mobile Download Image Modal */}
       {downloadImageUrl && (
         <div 
-          className="fixed inset-0 z-[120] flex flex-col items-center justify-center p-4 bg-black/95"
+          className="fixed inset-0 z-[120] flex flex-col items-center justify-between p-4 py-8 bg-black/95"
           onClick={() => setDownloadImageUrl(null)}
         >
-          <div className="text-center mb-4">
-            <p className="text-white font-bold text-lg">Maintenez l'image pour sauvegarder</p>
-            <p className="text-zinc-400 text-sm">Puis "Enregistrer l'image"</p>
+          {/* Header */}
+          <div className="text-center shrink-0">
+            <p className="text-white font-bold text-base">Maintenez l'image pour sauvegarder</p>
+            <p className="text-zinc-400 text-xs">Puis "Enregistrer l'image"</p>
           </div>
-          <img 
-            src={downloadImageUrl} 
-            alt="YOMI Card" 
-            className="max-w-full max-h-[70vh] rounded-xl shadow-2xl"
-            style={{ touchAction: 'none' }}
-          />
+          
+          {/* Image - takes available space */}
+          <div className="flex-1 flex items-center justify-center py-4 min-h-0">
+            <img 
+              src={downloadImageUrl} 
+              alt="YOMI Card" 
+              className="max-w-full max-h-full rounded-xl shadow-2xl object-contain"
+              style={{ touchAction: 'none' }}
+            />
+          </div>
+          
+          {/* Close button - always visible at bottom */}
           <button 
             onClick={() => setDownloadImageUrl(null)}
-            className="mt-6 px-6 py-3 rounded-xl bg-zinc-800 text-white font-bold hover:bg-zinc-700 active:bg-zinc-600"
+            className="shrink-0 px-8 py-3 rounded-xl bg-zinc-800 text-white font-bold hover:bg-zinc-700 active:bg-zinc-600"
           >
             Fermer
           </button>
