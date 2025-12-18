@@ -663,9 +663,11 @@ export async function getPastSeason(id: string) {
 
 export async function getAllPastSeasons() {
   // Get all inactive seasons from the 'seasons' table (unified source)
+  // Exclude Beta Testeur - it's a permanent special "season" for beta cards
   const { data, error } = await supabaseAdmin
     .from('seasons')
     .select('id, name, start_date, end_date')
+    .neq('name', 'Beta Testeur')
     .eq('is_active', false)
     .order('end_date', { ascending: false })
 
@@ -698,15 +700,20 @@ export async function deletePastSeason(id: string) {
     
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
-  // Check if this is the active season
+  // Check if this is the active season or protected Beta season
   const { data: seasonToDelete } = await supabaseAdmin
     .from('seasons')
-    .select('is_active')
+    .select('is_active, name')
     .eq('id', id)
     .single()
   
   if (seasonToDelete?.is_active) {
     return { error: "Impossible de supprimer la saison active" }
+  }
+  
+  // Protect Beta Testeur season - it's permanent!
+  if (seasonToDelete?.name === 'Beta Testeur') {
+    return { error: "Impossible de supprimer la saison Beta Testeur (cartes permanentes)" }
   }
 
   // Use admin client to bypass RLS - delete from seasons table
