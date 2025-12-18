@@ -519,8 +519,15 @@ export function ProfileView() {
                 </div>
               </div>
               
-              {/* Balance + Card Button (HORIZONTAL) */}
+              {/* Card Button + Balance (HORIZONTAL - button LEFT) */}
               <div className="flex items-center gap-2 shrink-0">
+                {/* Profile Card Button - LEFT of balance */}
+                {seasonCard && (
+                  <ProfileCardButton 
+                    tier={seasonCard.tier} 
+                    onClick={() => setShowCardGenerator(true)} 
+                  />
+                )}
                 <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
                   <p className="text-xl font-bold text-center">
@@ -528,13 +535,6 @@ export function ProfileView() {
                     <CurrencySymbol className="text-primary" />
                   </p>
                 </div>
-                {/* Profile Card Button - RED, next to balance */}
-                {seasonCard && (
-                  <ProfileCardButton 
-                    tier={seasonCard.tier} 
-                    onClick={() => setShowCardGenerator(true)} 
-                  />
-                )}
               </div>
             </div>
 

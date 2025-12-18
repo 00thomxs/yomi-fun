@@ -254,34 +254,6 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
       className="relative cursor-pointer transition-transform duration-200 ease-out group"
       style={{ transform, transformStyle: "preserve-3d" }}
     >
-      {/* Flames for high ranks */}
-      {isHighRank && (
-        <div className="absolute -inset-4 z-0 pointer-events-none overflow-visible">
-          <svg
-            className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[140%] h-28"
-            viewBox="0 0 400 100"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient id={`flame-grad-${rank}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stopColor="#ef4444" stopOpacity="0.9" />
-                <stop offset="50%" stopColor="#ef4444" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
-              </linearGradient>
-              <filter id="flame-blur">
-                <feGaussianBlur stdDeviation="4" />
-              </filter>
-            </defs>
-            <path
-              className="animate-[flameWave_1.5s_ease-in-out_infinite]"
-              d="M0,100 Q50,60 80,80 Q110,40 140,70 Q170,30 200,55 Q230,25 260,60 Q290,35 320,75 Q350,50 380,85 Q400,70 400,100 Z"
-              fill={`url(#flame-grad-${rank})`}
-              filter="url(#flame-blur)"
-            />
-          </svg>
-        </div>
-      )}
-
       {/* Outer glow */}
       <div
         className="absolute -inset-1 rounded-2xl transition-all duration-300"
