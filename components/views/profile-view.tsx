@@ -519,9 +519,9 @@ export function ProfileView() {
                 </div>
               </div>
               
-              {/* Card Button + Balance (HORIZONTAL - button LEFT) */}
-              <div className="flex items-center gap-2 shrink-0">
-                {/* Profile Card Button - LEFT of balance */}
+              {/* Card Button + Balance (HORIZONTAL - button LEFT, aligned top) */}
+              <div className="flex items-start gap-2 shrink-0">
+                {/* Profile Card Button - LEFT of balance, aligned with top */}
                 {seasonCard && (
                   <ProfileCardButton 
                     tier={seasonCard.tier} 

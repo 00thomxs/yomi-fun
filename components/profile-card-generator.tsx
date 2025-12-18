@@ -38,9 +38,9 @@ export function ProfileCardButton({ tier, onClick }: { tier: CardRank; onClick: 
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all hover:scale-105 active:scale-95 bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30"
+      className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-bold text-xs transition-all hover:scale-105 active:scale-95 bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30"
     >
-      <CreditCard className="w-3.5 h-3.5" />
+      <Sparkles className="w-3.5 h-3.5" />
       <span>Carte</span>
     </button>
   )
@@ -224,8 +224,10 @@ export function ProfileCardGenerator({
                     key={card.id}
                     onClick={() => handleSelectCard(card)}
                     className={cn(
-                      "w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left",
-                      isSelected ? "bg-primary/20 border-2 border-primary" : "bg-white/5 border border-transparent hover:bg-white/10"
+                      "w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left cursor-pointer",
+                      isSelected 
+                        ? "bg-primary/20 border-2 border-primary" 
+                        : "bg-white/5 border border-transparent hover:bg-white/15 hover:border-white/20 hover:scale-[1.02] active:scale-[0.98]"
                     )}
                   >
                     <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${info.color}20`, border: `2px solid ${info.color}` }}>
@@ -258,7 +260,7 @@ export function ProfileCardGenerator({
                             <button
                               key={`${season.id}-${tier}`}
                               onClick={() => handleAdminSelectCard(season.id, tier)}
-                              className="p-3 rounded-lg transition-all hover:scale-105 text-center"
+                              className="p-3 rounded-lg transition-all hover:scale-110 hover:brightness-125 active:scale-95 text-center cursor-pointer"
                               style={{ background: `${info.color}15`, border: `1px solid ${info.color}40` }}
                             >
                               <Sparkles className="w-5 h-5 mx-auto" style={{ color: info.color }}/>

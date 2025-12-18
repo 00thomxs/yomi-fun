@@ -254,6 +254,44 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
       className="relative cursor-pointer transition-transform duration-200 ease-out group"
       style={{ transform, transformStyle: "preserve-3d" }}
     >
+      {/* Super Saiyan Aura Effect */}
+      <div className="absolute -inset-3 z-0 pointer-events-none overflow-visible">
+        {/* Pulsing aura background */}
+        <div 
+          className="absolute inset-0 rounded-2xl"
+          style={{
+            background: `radial-gradient(ellipse 100% 80% at 50% 100%, ${styles.glowColor} 0%, transparent 50%),
+                        radial-gradient(ellipse 80% 60% at 50% 0%, ${styles.secondaryGlow} 0%, transparent 40%)`,
+            animation: 'auraPulse 2s ease-in-out infinite',
+          }}
+        />
+        {/* Rising energy particles */}
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 rounded-full"
+            style={{
+              height: 6 + (i % 3) * 4,
+              left: `${8 + i * 9}%`,
+              bottom: 0,
+              background: `linear-gradient(to top, ${styles.accentColor}, transparent)`,
+              animation: `auraRise ${1.2 + (i % 4) * 0.3}s ease-out infinite`,
+              animationDelay: `${i * 0.12}s`,
+              opacity: 0.6,
+            }}
+          />
+        ))}
+        {/* Outer glow ring */}
+        <div 
+          className="absolute -inset-1 rounded-2xl"
+          style={{
+            border: `1px solid ${styles.accentColor}30`,
+            boxShadow: `0 0 15px ${styles.glowColor}, 0 0 30px ${styles.secondaryGlow}`,
+            animation: 'auraGlow 1.5s ease-in-out infinite alternate',
+          }}
+        />
+      </div>
+
       {/* Outer glow */}
       <div
         className="absolute -inset-1 rounded-2xl transition-all duration-300"
@@ -562,6 +600,22 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
           }}
         />
       </div>
+
+      {/* Aura animations */}
+      <style jsx>{`
+        @keyframes auraPulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 0.9; transform: scale(1.02); }
+        }
+        @keyframes auraRise {
+          0% { transform: translateY(0) scaleY(1); opacity: 0.6; }
+          100% { transform: translateY(-50px) scaleY(1.5); opacity: 0; }
+        }
+        @keyframes auraGlow {
+          0% { opacity: 0.3; }
+          100% { opacity: 0.6; }
+        }
+      `}</style>
     </div>
   )
 })

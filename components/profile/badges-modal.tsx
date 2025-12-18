@@ -157,9 +157,9 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
                           className={cn(
                             'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all',
                             isEquipped
-                              ? 'bg-primary/10 border-primary/30'
-                              : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700',
-                            !canEquip && !isEquipped && 'opacity-50 cursor-not-allowed'
+                              ? 'bg-primary/10 border-primary/30 hover:bg-primary/15'
+                              : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98]',
+                            !canEquip && !isEquipped && 'opacity-50 cursor-not-allowed hover:scale-100'
                           )}
                         >
                           <BadgeDisplay badge={badge} size="sm" showName={false} />
