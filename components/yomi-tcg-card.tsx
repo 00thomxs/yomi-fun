@@ -125,12 +125,18 @@ function StreakBadge({ streak }: { streak: number }) {
 
   return (
     <div
-      className="absolute -bottom-2 -right-3 z-20 flex items-center gap-0.5"
+      className="absolute -bottom-2 -right-3 z-20 flex items-center gap-1"
       style={{ filter: `drop-shadow(0 0 8px ${color})` }}
     >
-      <svg width="18" height="22" viewBox="0 0 24 28" fill="none">
+      <svg width="16" height="20" viewBox="0 0 24 24" fill="none">
+        {/* Modern stylized flame */}
         <path
-          d="M12 0C12 0 15 5 15 9C15 11 16 12 17.5 11C19 10 21 12 21 15C21 21 17 26 12 26C7 26 3 21 3 15C3 12 5 10 6.5 11C8 12 9 11 9 9C9 5 12 0 12 0Z"
+          d="M12 2C12 2 8 8 8 12C8 14 9 15.5 10 15C11 14.5 11 13 12 12C13 13 13 14.5 14 15C15 15.5 16 14 16 12C16 8 12 2 12 2Z"
+          fill={color}
+          opacity="0.6"
+        />
+        <path
+          d="M12 5C12 5 9 9 9 12C9 14 10 15 11 14.5C11.5 14.25 12 13 12 12C12 13 12.5 14.25 13 14.5C14 15 15 14 15 12C15 9 12 5 12 5Z"
           fill={color}
         />
       </svg>
