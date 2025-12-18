@@ -171,15 +171,32 @@ export function YomiCardPack({
         }}/>
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
+          {/* YOMI Logo */}
           <div className="flex items-baseline">
-            <span className="font-black text-5xl tracking-tighter text-primary" style={{ textShadow: '0 0 40px rgba(239,68,68,0.8)' }}>YOMI</span>
-            <span className="font-semibold text-2xl text-white">.fun</span>
+            <span 
+              className="font-black text-5xl italic tracking-tight text-primary" 
+              style={{ 
+                textShadow: '0 0 40px rgba(239,68,68,0.8)',
+                fontStyle: 'italic',
+              }}
+            >
+              YOMI
+            </span>
+            <span className="font-medium text-2xl text-white/90">.fun</span>
           </div>
-          <div className="w-20 h-20 rounded-xl border-2 border-primary/50 flex items-center justify-center"
-            style={{ background: 'rgba(239,68,68,0.1)', boxShadow: '0 0 30px rgba(239,68,68,0.3)' }}>
-            <span className="text-4xl font-black text-primary">?</span>
-          </div>
+          
+          {/* Big question mark - no frame */}
+          <span 
+            className="text-8xl font-black text-primary"
+            style={{ 
+              textShadow: '0 0 60px rgba(239,68,68,0.6)',
+              filter: 'drop-shadow(0 0 20px rgba(239,68,68,0.4))',
+            }}
+          >
+            ?
+          </span>
+          
           <span className={cn("text-xs font-bold uppercase tracking-widest text-zinc-500", stage !== "idle" && "opacity-0")}>
             Cliquez pour ouvrir
           </span>
