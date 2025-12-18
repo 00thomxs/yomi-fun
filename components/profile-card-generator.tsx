@@ -57,7 +57,29 @@ export function ProfileCardGenerator({
   const [showSelector, setShowSelector] = useState(false)
   const [selectedCard, setSelectedCard] = useState<UserSeasonCard>(currentCard)
   const [adminOptions, setAdminOptions] = useState<{ seasons: { id: string; name: string; number: number }[]; tiers: CardRank[] } | null>(null)
+  const [avatarBase64, setAvatarBase64] = useState<string>(avatarUrl)
   const cardRef = useRef<HTMLDivElement>(null)
+
+  // Convert avatar to base64 for download compatibility
+  useEffect(() => {
+    const convertToBase64 = async () => {
+      if (!avatarUrl || avatarUrl.startsWith('data:')) return
+      try {
+        const response = await fetch(avatarUrl)
+        const blob = await response.blob()
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setAvatarBase64(reader.result)
+          }
+        }
+        reader.readAsDataURL(blob)
+      } catch (err) {
+        console.log('Could not convert avatar to base64')
+      }
+    }
+    convertToBase64()
+  }, [avatarUrl])
 
   useEffect(() => {
     if (isAdmin) getAdminCardOptions().then(setAdminOptions)
@@ -84,13 +106,51 @@ export function ProfileCardGenerator({
     if (!cardRef.current) return
     setIsDownloading(true)
     try {
-      const dataUrl = await toPng(cardRef.current, { quality: 1, pixelRatio: 2, backgroundColor: 'transparent' })
-      const link = document.createElement('a')
-      link.download = `yomi-card-${username}-s${selectedCard.seasonNumber}.png`
-      link.href = dataUrl
-      link.click()
-      toast.success('Carte téléchargée !')
+      // Convert all images to data URLs to avoid CORS issues
+      const dataUrl = await toPng(cardRef.current, { 
+        quality: 1, 
+        pixelRatio: 3, // Higher quality for mobile
+        backgroundColor: undefined, // Transparent background
+        skipFonts: true, // Skip fonts to avoid issues
+        cacheBust: true, // Bypass cache
+        includeQueryParams: true,
+        // Fetch images with CORS bypass
+        fetchRequestInit: {
+          mode: 'cors',
+          cache: 'no-cache',
+        },
+        // Filter to handle external images
+        filter: (node) => {
+          // Skip elements that might cause issues
+          if (node instanceof HTMLElement && node.classList?.contains('aura-effect')) {
+            return false // Skip animated aura effects
+          }
+          return true
+        }
+      })
+      
+      // For mobile, use different download method
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Open image in new tab for mobile (easier to save)
+        const newTab = window.open()
+        if (newTab) {
+          newTab.document.body.innerHTML = `
+            <style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000;}</style>
+            <img src="${dataUrl}" style="max-width:100%;height:auto;" />
+          `
+          newTab.document.title = `YOMI Card - ${username}`
+          toast.success('Image ouverte ! Maintenez pour sauvegarder')
+        }
+      } else {
+        // Desktop: direct download
+        const link = document.createElement('a')
+        link.download = `yomi-card-${username}-s${selectedCard.seasonNumber}.png`
+        link.href = dataUrl
+        link.click()
+        toast.success('Carte téléchargée !')
+      }
     } catch (err) {
+      console.error('Download error:', err)
       toast.error('Erreur lors du téléchargement')
     } finally {
       setIsDownloading(false)
@@ -173,7 +233,7 @@ export function ProfileCardGenerator({
                 totalBets={totalBets}
                 streak={streak}
                 equippedBadges={equippedBadges}
-                avatarUrl={avatarUrl}
+                avatarUrl={avatarBase64}
               />
             </YomiCardPack>
           ) : (
@@ -188,7 +248,7 @@ export function ProfileCardGenerator({
               totalBets={totalBets}
               streak={streak}
               equippedBadges={equippedBadges}
-              avatarUrl={avatarUrl}
+              avatarUrl={avatarBase64}
             />
           )}
 

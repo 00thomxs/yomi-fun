@@ -298,8 +298,8 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
       className="relative cursor-pointer transition-transform duration-200 ease-out group"
       style={{ transform, transformStyle: "preserve-3d" }}
     >
-      {/* Super Saiyan Aura Effect */}
-      <div className="absolute -inset-3 z-0 pointer-events-none overflow-visible">
+      {/* Super Saiyan Aura Effect - excluded from download */}
+      <div className="aura-effect absolute -inset-3 z-0 pointer-events-none overflow-visible">
         {/* Pulsing aura background */}
         <div 
           className="absolute inset-0 rounded-2xl"
