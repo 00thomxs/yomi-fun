@@ -59,9 +59,12 @@ export async function getUserSelectedCard(userId?: string): Promise<UserSeasonCa
       .select('id', { count: 'exact', head: true })
       .lte('created_at', (selectedCard.seasons as any)?.created_at)
     
+    // Use 'tier' for display (current volatile tier)
+    // For past seasons, tier = highest_tier_achieved (both set at season end)
+    // For active seasons, tier can be diamond/holo based on current rank
     return {
       id: selectedCard.id,
-      tier: selectedCard.highest_tier_achieved as CardRank,
+      tier: selectedCard.tier as CardRank,
       highestTierAchieved: selectedCard.highest_tier_achieved as CardRank,
       seasonId: selectedCard.season_id,
       seasonName: (selectedCard.seasons as any)?.name || 'Saison',
@@ -167,9 +170,10 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
   const seasonNumbers = new Map<string, number>()
   allSeasons.data?.forEach((s, i) => seasonNumbers.set(s.id, i + 1))
   
+  // Use 'tier' for display (current volatile tier for active season, final tier for past seasons)
   return cards.map((card) => ({
     id: card.id,
-    tier: card.highest_tier_achieved as CardRank,
+    tier: card.tier as CardRank,
     highestTierAchieved: card.highest_tier_achieved as CardRank,
     seasonId: card.season_id,
     seasonName: (card.seasons as any)?.name || 'Saison',
