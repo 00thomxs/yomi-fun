@@ -208,13 +208,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           setPlayers([])
         }
       } else {
-        // Fetch from profiles (global)
+        // Fetch from profiles (global) - 25 players for global leaderboard
         const { data } = await supabase
           .from('profiles')
           .select('id, username, avatar_url, total_won, win_rate, balance, role')
           .neq('role', 'admin')
           .order('total_won', { ascending: false })
-          .limit(10)
+          .limit(25)
 
         if (data) {
           const formatted = data.map((p: any, idx: number) => ({
