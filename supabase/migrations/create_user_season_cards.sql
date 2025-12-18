@@ -17,6 +17,7 @@ CREATE TABLE public.user_season_cards (
   season_id UUID NOT NULL REFERENCES public.seasons(id) ON DELETE CASCADE,
   tier TEXT NOT NULL CHECK (tier IN ('iron', 'bronze', 'gold', 'diamond', 'holographic')),
   highest_tier_achieved TEXT NOT NULL CHECK (highest_tier_achieved IN ('iron', 'bronze', 'gold', 'diamond', 'holographic')),
+  is_selected BOOLEAN DEFAULT FALSE, -- User's currently selected card to display
   unlocked_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, season_id)

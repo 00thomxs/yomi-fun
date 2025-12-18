@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, forwardRef, type MouseEvent } from "react"
+import { useState, useRef, forwardRef, useEffect, type MouseEvent } from "react"
 import { cn } from "@/lib/utils"
 import { Target, Crown, Zap, Trophy, Crosshair, Eye, TrendingUp, Medal, Diamond, Swords, Gamepad2, Brain, Award, Skull, Rocket, Drama, Sprout, BadgeCheck, Star, HelpCircle } from "lucide-react"
 import type { Badge } from "@/lib/types"
@@ -156,8 +156,63 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   const cardRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState("")
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 })
+  const [gyroEnabled, setGyroEnabled] = useState(false)
+
+  // Gyroscope effect for mobile
+  useEffect(() => {
+    // Check if device orientation is supported
+    if (typeof window === 'undefined' || !window.DeviceOrientationEvent) return
+    
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (!isMobile) return
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return
+      
+      // Clamp values to reasonable range
+      const gamma = Math.max(-30, Math.min(30, e.gamma)) // Left-right tilt
+      const beta = Math.max(-30, Math.min(30, e.beta - 45)) // Front-back tilt (offset for holding phone)
+      
+      const rotateY = gamma / 2 // -15 to 15 degrees
+      const rotateX = -beta / 2 // -15 to 15 degrees
+      
+      setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`)
+      setGlarePos({
+        x: 50 + gamma,
+        y: 50 + beta,
+        opacity: 0.2,
+      })
+    }
+
+    // Request permission on iOS 13+
+    const requestPermission = async () => {
+      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+        try {
+          const permission = await (DeviceOrientationEvent as any).requestPermission()
+          if (permission === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation)
+            setGyroEnabled(true)
+          }
+        } catch (err) {
+          console.log('Gyro permission denied')
+        }
+      } else {
+        // Non-iOS or older iOS
+        window.addEventListener('deviceorientation', handleOrientation)
+        setGyroEnabled(true)
+      }
+    }
+
+    requestPermission()
+
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation)
+    }
+  }, [])
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (gyroEnabled) return // Skip mouse handling if gyro is active
+    
     const element = cardRef.current || (ref as React.RefObject<HTMLDivElement>)?.current
     if (!element) return
     const rect = element.getBoundingClientRect()
@@ -177,6 +232,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   }
 
   const handleMouseLeave = () => {
+    if (gyroEnabled) return // Skip if gyro is active
     setTransform("")
     setGlarePos({ x: 50, y: 50, opacity: 0 })
   }

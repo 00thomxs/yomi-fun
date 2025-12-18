@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X, Download, Sparkles, RefreshCw, Loader2 } from "lucide-react"
+import { X, Download, Sparkles, RefreshCw, Loader2, ChevronDown, Check } from "lucide-react"
 import { YomiTCGCard, type CardRank } from "./yomi-tcg-card"
 import { YomiCardPack } from "./yomi-card-pack"
 import { toPng } from "html-to-image"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import { selectCard, getAdminCardOptions, setAdminCard, type UserSeasonCard } from "@/app/actions/profile-cards"
 
 interface ProfileCardGeneratorProps {
   username: string
@@ -15,12 +17,11 @@ interface ProfileCardGeneratorProps {
   streak: number
   avatarUrl: string
   equippedBadges: { name: string; description: string; iconName: string }[]
-  seasonNumber: string
-  seasonTitle: string
-  cardTier: CardRank
-  highestTier: CardRank
-  isNewTier?: boolean
-  onTierSeen?: () => void
+  currentCard: UserSeasonCard
+  cardCollection: UserSeasonCard[]
+  isAdmin?: boolean
+  onCardChange?: () => void
+  onClose?: () => void
 }
 
 // Tier info for display
@@ -32,6 +33,33 @@ const TIER_INFO: Record<CardRank, { label: string; color: string; description: s
   holographic: { label: "HOLO", color: "#ffffff", description: "Top 3" },
 }
 
+// Compact button for profile banner
+export function ProfileCardButton({
+  tier,
+  onClick,
+}: {
+  tier: CardRank
+  onClick: () => void
+}) {
+  const tierInfo = TIER_INFO[tier]
+  
+  return (
+    <button
+      onClick={onClick}
+      className="relative flex items-center gap-2 px-3 py-1.5 rounded-lg font-bold text-xs transition-all hover:scale-105 active:scale-95 animate-pulse hover:animate-none"
+      style={{
+        background: `${tierInfo.color}20`,
+        border: `1px solid ${tierInfo.color}50`,
+        color: tierInfo.color,
+      }}
+    >
+      <Sparkles className="w-3.5 h-3.5" />
+      <span className="hidden sm:inline">Ma Carte</span>
+      <span className="sm:hidden">Carte</span>
+    </button>
+  )
+}
+
 export function ProfileCardGenerator({
   username,
   level,
@@ -40,18 +68,30 @@ export function ProfileCardGenerator({
   streak,
   avatarUrl,
   equippedBadges,
-  seasonNumber,
-  seasonTitle,
-  cardTier,
-  highestTier,
-  isNewTier,
-  onTierSeen,
+  currentCard,
+  cardCollection,
+  isAdmin = false,
+  onCardChange,
+  onClose,
 }: ProfileCardGeneratorProps) {
-  const [showCard, setShowCard] = useState(false)
+  const [showCard, setShowCard] = useState(true) // Start open since rendered conditionally
   const [isRevealed, setIsRevealed] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
-  const [animationKey, setAnimationKey] = useState(0) // Key to force re-mount pack
+  const [animationKey, setAnimationKey] = useState(0)
+  const [showSelector, setShowSelector] = useState(false)
+  const [selectedCard, setSelectedCard] = useState<UserSeasonCard>(currentCard)
+  const [adminOptions, setAdminOptions] = useState<{
+    seasons: { id: string; name: string; number: number }[]
+    tiers: CardRank[]
+  } | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
+
+  // Load admin options if admin
+  useEffect(() => {
+    if (isAdmin) {
+      getAdminCardOptions().then(setAdminOptions)
+    }
+  }, [isAdmin])
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -66,21 +106,18 @@ export function ProfileCardGenerator({
   }, [showCard])
 
   const handleGenerateCard = () => {
-    setAnimationKey(prev => prev + 1) // Force new animation
+    setAnimationKey(prev => prev + 1)
     setIsRevealed(false)
     setShowCard(true)
   }
 
   const handleReveal = () => {
     setIsRevealed(true)
-    if (isNewTier && onTierSeen) {
-      onTierSeen()
-    }
   }
 
   const handleReplay = () => {
     setIsRevealed(false)
-    setAnimationKey(prev => prev + 1) // Force re-mount pack
+    setAnimationKey(prev => prev + 1)
   }
 
   const handleDownload = async () => {
@@ -95,7 +132,7 @@ export function ProfileCardGenerator({
       })
       
       const link = document.createElement('a')
-      link.download = `yomi-card-${username}-${seasonTitle.toLowerCase().replace(/\s+/g, '-')}.png`
+      link.download = `yomi-card-${username}-s${selectedCard.seasonNumber}.png`
       link.href = dataUrl
       link.click()
       
@@ -111,53 +148,54 @@ export function ProfileCardGenerator({
   const handleClose = () => {
     setShowCard(false)
     setIsRevealed(false)
+    setShowSelector(false)
+    onClose?.()
   }
 
-  const tierInfo = TIER_INFO[cardTier]
+  const handleSelectCard = async (card: UserSeasonCard) => {
+    setSelectedCard(card)
+    if (card.id) {
+      await selectCard(card.id)
+      onCardChange?.()
+    }
+    setShowSelector(false)
+  }
+
+  const handleAdminSelectCard = async (seasonId: string, tier: CardRank) => {
+    const season = adminOptions?.seasons.find(s => s.id === seasonId)
+    if (!season) return
+    
+    await setAdminCard(seasonId, tier)
+    setSelectedCard({
+      id: '',
+      tier,
+      highestTierAchieved: tier,
+      seasonId,
+      seasonName: season.name,
+      seasonNumber: season.number,
+      isSelected: true,
+    })
+    onCardChange?.()
+    setShowSelector(false)
+  }
+
+  const tierInfo = TIER_INFO[selectedCard.tier]
+  const hasMultipleCards = cardCollection.length > 1 || isAdmin
 
   return (
     <>
-      {/* Generate Button */}
-      <button
-        onClick={handleGenerateCard}
-        className="w-full rounded-xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border border-primary/30 p-4 flex items-center justify-between hover:border-primary/50 transition-all group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-primary" />
-          </div>
-          <div className="text-left min-w-0">
-            <p className="text-sm font-bold">Ma Carte Profil</p>
-            <p className="text-xs text-muted-foreground truncate">
-              Carte <span style={{ color: tierInfo.color }} className="font-bold">{tierInfo.label}</span>
-            </p>
-          </div>
-        </div>
-        <div 
-          className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider shrink-0"
-          style={{ 
-            background: `${tierInfo.color}20`,
-            color: tierInfo.color,
-            border: `1px solid ${tierInfo.color}40`
-          }}
-        >
-          Générer
-        </div>
-      </button>
-
       {/* Modal */}
       {showCard && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm overflow-y-auto"
           onClick={handleClose}
         >
-          {/* Safe area padding for mobile */}
           <div className="min-h-full w-full flex items-center justify-center p-4 py-16">
             <div 
               className="relative"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button - fixed position for mobile */}
+              {/* Close button */}
               <button
                 onClick={handleClose}
                 className="fixed top-4 right-4 z-[110] p-2.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all border border-white/10"
@@ -165,15 +203,26 @@ export function ProfileCardGenerator({
                 <X className="w-5 h-5" />
               </button>
 
-              {/* Card Container - Scaled for mobile */}
+              {/* Card selector button */}
+              {hasMultipleCards && isRevealed && (
+                <button
+                  onClick={() => setShowSelector(true)}
+                  className="fixed top-4 left-4 z-[110] flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 hover:bg-black/70 text-white text-sm font-bold transition-all border border-white/10"
+                >
+                  <span style={{ color: tierInfo.color }}>{tierInfo.label}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Card Container */}
               <div className="flex flex-col items-center gap-4 sm:gap-6 scale-[0.85] sm:scale-100 origin-center">
                 {!isRevealed ? (
                   <YomiCardPack key={animationKey} onReveal={handleReveal}>
                     <YomiTCGCard
                       ref={cardRef}
-                      rank={cardTier}
-                      seasonNumber={seasonNumber}
-                      seasonTitle={seasonTitle}
+                      rank={selectedCard.tier}
+                      seasonNumber={selectedCard.seasonNumber.toString()}
+                      seasonTitle={selectedCard.seasonName}
                       username={username}
                       level={level}
                       pnl={pnl}
@@ -187,9 +236,9 @@ export function ProfileCardGenerator({
                   <>
                     <YomiTCGCard
                       ref={cardRef}
-                      rank={cardTier}
-                      seasonNumber={seasonNumber}
-                      seasonTitle={seasonTitle}
+                      rank={selectedCard.tier}
+                      seasonNumber={selectedCard.seasonNumber.toString()}
+                      seasonTitle={selectedCard.seasonName}
                       username={username}
                       level={level}
                       pnl={pnl}
@@ -228,6 +277,90 @@ export function ProfileCardGenerator({
           </div>
         </div>
       )}
+
+      {/* Card Selector Modal */}
+      {showSelector && (
+        <div 
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowSelector(false)}
+        >
+          <div 
+            className="w-full max-w-md rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-white/10">
+              <h3 className="text-lg font-bold">Choisir une carte</h3>
+              <p className="text-sm text-muted-foreground">Sélectionne la carte à afficher</p>
+            </div>
+            
+            <div className="p-4 max-h-[60vh] overflow-y-auto space-y-2">
+              {/* User's cards */}
+              {cardCollection.map((card) => {
+                const info = TIER_INFO[card.tier]
+                const isSelected = card.id === selectedCard.id
+                
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => handleSelectCard(card)}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3 rounded-xl transition-all",
+                      isSelected 
+                        ? "bg-white/10 border border-white/20" 
+                        : "bg-white/5 border border-transparent hover:bg-white/10"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ background: `${info.color}20`, border: `1px solid ${info.color}40` }}
+                      >
+                        <Sparkles className="w-5 h-5" style={{ color: info.color }} />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold" style={{ color: info.color }}>{info.label}</p>
+                        <p className="text-xs text-muted-foreground">Saison {card.seasonNumber} : {card.seasonName}</p>
+                      </div>
+                    </div>
+                    {isSelected && <Check className="w-5 h-5 text-primary" />}
+                  </button>
+                )
+              })}
+              
+              {/* Admin section */}
+              {isAdmin && adminOptions && (
+                <>
+                  <div className="pt-4 pb-2 border-t border-white/10 mt-4">
+                    <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Admin - Toutes les cartes</p>
+                  </div>
+                  
+                  {adminOptions.seasons.map((season) => (
+                    <div key={season.id} className="space-y-1">
+                      <p className="text-xs text-muted-foreground px-1">Saison {season.number}: {season.name}</p>
+                      <div className="grid grid-cols-5 gap-1">
+                        {adminOptions.tiers.map((tier) => {
+                          const info = TIER_INFO[tier]
+                          return (
+                            <button
+                              key={`${season.id}-${tier}`}
+                              onClick={() => handleAdminSelectCard(season.id, tier)}
+                              className="p-2 rounded-lg transition-all hover:scale-105"
+                              style={{ background: `${info.color}20`, border: `1px solid ${info.color}30` }}
+                              title={info.label}
+                            >
+                              <Sparkles className="w-4 h-4 mx-auto" style={{ color: info.color }} />
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -243,7 +376,6 @@ interface NewTierPopupProps {
 export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: NewTierPopupProps) {
   const tierInfo = TIER_INFO[tier]
   
-  // Lock body scroll when popup is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -271,7 +403,6 @@ export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white transition-all"
@@ -279,9 +410,7 @@ export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: 
           <X className="w-4 h-4" />
         </button>
 
-        {/* Content */}
         <div className="p-6 sm:p-8 text-center">
-          {/* Icon */}
           <div 
             className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-full flex items-center justify-center"
             style={{
@@ -293,7 +422,6 @@ export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: 
             <Sparkles className="w-8 sm:w-10 h-8 sm:h-10" style={{ color: tierInfo.color }} />
           </div>
 
-          {/* Title */}
           <p className="text-zinc-500 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-2">
             Nouvelle Carte Débloquée
           </p>
@@ -310,12 +438,11 @@ export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: 
             {tierInfo.description}
           </p>
 
-          {/* Actions */}
           <div className="flex flex-col gap-2 sm:gap-3">
             <button
               onClick={() => {
                 onClose()
-                setTimeout(() => onGenerateCard(), 100) // Small delay for smooth transition
+                setTimeout(() => onGenerateCard(), 100)
               }}
               className="w-full py-2.5 sm:py-3 px-4 rounded-lg font-bold text-sm transition-all active:scale-95"
               style={{

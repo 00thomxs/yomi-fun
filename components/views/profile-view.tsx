@@ -14,8 +14,8 @@ import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 import { BadgeDisplayCompact } from "@/components/ui/badge-display"
 import { getUserBadges, getEquippedBadges } from "@/app/actions/badges"
 import { BadgesModal } from "@/components/profile/badges-modal"
-import { ProfileCardGenerator, NewTierUnlockedPopup } from "@/components/profile-card-generator"
-import { getUserSeasonCard, checkAndUpdateCardTier, type UserSeasonCard } from "@/app/actions/profile-cards"
+import { ProfileCardGenerator, ProfileCardButton, NewTierUnlockedPopup } from "@/components/profile-card-generator"
+import { getUserSelectedCard, checkAndUpdateCardTier, getUserCardCollection, type UserSeasonCard } from "@/app/actions/profile-cards"
 import type { CardRank } from "@/components/yomi-tcg-card"
 import type { UserBadgeWithDetails } from "@/lib/types"
 import { toast } from "sonner"
@@ -70,6 +70,7 @@ export function ProfileView() {
   
   // Profile Card state
   const [seasonCard, setSeasonCard] = useState<UserSeasonCard | null>(null)
+  const [cardCollection, setCardCollection] = useState<UserSeasonCard[]>([])
   const [showNewTierPopup, setShowNewTierPopup] = useState(false)
   const [newTier, setNewTier] = useState<CardRank | null>(null)
   const [showCardGenerator, setShowCardGenerator] = useState(false)
@@ -203,9 +204,13 @@ export function ProfileView() {
         }
       } else {
         // Fallback to getting existing card
-        const card = await getUserSeasonCard(user.id)
+        const card = await getUserSelectedCard(user.id)
         setSeasonCard(card)
       }
+      
+      // Load card collection
+      const collection = await getUserCardCollection(user.id)
+      setCardCollection(collection)
     }
     
     loadSeasonCard()
@@ -497,6 +502,13 @@ export function ProfileView() {
                       ))}
                     </div>
                   )}
+                  {/* Profile Card Button */}
+                  {seasonCard && (
+                    <ProfileCardButton 
+                      tier={seasonCard.tier} 
+                      onClick={() => setShowCardGenerator(true)} 
+                    />
+                  )}
                 </div>
                 
                 {/* Level & XP Progress */}
@@ -606,8 +618,8 @@ export function ProfileView() {
         />
       )}
 
-      {/* Profile Card Generator */}
-      {user && profile && seasonCard && (
+      {/* Profile Card Generator (Modal) */}
+      {user && profile && seasonCard && showCardGenerator && (
         <ProfileCardGenerator
           username={user.username || 'Joueur'}
           level={userStats.level}
@@ -620,10 +632,14 @@ export function ProfileView() {
             description: ub.badge.description || '',
             iconName: ub.badge.icon_name,
           }))}
-          seasonNumber={seasonCard.seasonNumber.toString()}
-          seasonTitle={seasonCard.seasonName}
-          cardTier={seasonCard.tier}
-          highestTier={seasonCard.highestTierAchieved}
+          currentCard={seasonCard}
+          cardCollection={cardCollection}
+          isAdmin={profile.role === 'admin'}
+          onCardChange={async () => {
+            const card = await getUserSelectedCard(user.id)
+            if (card) setSeasonCard(card)
+          }}
+          onClose={() => setShowCardGenerator(false)}
         />
       )}
 
