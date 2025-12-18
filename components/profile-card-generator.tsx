@@ -127,25 +127,27 @@ export function ProfileCardGenerator({
       
       {/* Content */}
       <div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
-        <div className="pointer-events-auto flex flex-col items-center gap-4 scale-[0.9] sm:scale-100">
+        <div className="pointer-events-auto flex flex-col items-center gap-6 scale-[0.9] sm:scale-100">
           
-          {/* Top bar */}
-          <div className="flex items-center gap-3">
-            {/* Card selector */}
+          {/* Top bar - more spacing from card */}
+          <div className="flex items-center gap-3 mb-2">
+            {/* Card selector - improved */}
             {hasMultipleCards && isRevealed && (
               <button
                 onClick={() => setShowSelector(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900/90 border border-white/10 text-white text-sm font-bold hover:bg-zinc-800 transition-all"
+                className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white text-sm font-bold hover:bg-zinc-800 hover:border-white/30 transition-all shadow-xl"
               >
-                <div className="w-3 h-3 rounded-full" style={{ background: tierInfo.color }}/>
-                <span>{tierInfo.label}</span>
-                <span className="text-zinc-500">• Saison {selectedCard.seasonNumber}</span>
-                <ChevronDown className="w-4 h-4 text-zinc-400"/>
+                <div className="w-4 h-4 rounded-full ring-2 ring-white/20" style={{ background: tierInfo.color, boxShadow: `0 0 10px ${tierInfo.color}` }}/>
+                <div className="flex flex-col items-start">
+                  <span className="text-xs text-zinc-400">Carte actuelle</span>
+                  <span className="font-bold">{tierInfo.label} <span className="font-normal text-zinc-500">• S{selectedCard.seasonNumber}</span></span>
+                </div>
+                <ChevronDown className="w-5 h-5 text-zinc-400 ml-1"/>
               </button>
             )}
             
             {/* Close */}
-            <button onClick={handleClose} className="p-2.5 rounded-xl bg-zinc-900/90 border border-white/10 text-white hover:bg-zinc-800 transition-all">
+            <button onClick={handleClose} className="p-2.5 rounded-xl bg-zinc-900/95 border border-white/20 text-white hover:bg-zinc-800 transition-all shadow-xl">
               <X className="w-5 h-5"/>
             </button>
           </div>
