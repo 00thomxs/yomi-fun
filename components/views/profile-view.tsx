@@ -502,13 +502,6 @@ export function ProfileView() {
                       ))}
                     </div>
                   )}
-                  {/* Profile Card Button */}
-                  {seasonCard && (
-                    <ProfileCardButton 
-                      tier={seasonCard.tier} 
-                      onClick={() => setShowCardGenerator(true)} 
-                    />
-                  )}
                 </div>
                 
                 {/* Level & XP Progress */}
@@ -525,12 +518,23 @@ export function ProfileView() {
                   </div>
                 </div>
               </div>
-              <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 shrink-0">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
-                <p className="text-xl font-bold text-center">
-                  <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
-                  <CurrencySymbol className="text-primary" />
-                </p>
+              
+              {/* Balance + Card Button */}
+              <div className="flex flex-col items-center gap-2 shrink-0">
+                <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
+                  <p className="text-xl font-bold text-center">
+                    <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
+                    <CurrencySymbol className="text-primary" />
+                  </p>
+                </div>
+                {/* Profile Card Button - RED */}
+                {seasonCard && (
+                  <ProfileCardButton 
+                    tier={seasonCard.tier} 
+                    onClick={() => setShowCardGenerator(true)} 
+                  />
+                )}
               </div>
             </div>
 
