@@ -159,6 +159,11 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   const [gyroEnabled, setGyroEnabled] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [needsPermission, setNeedsPermission] = useState(false)
+  
+  // Smoothing refs for gyroscope
+  const targetRotation = useRef({ x: 0, y: 0 })
+  const currentRotation = useRef({ x: 0, y: 0 })
+  const animationFrame = useRef<number | null>(null)
 
   // Detect mobile on mount
   useEffect(() => {
@@ -176,22 +181,34 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
     }
   }, [])
 
+  // Smooth animation loop for gyroscope
+  const animateGyro = () => {
+    const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor
+    const smoothFactor = 0.08 // Lower = smoother but slower response
+    
+    currentRotation.current.x = lerp(currentRotation.current.x, targetRotation.current.x, smoothFactor)
+    currentRotation.current.y = lerp(currentRotation.current.y, targetRotation.current.y, smoothFactor)
+    
+    setTransform(`perspective(1000px) rotateX(${currentRotation.current.x}deg) rotateY(${currentRotation.current.y}deg) scale3d(1.02, 1.02, 1.02)`)
+    setGlarePos({
+      x: 50 + currentRotation.current.y * 2,
+      y: 50 - currentRotation.current.x * 2,
+      opacity: 0.2,
+    })
+    
+    animationFrame.current = requestAnimationFrame(animateGyro)
+  }
+
   const handleOrientation = (e: DeviceOrientationEvent) => {
     if (e.gamma === null || e.beta === null) return
     
     // Clamp values to reasonable range
-    const gamma = Math.max(-30, Math.min(30, e.gamma)) // Left-right tilt
-    const beta = Math.max(-30, Math.min(30, e.beta - 45)) // Front-back tilt (offset for holding phone)
+    const gamma = Math.max(-25, Math.min(25, e.gamma)) // Left-right tilt
+    const beta = Math.max(-25, Math.min(25, e.beta - 45)) // Front-back tilt (offset for holding phone)
     
-    const rotateY = gamma / 2 // -15 to 15 degrees
-    const rotateX = -beta / 2 // -15 to 15 degrees
-    
-    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`)
-    setGlarePos({
-      x: 50 + gamma,
-      y: 50 + beta,
-      opacity: 0.2,
-    })
+    // Store target values (animation loop will smoothly interpolate)
+    targetRotation.current.y = gamma / 2.5 // -10 to 10 degrees
+    targetRotation.current.x = -beta / 2.5
   }
 
   // Enable gyroscope (called on user tap for iOS)
@@ -203,6 +220,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
         const permission = await (DeviceOrientationEvent as any).requestPermission()
         if (permission === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation)
+          animationFrame.current = requestAnimationFrame(animateGyro)
           setGyroEnabled(true)
           setNeedsPermission(false)
         }
@@ -213,6 +231,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
     } else {
       // Non-iOS or older iOS
       window.addEventListener('deviceorientation', handleOrientation)
+      animationFrame.current = requestAnimationFrame(animateGyro)
       setGyroEnabled(true)
     }
   }
@@ -221,6 +240,9 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   useEffect(() => {
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation)
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current)
+      }
     }
   }, [])
 
