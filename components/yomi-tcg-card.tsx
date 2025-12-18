@@ -496,7 +496,11 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                   color: rank === 'beta' ? '#facc15' : styles.accentColor,
                 }}
               >
-                {rank === 'beta' ? '⭐ BETA TESTEUR ⭐' : `Saison ${seasonNumber} : ${seasonTitle}`}
+                {rank === 'beta' 
+                  ? '⭐ BETA TESTEUR ⭐' 
+                  : seasonNumber === '0' 
+                    ? 'HORS SAISON'
+                    : `Saison ${seasonNumber} : ${seasonTitle}`}
               </div>
             </div>
             <div className="flex flex-col items-end" style={{ filter: `drop-shadow(0 0 10px ${styles.glowColor})` }}>
