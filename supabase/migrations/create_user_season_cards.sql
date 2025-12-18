@@ -4,8 +4,14 @@
 -- Stores the highest card tier achieved by each user per season
 -- Tiers: iron, bronze, gold, diamond, holographic
 
+-- Clean up existing objects (for re-running migration)
+DROP FUNCTION IF EXISTS get_user_season_card(UUID, UUID);
+DROP FUNCTION IF EXISTS update_user_card_tier(UUID, UUID);
+DROP FUNCTION IF EXISTS calculate_card_tier(UUID, UUID);
+DROP TABLE IF EXISTS public.user_season_cards;
+
 -- Create table
-CREATE TABLE IF NOT EXISTS public.user_season_cards (
+CREATE TABLE public.user_season_cards (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   season_id UUID NOT NULL REFERENCES public.seasons(id) ON DELETE CASCADE,
@@ -24,28 +30,14 @@ CREATE INDEX idx_user_season_cards_season ON public.user_season_cards(season_id)
 ALTER TABLE public.user_season_cards ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
--- Users can view their own cards
-CREATE POLICY "Users can view own cards"
-  ON public.user_season_cards
-  FOR SELECT
-  USING (auth.uid() = user_id);
-
--- Users can view others' cards (for display purposes)
+-- Anyone can view cards (for leaderboard display, etc.)
 CREATE POLICY "Anyone can view cards"
   ON public.user_season_cards
   FOR SELECT
   USING (true);
 
--- Only system/admin can insert/update
-CREATE POLICY "System can manage cards"
-  ON public.user_season_cards
-  FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND role = 'admin'
-    )
-  );
+-- Only service role can insert/update (via server actions with admin client)
+-- No user-facing write policies - all writes go through server actions
 
 -- Function to calculate card tier based on season stats
 CREATE OR REPLACE FUNCTION calculate_card_tier(
@@ -55,14 +47,19 @@ CREATE OR REPLACE FUNCTION calculate_card_tier(
 DECLARE
   v_season_pnl BIGINT;
   v_season_rank INT;
-  v_tier TEXT;
 BEGIN
-  -- Get user's season leaderboard entry
-  SELECT points, 
-         ROW_NUMBER() OVER (ORDER BY points DESC)
-  INTO v_season_pnl, v_season_rank
-  FROM public.season_leaderboards
-  WHERE season_id = p_season_id AND user_id = p_user_id;
+  -- Get user's season leaderboard entry and rank
+  WITH ranked AS (
+    SELECT 
+      user_id,
+      points,
+      ROW_NUMBER() OVER (ORDER BY points DESC) as rank
+    FROM public.season_leaderboards
+    WHERE season_id = p_season_id
+  )
+  SELECT points, rank INTO v_season_pnl, v_season_rank
+  FROM ranked
+  WHERE user_id = p_user_id;
   
   -- If user not in season leaderboard, return iron
   IF v_season_pnl IS NULL THEN
@@ -114,7 +111,7 @@ BEGIN
   -- Determine if this is a new/higher tier
   IF v_existing_highest IS NULL THEN
     v_new_highest := v_current_tier;
-    v_is_new := TRUE;
+    v_is_new := v_current_tier != 'iron'; -- Only notify for non-iron tiers
   ELSE
     -- Compare tiers
     IF array_position(v_tier_order, v_current_tier) > array_position(v_tier_order, v_existing_highest) THEN
@@ -167,4 +164,3 @@ BEGIN
   WHERE s.id = p_season_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
