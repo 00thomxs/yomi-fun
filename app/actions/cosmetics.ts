@@ -161,6 +161,7 @@ export async function getUserEquippedCosmetics(userId?: string): Promise<{
 
 /**
  * Purchase a cosmetic item
+ * Uses atomic RPC function to ensure transaction safety
  */
 export async function purchaseCosmetic(cosmeticId: string): Promise<PurchaseResult> {
   const supabase = await createClient()
@@ -169,90 +170,31 @@ export async function purchaseCosmetic(cosmeticId: string): Promise<PurchaseResu
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Non authentifié' }
   
-  // Get item details
-  const { data: item, error: itemError } = await supabase
-    .from('cosmetic_items')
-    .select('*')
-    .eq('id', cosmeticId)
-    .eq('is_available', true)
-    .single()
-  
-  if (itemError || !item) {
-    return { error: 'Cosmétique introuvable ou non disponible' }
-  }
-  
-  // Check if already owned
-  const { data: existing } = await supabaseAdmin
-    .from('user_cosmetics')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('cosmetic_id', cosmeticId)
-    .maybeSingle()
-  
-  if (existing) {
-    return { error: 'Vous possédez déjà ce cosmétique' }
-  }
-  
-  // Get user balance
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('balance')
-    .eq('id', user.id)
-    .single()
-  
-  if (!profile) {
-    return { error: 'Profil introuvable' }
-  }
-  
-  if (profile.balance < item.price) {
-    return { error: `Solde insuffisant. Il vous manque ${(item.price - profile.balance).toLocaleString()} Zeny.` }
-  }
-  
-  // Deduct balance
-  const newBalance = profile.balance - item.price
-  const { error: balanceError } = await supabaseAdmin
-    .from('profiles')
-    .update({ balance: newBalance })
-    .eq('id', user.id)
-  
-  if (balanceError) {
-    return { error: 'Erreur lors du paiement' }
-  }
-  
-  // Add to user's cosmetics
-  const { error: insertError } = await supabaseAdmin
-    .from('user_cosmetics')
-    .insert({
-      user_id: user.id,
-      cosmetic_id: cosmeticId,
-      price_paid: item.price,
+  // Call atomic purchase function
+  const { data, error } = await supabaseAdmin
+    .rpc('purchase_cosmetic', {
+      p_user_id: user.id,
+      p_cosmetic_id: cosmeticId
     })
   
-  if (insertError) {
-    // Refund on error
-    await supabaseAdmin
-      .from('profiles')
-      .update({ balance: profile.balance })
-      .eq('id', user.id)
-    
-    console.error('[purchaseCosmetic] Insert error:', insertError)
+  if (error) {
+    console.error('[purchaseCosmetic] RPC error:', error)
     return { error: 'Erreur lors de l\'achat' }
   }
   
-  // Log transaction (non-blocking, ignore errors)
-  supabaseAdmin.from('transactions').insert({
-    user_id: user.id,
-    type: 'shop_purchase',
-    amount: -item.price,
-    description: `Achat cosmétique: ${item.name}`,
-  }).then(() => {}) // Fire and forget
+  // Parse RPC result
+  const result = data as { success: boolean; error?: string; newBalance?: number; itemName?: string }
   
-  console.log(`[purchaseCosmetic] User ${user.id} bought ${item.name} for ${item.price} Zeny`)
+  if (!result.success) {
+    return { error: result.error || 'Erreur inconnue' }
+  }
+  
+  console.log(`[purchaseCosmetic] User ${user.id} bought ${result.itemName} - New balance: ${result.newBalance}`)
   
   revalidatePath('/shop')
   revalidatePath('/profile')
   
-  return { success: true, newBalance }
+  return { success: true, newBalance: result.newBalance }
 }
 
 /**
