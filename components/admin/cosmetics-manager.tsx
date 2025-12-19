@@ -150,7 +150,8 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
   }
   
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Supprimer "${name}" ? Cette action est irréversible.`)) return
+    const confirmMsg = `⚠️ Supprimer "${name}" ?\n\nCette action est irréversible.\nTous les utilisateurs qui possèdent ce cosmétique le perdront (sans remboursement).`
+    if (!confirm(confirmMsg)) return
     
     setLoading(id)
     const result = await deleteCosmeticItem(id)
@@ -158,7 +159,10 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
       toast.error('Erreur', { description: result.error })
     } else {
       setItems(prev => prev.filter(i => i.id !== id))
-      toast.success('Cosmétique supprimé')
+      const ownersMsg = result.ownersCount && result.ownersCount > 0 
+        ? ` (${result.ownersCount} utilisateur${result.ownersCount > 1 ? 's' : ''} affecté${result.ownersCount > 1 ? 's' : ''})`
+        : ''
+      toast.success(`Cosmétique supprimé${ownersMsg}`)
     }
     setLoading(null)
   }

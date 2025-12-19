@@ -455,8 +455,10 @@ export async function updateCosmeticItem(
 
 /**
  * Delete a cosmetic item
+ * Note: This will remove the cosmetic from all users who own it (no refund)
+ * The database uses CASCADE on user_cosmetics and SET NULL on user_equipped_cosmetics
  */
-export async function deleteCosmeticItem(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteCosmeticItem(id: string): Promise<{ success: boolean; error?: string; ownersCount?: number }> {
   const supabase = await createClient()
   
   // Verify admin
@@ -473,16 +475,13 @@ export async function deleteCosmeticItem(id: string): Promise<{ success: boolean
     return { success: false, error: 'Non autorisé' }
   }
   
-  // Check if any users own this cosmetic
-  const { count } = await supabaseAdmin
+  // Get count of users who own this cosmetic (for info)
+  const { count: ownersCount } = await supabaseAdmin
     .from('user_cosmetics')
     .select('id', { count: 'exact', head: true })
     .eq('cosmetic_id', id)
   
-  if (count && count > 0) {
-    return { success: false, error: `Impossible de supprimer: ${count} utilisateur(s) possède(nt) ce cosmétique` }
-  }
-  
+  // Delete the cosmetic (CASCADE will remove from user_cosmetics, SET NULL on equipped)
   const { error } = await supabaseAdmin
     .from('cosmetic_items')
     .delete()
@@ -493,10 +492,13 @@ export async function deleteCosmeticItem(id: string): Promise<{ success: boolean
     return { success: false, error: error.message }
   }
   
+  console.log(`[deleteCosmeticItem] Admin ${user.id} deleted cosmetic ${id}. ${ownersCount || 0} users affected (no refund).`)
+  
   revalidatePath('/admin/shop')
   revalidatePath('/shop')
+  revalidatePath('/profile')
   
-  return { success: true }
+  return { success: true, ownersCount: ownersCount || 0 }
 }
 
 /**
