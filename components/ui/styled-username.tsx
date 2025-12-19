@@ -42,7 +42,10 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
   // Detect if it's a CosmeticItem (has slug) or a NametagEffect (has effect)
   const isCosmeticItem = 'slug' in nametagEffect
   const effectSlug = isCosmeticItem ? nametagEffect.slug : nametagEffect.effect
-  const previewData = isCosmeticItem ? (nametagEffect.preview_data || {}) : nametagEffect
+  // Cast to any to avoid strict type checking on dynamic properties
+  const previewData: Record<string, any> = isCosmeticItem 
+    ? (nametagEffect.preview_data || {}) 
+    : (nametagEffect as Record<string, any>)
 
   // Check for useRankColor (for neon-glow)
   const glowColor = previewData.useRankColor && rankColor 
