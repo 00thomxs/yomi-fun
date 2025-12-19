@@ -80,7 +80,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
     if (rarityDiff !== 0) return rarityDiff
     return b.price - a.price
   })
-  
+
   const filteredItems = cosmeticCategory === 'all' || cosmeticCategory === 'packs'
     ? sortedItems
     : sortedItems.filter(i => i.type === cosmeticCategory)
@@ -187,29 +187,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-2xl font-bold tracking-tight uppercase">Boutique</h2>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Solde:</span>
-          <span className="font-mono font-bold text-primary flex items-center gap-1">
-            {userBalance.toLocaleString()} <CurrencySymbol />
-          </span>
-        </div>
-      </div>
+      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
 
       {/* Main Category Tabs */}
       <div className="flex gap-2">
-        <button
-          onClick={() => setCategory('zeny')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
-            category === 'zeny'
-              ? 'bg-primary text-white shadow-lg shadow-primary/20'
-              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
-          }`}
-        >
-          <Coins className="w-4 h-4" />
-          Acheter des Zeny
-        </button>
         <button
           onClick={() => setCategory('cosmetics')}
           className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
@@ -220,6 +201,17 @@ export function ShopView({ initialItems }: ShopViewProps) {
         >
           <Palette className="w-4 h-4" />
           Cosmétiques
+        </button>
+        <button
+          onClick={() => setCategory('zeny')}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
+            category === 'zeny'
+              ? 'bg-primary text-white shadow-lg shadow-primary/20'
+              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
+          }`}
+        >
+          <Coins className="w-4 h-4" />
+          Acheter des Zeny
         </button>
       </div>
 
@@ -303,33 +295,33 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {category === 'cosmetics' && (
         <div className="space-y-6">
           {/* Sub-categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2">
             {COSMETIC_CATEGORIES.map(cat => {
-              const Icon = cat.icon
+          const Icon = cat.icon
               const count = cat.id === 'all' 
                 ? initialItems.length 
                 : cat.id === 'packs'
                   ? 0
                   : initialItems.filter(i => i.type === cat.id).length
               
-              return (
-                <button
-                  key={cat.id}
+          return (
+            <button
+              key={cat.id}
                   onClick={() => setCosmeticCategory(cat.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                     cosmeticCategory === cat.id
                       ? 'bg-white/10 text-white border border-white/20'
                       : 'bg-card border border-border text-muted-foreground hover:text-white'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
+              }`}
+            >
+              <Icon className="w-4 h-4" />
                   {cat.label}
                   {cat.id !== 'packs' && <span className="text-xs opacity-60">({count})</span>}
-                </button>
-              )
-            })}
-          </div>
-          
+            </button>
+          )
+        })}
+      </div>
+
           {/* Packs Coming Soon */}
           {cosmeticCategory === 'packs' && (
             <div className="rounded-xl bg-card border border-border p-12 text-center">
@@ -342,7 +334,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 <Clock className="w-4 h-4" />
                 Bientôt disponible
               </div>
-            </div>
+        </div>
           )}
           
           {/* Cosmetics Grid */}
@@ -355,8 +347,8 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 const isPurchasingThis = isPurchasing === item.id
                 
                 return (
-                  <div
-                    key={item.id}
+          <div
+            key={item.id}
                     onClick={() => setPreviewItem(item)}
                     className={`relative rounded-xl border p-4 cursor-pointer transition-all hover:scale-[1.02] ${
                       isOwned 
@@ -427,8 +419,8 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   </div>
                 )
               })}
-            </div>
-          )}
+                  </div>
+                )}
           
           {cosmeticCategory !== 'packs' && filteredItems.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
@@ -460,7 +452,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   }}
                 >
                   {RARITY_INFO[previewItem.rarity].label}
-                </div>
+              </div>
                 <h3 className="text-xl font-bold">{previewItem.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{previewItem.description}</p>
               </div>
@@ -485,9 +477,9 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 {previewItem.type === 'aura' && <Sparkles className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
                 {previewItem.type === 'nametag' && <Type className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
                 <p className="text-xs text-muted-foreground">Aperçu sur votre carte</p>
-              </div>
+      </div>
             </div>
-            
+
             {/* Price */}
             <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-white/10">
               <span className="text-sm font-medium">Prix</span>
@@ -530,7 +522,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   )}
                 </button>
               )}
-            </div>
+              </div>
           </div>
         </div>
       )}

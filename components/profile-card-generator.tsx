@@ -82,6 +82,15 @@ export function ProfileCardGenerator({
     aura: initialAura || null,
     nametag: initialNametag || null,
   })
+  
+  // Sync props with state when they change
+  useEffect(() => {
+    setEquippedCosmetics({
+      background: initialBackground || null,
+      aura: initialAura || null,
+      nametag: initialNametag || null,
+    })
+  }, [initialBackground, initialAura, initialNametag])
 
   // Convert avatar to base64 for download compatibility
   useEffect(() => {

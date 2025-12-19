@@ -587,14 +587,15 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
               className="text-white font-black text-xl tracking-tight mb-3"
               style={{ textShadow: "0 2px 10px rgba(0,0,0,0.9)" }}
             >
-              @{nametagEffect && !isCapturing ? (
+              {nametagEffect && !isCapturing ? (
                 <StyledUsername
                   username={username}
                   nametagEffect={nametagEffect as NametagEffect}
                   rankColor={styles.accentColor}
+                  withAt
                 />
               ) : (
-                username
+                `@${username}`
               )}
             </h2>
 

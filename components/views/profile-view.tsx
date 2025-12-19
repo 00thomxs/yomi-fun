@@ -21,6 +21,7 @@ import { getUserEquippedCosmetics, type CosmeticItem } from "@/app/actions/cosme
 import type { CardRank } from "@/components/yomi-tcg-card"
 import type { UserBadgeWithDetails } from "@/lib/types"
 import { toast } from "sonner"
+import { StyledUsername } from "@/components/ui/styled-username"
 
 // Helper to abbreviate large numbers (e.g., 2420000 → 2.4M)
 function formatCompactNumber(num: number): string {
@@ -517,7 +518,13 @@ export function ProfileView() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
-                  <h3 className="text-xl font-bold tracking-tight">@{user?.username || "Utilisateur"}</h3>
+                  <h3 className="text-xl font-bold tracking-tight">
+                    <StyledUsername 
+                      username={user?.username || "Utilisateur"} 
+                      nametagEffect={equippedCosmetics.nametag}
+                      withAt
+                    />
+                  </h3>
                   {/* Equipped Badges */}
                   {equippedBadges.length > 0 && (
                     <div className="flex items-center gap-1.5">

@@ -16,27 +16,31 @@ export type NametagEffect = {
   color?: string
 }
 
-// For leaderboard (uses CosmeticItem directly)
-type StyledUsernamePropsWithItem = {
+// Common props
+type BaseProps = {
   username: string
-  nametagEffect?: CosmeticItem | null
   rankColor?: string
   className?: string
+  withAt?: boolean // Include @ in the styled effect
+}
+
+// For leaderboard (uses CosmeticItem directly)
+type StyledUsernamePropsWithItem = BaseProps & {
+  nametagEffect?: CosmeticItem | null
 }
 
 // For card (uses NametagEffect from preview_data)
-type StyledUsernamePropsWithEffect = {
-  username: string
+type StyledUsernamePropsWithEffect = BaseProps & {
   nametagEffect?: NametagEffect | null
-  rankColor?: string
-  className?: string
 }
 
 type StyledUsernameProps = StyledUsernamePropsWithItem | StyledUsernamePropsWithEffect
 
-export function StyledUsername({ username, nametagEffect, rankColor, className }: StyledUsernameProps) {
+export function StyledUsername({ username, nametagEffect, rankColor, className, withAt = false }: StyledUsernameProps) {
+  const displayName = withAt ? `@${username}` : username
+  
   if (!nametagEffect) {
-    return <span className={className}>{username}</span>
+    return <span className={className}>{displayName}</span>
   }
 
   // Detect if it's a CosmeticItem (has slug) or a NametagEffect (has effect)
@@ -66,7 +70,7 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
           textShadow: `0 0 8px ${glowColor}, 0 0 16px ${glowColor}40`
         } as React.CSSProperties}
       >
-        {username}
+        {displayName}
       </span>
     )
   }
@@ -88,7 +92,7 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
           backgroundClip: 'text'
         }}
       >
-        {username}
+        {displayName}
       </span>
     )
   }
@@ -100,7 +104,7 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
         className={cn("nametag-pixel", className)}
         style={{ fontFamily: '"Press Start 2P", "Courier New", monospace', fontSize: '0.75em' }}
       >
-        {username}
+        {displayName}
       </span>
     )
   }
@@ -109,7 +113,7 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
   if (normalizedEffect === 'shiny' || normalizedEffect === 'shine' || previewData.effect === 'shine') {
     return (
       <span className={cn("nametag-shiny", className)}>
-        <span className="shiny-text">{username}</span>
+        <span className="shiny-text">{displayName}</span>
       </span>
     )
   }
@@ -121,13 +125,13 @@ export function StyledUsername({ username, nametagEffect, rankColor, className }
         className={cn("nametag-gothic", className)}
         style={{ fontFamily: '"UnifrakturMaguntia", "Times New Roman", serif' }}
       >
-        {username}
+        {displayName}
       </span>
     )
   }
 
   // Default
-  return <span className={className}>{username}</span>
+  return <span className={className}>{displayName}</span>
 }
 
 // Helper to parse preview_data from DB

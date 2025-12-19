@@ -634,7 +634,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@<StyledUsername username={top2.username} nametagEffect={equippedNametags[top2.id]} /></p>
+                <p className="font-bold text-sm truncate px-2"><StyledUsername username={top2.username} nametagEffect={equippedNametags[top2.id]} withAt /></p>
                 {equippedBadges[top2.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top2.id].slice(0, 2).map(badge => (
@@ -685,7 +685,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-black text-base truncate px-2 text-amber-100">@<StyledUsername username={top1.username} nametagEffect={equippedNametags[top1.id]} /></p>
+                <p className="font-black text-base truncate px-2 text-amber-100"><StyledUsername username={top1.username} nametagEffect={equippedNametags[top1.id]} withAt /></p>
                 {equippedBadges[top1.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top1.id].slice(0, 2).map(badge => (
@@ -732,7 +732,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@<StyledUsername username={top3.username} nametagEffect={equippedNametags[top3.id]} /></p>
+                <p className="font-bold text-sm truncate px-2"><StyledUsername username={top3.username} nametagEffect={equippedNametags[top3.id]} withAt /></p>
                 {equippedBadges[top3.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top3.id].slice(0, 2).map(badge => (

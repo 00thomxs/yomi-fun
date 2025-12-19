@@ -9,7 +9,7 @@ export default async function AdminShopPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Gestion du Shop</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Gestion du Shop</h1>
         <p className="text-muted-foreground">Gérez les cosmétiques disponibles à l'achat</p>
       </div>
       <CosmeticsManager initialItems={items} />
