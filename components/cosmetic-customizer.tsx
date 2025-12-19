@@ -183,10 +183,15 @@ export function CosmeticCustomizer({
               <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="text-center py-12">
-              <TYPE_INFO[selectedType].icon className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-              <p className="text-muted-foreground">Aucun cosmétique de ce type disponible</p>
-            </div>
+            (() => {
+              const Icon = TYPE_INFO[selectedType].icon
+              return (
+                <div className="text-center py-12">
+                  <Icon className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+                  <p className="text-muted-foreground">Aucun cosmétique de ce type disponible</p>
+                </div>
+              )
+            })()
           ) : (
             <>
               {/* Owned Items */}
