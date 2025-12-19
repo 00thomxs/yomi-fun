@@ -31,6 +31,10 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       setIsLoading(false)
     }
     fetchStatus()
+    
+    // Refresh periodically to sync with widget claims
+    const interval = setInterval(fetchStatus, 3000)
+    return () => clearInterval(interval)
   }, [])
 
   const handleClaimWelcome = async () => {
