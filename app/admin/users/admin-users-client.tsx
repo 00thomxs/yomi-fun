@@ -212,8 +212,8 @@ function UserSearchTable({
   }
   
   const handleSort = (column: UserSearchFilters['sortBy']) => {
-    const newOrder = filters.sortBy === column && filters.sortOrder === 'desc' ? 'asc' : 'desc'
-    const newFilters = { ...filters, query, sortBy: column, sortOrder: newOrder, offset: 0 }
+    const newOrder: 'asc' | 'desc' = filters.sortBy === column && filters.sortOrder === 'desc' ? 'asc' : 'desc'
+    const newFilters: UserSearchFilters = { ...filters, query, sortBy: column, sortOrder: newOrder, offset: 0 }
     setFilters(newFilters)
     doSearch(newFilters)
   }
