@@ -5,12 +5,12 @@ import { X, Palette, Sparkles, Type, Check, Loader2, Lock, ChevronRight } from '
 import { 
   type CosmeticItem, 
   type CosmeticType,
-  RARITY_INFO,
   getUserCosmetics,
   getUserEquippedCosmetics,
   equipCosmetic,
   getCosmeticItems
 } from '@/app/actions/cosmetics'
+import { RARITY_INFO } from '@/lib/cosmetics-types'
 import { CurrencySymbol } from '@/components/ui/currency-symbol'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'

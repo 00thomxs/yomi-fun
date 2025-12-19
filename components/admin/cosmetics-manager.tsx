@@ -11,12 +11,12 @@ import {
   type CosmeticItem, 
   type CosmeticType, 
   type CosmeticRarity,
-  RARITY_INFO,
   createCosmeticItem,
   updateCosmeticItem,
   deleteCosmeticItem,
   toggleCosmeticAvailability
 } from "@/app/actions/cosmetics"
+import { RARITY_INFO } from "@/lib/cosmetics-types"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 
 const TYPE_INFO: Record<CosmeticType, { label: string; icon: typeof Palette; color: string }> = {

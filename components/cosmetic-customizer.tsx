@@ -5,11 +5,11 @@ import { X, Check, Palette, Sparkles, Type, Lock, ChevronRight, Loader2 } from "
 import { 
   type CosmeticItem, 
   type CosmeticType,
-  RARITY_INFO,
   getUserCosmetics,
   getUserEquippedCosmetics,
   equipCosmetic
 } from "@/app/actions/cosmetics"
+import { RARITY_INFO } from "@/lib/cosmetics-types"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { toast } from "sonner"
 import Link from "next/link"

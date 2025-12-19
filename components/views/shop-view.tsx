@@ -12,11 +12,11 @@ import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { 
   type CosmeticItem, 
   type CosmeticType,
-  RARITY_INFO,
   purchaseCosmetic,
   getUserCosmetics,
   equipCosmetic
 } from "@/app/actions/cosmetics"
+import { RARITY_INFO } from "@/lib/cosmetics-types"
 import { useUser } from "@/contexts/user-context"
 import { ZENY_PACKS } from "@/lib/constants"
 import { createStripeCheckoutSession } from "@/app/actions/stripe"
