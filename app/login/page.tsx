@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2 } from "lucide-react"
 import { signInWithGoogle } from "@/app/auth/actions"
 import { YomiLogo } from "@/components/ui/yomi-logo"
@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { signIn, signUp, isAuthenticated, isLoading: authLoading } = useUser()
   
   const [isLogin, setIsLogin] = useState(true)
@@ -23,6 +24,16 @@ export default function LoginPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  
+  // Check for error in URL params (e.g., from banned user redirect)
+  useEffect(() => {
+    const urlError = searchParams.get('error')
+    if (urlError === 'banned') {
+      setError('Votre compte a été suspendu. Contactez le support pour plus d\'informations.')
+    } else if (urlError === 'auth_error') {
+      setError('Une erreur d\'authentification s\'est produite. Veuillez réessayer.')
+    }
+  }, [searchParams])
 
   // Redirect if already authenticated
   useEffect(() => {

@@ -67,13 +67,30 @@ export async function signUp(email: string, password: string, username: string):
 export async function signIn(email: string, password: string): Promise<AuthResult> {
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Check if user is banned
+  if (data.user) {
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_banned, ban_reason')
+      .eq('id', data.user.id)
+      .single()
+    
+    if (profile?.is_banned) {
+      // Sign out the banned user immediately
+      await supabase.auth.signOut()
+      return { 
+        error: `Votre compte a été suspendu${profile.ban_reason ? ` : ${profile.ban_reason}` : ''}` 
+      }
+    }
   }
 
   return { success: true }
