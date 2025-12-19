@@ -3,299 +3,614 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
-import { ShoppingBag, CreditCard, Gamepad2, Sparkles, Heart, Loader2, Mail, Tag, Package, CheckCircle, AlertTriangle } from "lucide-react"
+import { 
+  Coins, Palette, Sparkles, Type, Package, Loader2, 
+  Check, Lock, ChevronRight, Zap, Crown, Star, Clock, X, PartyPopper
+} from "lucide-react"
 import { toast } from "sonner"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import { ShopItem } from "@/lib/types"
-import { purchaseItem } from "@/app/actions/shop"
+import { 
+  type CosmeticItem, 
+  type CosmeticType,
+  RARITY_INFO,
+  purchaseCosmetic,
+  getUserCosmetics,
+  equipCosmetic
+} from "@/app/actions/cosmetics"
 import { useUser } from "@/contexts/user-context"
-import { SuccessPopup } from "@/components/ui/success-popup"
+import { ZENY_PACKS } from "@/lib/constants"
+import { createStripeCheckoutSession } from "@/app/actions/stripe"
 
 interface ShopViewProps {
-  initialItems: ShopItem[]
+  initialItems: CosmeticItem[]
 }
 
+type ShopCategory = 'zeny' | 'cosmetics'
+type CosmeticCategory = 'all' | 'background' | 'aura' | 'nametag' | 'packs'
+
+const COSMETIC_CATEGORIES: { id: CosmeticCategory; label: string; icon: typeof Palette }[] = [
+  { id: 'all', label: 'Tous', icon: Sparkles },
+  { id: 'background', label: 'Fonds', icon: Palette },
+  { id: 'aura', label: 'Auras', icon: Sparkles },
+  { id: 'nametag', label: 'Pseudo', icon: Type },
+  { id: 'packs', label: 'Packs', icon: Package },
+]
+
 export function ShopView({ initialItems }: ShopViewProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [isPurchasing, setIsPurchasing] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null)
-  const [deliveryInfo, setDeliveryInfo] = useState("")
-  const [showPurchasePopup, setShowPurchasePopup] = useState(false)
-  const [purchasedItemName, setPurchasedItemName] = useState("")
+  const [category, setCategory] = useState<ShopCategory>('cosmetics')
+  const [cosmeticCategory, setCosmeticCategory] = useState<CosmeticCategory>('all')
+  const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set())
+  const [isPurchasing, setIsPurchasing] = useState<string | null>(null)
+  const [loadingZeny, setLoadingZeny] = useState<string | null>(null)
+  const [previewItem, setPreviewItem] = useState<CosmeticItem | null>(null)
+  const [purchasedItem, setPurchasedItem] = useState<CosmeticItem | null>(null)
+  const [isEquipping, setIsEquipping] = useState(false)
   
-  const { userBalance, setUserBalance } = useUser()
+  const { userBalance, setUserBalance, isAuthenticated } = useUser()
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Check for successful payment on mount
+  // Check for successful Zeny payment
   useEffect(() => {
     const success = searchParams.get("success")
-    console.log("ShopView mounted. Success param:", success)
-
     if (success === "true") {
       const amount = searchParams.get("amount")
-      
       toast.success("Paiement réussi !", {
         description: `Votre compte a été crédité de ${Number(amount).toLocaleString()} Zeny.`,
         duration: 5000,
       })
-
-      // Clean URL after a short delay to ensure toast is seen
-      setTimeout(() => {
-        router.replace("/shop")
-      }, 1000)
+      setTimeout(() => router.replace("/shop"), 1000)
     }
   }, [searchParams, router])
 
-  const categories = [
-    { id: "all", name: "Tout", icon: ShoppingBag },
-    { id: "gaming", name: "Gaming", icon: Gamepad2 },
-    { id: "giftcards", name: "Cartes Cadeaux", icon: CreditCard },
-    { id: "experiences", name: "Expériences", icon: Sparkles },
-    { id: "deals", name: "Bons Plans", icon: Tag },
-  ]
+  // Load owned cosmetics
+  useEffect(() => {
+    const loadOwned = async () => {
+      if (!isAuthenticated) return
+      const owned = await getUserCosmetics()
+      setOwnedIds(new Set(owned.map(o => o.cosmetic_id)))
+    }
+    loadOwned()
+  }, [isAuthenticated])
 
-  const filteredItems =
-    selectedCategory === "all" 
-      ? initialItems 
-      : initialItems.filter((item) => {
-          const itemCat = item.category?.toLowerCase() || ""
-          const filterCat = selectedCategory.toLowerCase()
-          
-          // Mapping spécial pour les catégories composées
-          if (filterCat === "giftcards") return itemCat.includes("carte") || itemCat.includes("gift")
-          if (filterCat === "deals") return itemCat.includes("bon") || itemCat.includes("deal") || itemCat.includes("shop")
-          if (filterCat === "experiences") return itemCat.includes("exp")
-          
-          // Fallback simple
-          return itemCat.includes(filterCat)
-        })
+  // Sort by rarity then by price
+  const rarityOrder = { legendary: 0, epic: 1, rare: 2, common: 3 }
+  const sortedItems = [...initialItems].sort((a, b) => {
+    const rarityDiff = rarityOrder[a.rarity] - rarityOrder[b.rarity]
+    if (rarityDiff !== 0) return rarityDiff
+    return b.price - a.price
+  })
+  
+  const filteredItems = cosmeticCategory === 'all' || cosmeticCategory === 'packs'
+    ? sortedItems
+    : sortedItems.filter(i => i.type === cosmeticCategory)
 
-  const handlePurchaseClick = (item: ShopItem) => {
-    setSelectedItem(item)
-    setDeliveryInfo("")
-  }
-
-  const handleConfirmPurchase = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedItem) return
-
-    setIsPurchasing(true)
+  const handleBuyZeny = async (packId: string) => {
+    setLoadingZeny(packId)
     try {
-      const result = await purchaseItem(selectedItem.id, deliveryInfo)
-      
-      if (result.error) {
-        toast.error("Erreur", { description: result.error })
-      } else {
-        if (result.newBalance !== undefined) {
-          setUserBalance(result.newBalance)
-        }
-        // Store item name and show popup
-        setPurchasedItemName(selectedItem.name)
-        setSelectedItem(null) // Close purchase modal
-        setShowPurchasePopup(true) // Show success popup
+      const { url, error } = await createStripeCheckoutSession(packId)
+      if (error) {
+        toast.error("Erreur", { description: error })
+        return
       }
+      if (url) window.location.href = url
     } catch (error) {
-      console.error(error)
       toast.error("Erreur", { description: "Une erreur est survenue." })
     } finally {
-      setIsPurchasing(false)
+      setLoadingZeny(null)
     }
   }
 
-  const getCategoryIcon = (category: string) => {
-    const lowerCat = category?.toLowerCase() || ""
-    if (lowerCat.includes("gaming")) return <Gamepad2 className="w-3 h-3" />
-    if (lowerCat.includes("carte") || lowerCat.includes("gift")) return <CreditCard className="w-3 h-3" />
-    if (lowerCat.includes("deal") || lowerCat.includes("shopping")) return <Tag className="w-3 h-3" />
-    if (lowerCat.includes("experience")) return <Sparkles className="w-3 h-3" />
-        return <ShoppingBag className="w-3 h-3" />
+  const handlePurchaseCosmetic = async (item: CosmeticItem) => {
+    if (!isAuthenticated) {
+      toast.error("Connectez-vous", { description: "Vous devez être connecté pour acheter." })
+      return
+    }
+    
+    if (ownedIds.has(item.id)) {
+      toast.info("Déjà possédé", { description: "Vous possédez déjà ce cosmétique." })
+      return
+    }
+    
+    if (userBalance < item.price) {
+      toast.error("Solde insuffisant", { 
+        description: `Il vous manque ${(item.price - userBalance).toLocaleString()} Zeny.` 
+      })
+      return
+    }
+    
+    setIsPurchasing(item.id)
+    try {
+      const result = await purchaseCosmetic(item.id)
+      if (result.error) {
+        toast.error("Erreur", { description: result.error })
+      } else {
+        if (result.newBalance !== undefined) setUserBalance(result.newBalance)
+        setOwnedIds(prev => new Set([...prev, item.id]))
+        setPreviewItem(null)
+        // Show success popup with equip option
+        setPurchasedItem(item)
+      }
+    } catch (error) {
+      toast.error("Erreur", { description: "Une erreur est survenue." })
+    } finally {
+      setIsPurchasing(null)
+    }
+  }
+
+  const handleEquipPurchased = async () => {
+    if (!purchasedItem) return
+    setIsEquipping(true)
+    try {
+      const result = await equipCosmetic(purchasedItem.type, purchasedItem.id)
+      if (result.error) {
+        toast.error("Erreur", { description: result.error })
+      } else {
+        toast.success("Style appliqué !", { description: `${purchasedItem.name} est maintenant équipé sur votre carte.` })
+        setPurchasedItem(null)
+      }
+    } catch {
+      toast.error("Erreur", { description: "Impossible d'équiper le cosmétique." })
+    } finally {
+      setIsEquipping(false)
+    }
+  }
+
+  const getZenyPackTheme = (id: string) => {
+    switch (id) {
+      case 'pack_little_player': return { 
+        iconBg: 'bg-white/5', iconColor: 'text-muted-foreground', accent: 'text-white', popular: false 
+      }
+      case 'pack_degen': return { 
+        iconBg: 'bg-primary/20', iconColor: 'text-primary', accent: 'text-primary', popular: true 
+      }
+      case 'pack_trader': return { 
+        iconBg: 'bg-purple-500/10', iconColor: 'text-purple-400', accent: 'text-purple-400', popular: false 
+      }
+      case 'pack_whale': return { 
+        iconBg: 'bg-amber-400/10', iconColor: 'text-amber-400', accent: 'text-amber-400', popular: false 
+      }
+      default: return { iconBg: 'bg-white/5', iconColor: 'text-white', accent: 'text-white', popular: false }
+    }
+  }
+
+  const getZenyIcon = (id: string) => {
+    switch (id) {
+      case 'pack_little_player': return <Star className="w-6 h-6" />
+      case 'pack_degen': return <Zap className="w-6 h-6" />
+      case 'pack_trader': return <Sparkles className="w-6 h-6" />
+      case 'pack_whale': return <Crown className="w-6 h-6" />
+      default: return <Star className="w-6 h-6" />
+    }
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link 
-            href="/shop/buy-zeny"
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs sm:text-sm font-bold hover:bg-primary/20 transition-all shadow-[0_0_15px_rgba(220,38,38,0.15)]"
-          >
-            <CreditCard className="w-4 h-4" />
-            <span className="hidden xs:inline">Acheter des</span> Zeny
-          </Link>
-          <Link 
-            href="/orders"
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-card border border-border rounded-lg text-xs sm:text-sm font-medium hover:bg-white/5 hover:border-white/20 transition-all"
-          >
-            <Package className="w-4 h-4" />
-            <span className="hidden sm:inline">Mes</span> Commandes
-          </Link>
+        <h2 className="text-2xl font-bold tracking-tight uppercase">Boutique</h2>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Solde:</span>
+          <span className="font-mono font-bold text-primary flex items-center gap-1">
+            {userBalance.toLocaleString()} <CurrencySymbol />
+          </span>
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {categories.map((cat) => {
-          const Icon = cat.icon
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-lg font-semibold text-sm tracking-tight whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-                selectedCategory === cat.id
-                  ? "bg-white/10 text-white border border-white/20"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/10"
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              {cat.name}
-            </button>
-          )
-        })}
+      {/* Main Category Tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setCategory('zeny')}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
+            category === 'zeny'
+              ? 'bg-primary text-white shadow-lg shadow-primary/20'
+              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
+          }`}
+        >
+          <Coins className="w-4 h-4" />
+          Acheter des Zeny
+        </button>
+        <button
+          onClick={() => setCategory('cosmetics')}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
+            category === 'cosmetics'
+              ? 'bg-white/10 text-white border border-white/20'
+              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
+          }`}
+        >
+          <Palette className="w-4 h-4" />
+          Cosmétiques
+        </button>
       </div>
 
-      {/* Shop Items Grid */}
-      {filteredItems.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Aucun article disponible dans cette catégorie pour le moment.
-        </div>
-      ) : (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-              className="relative overflow-hidden rounded-xl bg-card border border-border hover:border-white/20 transition-all group flex flex-col"
-            >
-              <div className="relative aspect-square overflow-hidden bg-black/20">
-                {item.image_url ? (
-              <img
-                    src={item.image_url}
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <ShoppingBag className="w-12 h-12 opacity-20" />
-                  </div>
-                )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-            </div>
-
-              <div className="p-4 space-y-3 flex-1 flex flex-col">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
-                {getCategoryIcon(item.category)}
-                <span>{item.category}</span>
-              </div>
-                <p className="font-semibold text-sm tracking-tight leading-snug flex-1">{item.name}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="font-mono text-primary text-sm font-bold flex items-center gap-1">
-                    {item.price.toLocaleString()} <CurrencySymbol />
-                  </span>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    item.stock === 0 
-                      ? 'bg-rose-500/10 text-rose-500' 
-                      : item.stock === -1 
-                        ? 'bg-blue-500/10 text-blue-500'
-                        : 'bg-green-500/10 text-green-500'
-                  }`}>
-                    {item.stock === -1 ? 'Infini' : `${item.stock} dispo`}
-                </span>
-              </div>
-              {/* Button - Always at bottom */}
-              <button
-                onClick={() => handlePurchaseClick(item)}
-                disabled={isPurchasing || item.stock === 0}
-                className="w-full py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-bold text-sm tracking-tight uppercase hover:bg-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_10px_rgba(220,38,38,0.1)]"
-              >
-                {item.stock === 0 ? "Rupture" : "Acheter"}
-              </button>
-            </div>
+      {/* ZENY SECTION */}
+      {category === 'zeny' && (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h3 className="text-xl font-bold">Recharge tes <span className="text-primary">Zeny</span></h3>
+            <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+              Plus le pack est gros, plus le bonus est important !
+            </p>
           </div>
-        ))}
-      </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {ZENY_PACKS.map((pack) => {
+              const theme = getZenyPackTheme(pack.id)
+              
+              return (
+                <div 
+                  key={pack.id}
+                  className={`relative rounded-xl border p-5 flex flex-col transition-all hover:scale-[1.02] ${
+                    theme.popular 
+                      ? 'border-primary/50 bg-gradient-to-b from-primary/10 to-card' 
+                      : 'border-border bg-card'
+                  }`}
+                >
+                  {theme.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-bold uppercase tracking-wider text-white">
+                      Populaire
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-4">
+                    <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mx-auto mb-3`}>
+                      <div className={theme.iconColor}>{getZenyIcon(pack.id)}</div>
+                    </div>
+                    <h4 className="font-bold uppercase tracking-tight">{pack.name}</h4>
+                    <div className="text-2xl font-bold mt-1">{pack.price}€</div>
+                  </div>
+                  
+                  <div className="p-3 rounded-lg bg-black/40 text-center mb-4">
+                    <div className={`text-xl font-bold ${theme.accent} flex items-center justify-center gap-1`}>
+                      {pack.amount.toLocaleString()} <CurrencySymbol />
+                    </div>
+                    {pack.bonus > 0 ? (
+                      <div className="text-xs font-bold text-emerald-400 mt-1">
+                        +{pack.bonus.toLocaleString()} offerts
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground/50 mt-1">Pas de bonus</div>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handleBuyZeny(pack.id)}
+                    disabled={!!loadingZeny}
+                    className={`w-full py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all ${
+                      theme.popular
+                        ? 'bg-primary text-white hover:bg-primary/90'
+                        : 'bg-white/5 hover:bg-white/10 border border-white/5'
+                    }`}
+                  >
+                    {loadingZeny === pack.id ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </span>
+                    ) : 'Acheter'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          
+          <p className="text-center text-xs text-muted-foreground">
+            Paiement sécurisé par Stripe. Les Zeny sont une monnaie virtuelle utilisable uniquement sur YOMI.
+          </p>
+        </div>
       )}
 
-      {/* Purchase Modal */}
-      {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md p-6 space-y-6 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4">
-            <div className="space-y-2 text-center">
-              <h3 className="text-xl font-bold">Confirmer l'achat</h3>
-              <p className="text-muted-foreground text-sm">
-                Vous êtes sur le point d'acheter <span className="text-white font-semibold">{selectedItem.name}</span>
+      {/* COSMETICS SECTION */}
+      {category === 'cosmetics' && (
+        <div className="space-y-6">
+          {/* Sub-categories */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {COSMETIC_CATEGORIES.map(cat => {
+              const Icon = cat.icon
+              const count = cat.id === 'all' 
+                ? initialItems.length 
+                : cat.id === 'packs'
+                  ? 0
+                  : initialItems.filter(i => i.type === cat.id).length
+              
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setCosmeticCategory(cat.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                    cosmeticCategory === cat.id
+                      ? 'bg-white/10 text-white border border-white/20'
+                      : 'bg-card border border-border text-muted-foreground hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {cat.label}
+                  {cat.id !== 'packs' && <span className="text-xs opacity-60">({count})</span>}
+                </button>
+              )
+            })}
+          </div>
+          
+          {/* Packs Coming Soon */}
+          {cosmeticCategory === 'packs' && (
+            <div className="rounded-xl bg-card border border-border p-12 text-center">
+              <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
+              <h3 className="text-xl font-bold mb-2">Packs & Bundles</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Des offres groupées avec des réductions exclusives arrivent bientôt !
               </p>
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold">
+                <Clock className="w-4 h-4" />
+                Bientôt disponible
+              </div>
             </div>
+          )}
+          
+          {/* Cosmetics Grid */}
+          {cosmeticCategory !== 'packs' && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredItems.map(item => {
+                const rarityInfo = RARITY_INFO[item.rarity]
+                const isOwned = ownedIds.has(item.id)
+                const canAfford = userBalance >= item.price
+                const isPurchasingThis = isPurchasing === item.id
+                
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setPreviewItem(item)}
+                    className={`relative rounded-xl border p-4 cursor-pointer transition-all hover:scale-[1.02] ${
+                      isOwned 
+                        ? 'bg-emerald-500/5 border-emerald-500/30' 
+                        : 'bg-card border-border hover:border-white/20'
+                    }`}
+                  >
+                    {/* Rarity Badge */}
+                    <div 
+                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[9px] font-bold uppercase"
+                      style={{ 
+                        background: `${rarityInfo.color}15`, 
+                        border: `1px solid ${rarityInfo.color}40`,
+                        color: rarityInfo.color 
+                      }}
+                    >
+                      {rarityInfo.label}
+                    </div>
+                    
+                    {/* Limited Badge */}
+                    {item.is_limited && (
+                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-bold">
+                        <Clock className="w-2.5 h-2.5" />
+                        Limité
+                      </div>
+                    )}
+                    
+                    {/* Preview Area */}
+                    <div 
+                      className="aspect-square rounded-lg mb-3 flex items-center justify-center"
+                      style={{ 
+                        background: `${rarityInfo.color}10`,
+                        border: `1px solid ${rarityInfo.color}20`
+                      }}
+                    >
+                      {item.type === 'background' && <Palette className="w-10 h-10" style={{ color: rarityInfo.color }} />}
+                      {item.type === 'aura' && <Sparkles className="w-10 h-10" style={{ color: rarityInfo.color }} />}
+                      {item.type === 'nametag' && <Type className="w-10 h-10" style={{ color: rarityInfo.color }} />}
+                    </div>
+                    
+                    {/* Info */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-bold text-sm truncate">{item.name}</h4>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-2">
+                      {item.type === 'background' && <><Palette className="w-3 h-3" /> Fond</>}
+                      {item.type === 'aura' && <><Sparkles className="w-3 h-3" /> Aura</>}
+                      {item.type === 'nametag' && <><Type className="w-3 h-3" /> Pseudo</>}
+                    </div>
+                    {item.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{item.description}</p>
+                    )}
+                    
+                    {/* Price / Owned */}
+                    <div className="flex items-center justify-between">
+                      {isOwned ? (
+                        <span className="flex items-center gap-1 text-emerald-400 text-sm font-bold">
+                          <Check className="w-4 h-4" />
+                          Possédé
+                        </span>
+                      ) : (
+                        <span className={`font-mono font-bold text-sm flex items-center gap-1 ${canAfford ? 'text-primary' : 'text-rose-400'}`}>
+                          {item.price.toLocaleString()} <CurrencySymbol />
+                        </span>
+                      )}
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          
+          {cosmeticCategory !== 'packs' && filteredItems.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              Aucun cosmétique disponible dans cette catégorie.
+            </div>
+          )}
+        </div>
+      )}
 
+      {/* Preview/Purchase Modal */}
+      {previewItem && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onClick={() => setPreviewItem(null)}
+        >
+          <div 
+            className="bg-card border border-border rounded-xl w-full max-w-md p-6 space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <div 
+                  className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase mb-2"
+                  style={{ 
+                    background: `${RARITY_INFO[previewItem.rarity].color}15`, 
+                    border: `1px solid ${RARITY_INFO[previewItem.rarity].color}40`,
+                    color: RARITY_INFO[previewItem.rarity].color 
+                  }}
+                >
+                  {RARITY_INFO[previewItem.rarity].label}
+                </div>
+                <h3 className="text-xl font-bold">{previewItem.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{previewItem.description}</p>
+              </div>
+              <button
+                onClick={() => setPreviewItem(null)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-all"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            
+            {/* Preview Placeholder */}
+            <div 
+              className="aspect-video rounded-xl flex items-center justify-center"
+              style={{ 
+                background: `${RARITY_INFO[previewItem.rarity].color}10`,
+                border: `1px solid ${RARITY_INFO[previewItem.rarity].color}30`
+              }}
+            >
+              <div className="text-center">
+                {previewItem.type === 'background' && <Palette className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
+                {previewItem.type === 'aura' && <Sparkles className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
+                {previewItem.type === 'nametag' && <Type className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
+                <p className="text-xs text-muted-foreground">Aperçu sur votre carte</p>
+              </div>
+            </div>
+            
+            {/* Price */}
             <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-white/10">
-              <span className="text-sm font-medium">Prix total</span>
+              <span className="text-sm font-medium">Prix</span>
               <span className="text-xl font-bold text-primary flex items-center gap-1">
-                {selectedItem.price.toLocaleString()} <CurrencySymbol />
+                {previewItem.price.toLocaleString()} <CurrencySymbol />
               </span>
             </div>
             
-            {selectedItem.stock !== -1 && (
-              <p className="text-center text-xs text-amber-400 font-bold uppercase tracking-widest">
-                Attention : Plus que {selectedItem.stock} exemplaires !
-              </p>
-            )}
-
-            {userBalance < selectedItem.price && (
-              <div className="flex items-center gap-2 text-xs text-rose-400 font-bold uppercase tracking-widest justify-center">
-                <AlertTriangle className="w-3 h-3" />
-                Solde insuffisant ! Il vous manque {(selectedItem.price - userBalance).toLocaleString()} Zeny
-              </div>
-            )}
-
-            <form onSubmit={handleConfirmPurchase} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3 h-3" />
-                  Email de réception
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={deliveryInfo}
-                  onChange={(e) => setDeliveryInfo(e.target.value)}
-                  placeholder="exemple@email.com"
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 transition-all"
-                />
-                <p className="text-xs text-muted-foreground">
-                  L'article sera envoyé à cette adresse email.
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-2">
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPreviewItem(null)}
+                className="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 font-medium transition-all"
+              >
+                Fermer
+              </button>
+              {ownedIds.has(previewItem.id) ? (
                 <button
-                  type="button"
-                  onClick={() => setSelectedItem(null)}
-                  disabled={isPurchasing}
-                  className="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 font-semibold transition-all cursor-pointer"
+                  disabled
+                  className="flex-1 py-3 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center gap-2"
                 >
-                  Annuler
+                  <Check className="w-4 h-4" />
+                  Possédé
                 </button>
+              ) : (
                 <button
-                  type="submit"
-                  disabled={isPurchasing || !deliveryInfo.trim() || userBalance < selectedItem.price}
-                  className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={() => handlePurchaseCosmetic(previewItem)}
+                  disabled={isPurchasing === previewItem.id || userBalance < previewItem.price}
+                  className="flex-1 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isPurchasing && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {userBalance < selectedItem.price ? "Solde insuffisant" : "Confirmer"}
+                  {isPurchasing === previewItem.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : userBalance < previewItem.price ? (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      Solde insuffisant
+                    </>
+                  ) : (
+                    'Acheter'
+                  )}
                 </button>
-              </div>
-            </form>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Purchase Success Popup */}
-      <SuccessPopup
-        type="purchase"
-        isOpen={showPurchasePopup}
-        onClose={() => setShowPurchasePopup(false)}
-        data={{ itemName: purchasedItemName }}
-      />
+      {/* Purchase Success Modal */}
+      {purchasedItem && (
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in"
+          onClick={() => setPurchasedItem(null)}
+        >
+          <div 
+            className="bg-card border rounded-2xl w-full max-w-sm p-6 text-center space-y-5 animate-in zoom-in-95"
+            style={{ 
+              borderColor: `${RARITY_INFO[purchasedItem.rarity].color}50`,
+              boxShadow: `0 0 60px ${RARITY_INFO[purchasedItem.rarity].color}20`
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Celebration Icon */}
+            <div 
+              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+              style={{ 
+                background: `${RARITY_INFO[purchasedItem.rarity].color}15`,
+                border: `2px solid ${RARITY_INFO[purchasedItem.rarity].color}40`
+              }}
+            >
+              <PartyPopper className="w-10 h-10" style={{ color: RARITY_INFO[purchasedItem.rarity].color }} />
+            </div>
+            
+            {/* Title */}
+            <div>
+              <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">Achat réussi !</p>
+              <h3 className="text-2xl font-black" style={{ color: RARITY_INFO[purchasedItem.rarity].color }}>
+                {purchasedItem.name}
+              </h3>
+              <div 
+                className="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                style={{ 
+                  background: `${RARITY_INFO[purchasedItem.rarity].color}15`, 
+                  color: RARITY_INFO[purchasedItem.rarity].color 
+                }}
+              >
+                {RARITY_INFO[purchasedItem.rarity].label}
+              </div>
+            </div>
+            
+            <p className="text-sm text-muted-foreground">
+              Ce cosmétique a été ajouté à votre collection. Voulez-vous l'équiper maintenant ?
+            </p>
+            
+            {/* Actions */}
+            <div className="space-y-2">
+              <button
+                onClick={handleEquipPurchased}
+                disabled={isEquipping}
+                className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                style={{ 
+                  background: RARITY_INFO[purchasedItem.rarity].color,
+                  color: purchasedItem.rarity === 'legendary' || purchasedItem.rarity === 'common' ? '#000' : '#fff'
+                }}
+              >
+                {isEquipping ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Équiper maintenant
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setPurchasedItem(null)}
+                className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 font-medium transition-all text-muted-foreground"
+              >
+                Plus tard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

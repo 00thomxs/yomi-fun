@@ -57,8 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Saisons", href: "/admin/seasons", icon: Trophy },
     { name: "Badges", href: "/admin/badges/award-existing", icon: Award },
     { name: "Cartes Profil", href: "/admin/cards", icon: CreditCard },
-    { name: "Commandes", href: "/admin/orders", icon: Package },
-    { name: "Shop Items", href: "/admin/shop", icon: ShoppingBag },
+    { name: "Cosmétiques", href: "/admin/shop", icon: ShoppingBag },
     { name: "Paramètres", href: "/admin/settings", icon: Settings },
   ]
 

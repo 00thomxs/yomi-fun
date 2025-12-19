@@ -1,16 +1,18 @@
-import { getShopItems } from "@/app/actions/shop"
-import { AdminShopManager } from "@/components/admin/shop-manager"
+import { getAllCosmeticItems } from "@/app/actions/cosmetics"
+import { CosmeticsManager } from "@/components/admin/cosmetics-manager"
 
 export const revalidate = 0
 
 export default async function AdminShopPage() {
-  const items = await getShopItems()
+  const items = await getAllCosmeticItems()
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Gestion du Shop</h1>
-      <AdminShopManager items={items} />
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Gestion du Shop</h1>
+        <p className="text-muted-foreground">Gérez les cosmétiques disponibles à l'achat</p>
+      </div>
+      <CosmeticsManager initialItems={items} />
     </div>
   )
 }
-

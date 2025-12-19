@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, UserCog, X, Trophy, ImageIcon, Loader2 } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Settings, Key, Clock, Flame, UserCog, X, Trophy, ImageIcon, Loader2, Palette } from "lucide-react"
 import { PnlCardModal } from "@/components/pnl-card-modal"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -14,8 +14,10 @@ import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 import { BadgeDisplayCompact } from "@/components/ui/badge-display"
 import { getUserBadges, getEquippedBadges } from "@/app/actions/badges"
 import { BadgesModal } from "@/components/profile/badges-modal"
+import { CosmeticsModal } from "@/components/profile/cosmetics-modal"
 import { ProfileCardGenerator, ProfileCardButton, NewTierUnlockedPopup } from "@/components/profile-card-generator"
 import { getUserSelectedCard, checkAndUpdateCardTier, getUserCardCollection, type UserSeasonCard } from "@/app/actions/profile-cards"
+import { getUserEquippedCosmetics, type CosmeticItem } from "@/app/actions/cosmetics"
 import type { CardRank } from "@/components/yomi-tcg-card"
 import type { UserBadgeWithDetails } from "@/lib/types"
 import { toast } from "sonner"
@@ -67,6 +69,7 @@ export function ProfileView() {
   const [equippedBadges, setEquippedBadges] = useState<UserBadgeWithDetails[]>([])
   const [loadingBadges, setLoadingBadges] = useState(true)
   const [showBadgesModal, setShowBadgesModal] = useState(false)
+  const [showCosmeticsModal, setShowCosmeticsModal] = useState(false)
   
   // Profile Card state
   const [seasonCard, setSeasonCard] = useState<UserSeasonCard | null>(null)
@@ -74,6 +77,13 @@ export function ProfileView() {
   const [showNewTierPopup, setShowNewTierPopup] = useState(false)
   const [newTier, setNewTier] = useState<CardRank | null>(null)
   const [showCardGenerator, setShowCardGenerator] = useState(false)
+  
+  // Cosmetics state
+  const [equippedCosmetics, setEquippedCosmetics] = useState<{
+    background: CosmeticItem | null
+    aura: CosmeticItem | null
+    nametag: CosmeticItem | null
+  }>({ background: null, aura: null, nametag: null })
 
   useEffect(() => {
     const loadData = async () => {
@@ -211,6 +221,10 @@ export function ProfileView() {
       // Load card collection
       const collection = await getUserCardCollection(user.id)
       setCardCollection(collection)
+      
+      // Load equipped cosmetics
+      const cosmetics = await getUserEquippedCosmetics(user.id)
+      setEquippedCosmetics(cosmetics)
     }
     
     loadSeasonCard()
@@ -625,6 +639,46 @@ export function ProfileView() {
         </div>
       </button>
 
+      {/* Customization Button */}
+      <button
+        onClick={() => setShowCosmeticsModal(true)}
+        className="w-full rounded-xl bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/20 transition-all group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+            <Palette className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-bold">Personnalisation</p>
+            <p className="text-xs text-muted-foreground">
+              Cosmétiques de carte
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {(equippedCosmetics.background || equippedCosmetics.aura || equippedCosmetics.nametag) && (
+            <div className="flex items-center gap-1.5">
+              {equippedCosmetics.background && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">
+                  Fond
+                </span>
+              )}
+              {equippedCosmetics.aura && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">
+                  Aura
+                </span>
+              )}
+              {equippedCosmetics.nametag && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">
+                  Pseudo
+                </span>
+              )}
+            </div>
+          )}
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors shrink-0" />
+        </div>
+      </button>
+
       {/* Badges Modal */}
       {user && (
         <BadgesModal
@@ -633,6 +687,16 @@ export function ProfileView() {
           userId={user.id}
         />
       )}
+
+      {/* Cosmetics Modal */}
+      <CosmeticsModal
+        isOpen={showCosmeticsModal}
+        onClose={() => setShowCosmeticsModal(false)}
+        onEquipChange={async () => {
+          const cosmetics = await getUserEquippedCosmetics()
+          setEquippedCosmetics(cosmetics)
+        }}
+      />
 
       {/* Profile Card Generator (Modal) */}
       {user && profile && seasonCard && showCardGenerator && (
@@ -651,9 +715,15 @@ export function ProfileView() {
           currentCard={seasonCard}
           cardCollection={cardCollection}
           isAdmin={profile.role === 'admin'}
+          equippedBackground={equippedCosmetics.background}
+          equippedAura={equippedCosmetics.aura}
+          equippedNametag={equippedCosmetics.nametag}
           onCardChange={async () => {
             const card = await getUserSelectedCard(user.id)
             if (card) setSeasonCard(card)
+            // Also refresh cosmetics
+            const cosmetics = await getUserEquippedCosmetics(user.id)
+            setEquippedCosmetics(cosmetics)
           }}
           onClose={() => setShowCardGenerator(false)}
         />

@@ -25,11 +25,11 @@ export function DailyRewardWidget() {
   const [isWelcomeBonus, setIsWelcomeBonus] = useState(false)
   const [countdown, setCountdown] = useState<string>('')
 
-  const fetchStatus = async () => {
-    const result = await getDailyRewardStatus()
-    setStatus(result)
-    setIsLoading(false)
-  }
+    const fetchStatus = async () => {
+      const result = await getDailyRewardStatus()
+      setStatus(result)
+      setIsLoading(false)
+    }
 
   useEffect(() => {
     fetchStatus()
@@ -148,13 +148,13 @@ export function DailyRewardWidget() {
         className="w-full p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all text-left disabled:opacity-50"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
             {isClaiming ? (
               <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
             ) : (
-              <Gift className="w-4 h-4 text-amber-400" />
+          <Gift className="w-4 h-4 text-amber-400" />
             )}
-            <span className="text-xs font-bold text-amber-400">Bienvenue !</span>
+          <span className="text-xs font-bold text-amber-400">Bienvenue !</span>
           </div>
           <span className="text-xs font-bold text-amber-400 font-mono flex items-center gap-0.5">
             +200<CurrencySymbol className="w-3 h-3" />
@@ -172,7 +172,7 @@ export function DailyRewardWidget() {
 
   // Can claim - make it a button
   if (status.canClaim) {
-    return (
+  return (
       <button
         onClick={handleClaimDaily}
         disabled={isClaiming}
@@ -182,15 +182,15 @@ export function DailyRewardWidget() {
             : 'bg-primary/10 border-primary/30 hover:bg-primary/20'
         }`}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
             {isClaiming ? (
               <Loader2 className={`w-4 h-4 animate-spin ${isJackpotDay ? 'text-amber-400' : 'text-primary'}`} />
             ) : isJackpotDay ? (
-              <Trophy className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Gift className="w-4 h-4 text-primary" />
-            )}
+            <Trophy className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Gift className="w-4 h-4 text-primary" />
+          )}
             <span className={`text-xs font-bold ${isJackpotDay ? 'text-amber-400' : 'text-primary'}`}>
               Jour {dayDisplay}/7
             </span>
@@ -260,9 +260,9 @@ export function DailyRewardWidget() {
               className={`h-1 flex-1 rounded-full transition-all ${
                 isPast 
                   ? 'bg-emerald-500' 
-                  : isCurrent
-                    ? 'bg-white/30'
-                    : 'bg-white/10'
+                    : isCurrent
+                      ? 'bg-white/30'
+                      : 'bg-white/10'
               }`}
             />
           )

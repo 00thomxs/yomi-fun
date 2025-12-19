@@ -201,13 +201,13 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
   const userCards: UserSeasonCard[] = (cards || []).map((card) => {
     const seasonInfo = seasonMap.get(card.season_id)
     return {
-      id: card.id,
-      tier: card.tier as CardRank,
-      highestTierAchieved: card.highest_tier_achieved as CardRank,
-      seasonId: card.season_id,
+    id: card.id,
+    tier: card.tier as CardRank,
+    highestTierAchieved: card.highest_tier_achieved as CardRank,
+    seasonId: card.season_id,
       seasonName: seasonInfo?.name || 'Saison',
       seasonNumber: seasonInfo?.number || 1,
-      isSelected: card.is_selected || false,
+    isSelected: card.is_selected || false,
     }
   })
   
@@ -766,14 +766,14 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
     
     // Insert new beta card - select it if user has no other selected card
     const { error: insertError } = await supabaseAdmin
-      .from('user_season_cards')
-      .insert({
-        user_id: u.id,
+        .from('user_season_cards')
+        .insert({
+          user_id: u.id,
         season_id: betaSeasonId,
-        tier: 'beta',
-        highest_tier_achieved: 'beta',
+          tier: 'beta',
+          highest_tier_achieved: 'beta',
         is_selected: !hasSelectedCard, // Auto-select if no other card selected
-      })
+        })
     
     if (insertError) {
       errors.push(`User ${u.id}: ${insertError.message}`)

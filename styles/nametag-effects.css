@@ -1,0 +1,68 @@
+/* Nametag Effects CSS */
+
+/* Import Google Fonts for special nametag effects */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=UnifrakturMaguntia&display=swap');
+
+/* Neon Glow Effect */
+.nametag-neon-glow {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+/* Gradient Effect */
+.nametag-gradient {
+  display: inline-block;
+}
+
+/* Pixel Effect - uses Press Start 2P font */
+.nametag-pixel {
+  letter-spacing: 1px;
+  image-rendering: pixelated;
+}
+
+/* Shiny Effect */
+.nametag-shiny {
+  position: relative;
+  display: inline-block;
+}
+
+.nametag-shiny .shiny-text {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    currentColor 0%,
+    currentColor 40%,
+    #ffffff 50%,
+    currentColor 60%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 3s ease-in-out infinite;
+}
+
+@keyframes textShine {
+  0%, 100% {
+    background-position: 200% center;
+  }
+  50% {
+    background-position: -200% center;
+  }
+}
+
+/* Gothic Effect - uses UnifrakturMaguntia font */
+.nametag-gothic {
+  letter-spacing: 0.5px;
+}
+

@@ -5,6 +5,8 @@ import { useState, useRef, forwardRef, useEffect, type MouseEvent } from "react"
 import { cn } from "@/lib/utils"
 import { Target, Crown, Zap, Trophy, Crosshair, Eye, TrendingUp, Medal, Diamond, Swords, Gamepad2, Brain, Award, Skull, Rocket, Drama, Sprout, BadgeCheck, Star, HelpCircle } from "lucide-react"
 import type { Badge } from "@/lib/types"
+import { CardBackground, AvatarAura, type BackgroundEffect, type AuraEffect } from "./card-cosmetics"
+import { StyledUsername, type NametagEffect } from "./ui/styled-username"
 
 // Types
 export type CardRank = "iron" | "bronze" | "gold" | "diamond" | "holographic" | "beta"
@@ -27,6 +29,10 @@ export interface YomiTCGCardProps {
   equippedBadges: CardBadge[]
   avatarUrl?: string
   isCapturing?: boolean // Disable effects when capturing image
+  // Cosmetics
+  backgroundEffect?: { type: string; pattern?: string; effect?: string; colors: string[] } | null
+  auraEffect?: { type: string; effect: string; color?: string; colors?: string[]; speed?: string; glow?: boolean; sparkle?: boolean } | null
+  nametagEffect?: { type: string; effect?: string; fontFamily?: string; colors?: string[]; useRankColor?: boolean; intensity?: number; direction?: string; color?: string } | null
 }
 
 // Icon mapping for badges
@@ -163,6 +169,9 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   equippedBadges,
   avatarUrl = "/placeholder-avatar.png",
   isCapturing = false,
+  backgroundEffect,
+  auraEffect,
+  nametagEffect,
 }, ref) => {
   const cardRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState("")
@@ -413,6 +422,11 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
           }}
         />
 
+        {/* Custom Background Effect (from cosmetics) */}
+        {backgroundEffect && !isCapturing && (
+          <CardBackground effect={backgroundEffect as BackgroundEffect} />
+        )}
+
         {/* Ambient glow effects */}
         <div
           className="absolute inset-0 z-10 pointer-events-none"
@@ -549,6 +563,10 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                   filter: "blur(6px)",
                 }}
               />
+              {/* Avatar Aura Effect (from cosmetics) */}
+              {auraEffect && !isCapturing && (
+                <AvatarAura effect={auraEffect as AuraEffect} />
+              )}
               {/* Avatar image */}
               <div
                 className="relative w-28 h-28 rounded-full overflow-hidden bg-zinc-900"
@@ -569,7 +587,15 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
               className="text-white font-black text-xl tracking-tight mb-3"
               style={{ textShadow: "0 2px 10px rgba(0,0,0,0.9)" }}
             >
-              @{username}
+              @{nametagEffect && !isCapturing ? (
+                <StyledUsername
+                  username={username}
+                  nametagEffect={nametagEffect as NametagEffect}
+                  rankColor={styles.accentColor}
+                />
+              ) : (
+                username
+              )}
             </h2>
 
             <div className="flex items-center gap-6">

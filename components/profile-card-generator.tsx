@@ -1,13 +1,17 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { X, Download, Sparkles, RefreshCw, Loader2, ChevronDown, Check, CreditCard } from "lucide-react"
+import { X, Download, Sparkles, RefreshCw, Loader2, ChevronDown, Check, Palette } from "lucide-react"
 import { YomiTCGCard, type CardRank, rankStyles } from "./yomi-tcg-card"
 import { YomiCardPack } from "./yomi-card-pack"
 import { toPng } from "html-to-image"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { selectCard, getAdminCardOptions, setAdminCard, type UserSeasonCard } from "@/app/actions/profile-cards"
+import { CosmeticCustomizer } from "./cosmetic-customizer"
+import { type CosmeticItem, getCosmeticItems, getUserEquippedCosmetics } from "@/app/actions/cosmetics"
+import { parseBackgroundEffect, parseAuraEffect, type BackgroundEffect, type AuraEffect } from "./card-cosmetics"
+import { parseNametagEffect, type NametagEffect } from "./ui/styled-username"
 
 interface ProfileCardGeneratorProps {
   username: string
@@ -22,6 +26,10 @@ interface ProfileCardGeneratorProps {
   isAdmin?: boolean
   onCardChange?: () => void
   onClose?: () => void
+  // Cosmetics
+  equippedBackground?: CosmeticItem | null
+  equippedAura?: CosmeticItem | null
+  equippedNametag?: CosmeticItem | null
 }
 
 // Tier info
@@ -50,6 +58,9 @@ export function ProfileCardButton({ tier, onClick }: { tier: CardRank; onClick: 
 export function ProfileCardGenerator({
   username, level, pnl, winRate, streak, avatarUrl, equippedBadges,
   currentCard, cardCollection, isAdmin = false, onCardChange, onClose,
+  equippedBackground: initialBackground,
+  equippedAura: initialAura,
+  equippedNametag: initialNametag,
 }: ProfileCardGeneratorProps) {
   const [showCard, setShowCard] = useState(true)
   const [isRevealed, setIsRevealed] = useState(false)
@@ -62,6 +73,15 @@ export function ProfileCardGenerator({
   const [avatarReady, setAvatarReady] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
+  
+  // Cosmetics state
+  const [showCosmeticCustomizer, setShowCosmeticCustomizer] = useState(false)
+  const [allCosmetics, setAllCosmetics] = useState<CosmeticItem[]>([])
+  const [equippedCosmetics, setEquippedCosmetics] = useState({
+    background: initialBackground || null,
+    aura: initialAura || null,
+    nametag: initialNametag || null,
+  })
 
   // Convert avatar to base64 for download compatibility
   useEffect(() => {
@@ -112,6 +132,18 @@ export function ProfileCardGenerator({
   useEffect(() => {
     if (isAdmin) getAdminCardOptions().then(setAdminOptions)
   }, [isAdmin])
+
+  // Load all cosmetics for customizer
+  useEffect(() => {
+    getCosmeticItems().then(setAllCosmetics)
+  }, [])
+
+  // Refresh equipped cosmetics when customizer closes
+  const handleCosmeticChange = async () => {
+    const equipped = await getUserEquippedCosmetics()
+    setEquippedCosmetics(equipped)
+    onCardChange?.()
+  }
 
   useEffect(() => {
     document.body.style.overflow = showCard ? 'hidden' : ''
@@ -199,6 +231,12 @@ export function ProfileCardGenerator({
 
   const tierInfo = TIER_INFO[selectedCard.tier]
   const hasMultipleCards = cardCollection.length > 1 || isAdmin
+  
+  // Parse cosmetic effects
+  const backgroundEffect = parseBackgroundEffect(equippedCosmetics.background?.preview_data || null)
+  const auraEffect = parseAuraEffect(equippedCosmetics.aura?.preview_data || null)
+  const nametagEffect = parseNametagEffect(equippedCosmetics.nametag?.preview_data || null)
+  const hasCosmetics = equippedCosmetics.background || equippedCosmetics.aura || equippedCosmetics.nametag
 
   if (!showCard) return null
 
@@ -257,6 +295,9 @@ export function ProfileCardGenerator({
                 equippedBadges={equippedBadges}
                 avatarUrl={avatarBase64}
                 isCapturing={isCapturing}
+                backgroundEffect={backgroundEffect}
+                auraEffect={auraEffect}
+                nametagEffect={nametagEffect}
               />
             </YomiCardPack>
           ) : (
@@ -273,6 +314,9 @@ export function ProfileCardGenerator({
               equippedBadges={equippedBadges}
               avatarUrl={avatarBase64}
               isCapturing={isCapturing}
+              backgroundEffect={backgroundEffect}
+              auraEffect={auraEffect}
+              nametagEffect={nametagEffect}
             />
           )}
 
@@ -287,6 +331,20 @@ export function ProfileCardGenerator({
               >
                 <RefreshCw className="w-4 h-4"/>
                 <span className="hidden sm:inline">Rejouer</span>
+              </button>
+              {/* Customize button */}
+              <button 
+                onClick={() => setShowCosmeticCustomizer(true)} 
+                onTouchEnd={(e) => { e.preventDefault(); setShowCosmeticCustomizer(true) }}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-xl ${
+                  hasCosmetics
+                    ? 'bg-purple-500/20 border border-purple-500/50 text-purple-400 hover:bg-purple-500/30'
+                    : 'bg-zinc-900/95 border border-white/20 text-white hover:bg-zinc-800'
+                }`}
+                style={{ touchAction: 'manipulation' }}
+              >
+                <Palette className="w-4 h-4"/>
+                <span className="hidden sm:inline">Perso</span>
               </button>
               <button 
                 onClick={handleDownload} 
@@ -432,6 +490,14 @@ export function ProfileCardGenerator({
           </button>
         </div>
       )}
+
+      {/* Cosmetic Customizer Modal */}
+      <CosmeticCustomizer
+        isOpen={showCosmeticCustomizer}
+        onClose={() => setShowCosmeticCustomizer(false)}
+        allCosmetics={allCosmetics}
+        onEquipChange={handleCosmeticChange}
+      />
     </>
   )
 }

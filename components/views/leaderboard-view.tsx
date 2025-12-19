@@ -5,12 +5,14 @@ import { ArrowLeft, Trophy, ArrowUpRight, ArrowDownRight, Flame, Gift, Calendar,
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { BadgeDisplayCompact, BadgeIcon } from "@/components/ui/badge-display"
+import { StyledUsername } from "@/components/ui/styled-username"
 import { createClient } from "@/lib/supabase/client"
 import { useUser } from "@/contexts/user-context"
 import { getSeasonSettings, checkAndDistributeRewards, type SeasonSettings } from "@/app/admin/settings/actions"
 import { toast } from "sonner"
 import { getAvatarUrl } from "@/lib/utils/avatar"
 import type { Badge } from "@/lib/types"
+import type { CosmeticItem } from "@/app/actions/cosmetics"
 
 type LeaderboardViewProps = {
   onBack: () => void
@@ -37,6 +39,9 @@ type SeasonEvent = {
 // Equipped badges by user ID
 type EquippedBadgesMap = Record<string, Badge[]>
 
+// Equipped nametag cosmetics by user ID
+type EquippedNametagsMap = Record<string, CosmeticItem | null>
+
 export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const { user } = useUser()
   const [players, setPlayers] = useState<Player[]>([])
@@ -48,6 +53,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   const [seasonEvents, setSeasonEvents] = useState<SeasonEvent[]>([])
   const [eventsExpanded, setEventsExpanded] = useState(false)
   const [equippedBadges, setEquippedBadges] = useState<EquippedBadgesMap>({})
+  const [equippedNametags, setEquippedNametags] = useState<EquippedNametagsMap>({})
   const rewardsCheckedRef = useRef(false)
 
   // Fetch season settings on mount
@@ -273,6 +279,37 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
     }
     
     fetchBadges()
+  }, [players])
+
+  // Fetch equipped nametag cosmetics for all players
+  useEffect(() => {
+    const fetchNametags = async () => {
+      if (players.length === 0) return
+      
+      const supabase = createClient()
+      const playerIds = players.map(p => p.id)
+      
+      const { data } = await supabase
+        .from('user_equipped_cosmetics')
+        .select(`
+          user_id,
+          nametag:cosmetic_items!user_equipped_cosmetics_nametag_id_fkey(*)
+        `)
+        .in('user_id', playerIds)
+        .not('nametag_id', 'is', null)
+      
+      if (data) {
+        const nametagsMap: EquippedNametagsMap = {}
+        for (const entry of data as any[]) {
+          if (entry.nametag) {
+            nametagsMap[entry.user_id] = entry.nametag
+          }
+        }
+        setEquippedNametags(nametagsMap)
+      }
+    }
+    
+    fetchNametags()
   }, [players])
 
   const top1 = players[0]
@@ -597,7 +634,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@{top2.username}</p>
+                <p className="font-bold text-sm truncate px-2">@<StyledUsername username={top2.username} nametagEffect={equippedNametags[top2.id]} /></p>
                 {equippedBadges[top2.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top2.id].slice(0, 2).map(badge => (
@@ -648,7 +685,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-black text-base truncate px-2 text-amber-100">@{top1.username}</p>
+                <p className="font-black text-base truncate px-2 text-amber-100">@<StyledUsername username={top1.username} nametagEffect={equippedNametags[top1.id]} /></p>
                 {equippedBadges[top1.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top1.id].slice(0, 2).map(badge => (
@@ -695,7 +732,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2">@{top3.username}</p>
+                <p className="font-bold text-sm truncate px-2">@<StyledUsername username={top3.username} nametagEffect={equippedNametags[top3.id]} /></p>
                 {equippedBadges[top3.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top3.id].slice(0, 2).map(badge => (
@@ -757,7 +794,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   <div className="flex flex-col min-w-0 gap-0.5">
                     <div className="flex items-center gap-1 min-w-0">
                       <span className={`font-bold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-primary" : "text-foreground"}`}>
-                        {player.username}
+                        <StyledUsername username={player.username} nametagEffect={equippedNametags[player.id]} />
                       </span>
                       {/* Mobile: only 1 icon */}
                       {equippedBadges[player.id]?.[0] && (

@@ -1,12 +1,12 @@
 import { ShopView } from "@/components/views/shop-view"
-import { getShopItems } from "@/app/actions/shop"
+import { getCosmeticItems } from "@/app/actions/cosmetics"
 import { Suspense } from "react"
 import { Loader2 } from "lucide-react"
 
-export const revalidate = 60 // Revalidate every minute
+export const revalidate = 60
 
 export default async function ShopPage() {
-  const items = await getShopItems()
+  const items = await getCosmeticItems()
   
   return (
     <Suspense fallback={
