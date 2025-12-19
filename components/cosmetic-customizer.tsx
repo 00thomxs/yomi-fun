@@ -100,7 +100,11 @@ export function CosmeticCustomizer({
     setLoading(null)
   }
   
-  const filteredItems = allCosmetics.filter(c => c.type === selectedType)
+  // Sort by rarity: common -> rare -> epic -> legendary
+  const rarityOrder = { common: 0, rare: 1, epic: 2, legendary: 3 }
+  const filteredItems = allCosmetics
+    .filter(c => c.type === selectedType)
+    .sort((a, b) => rarityOrder[a.rarity] - rarityOrder[b.rarity])
   const currentEquipped = equipped[selectedType]
   
   if (!isOpen) return null

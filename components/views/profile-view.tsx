@@ -230,6 +230,22 @@ export function ProfileView() {
     
     loadSeasonCard()
   }, [user])
+  
+  // Always refresh cosmetics when component mounts or becomes visible
+  useEffect(() => {
+    const refreshCosmetics = async () => {
+      if (!user) return
+      const cosmetics = await getUserEquippedCosmetics(user.id)
+      setEquippedCosmetics(cosmetics)
+    }
+    
+    refreshCosmetics()
+    
+    // Also refresh when window gains focus
+    const handleFocus = () => refreshCosmetics()
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [user])
 
   // Prepare Chart Data with timeframe filtering
   const now = new Date()

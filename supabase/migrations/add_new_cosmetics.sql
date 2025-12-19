@@ -2,12 +2,12 @@
 -- ADD NEW COSMETICS - New backgrounds and nametag gradients
 -- =====================================================
 
--- Update Glitch to Holographic
+-- Update Glitch to Arc-en-ciel (Rainbow)
 UPDATE public.cosmetic_items 
 SET 
-  name = 'Holographic',
-  slug = 'holographic',
-  description = 'Reflets irisés arc-en-ciel',
+  name = 'Arc-en-ciel',
+  slug = 'rainbow',
+  description = 'Reflets irisés multicolores',
   preview_data = '{"type": "animated", "effect": "holographic", "colors": ["#ff0080", "#00ffff", "#ffff00"]}'
 WHERE slug = 'neon-glitch';
 

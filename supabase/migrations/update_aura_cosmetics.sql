@@ -29,10 +29,12 @@ SET
   preview_data = '{"type": "floating", "effect": "diamond", "color": "#00ffff", "sparkle": true}'
 WHERE slug = 'flame';
 
--- Keep Crown but update for better Lucide-inspired design
+-- Update Crown → Golden Glow (elegant golden aura)
 UPDATE public.cosmetic_items 
 SET 
-  description = 'Couronne royale dorée avec gemmes (style Lucide)',
-  preview_data = '{"type": "floating", "effect": "crown", "color": "#ffd700", "sparkle": true, "style": "lucide"}'
+  name = 'Golden Glow',
+  slug = 'golden-glow',
+  description = 'Aura dorée élégante autour de l''avatar',
+  preview_data = '{"type": "glow", "effect": "crown", "color": "#ffd700"}'
 WHERE slug = 'crown';
 

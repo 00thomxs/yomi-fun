@@ -73,12 +73,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
     loadOwned()
   }, [isAuthenticated])
 
-  // Sort by rarity then by price
-  const rarityOrder = { legendary: 0, epic: 1, rare: 2, common: 3 }
+  // Sort by rarity (common first, legendary last) then by price
+  const rarityOrder = { common: 0, rare: 1, epic: 2, legendary: 3 }
   const sortedItems = [...initialItems].sort((a, b) => {
     const rarityDiff = rarityOrder[a.rarity] - rarityOrder[b.rarity]
     if (rarityDiff !== 0) return rarityDiff
-    return b.price - a.price
+    return a.price - b.price // Cheaper first within same rarity
   })
 
   const filteredItems = cosmeticCategory === 'all' || cosmeticCategory === 'packs'

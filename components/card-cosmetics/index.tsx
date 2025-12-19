@@ -68,31 +68,39 @@ function PatternBackground({ effect, className }: { effect: BackgroundEffect; cl
   }
   
   if (effect.pattern === 'camo') {
-    // Military camo using SVG pattern - realistic organic shapes
-    const camoSvg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-        <rect fill="${effect.colors[2]}" width="200" height="200"/>
-        <path fill="${effect.colors[0]}" d="M20,30 Q50,10 80,35 T120,25 Q150,40 170,20 L180,60 Q160,80 130,70 T80,85 Q40,70 20,90 Z"/>
-        <path fill="${effect.colors[1]}" d="M0,80 Q30,60 60,85 T100,70 Q130,90 160,75 L180,110 Q150,130 110,115 T50,130 Q20,110 0,130 Z"/>
-        <path fill="${effect.colors[0]}" d="M10,140 Q40,120 75,145 T115,130 Q145,150 175,135 L190,175 Q160,195 120,180 T60,195 Q25,175 10,195 Z"/>
-        <path fill="${effect.colors[1]}" d="M30,0 Q60,20 90,5 T140,15 Q170,0 200,20 L200,50 Q170,70 130,55 T70,65 Q35,50 0,70 L0,30 Z"/>
-        <path fill="${effect.colors[0]}" d="M150,90 Q180,70 200,95 L200,140 Q175,160 145,145 T100,155 Q130,130 150,150 Z"/>
-        <path fill="${effect.colors[1]}" d="M0,160 Q25,140 55,165 T95,150 L85,200 L0,200 Z"/>
-        <path fill="${effect.colors[0]}" d="M120,170 Q150,155 180,175 L200,200 L100,200 Q115,185 120,170 Z"/>
-      </svg>
-    `
-    const encodedSvg = `data:image/svg+xml,${encodeURIComponent(camoSvg)}`
-    
+    // Military camo using CSS gradients - no repetition, full coverage
     return (
-      <div 
-        className={className}
-        style={{
-          backgroundImage: `url("${encodedSvg}")`,
-          backgroundSize: '150px 150px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.9,
-        }}
-      />
+      <>
+        {/* Base color */}
+        <div className={className} style={{ background: effect.colors[2], opacity: 0.95 }} />
+        {/* Camo spots layer 1 - large blobs */}
+        <div 
+          className={className}
+          style={{
+            background: `
+              radial-gradient(ellipse 60% 40% at 15% 20%, ${effect.colors[0]} 0%, transparent 70%),
+              radial-gradient(ellipse 50% 35% at 75% 15%, ${effect.colors[1]} 0%, transparent 70%),
+              radial-gradient(ellipse 45% 50% at 40% 45%, ${effect.colors[0]} 0%, transparent 70%),
+              radial-gradient(ellipse 55% 40% at 85% 55%, ${effect.colors[1]} 0%, transparent 70%),
+              radial-gradient(ellipse 50% 45% at 20% 75%, ${effect.colors[1]} 0%, transparent 70%),
+              radial-gradient(ellipse 60% 35% at 60% 85%, ${effect.colors[0]} 0%, transparent 70%)
+            `,
+          }}
+        />
+        {/* Camo spots layer 2 - medium blobs */}
+        <div 
+          className={className}
+          style={{
+            background: `
+              radial-gradient(ellipse 35% 25% at 30% 10%, ${effect.colors[0]} 0%, transparent 70%),
+              radial-gradient(ellipse 30% 35% at 55% 30%, ${effect.colors[1]} 0%, transparent 70%),
+              radial-gradient(ellipse 40% 30% at 10% 50%, ${effect.colors[0]} 0%, transparent 70%),
+              radial-gradient(ellipse 35% 40% at 70% 70%, ${effect.colors[0]} 0%, transparent 70%),
+              radial-gradient(ellipse 30% 25% at 45% 90%, ${effect.colors[1]} 0%, transparent 70%)
+            `,
+          }}
+        />
+      </>
     )
   }
   
@@ -446,56 +454,55 @@ export function AvatarAura({ effect, className = "" }: { effect: AuraEffect | nu
 function SparkleRingAura({ effect, className }: { effect: AuraEffect; className: string }) {
   const color = effect.color || '#ffffff'
   
-  // Generate sparkle positions around a circle
-  const sparkles = [...Array(8)].map((_, i) => {
-    const angle = (i / 8) * Math.PI * 2
-    const radius = 52 // Distance from center
-    return {
-      x: 50 + Math.cos(angle) * 45,
-      y: 50 + Math.sin(angle) * 45,
-      size: 4 + (i % 2) * 2,
-      delay: i * 0.2,
-    }
-  })
-  
   return (
     <>
       <style>{`
         @keyframes sparkleGlow {
-          0%, 100% { opacity: 0.4; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
+          0%, 100% { opacity: 0.5; transform: scale(0.9); }
+          50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes ringPulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
       `}</style>
-      {/* Glowing ring */}
+      {/* Bright glowing ring */}
       <div 
         className={`absolute ${className}`}
         style={{
-          inset: '-6px',
+          inset: '-8px',
           borderRadius: '50%',
-          border: `2px solid ${color}60`,
-          boxShadow: `0 0 10px ${color}40, inset 0 0 10px ${color}20`,
+          border: `3px solid ${color}`,
+          boxShadow: `0 0 15px ${color}, 0 0 30px ${color}60, inset 0 0 15px ${color}40`,
+          animation: 'ringPulse 2s ease-in-out infinite',
         }}
       />
-      {/* Sparkles at fixed positions */}
-      {sparkles.map((s, i) => (
-        <div
-          key={i}
-          className="absolute pointer-events-none"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            marginLeft: `-${s.size / 2}px`,
-            marginTop: `-${s.size / 2}px`,
-            background: color,
-            borderRadius: '50%',
-            boxShadow: `0 0 ${s.size * 2}px ${color}, 0 0 ${s.size * 3}px ${color}`,
-            animation: `sparkleGlow ${0.8 + (i % 3) * 0.3}s ease-in-out infinite`,
-            animationDelay: `${s.delay}s`,
-          }}
-        />
-      ))}
+      {/* Large sparkles at cardinal positions */}
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180
+        const x = 50 + Math.cos(rad) * 52
+        const y = 50 + Math.sin(rad) * 52
+        const size = i % 2 === 0 ? 8 : 6
+        return (
+          <div
+            key={i}
+            className="absolute pointer-events-none"
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              marginLeft: `-${size / 2}px`,
+              marginTop: `-${size / 2}px`,
+              background: color,
+              borderRadius: '50%',
+              boxShadow: `0 0 ${size}px ${color}, 0 0 ${size * 2}px ${color}, 0 0 ${size * 3}px ${color}80`,
+              animation: `sparkleGlow ${0.6 + (i % 3) * 0.2}s ease-in-out infinite`,
+              animationDelay: `${i * 0.1}s`,
+            }}
+          />
+        )
+      })}
     </>
   )
 }
@@ -621,34 +628,37 @@ function HaloAura({ effect, className }: { effect: AuraEffect; className: string
 }
 
 // Crown Aura - Using emoji for universal beauty
+// Golden Glow Aura - elegant golden glow around avatar (replaces Crown)
 function CrownAura({ effect, className }: { effect: AuraEffect; className: string }) {
   const color = effect.color || '#ffd700'
   return (
     <>
       <style>{`
-        @keyframes crownBob {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-        @keyframes crownGlow {
-          0%, 100% { text-shadow: 0 0 8px ${color}, 0 0 16px ${color}60; }
-          50% { text-shadow: 0 0 12px ${color}, 0 0 24px ${color}; }
+        @keyframes goldenPulse {
+          0%, 100% { opacity: 0.7; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.05); }
         }
       `}</style>
-      {/* Crown emoji - centered above avatar */}
+      {/* Outer golden glow */}
       <div 
         className={`absolute ${className}`}
-        style={{ 
-          top: '-28px', 
-          left: '50%',
-          marginLeft: '-16px',
-          fontSize: '32px',
-          lineHeight: 1,
-          animation: 'crownBob 2s ease-in-out infinite, crownGlow 1.5s ease-in-out infinite',
+        style={{
+          inset: '-12px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, transparent 50%, ${color}30 70%, ${color}60 85%, transparent 100%)`,
+          animation: 'goldenPulse 2s ease-in-out infinite',
         }}
-      >
-        👑
-      </div>
+      />
+      {/* Inner bright ring */}
+      <div 
+        className={`absolute ${className}`}
+        style={{
+          inset: '-4px',
+          borderRadius: '50%',
+          border: `2px solid ${color}`,
+          boxShadow: `0 0 10px ${color}, 0 0 20px ${color}60`,
+        }}
+      />
     </>
   )
 }
