@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2 } from "lucide-react"
@@ -9,7 +9,7 @@ import { YomiLogo } from "@/components/ui/yomi-logo"
 import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { signIn, signUp, isAuthenticated, isLoading: authLoading } = useUser()
@@ -433,5 +433,21 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoginFallback() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginContent />
+    </Suspense>
   )
 }
