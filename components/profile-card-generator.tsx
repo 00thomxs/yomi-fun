@@ -355,7 +355,11 @@ export function ProfileCardGenerator({
                         {isSelected && <Check className="w-4 h-4 text-primary"/>}
                       </div>
                       <p className="text-sm text-zinc-400">
-                        {card.seasonNumber === 0 ? card.seasonName : `Saison ${card.seasonNumber} : ${card.seasonName}`}
+                        {card.seasonNumber === 0 
+                          ? card.seasonName 
+                          : card.tier === 'beta' 
+                            ? card.seasonName 
+                            : `Saison ${card.seasonNumber} : ${card.seasonName}`}
                       </p>
                     </div>
                   </button>
