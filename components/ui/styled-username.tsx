@@ -88,11 +88,13 @@ export function StyledUsername({ username, nametagEffect, rankColor, className, 
       <span 
         className={cn("nametag-gradient", className)}
         style={{
+          display: 'inline-block',
           background: `linear-gradient(${direction}, ${gradientColors})`,
           WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}
+          color: 'transparent',
+        } as React.CSSProperties}
       >
         {displayName}
       </span>

@@ -239,12 +239,26 @@ export function ProfileView() {
       setEquippedCosmetics(cosmetics)
     }
     
+    // Initial load
     refreshCosmetics()
     
-    // Also refresh when window gains focus
+    // Small delay to ensure server data is fresh
+    const timer = setTimeout(refreshCosmetics, 500)
+    
+    // Also refresh when window gains focus or becomes visible
     const handleFocus = () => refreshCosmetics()
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') refreshCosmetics()
+    }
+    
     window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibility)
+    
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
   }, [user])
 
   // Prepare Chart Data with timeframe filtering
