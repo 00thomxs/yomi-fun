@@ -354,7 +354,9 @@ export function ProfileCardGenerator({
                         <span className="font-bold text-lg" style={{ color: info.color }}>{info.label}</span>
                         {isSelected && <Check className="w-4 h-4 text-primary"/>}
                       </div>
-                      <p className="text-sm text-zinc-400">Saison {card.seasonNumber} : {card.seasonName}</p>
+                      <p className="text-sm text-zinc-400">
+                        {card.seasonNumber === 0 ? card.seasonName : `Saison ${card.seasonNumber} : ${card.seasonName}`}
+                      </p>
                     </div>
                   </button>
                 )

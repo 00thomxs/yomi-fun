@@ -26,7 +26,7 @@ const TIER_ORDER: CardRank[] = ['iron', 'bronze', 'gold', 'diamond', 'holographi
 const ALL_TIERS: CardRank[] = ['iron', 'bronze', 'gold', 'diamond', 'holographic', 'beta']
 
 /**
- * Get the user's selected card (or current season card if none selected)
+ * Get the user's selected card (or default "Hors Saison" if none selected)
  */
 export async function getUserSelectedCard(userId?: string): Promise<UserSeasonCard | null> {
   const supabase = await createClient()
@@ -38,7 +38,7 @@ export async function getUserSelectedCard(userId?: string): Promise<UserSeasonCa
     targetUserId = user.id
   }
   
-  // First try to get selected card
+  // First try to get explicitly selected card
   const { data: selectedCard } = await supabaseAdmin
     .from('user_season_cards')
     .select(`
@@ -76,45 +76,17 @@ export async function getUserSelectedCard(userId?: string): Promise<UserSeasonCa
     }
   }
   
-  // Fallback 1: Try to get any card the user has (prefer beta card)
-  const { data: anyCard } = await supabaseAdmin
-    .from('user_season_cards')
-    .select(`
-      id,
-      tier,
-      highest_tier_achieved,
-      season_id
-    `)
-    .eq('user_id', targetUserId)
-    .order('tier', { ascending: false }) // 'beta' comes after 'iron' alphabetically, but let's prioritize beta
-    .limit(1)
-    .maybeSingle()
-  
-  if (anyCard) {
-    const { data: season } = await supabaseAdmin
-      .from('seasons')
-      .select('id, name, created_at')
-      .eq('id', anyCard.season_id)
-      .single()
-    
-    const { count } = await supabaseAdmin
-      .from('seasons')
-      .select('id', { count: 'exact', head: true })
-      .lte('created_at', season?.created_at || new Date().toISOString())
-    
-    return {
-      id: anyCard.id,
-      tier: anyCard.tier as CardRank,
-      highestTierAchieved: anyCard.highest_tier_achieved as CardRank,
-      seasonId: anyCard.season_id,
-      seasonName: season?.name || 'Saison',
-      seasonNumber: count || 1,
-      isSelected: false,
-    }
+  // No card explicitly selected = return default "Hors Saison" card
+  // This is the grey default card that everyone can access
+  return {
+    id: 'default',
+    tier: 'iron',
+    highestTierAchieved: 'iron',
+    seasonId: '',
+    seasonName: 'Hors Saison',
+    seasonNumber: 0,
+    isSelected: true,
   }
-  
-  // Fallback 2: current season card (creates default if needed)
-  return getUserSeasonCard(targetUserId)
 }
 
 /**
@@ -175,6 +147,7 @@ export async function getUserSeasonCard(userId?: string): Promise<UserSeasonCard
 
 /**
  * Get all user's cards (for card collection/selector)
+ * Always includes the default "Hors Saison" card as first option
  */
 export async function getUserCardCollection(userId?: string): Promise<UserSeasonCard[]> {
   const supabase = await createClient()
@@ -200,11 +173,6 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
   
   if (cardsError) {
     console.error('[getUserCardCollection] Error fetching cards:', cardsError)
-    return []
-  }
-  
-  if (!cards || cards.length === 0) {
-    return []
   }
   
   // Get all seasons data separately (more reliable than join)
@@ -216,8 +184,21 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
   const seasonMap = new Map<string, { name: string; number: number }>()
   allSeasons?.forEach((s, i) => seasonMap.set(s.id, { name: s.name || 'Saison', number: i + 1 }))
   
-  // Use 'tier' for display (current volatile tier for active season, final tier for past seasons)
-  return cards.map((card) => {
+  // Check if any card is selected
+  const hasSelectedCard = cards?.some(c => c.is_selected) || false
+  
+  // Always include the default "Hors Saison" card as first option
+  const defaultCard: UserSeasonCard = {
+    id: 'default', // Special ID for the default card
+    tier: 'iron',
+    highestTierAchieved: 'iron',
+    seasonId: '',
+    seasonName: 'Hors Saison',
+    seasonNumber: 0,
+    isSelected: !hasSelectedCard, // Selected if no other card is selected
+  }
+  
+  const userCards: UserSeasonCard[] = (cards || []).map((card) => {
     const seasonInfo = seasonMap.get(card.season_id)
     return {
       id: card.id,
@@ -229,16 +210,31 @@ export async function getUserCardCollection(userId?: string): Promise<UserSeason
       isSelected: card.is_selected || false,
     }
   })
+  
+  // Return default card first, then user's earned cards
+  return [defaultCard, ...userCards]
 }
 
 /**
  * Select a card to display
+ * Use cardId='default' to reset to the default "Hors Saison" card
  */
 export async function selectCard(cardId: string): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
+  
+  // Special case: 'default' means deselect all cards to show "Hors Saison"
+  if (cardId === 'default') {
+    await supabaseAdmin
+      .from('user_season_cards')
+      .update({ is_selected: false })
+      .eq('user_id', user.id)
+    
+    revalidatePath('/profile')
+    return { success: true }
+  }
   
   // Verify the card belongs to the user
   const { data: card } = await supabase
