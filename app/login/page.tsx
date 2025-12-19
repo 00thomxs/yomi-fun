@@ -89,21 +89,6 @@ function LoginContent() {
           return
         }
 
-        // =============================================
-        // 🎮 LIMITE DE JOUEURS POUR LE TOURNOI
-        // Commenter ce bloc pour désactiver la limite
-        // =============================================
-        const MAX_PLAYERS = 15 // Changer ce nombre selon le besoin
-        const { count: totalPlayers } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-        
-        if (totalPlayers && totalPlayers >= MAX_PLAYERS) {
-          setError(`Le tournoi est complet ! Maximum ${MAX_PLAYERS} joueurs.`)
-          setIsLoading(false)
-          return
-        }
-        // =============================================
 
         const result = await signUp(email, password, username)
         if (result.error) {
