@@ -17,9 +17,23 @@
   }
 }
 
-/* Gradient Effect */
-.nametag-gradient {
-  display: inline-block;
+/* Gradient Effect - Force text transparency for gradient to show */
+/* Using multiple selectors and !important to override any inherited styles */
+.nametag-gradient,
+h1 .nametag-gradient,
+h2 .nametag-gradient,
+h3 .nametag-gradient,
+h3.nametag-gradient,
+p .nametag-gradient,
+span .nametag-gradient,
+div .nametag-gradient,
+.text-white .nametag-gradient,
+.text-foreground .nametag-gradient {
+  display: inline-block !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
 }
 
 /* Pixel Effect - uses Press Start 2P font */

@@ -550,6 +550,7 @@ export function ProfileView() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
                   <h3 className="text-xl font-bold tracking-tight">
                     <StyledUsername 
+                      key={equippedCosmetics.nametag?.id || 'default'}
                       username={user?.username || "Utilisateur"} 
                       nametagEffect={equippedCosmetics.nametag}
                       withAt

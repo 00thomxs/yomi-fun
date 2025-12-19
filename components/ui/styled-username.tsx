@@ -84,16 +84,14 @@ export function StyledUsername({ username, nametagEffect, rankColor, className, 
       : previewData.direction || '90deg'
     // Build gradient string with all colors
     const gradientColors = colors.join(', ')
+    
+    // Use CSS class + inline style for maximum compatibility
+    // The CSS class ensures text-fill-color is transparent with !important
     return (
       <span 
         className={cn("nametag-gradient", className)}
         style={{
-          display: 'inline-block',
           background: `linear-gradient(${direction}, ${gradientColors})`,
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          color: 'transparent',
         } as React.CSSProperties}
       >
         {displayName}
