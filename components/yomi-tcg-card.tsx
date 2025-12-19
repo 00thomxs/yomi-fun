@@ -22,7 +22,7 @@ export interface YomiTCGCardProps {
   username: string
   level: number
   pnl: number
-  totalBets: number
+  winRate: number
   streak: number
   equippedBadges: CardBadge[]
   avatarUrl?: string
@@ -158,7 +158,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
   username,
   level,
   pnl,
-  totalBets,
+  winRate,
   streak,
   equippedBadges,
   avatarUrl = "/placeholder-avatar.png",
@@ -590,7 +590,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                 }}
               />
               <div className="text-center">
-                <span className="text-zinc-400 text-[10px] font-semibold font-mono uppercase block">Paris</span>
+                <span className="text-zinc-400 text-[10px] font-semibold font-mono uppercase block">Win Rate</span>
                 <span
                   className="font-mono font-black text-lg block"
                   style={{
@@ -598,7 +598,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
                     textShadow: `0 0 8px ${styles.glowColor}`,
                   }}
                 >
-                  {totalBets}
+                  {winRate}%
                 </span>
               </div>
             </div>

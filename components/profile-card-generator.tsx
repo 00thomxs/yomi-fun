@@ -13,7 +13,7 @@ interface ProfileCardGeneratorProps {
   username: string
   level: number
   pnl: number
-  totalBets: number
+  winRate: number
   streak: number
   avatarUrl: string
   equippedBadges: { name: string; description: string; iconName: string }[]
@@ -48,7 +48,7 @@ export function ProfileCardButton({ tier, onClick }: { tier: CardRank; onClick: 
 }
 
 export function ProfileCardGenerator({
-  username, level, pnl, totalBets, streak, avatarUrl, equippedBadges,
+  username, level, pnl, winRate, streak, avatarUrl, equippedBadges,
   currentCard, cardCollection, isAdmin = false, onCardChange, onClose,
 }: ProfileCardGeneratorProps) {
   const [showCard, setShowCard] = useState(true)
@@ -252,7 +252,7 @@ export function ProfileCardGenerator({
                 username={username}
                 level={level}
                 pnl={pnl}
-                totalBets={totalBets}
+                winRate={winRate}
                 streak={streak}
                 equippedBadges={equippedBadges}
                 avatarUrl={avatarBase64}
@@ -268,7 +268,7 @@ export function ProfileCardGenerator({
               username={username}
               level={level}
               pnl={pnl}
-              totalBets={totalBets}
+              winRate={winRate}
               streak={streak}
               equippedBadges={equippedBadges}
               avatarUrl={avatarBase64}

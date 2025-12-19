@@ -640,7 +640,7 @@ export function ProfileView() {
           username={user.username || 'Joueur'}
           level={userStats.level}
           pnl={profile.total_won || 0}
-          totalBets={profile.total_bets || 0}
+          winRate={profile.win_rate || 0}
           streak={profile.streak || 0}
           avatarUrl={profile.avatar_url || '/placeholder-avatar.png'}
           equippedBadges={equippedBadges.map(ub => ({
