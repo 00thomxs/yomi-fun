@@ -277,13 +277,13 @@ export async function purchaseCosmetic(cosmeticId: string): Promise<PurchaseResu
     return { error: 'Erreur lors de l\'achat' }
   }
   
-  // Log transaction
-  await supabaseAdmin.from('transactions').insert({
+  // Log transaction (non-blocking, ignore errors)
+  supabaseAdmin.from('transactions').insert({
     user_id: user.id,
     type: 'shop_purchase',
     amount: -item.price,
     description: `Achat cosmétique: ${item.name}`,
-  }).catch(() => {}) // Non-blocking
+  }).then(() => {}) // Fire and forget
   
   console.log(`[purchaseCosmetic] User ${user.id} bought ${item.name} for ${item.price} Zeny`)
   
