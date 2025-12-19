@@ -39,41 +39,81 @@ export async function getUserSelectedCard(userId?: string): Promise<UserSeasonCa
   }
   
   // First try to get selected card
-  const { data: selectedCard } = await supabase
+  const { data: selectedCard } = await supabaseAdmin
     .from('user_season_cards')
     .select(`
       id,
       tier,
       highest_tier_achieved,
       season_id,
-      is_selected,
-      seasons (id, name, created_at)
+      is_selected
     `)
     .eq('user_id', targetUserId)
     .eq('is_selected', true)
-    .single()
+    .maybeSingle()
   
   if (selectedCard) {
-    const { count } = await supabase
+    // Get season info
+    const { data: season } = await supabaseAdmin
+      .from('seasons')
+      .select('id, name, created_at')
+      .eq('id', selectedCard.season_id)
+      .single()
+    
+    const { count } = await supabaseAdmin
       .from('seasons')
       .select('id', { count: 'exact', head: true })
-      .lte('created_at', (selectedCard.seasons as any)?.created_at)
+      .lte('created_at', season?.created_at || new Date().toISOString())
     
-    // Use 'tier' for display (current volatile tier)
-    // For past seasons, tier = highest_tier_achieved (both set at season end)
-    // For active seasons, tier can be diamond/holo based on current rank
     return {
       id: selectedCard.id,
       tier: selectedCard.tier as CardRank,
       highestTierAchieved: selectedCard.highest_tier_achieved as CardRank,
       seasonId: selectedCard.season_id,
-      seasonName: (selectedCard.seasons as any)?.name || 'Saison',
+      seasonName: season?.name || 'Saison',
       seasonNumber: count || 1,
       isSelected: true,
     }
   }
   
-  // Fallback to current season card
+  // Fallback 1: Try to get any card the user has (prefer beta card)
+  const { data: anyCard } = await supabaseAdmin
+    .from('user_season_cards')
+    .select(`
+      id,
+      tier,
+      highest_tier_achieved,
+      season_id
+    `)
+    .eq('user_id', targetUserId)
+    .order('tier', { ascending: false }) // 'beta' comes after 'iron' alphabetically, but let's prioritize beta
+    .limit(1)
+    .maybeSingle()
+  
+  if (anyCard) {
+    const { data: season } = await supabaseAdmin
+      .from('seasons')
+      .select('id, name, created_at')
+      .eq('id', anyCard.season_id)
+      .single()
+    
+    const { count } = await supabaseAdmin
+      .from('seasons')
+      .select('id', { count: 'exact', head: true })
+      .lte('created_at', season?.created_at || new Date().toISOString())
+    
+    return {
+      id: anyCard.id,
+      tier: anyCard.tier as CardRank,
+      highestTierAchieved: anyCard.highest_tier_achieved as CardRank,
+      seasonId: anyCard.season_id,
+      seasonName: season?.name || 'Saison',
+      seasonNumber: count || 1,
+      isSelected: false,
+    }
+  }
+  
+  // Fallback 2: current season card (creates default if needed)
   return getUserSeasonCard(targetUserId)
 }
 
@@ -706,20 +746,29 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
   
   // Award beta card to each user
   for (const u of allUsers) {
-    // Check if user already has beta card (use maybeSingle to avoid errors)
-    const { data: existingCards } = await supabaseAdmin
+    // Check if user already has beta card
+    const { data: existingBetaCards } = await supabaseAdmin
       .from('user_season_cards')
       .select('id')
       .eq('user_id', u.id)
       .eq('season_id', betaSeasonId)
     
-    // If user already has the card, skip
-    if (existingCards && existingCards.length > 0) {
+    // If user already has the beta card, skip
+    if (existingBetaCards && existingBetaCards.length > 0) {
       alreadyHadCount++
       continue
     }
     
-    // Insert new beta card
+    // Check if user has ANY selected card
+    const { data: selectedCards } = await supabaseAdmin
+      .from('user_season_cards')
+      .select('id')
+      .eq('user_id', u.id)
+      .eq('is_selected', true)
+    
+    const hasSelectedCard = selectedCards && selectedCards.length > 0
+    
+    // Insert new beta card - select it if user has no other selected card
     const { error: insertError } = await supabaseAdmin
       .from('user_season_cards')
       .insert({
@@ -727,7 +776,7 @@ export async function awardBetaCards(): Promise<{ success: boolean; count: numbe
         season_id: betaSeasonId,
         tier: 'beta',
         highest_tier_achieved: 'beta',
-        is_selected: false,
+        is_selected: !hasSelectedCard, // Auto-select if no other card selected
       })
     
     if (insertError) {
