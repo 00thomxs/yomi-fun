@@ -28,7 +28,7 @@
   image-rendering: pixelated;
 }
 
-/* Shiny Effect - Metallic shine passing over text */
+/* Shiny Effect - Golden metallic text with shine */
 .nametag-shiny {
   position: relative;
   display: inline-block;
@@ -37,28 +37,27 @@
 .nametag-shiny .shiny-text {
   position: relative;
   display: inline-block;
-  color: #ffffff;
   background: linear-gradient(
-    120deg,
-    #ffffff 0%,
-    #ffffff 35%,
-    #ffd700 45%,
-    #ffffff 55%,
-    #ffffff 100%
+    90deg,
+    #b8860b 0%,
+    #ffd700 20%,
+    #ffffff 50%,
+    #ffd700 80%,
+    #b8860b 100%
   );
-  background-size: 300% 100%;
+  background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: textShine 2.5s ease-in-out infinite;
+  animation: textShine 2s linear infinite;
 }
 
 @keyframes textShine {
   0% {
-    background-position: 100% center;
+    background-position: 200% center;
   }
   100% {
-    background-position: -100% center;
+    background-position: -200% center;
   }
 }
 

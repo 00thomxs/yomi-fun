@@ -68,51 +68,31 @@ function PatternBackground({ effect, className }: { effect: BackgroundEffect; cl
   }
   
   if (effect.pattern === 'camo') {
-    // True camouflage pattern with organic shapes
+    // Military camo using SVG pattern - realistic organic shapes
+    const camoSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+        <rect fill="${effect.colors[2]}" width="200" height="200"/>
+        <path fill="${effect.colors[0]}" d="M20,30 Q50,10 80,35 T120,25 Q150,40 170,20 L180,60 Q160,80 130,70 T80,85 Q40,70 20,90 Z"/>
+        <path fill="${effect.colors[1]}" d="M0,80 Q30,60 60,85 T100,70 Q130,90 160,75 L180,110 Q150,130 110,115 T50,130 Q20,110 0,130 Z"/>
+        <path fill="${effect.colors[0]}" d="M10,140 Q40,120 75,145 T115,130 Q145,150 175,135 L190,175 Q160,195 120,180 T60,195 Q25,175 10,195 Z"/>
+        <path fill="${effect.colors[1]}" d="M30,0 Q60,20 90,5 T140,15 Q170,0 200,20 L200,50 Q170,70 130,55 T70,65 Q35,50 0,70 L0,30 Z"/>
+        <path fill="${effect.colors[0]}" d="M150,90 Q180,70 200,95 L200,140 Q175,160 145,145 T100,155 Q130,130 150,150 Z"/>
+        <path fill="${effect.colors[1]}" d="M0,160 Q25,140 55,165 T95,150 L85,200 L0,200 Z"/>
+        <path fill="${effect.colors[0]}" d="M120,170 Q150,155 180,175 L200,200 L100,200 Q115,185 120,170 Z"/>
+      </svg>
+    `
+    const encodedSvg = `data:image/svg+xml,${encodeURIComponent(camoSvg)}`
+    
     return (
-      <>
-        <div 
-          className={className}
-          style={{
-            background: effect.colors[2],
-            opacity: 0.85,
-          }}
-        />
-        {/* Camo blobs layer 1 */}
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={`camo1-${i}`}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${(i * 25) % 100}%`,
-              top: `${(i * 30 + 10) % 100}%`,
-              width: `${40 + (i % 3) * 15}%`,
-              height: `${30 + (i % 2) * 20}%`,
-              background: effect.colors[0],
-              borderRadius: '60% 40% 70% 30% / 40% 60% 30% 70%',
-              transform: `rotate(${i * 45}deg)`,
-              opacity: 0.9,
-            }}
-          />
-        ))}
-        {/* Camo blobs layer 2 */}
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={`camo2-${i}`}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${(i * 35 + 15) % 100}%`,
-              top: `${(i * 40 + 20) % 100}%`,
-              width: `${35 + (i % 2) * 20}%`,
-              height: `${25 + (i % 3) * 15}%`,
-              background: effect.colors[1],
-              borderRadius: '40% 60% 30% 70% / 60% 40% 70% 30%',
-              transform: `rotate(${i * 60 + 30}deg)`,
-              opacity: 0.85,
-            }}
-          />
-        ))}
-      </>
+      <div 
+        className={className}
+        style={{
+          backgroundImage: `url("${encodedSvg}")`,
+          backgroundSize: '150px 150px',
+          backgroundRepeat: 'repeat',
+          opacity: 0.9,
+        }}
+      />
     )
   }
   
@@ -212,79 +192,132 @@ function AnimatedBackground({ effect, className }: { effect: BackgroundEffect; c
     )
   }
   
-  if (effect.effect === 'glitch') {
+  // Holographic effect - replaces glitch
+  if (effect.effect === 'glitch' || effect.effect === 'holographic') {
     return (
       <>
         <style>{`
-          @keyframes glitchShift1 {
-            0%, 90%, 100% { transform: translateX(0); opacity: 0.7; }
-            5% { transform: translateX(-8px) skewX(-2deg); opacity: 0.9; }
-            10% { transform: translateX(6px) skewX(1deg); opacity: 0.6; }
-            15% { transform: translateX(-4px); opacity: 0.8; }
-          }
-          @keyframes glitchShift2 {
-            0%, 85%, 100% { transform: translateX(0); opacity: 0.7; }
-            20% { transform: translateX(5px) skewX(1deg); opacity: 0.8; }
-            25% { transform: translateX(-7px) skewX(-1deg); opacity: 0.6; }
-            30% { transform: translateX(3px); opacity: 0.9; }
-          }
-          @keyframes glitchScan {
-            0% { top: -10%; opacity: 0; }
-            30% { opacity: 0.8; }
-            70% { opacity: 0.8; }
-            100% { top: 110%; opacity: 0; }
+          @keyframes holoShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
           }
         `}</style>
-        {/* Base layer with chromatic aberration */}
+        {/* Holographic rainbow gradient */}
         <div 
           className={className}
           style={{
-            background: `linear-gradient(135deg, ${effect.colors[0]}50 0%, ${effect.colors[1]}30 50%, ${effect.colors[2]}50 100%)`,
-            animation: 'glitchShift1 1.5s ease-in-out infinite',
+            background: `linear-gradient(
+              135deg,
+              #ff000030 0%,
+              #ff800030 14%,
+              #ffff0030 28%,
+              #00ff0030 42%,
+              #00ffff30 57%,
+              #0000ff30 71%,
+              #ff00ff30 85%,
+              #ff000030 100%
+            )`,
+            backgroundSize: '400% 400%',
+            animation: 'holoShift 4s ease-in-out infinite',
           }}
         />
-        {/* Offset color layers */}
+        {/* Shimmer overlay */}
         <div 
           className={className}
           style={{
-            background: `linear-gradient(45deg, ${effect.colors[0]}40 0%, transparent 50%)`,
-            animation: 'glitchShift2 1.2s ease-in-out infinite',
-            mixBlendMode: 'screen',
+            background: `linear-gradient(
+              45deg,
+              transparent 30%,
+              rgba(255,255,255,0.15) 50%,
+              transparent 70%
+            )`,
+            backgroundSize: '200% 200%',
+            animation: 'holoShift 3s ease-in-out infinite',
           }}
         />
+      </>
+    )
+  }
+  
+  // Starfield effect
+  if (effect.effect === 'starfield') {
+    return (
+      <>
+        <style>{`
+          @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+          }
+        `}</style>
+        {/* Dark space background */}
         <div 
           className={className}
           style={{
-            background: `linear-gradient(-45deg, ${effect.colors[1]}40 0%, transparent 50%)`,
-            animation: 'glitchShift1 0.8s ease-in-out infinite reverse',
-            mixBlendMode: 'screen',
+            background: 'radial-gradient(ellipse at 50% 50%, #1a1a2e 0%, #0d0d1a 100%)',
           }}
         />
-        {/* Scan line */}
-        <div
-          className="absolute left-0 right-0 h-2 pointer-events-none"
-          style={{
-            background: `linear-gradient(180deg, transparent, ${effect.colors[2]}80, transparent)`,
-            animation: 'glitchScan 2s linear infinite',
-          }}
-        />
-        {/* Glitch bars */}
-        {[...Array(4)].map((_, i) => (
+        {/* Stars */}
+        {[...Array(30)].map((_, i) => (
           <div
             key={i}
-            className="absolute pointer-events-none"
+            className="absolute rounded-full pointer-events-none"
             style={{
-              left: 0,
-              right: 0,
-              top: `${20 + i * 18}%`,
-              height: `${3 + (i % 2) * 2}px`,
-              background: effect.colors[i % 3],
-              opacity: 0,
-              animation: `glitchShift${(i % 2) + 1} ${0.3 + i * 0.1}s steps(2) infinite`,
-              animationDelay: `${i * 0.2}s`,
+              left: `${(i * 17 + 5) % 100}%`,
+              top: `${(i * 23 + 10) % 100}%`,
+              width: `${1 + (i % 3)}px`,
+              height: `${1 + (i % 3)}px`,
+              background: i % 5 === 0 ? '#ffffd0' : '#ffffff',
+              boxShadow: i % 5 === 0 
+                ? '0 0 4px #ffffd0, 0 0 8px #ffffd0' 
+                : '0 0 2px #ffffff',
+              animation: `twinkle ${1 + (i % 4) * 0.5}s ease-in-out infinite`,
+              animationDelay: `${(i * 0.1) % 2}s`,
             }}
           />
         ))}
+      </>
+    )
+  }
+  
+  // Neon Grid effect
+  if (effect.effect === 'neongrid') {
+    const color = effect.colors?.[0] || '#00ffff'
+    return (
+      <>
+        <style>{`
+          @keyframes gridPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+          }
+        `}</style>
+        {/* Dark background */}
+        <div 
+          className={className}
+          style={{
+            background: '#0a0a15',
+            opacity: 0.9,
+          }}
+        />
+        {/* Grid lines */}
+        <div 
+          className={className}
+          style={{
+            backgroundImage: `
+              linear-gradient(${color}20 1px, transparent 1px),
+              linear-gradient(90deg, ${color}20 1px, transparent 1px)
+            `,
+            backgroundSize: '20px 20px',
+            animation: 'gridPulse 3s ease-in-out infinite',
+          }}
+        />
+        {/* Glow at horizon */}
+        <div 
+          className={className}
+          style={{
+            background: `linear-gradient(to top, ${color}30 0%, transparent 40%)`,
+          }}
+        />
       </>
     )
   }
@@ -294,6 +327,11 @@ function AnimatedBackground({ effect, className }: { effect: BackgroundEffect; c
 
 function GradientBackground({ effect, className }: { effect: BackgroundEffect; className: string }) {
   if (effect.effect === 'shimmer') {
+    // Use darker gold tones for better readability
+    const darkGold = '#8B7500'
+    const medGold = '#B8960C'
+    const lightGold = '#D4AF37'
+    
     return (
       <>
         <style>{`
@@ -302,55 +340,55 @@ function GradientBackground({ effect, className }: { effect: BackgroundEffect; c
             100% { background-position: -200% center; }
           }
           @keyframes goldSparkle {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 0.8; transform: scale(1.1); }
           }
         `}</style>
-        {/* Base gold gradient */}
+        {/* Base dark gold gradient */}
         <div 
           className={className}
           style={{
             background: `linear-gradient(
               135deg,
-              ${effect.colors[2]} 0%,
-              ${effect.colors[0]} 30%,
-              ${effect.colors[1]} 50%,
-              ${effect.colors[0]} 70%,
-              ${effect.colors[2]} 100%
+              ${darkGold} 0%,
+              ${medGold} 25%,
+              ${lightGold} 50%,
+              ${medGold} 75%,
+              ${darkGold} 100%
             )`,
-            opacity: 0.85,
+            opacity: 0.7,
           }}
         />
-        {/* Shimmer overlay */}
+        {/* Shimmer overlay - subtle */}
         <div 
           className={className}
           style={{
             background: `linear-gradient(
               90deg,
               transparent 0%,
-              rgba(255,255,255,0.1) 25%,
-              rgba(255,255,255,0.4) 50%,
-              rgba(255,255,255,0.1) 75%,
+              rgba(255,215,0,0.1) 25%,
+              rgba(255,255,255,0.2) 50%,
+              rgba(255,215,0,0.1) 75%,
               transparent 100%
             )`,
             backgroundSize: '200% 100%',
-            animation: 'goldShimmer 2s ease-in-out infinite',
+            animation: 'goldShimmer 2.5s ease-in-out infinite',
           }}
         />
-        {/* Gold sparkles */}
-        {[...Array(12)].map((_, i) => (
+        {/* Gold sparkles - fewer and subtler */}
+        {[...Array(6)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full pointer-events-none"
             style={{
-              left: `${5 + (i * 8)}%`,
-              top: `${10 + (i % 4) * 22}%`,
-              width: `${2 + (i % 2)}px`,
-              height: `${2 + (i % 2)}px`,
-              background: '#ffffff',
-              boxShadow: `0 0 6px #ffffff, 0 0 12px ${effect.colors[0]}`,
-              animation: `goldSparkle ${0.8 + (i % 3) * 0.4}s ease-in-out infinite`,
-              animationDelay: `${i * 0.15}s`,
+              left: `${10 + (i * 15)}%`,
+              top: `${15 + (i % 3) * 30}%`,
+              width: '2px',
+              height: '2px',
+              background: lightGold,
+              boxShadow: `0 0 4px ${lightGold}`,
+              animation: `goldSparkle ${1 + (i % 3) * 0.5}s ease-in-out infinite`,
+              animationDelay: `${i * 0.2}s`,
             }}
           />
         ))}
@@ -407,50 +445,57 @@ export function AvatarAura({ effect, className = "" }: { effect: AuraEffect | nu
 
 function SparkleRingAura({ effect, className }: { effect: AuraEffect; className: string }) {
   const color = effect.color || '#ffffff'
+  
+  // Generate sparkle positions around a circle
+  const sparkles = [...Array(8)].map((_, i) => {
+    const angle = (i / 8) * Math.PI * 2
+    const radius = 52 // Distance from center
+    return {
+      x: 50 + Math.cos(angle) * 45,
+      y: 50 + Math.sin(angle) * 45,
+      size: 4 + (i % 2) * 2,
+      delay: i * 0.2,
+    }
+  })
+  
   return (
     <>
       <style>{`
-        @keyframes sparkleFloat {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-          50% { transform: translateY(-3px) scale(1.3); opacity: 1; }
-        }
-        @keyframes sparkleRotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @keyframes sparkleGlow {
+          0%, 100% { opacity: 0.4; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
         }
       `}</style>
+      {/* Glowing ring */}
       <div 
         className={`absolute ${className}`}
         style={{
-          inset: '-12px',
-          animation: 'sparkleRotate 8s linear infinite',
+          inset: '-6px',
+          borderRadius: '50%',
+          border: `2px solid ${color}60`,
+          boxShadow: `0 0 10px ${color}40, inset 0 0 10px ${color}20`,
         }}
-      >
-        {/* Sparkle particles around the avatar */}
-        {[...Array(12)].map((_, i) => {
-          const angle = (i / 12) * 360
-          const delay = i * 0.15
-          const size = 3 + (i % 3)
-          return (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: `${size}px`,
-                height: `${size}px`,
-                background: color,
-                borderRadius: '50%',
-                boxShadow: `0 0 ${size * 2}px ${color}, 0 0 ${size * 4}px ${color}80`,
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-48px)`,
-                animation: `sparkleFloat ${0.8 + (i % 4) * 0.3}s ease-in-out infinite`,
-                animationDelay: `${delay}s`,
-              }}
-            />
-          )
-        })}
-      </div>
+      />
+      {/* Sparkles at fixed positions */}
+      {sparkles.map((s, i) => (
+        <div
+          key={i}
+          className="absolute pointer-events-none"
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: `${s.size}px`,
+            height: `${s.size}px`,
+            marginLeft: `-${s.size / 2}px`,
+            marginTop: `-${s.size / 2}px`,
+            background: color,
+            borderRadius: '50%',
+            boxShadow: `0 0 ${s.size * 2}px ${color}, 0 0 ${s.size * 3}px ${color}`,
+            animation: `sparkleGlow ${0.8 + (i % 3) * 0.3}s ease-in-out infinite`,
+            animationDelay: `${s.delay}s`,
+          }}
+        />
+      ))}
     </>
   )
 }
@@ -503,57 +548,49 @@ function DiamondAura({ effect, className }: { effect: AuraEffect; className: str
   return (
     <>
       <style>{`
-        @keyframes diamondFloat {
-          0%, 100% { transform: translateX(-50%) translateY(0) rotate(45deg); }
-          50% { transform: translateX(-50%) translateY(-5px) rotate(45deg); }
+        @keyframes diamondBob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
         }
         @keyframes diamondGlow {
-          0%, 100% { box-shadow: 0 0 10px ${color}, 0 0 20px ${color}60; }
-          50% { box-shadow: 0 0 20px ${color}, 0 0 40px ${color}; }
+          0%, 100% { filter: drop-shadow(0 0 8px ${color}) drop-shadow(0 0 16px ${color}60); }
+          50% { filter: drop-shadow(0 0 12px ${color}) drop-shadow(0 0 24px ${color}); }
         }
         @keyframes diamondSparkle {
-          0%, 100% { opacity: 0; transform: scale(0.5); }
-          50% { opacity: 1; transform: scale(1); }
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
         }
       `}</style>
+      {/* Container centered above avatar */}
       <div 
         className={`absolute ${className}`}
         style={{ 
-          top: '-28px', 
+          top: '-24px', 
           left: '50%', 
-          transform: 'translateX(-50%)',
+          marginLeft: '-10px', // Half of diamond width
+          animation: 'diamondBob 2s ease-in-out infinite',
         }}
       >
-        {/* Diamond shape */}
+        {/* Diamond shape using CSS */}
         <div
           style={{
-            width: '18px',
-            height: '18px',
-            background: `linear-gradient(135deg, ${color}90 0%, ${color} 50%, ${color}70 100%)`,
+            width: '20px',
+            height: '20px',
+            background: `linear-gradient(135deg, ${color} 0%, #ffffff 50%, ${color} 100%)`,
             transform: 'rotate(45deg)',
-            boxShadow: `0 0 15px ${color}, 0 0 30px ${color}60`,
-            animation: 'diamondFloat 2.5s ease-in-out infinite, diamondGlow 2s ease-in-out infinite',
+            animation: 'diamondGlow 1.5s ease-in-out infinite',
           }}
         />
-        {/* Sparkles */}
-        {effect.sparkle && [...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              top: `${-5 + (i % 2) * 25}px`,
-              left: `${-8 + i * 10}px`,
-              width: '4px',
-              height: '4px',
-              background: '#ffffff',
-              borderRadius: '50%',
-              boxShadow: `0 0 6px #ffffff`,
-              animation: `diamondSparkle ${0.6 + i * 0.2}s ease-in-out infinite`,
-              animationDelay: `${i * 0.15}s`,
-            }}
-          />
-        ))}
       </div>
+      {/* Sparkles around diamond */}
+      {effect.sparkle && (
+        <>
+          <div className="absolute" style={{ top: '-30px', left: 'calc(50% - 18px)', width: '3px', height: '3px', background: '#fff', borderRadius: '50%', boxShadow: `0 0 4px ${color}`, animation: 'diamondSparkle 0.8s ease-in-out infinite' }} />
+          <div className="absolute" style={{ top: '-30px', left: 'calc(50% + 15px)', width: '3px', height: '3px', background: '#fff', borderRadius: '50%', boxShadow: `0 0 4px ${color}`, animation: 'diamondSparkle 0.8s ease-in-out infinite', animationDelay: '0.3s' }} />
+          <div className="absolute" style={{ top: '-18px', left: 'calc(50% - 22px)', width: '2px', height: '2px', background: '#fff', borderRadius: '50%', boxShadow: `0 0 3px ${color}`, animation: 'diamondSparkle 0.8s ease-in-out infinite', animationDelay: '0.5s' }} />
+          <div className="absolute" style={{ top: '-18px', left: 'calc(50% + 20px)', width: '2px', height: '2px', background: '#fff', borderRadius: '50%', boxShadow: `0 0 3px ${color}`, animation: 'diamondSparkle 0.8s ease-in-out infinite', animationDelay: '0.7s' }} />
+        </>
+      )}
     </>
   )
 }
@@ -583,71 +620,34 @@ function HaloAura({ effect, className }: { effect: AuraEffect; className: string
   )
 }
 
-// Crown Aura - Lucide-inspired clean design
+// Crown Aura - Using emoji for universal beauty
 function CrownAura({ effect, className }: { effect: AuraEffect; className: string }) {
   const color = effect.color || '#ffd700'
   return (
     <>
       <style>{`
-        @keyframes crownFloat {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(-5px); }
+        @keyframes crownBob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
         }
         @keyframes crownGlow {
-          0%, 100% { filter: drop-shadow(0 0 4px ${color}) drop-shadow(0 0 8px ${color}80); }
-          50% { filter: drop-shadow(0 0 8px ${color}) drop-shadow(0 0 16px ${color}); }
-        }
-        @keyframes crownSparkle {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 1; }
+          0%, 100% { text-shadow: 0 0 8px ${color}, 0 0 16px ${color}60; }
+          50% { text-shadow: 0 0 12px ${color}, 0 0 24px ${color}; }
         }
       `}</style>
+      {/* Crown emoji - centered above avatar */}
       <div 
         className={`absolute ${className}`}
         style={{ 
-          top: '-26px', 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          animation: 'crownFloat 2.5s ease-in-out infinite',
+          top: '-28px', 
+          left: '50%',
+          marginLeft: '-16px',
+          fontSize: '32px',
+          lineHeight: 1,
+          animation: 'crownBob 2s ease-in-out infinite, crownGlow 1.5s ease-in-out infinite',
         }}
       >
-        {/* Lucide-inspired Crown SVG - Clean minimal design */}
-        <svg 
-          width="48" 
-          height="32" 
-          viewBox="0 0 24 24" 
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{ animation: 'crownGlow 2s ease-in-out infinite' }}
-        >
-          {/* Lucide Crown path */}
-          <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-          <path d="M5 21h14" />
-        </svg>
-        {/* Sparkles */}
-        {effect.sparkle && (
-          <>
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  top: `${-2 + (i % 2) * 8}px`,
-                  left: `${4 + i * 10}px`,
-                  width: '3px',
-                  height: '3px',
-                  background: '#ffffff',
-                  boxShadow: `0 0 4px #ffffff, 0 0 8px ${color}`,
-                  animation: `crownSparkle ${0.5 + i * 0.15}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
-          </>
-        )}
+        👑
       </div>
     </>
   )

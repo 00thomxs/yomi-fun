@@ -75,18 +75,20 @@ export function StyledUsername({ username, nametagEffect, rankColor, className, 
     )
   }
 
-  // Gradient effect
-  if (normalizedEffect === 'gradient' || previewData.type === 'gradient') {
+  // Gradient effect - supports 2+ colors
+  if (normalizedEffect === 'gradient' || normalizedEffect === 'sunset' || normalizedEffect === 'ocean' || normalizedEffect === 'fire' || previewData.type === 'gradient') {
     const colors = previewData.colors || ['#00d4ff', '#ff00ff']
     // Support both "to right" and "90deg" formats
     const direction = previewData.direction === 'to right' ? '90deg' 
       : previewData.direction === 'to left' ? '270deg'
       : previewData.direction || '90deg'
+    // Build gradient string with all colors
+    const gradientColors = colors.join(', ')
     return (
       <span 
         className={cn("nametag-gradient", className)}
         style={{
-          background: `linear-gradient(${direction}, ${colors[0]}, ${colors[1]})`,
+          background: `linear-gradient(${direction}, ${gradientColors})`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text'
