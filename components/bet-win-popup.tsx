@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Trophy, Share2, Sparkles, Check } from "lucide-react"
+import { X, Trophy, Share2, Sparkles, Check, Target } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { PnlCardModal } from "@/components/pnl-card-modal"
 import { YomiLogo } from "@/components/ui/yomi-logo"
@@ -180,8 +180,9 @@ export function BetWinPopup() {
               <h2 className="text-2xl font-black text-amber-400 tracking-tight">
                 TU AS GAGNÉ !
               </h2>
-              <p className="text-zinc-400 text-sm mt-1">
-                Félicitations pour ta prédiction 🎯
+              <p className="text-zinc-400 text-sm mt-1 flex items-center justify-center gap-1.5">
+                Félicitations pour ta prédiction
+                <Target className="w-4 h-4 text-amber-400" />
               </p>
             </div>
 
