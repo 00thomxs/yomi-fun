@@ -7,6 +7,7 @@ import { RightSidebar } from "@/components/layout/right-sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppHeader } from "@/components/layout/app-header"
 import { BadgeEarnedPopup } from "@/components/badge-earned-popup"
+import { BetWinPopup } from "@/components/bet-win-popup"
 import { useUser } from "@/contexts/user-context"
 import { createClient } from "@/lib/supabase/client"
 import type { Market } from "@/lib/types"
@@ -139,6 +140,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
       {/* Badge Earned Popup - Global */}
       {isAuthenticated && <BadgeEarnedPopup />}
+
+      {/* Bet Win Popup - Global */}
+      {isAuthenticated && <BetWinPopup />}
     </div>
   )
 }

@@ -1,54 +1,92 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Trophy, Share2, ArrowRight, Sparkles, Check } from "lucide-react"
+import { X, Trophy, Share2, Sparkles, Check } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { PnlCardModal } from "@/components/pnl-card-modal"
 import { YomiLogo } from "@/components/ui/yomi-logo"
+import { getUnseenBetWins, markBetWinAsSeen, type UnseenBetWin } from "@/app/actions/bet-wins"
+import { cn } from "@/lib/utils"
 
-interface BetWinPopupProps {
-  isOpen: boolean
-  onClose: () => void
-  data: {
-    pnlPercentage: number
-    pnlAmount: number
-    event: string
-    sens: string
-    mise: number
-    winnings: number
-    date: string
-  }
-}
-
-export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
-  const [showConfetti, setShowConfetti] = useState(false)
+export function BetWinPopup() {
+  const [unseenWins, setUnseenWins] = useState<UnseenBetWin[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const [showPnlModal, setShowPnlModal] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0)
 
+  // Fetch unseen wins on mount (with delay like badges)
   useEffect(() => {
-    if (isOpen) {
-      setShowConfetti(true)
-      setAnimationPhase(0)
-      
-      // Stagger animations
-      const timer1 = setTimeout(() => setAnimationPhase(1), 200)
-      const timer2 = setTimeout(() => setAnimationPhase(2), 400)
-      const timer3 = setTimeout(() => setAnimationPhase(3), 600)
-      const confettiTimer = setTimeout(() => setShowConfetti(false), 3000)
-      
-      return () => {
-        clearTimeout(timer1)
-        clearTimeout(timer2)
-        clearTimeout(timer3)
-        clearTimeout(confettiTimer)
+    const timer = setTimeout(async () => {
+      try {
+        const wins = await getUnseenBetWins()
+        if (wins.length > 0) {
+          setUnseenWins(wins)
+          setTimeout(() => {
+            setIsVisible(true)
+            setShowConfetti(true)
+            // Stagger animations
+            setTimeout(() => setAnimationPhase(1), 200)
+            setTimeout(() => setAnimationPhase(2), 400)
+            setTimeout(() => setAnimationPhase(3), 600)
+            setTimeout(() => setShowConfetti(false), 3000)
+          }, 100)
+        }
+      } catch {
+        // Silently fail
       }
-    }
-  }, [isOpen])
+    }, 2000) // 2s delay after page load
 
-  if (!isOpen) return null
+    return () => clearTimeout(timer)
+  }, [])
 
-  const isPositive = data.pnlPercentage >= 0
-  const pnlDisplay = `${isPositive ? "+" : ""}${data.pnlPercentage.toLocaleString("fr-FR")}%`
+  const currentWin = unseenWins[currentIndex]
+
+  if (!currentWin || isClosing) return null
+
+  // Calculate PNL data
+  const winnings = currentWin.potential_payout
+  const mise = currentWin.amount
+  const pnlAmount = winnings - mise
+  const pnlPercentage = mise > 0 ? Math.round((pnlAmount / mise) * 100) : 0
+  const pnlDisplay = `+${pnlPercentage}%`
+
+  // Format date
+  const date = currentWin.resolved_at 
+    ? new Date(currentWin.resolved_at).toLocaleDateString('fr-FR')
+    : new Date(currentWin.created_at).toLocaleDateString('fr-FR')
+
+  // Truncate event name
+  const eventName = (currentWin.market as any)?.title || 'Événement'
+  const truncatedEvent = eventName.length > 35 
+    ? eventName.substring(0, 35) + "..." 
+    : eventName
+
+  const handleClose = async () => {
+    setIsVisible(false)
+    await markBetWinAsSeen(currentWin.id)
+    
+    setTimeout(() => {
+      if (currentIndex < unseenWins.length - 1) {
+        setCurrentIndex(currentIndex + 1)
+        setAnimationPhase(0)
+        setTimeout(() => {
+          setIsVisible(true)
+          setShowConfetti(true)
+          setTimeout(() => setAnimationPhase(1), 200)
+          setTimeout(() => setAnimationPhase(2), 400)
+          setTimeout(() => setAnimationPhase(3), 600)
+          setTimeout(() => setShowConfetti(false), 3000)
+        }, 100)
+      } else {
+        setIsClosing(true)
+        setUnseenWins([])
+        setCurrentIndex(0)
+      }
+    }, 300)
+  }
 
   const handleShare = () => {
     setShowPnlModal(true)
@@ -58,18 +96,19 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
     setShowPnlModal(false)
   }
 
-  // Truncate event name
-  const truncatedEvent = data.event.length > 40 
-    ? data.event.substring(0, 40) + "..." 
-    : data.event
+  // Get sens based on direction
+  const sens = currentWin.direction === 'YES' ? 'OUI' : 'NON'
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         {/* Backdrop with glow effect */}
         <div 
-          className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
-          onClick={onClose}
+          className={cn(
+            "absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
+            isVisible ? "opacity-100" : "opacity-0"
+          )}
+          onClick={handleClose}
         />
         
         {/* Victory glow */}
@@ -106,14 +145,21 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
         )}
 
         {/* Modal */}
-        <div className="relative bg-zinc-950 border border-amber-500/30 rounded-2xl max-w-md w-full shadow-2xl shadow-amber-500/20 animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-hidden">
+        <div 
+          className={cn(
+            "relative bg-zinc-950 border-2 border-amber-500/40 rounded-2xl max-w-md w-full shadow-2xl shadow-amber-500/20 overflow-hidden transition-all duration-500",
+            isVisible 
+              ? "opacity-100 scale-100 translate-y-0" 
+              : "opacity-0 scale-95 translate-y-4"
+          )}
+        >
           
           {/* Top Glow Bar */}
           <div className="h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
           
           {/* Close button */}
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors z-10"
           >
             <X className="w-5 h-5" />
@@ -123,9 +169,10 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
             
             {/* Victory Header */}
             <div 
-              className={`text-center transition-all duration-500 ${
+              className={cn(
+                "text-center transition-all duration-500",
                 animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+              )}
             >
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/40 mb-3">
                 <Trophy className="w-8 h-8 text-amber-400" />
@@ -140,9 +187,10 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
 
             {/* Mini PNL Card Preview */}
             <div 
-              className={`transition-all duration-500 delay-100 ${
+              className={cn(
+                "transition-all duration-500 delay-100",
                 animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+              )}
             >
               <div 
                 className="relative rounded-xl border border-zinc-700 overflow-hidden"
@@ -175,7 +223,7 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
                       {pnlDisplay}
                     </p>
                     <p className="text-lg font-bold text-emerald-400 flex items-center justify-center gap-1 mt-1">
-                      +{data.winnings.toLocaleString('fr-FR')} <CurrencySymbol className="w-4 h-4" />
+                      +{winnings.toLocaleString('fr-FR')} <CurrencySymbol className="w-4 h-4" />
                     </p>
                   </div>
 
@@ -187,14 +235,14 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-500">CHOIX</span>
-                      <span className={data.sens.toUpperCase().includes('OUI') ? 'text-emerald-400' : 'text-red-400'}>
-                        {data.sens}
+                      <span className={sens === 'OUI' ? 'text-emerald-400' : 'text-red-400'}>
+                        {sens}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-500">MISE</span>
                       <span className="text-white flex items-center gap-1">
-                        {data.mise.toLocaleString('fr-FR')} <CurrencySymbol className="w-3 h-3" />
+                        {mise.toLocaleString('fr-FR')} <CurrencySymbol className="w-3 h-3" />
                       </span>
                     </div>
                   </div>
@@ -207,11 +255,27 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
               </div>
             </div>
 
+            {/* Counter if multiple wins */}
+            {unseenWins.length > 1 && (
+              <div className="flex justify-center gap-1.5">
+                {unseenWins.map((_, i) => (
+                  <div 
+                    key={i}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all",
+                      i === currentIndex ? "bg-amber-400" : "bg-zinc-700"
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div 
-              className={`flex gap-3 transition-all duration-500 delay-200 ${
+              className={cn(
+                "flex gap-3 transition-all duration-500 delay-200",
                 animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+              )}
             >
               <button
                 onClick={handleShare}
@@ -221,11 +285,14 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
                 Partager
               </button>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium border border-zinc-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Check className="w-4 h-4" />
-                Continuer
+                {unseenWins.length > 1 && currentIndex < unseenWins.length - 1 
+                  ? 'Suivant' 
+                  : 'Continuer'
+                }
               </button>
             </div>
 
@@ -238,15 +305,14 @@ export function BetWinPopup({ isOpen, onClose, data }: BetWinPopupProps) {
         isOpen={showPnlModal}
         onClose={handleClosePnlModal}
         data={{
-          pnlPercentage: data.pnlPercentage,
-          pnlAmount: data.pnlAmount,
-          event: data.event,
-          sens: data.sens,
-          mise: data.mise,
-          date: data.date,
+          pnlPercentage: pnlPercentage,
+          pnlAmount: pnlAmount,
+          event: eventName,
+          sens: sens,
+          mise: mise,
+          date: date,
         }}
       />
     </>
   )
 }
-
