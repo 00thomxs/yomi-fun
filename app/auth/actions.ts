@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { AuthResult } from '@/lib/types'
+import { sendWelcomeEmail } from '@/app/actions/emails'
 
 // Create a separate admin client for deletion
 // Note: This will fail if env vars are missing, ensure they are set in Vercel
@@ -60,6 +61,11 @@ export async function signUp(email: string, password: string, username: string):
   if (error) {
     return { error: error.message }
   }
+
+  // Send welcome email (non-blocking)
+  sendWelcomeEmail(email, username).catch(err => {
+    console.error('[signUp] Failed to send welcome email:', err)
+  })
 
   return { success: true }
 }

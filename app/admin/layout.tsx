@@ -15,6 +15,7 @@ import {
   Award,
   CreditCard,
   Users,
+  Mail,
 } from "lucide-react"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -55,6 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Créer un Marché", href: "/admin/create", icon: PlusCircle },
     { name: "Utilisateurs", href: "/admin/users", icon: Users },
+    { name: "Emails", href: "/admin/emails", icon: Mail },
     { name: "Saisons", href: "/admin/seasons", icon: Trophy },
     { name: "Badges", href: "/admin/badges/award-existing", icon: Award },
     { name: "Cartes Profil", href: "/admin/cards", icon: CreditCard },
