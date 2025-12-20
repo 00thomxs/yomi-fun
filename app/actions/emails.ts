@@ -45,6 +45,7 @@ export async function sendWelcomeEmail(
   try {
     const { error } = await resend.emails.send({
       from: EMAIL_CONFIG.from.default,
+      replyTo: EMAIL_CONFIG.replyTo,
       to: email,
       subject: `Bienvenue sur YOMI.fun, ${username} ! 🎉`,
       react: WelcomeEmail({ username }),
@@ -74,6 +75,7 @@ export async function sendPasswordResetEmail(
   try {
     const { error } = await resend.emails.send({
       from: EMAIL_CONFIG.from.default,
+      replyTo: EMAIL_CONFIG.replyTo,
       to: email,
       subject: 'Réinitialise ton mot de passe YOMI.fun 🔐',
       react: PasswordResetEmail({ username, resetUrl }),
@@ -106,6 +108,7 @@ export async function sendBetWonEmail(
   try {
     const { error } = await resend.emails.send({
       from: EMAIL_CONFIG.from.default,
+      replyTo: EMAIL_CONFIG.replyTo,
       to: email,
       subject: `🎉 Tu as gagné ${winnings.toLocaleString()} Zeny !`,
       react: BetWonEmail({ username, marketQuestion, betAmount, winnings, newBalance }),
@@ -137,6 +140,7 @@ export async function sendBetLostEmail(
   try {
     const { error } = await resend.emails.send({
       from: EMAIL_CONFIG.from.default,
+      replyTo: EMAIL_CONFIG.replyTo,
       to: email,
       subject: `Résultat de ton pari sur "${marketQuestion.slice(0, 30)}..."`,
       react: BetLostEmail({ username, marketQuestion, betAmount, newBalance }),
@@ -174,6 +178,7 @@ export async function sendBroadcastEmail(
     if (testMode && testEmail) {
       const { error } = await resend.emails.send({
         from: EMAIL_CONFIG.from.default,
+        replyTo: EMAIL_CONFIG.replyTo,
         to: testEmail,
         subject: `[TEST] ${subject}`,
         react: BroadcastEmail({ 
@@ -250,6 +255,7 @@ export async function sendBroadcastEmail(
           try {
             await resend.emails.send({
               from: EMAIL_CONFIG.from.default,
+              replyTo: EMAIL_CONFIG.replyTo,
               to: user.email,
               subject,
               react: BroadcastEmail({ 
