@@ -7,8 +7,8 @@ if (!process.env.RESEND_API_KEY) {
 export const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Email configuration
-// Note: Use onboarding@resend.dev until y0mi.fun domain is verified on Resend
-const DOMAIN_VERIFIED = false // Set to true once domain is verified on resend.com/domains
+// Domain y0mi.fun is verified on Resend
+const DOMAIN_VERIFIED = true
 
 export const EMAIL_CONFIG = {
   from: {
