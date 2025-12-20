@@ -72,6 +72,8 @@ function StatCard({
 // ============================================
 // TOP PLAYERS TABLE (Compact - Top 50)
 // ============================================
+type TopSortColumn = 'balance' | 'total_won' | 'total_bets' | 'win_rate' | 'username'
+
 function TopPlayersTable({ 
   players, 
   timeframe, 
@@ -83,6 +85,9 @@ function TopPlayersTable({
   onTimeframeChange: (tf: string) => void
   loading: boolean
 }) {
+  const [sortColumn, setSortColumn] = useState<TopSortColumn>('total_won')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  
   const timeframes = [
     { id: 'day', label: '24h' },
     { id: 'week', label: '7j' },
@@ -95,6 +100,40 @@ function TopPlayersTable({
     if (rank === 2) return 'text-zinc-300'
     if (rank === 3) return 'text-amber-600'
     return 'text-zinc-500'
+  }
+  
+  const handleSort = (column: TopSortColumn) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')
+    } else {
+      setSortColumn(column)
+      setSortOrder('desc')
+    }
+  }
+  
+  const sortedPlayers = [...players].sort((a, b) => {
+    let aVal: number | string = 0
+    let bVal: number | string = 0
+    
+    switch (sortColumn) {
+      case 'balance': aVal = a.balance; bVal = b.balance; break
+      case 'total_won': aVal = a.total_won; bVal = b.total_won; break
+      case 'total_bets': aVal = a.total_bets; bVal = b.total_bets; break
+      case 'win_rate': aVal = a.win_rate; bVal = b.win_rate; break
+      case 'username': aVal = a.username.toLowerCase(); bVal = b.username.toLowerCase(); break
+    }
+    
+    if (typeof aVal === 'string') {
+      return sortOrder === 'asc' ? aVal.localeCompare(bVal as string) : (bVal as string).localeCompare(aVal)
+    }
+    return sortOrder === 'asc' ? aVal - (bVal as number) : (bVal as number) - aVal
+  })
+  
+  const TopSortIcon = ({ column }: { column: TopSortColumn }) => {
+    if (sortColumn !== column) return <ChevronDown className="w-3 h-3 opacity-30" />
+    return sortOrder === 'desc' 
+      ? <ChevronDown className="w-3 h-3" />
+      : <ChevronUp className="w-3 h-3" />
   }
   
   return (
@@ -135,15 +174,51 @@ function TopPlayersTable({
             <thead className="sticky top-0 bg-zinc-900 z-10">
               <tr className="text-zinc-500 border-b border-zinc-800">
                 <th className="text-left py-2 px-3 font-medium w-10">#</th>
-                <th className="text-left py-2 px-3 font-medium">Joueur</th>
-                <th className="text-right py-2 px-3 font-medium">Balance</th>
-                <th className="text-right py-2 px-3 font-medium">PNL</th>
-                <th className="text-right py-2 px-3 font-medium hidden sm:table-cell">Paris</th>
-                <th className="text-center py-2 px-3 font-medium hidden md:table-cell">Statut</th>
+                <th 
+                  className="text-left py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors"
+                  onClick={() => handleSort('username')}
+                >
+                  <span className="flex items-center gap-1">
+                    Joueur <TopSortIcon column="username" />
+                  </span>
+                </th>
+                <th 
+                  className="text-right py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors"
+                  onClick={() => handleSort('balance')}
+                >
+                  <span className="flex items-center justify-end gap-1">
+                    Balance <TopSortIcon column="balance" />
+                  </span>
+                </th>
+                <th 
+                  className="text-right py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors"
+                  onClick={() => handleSort('total_won')}
+                >
+                  <span className="flex items-center justify-end gap-1">
+                    PNL <TopSortIcon column="total_won" />
+                  </span>
+                </th>
+                <th 
+                  className="text-right py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors hidden sm:table-cell"
+                  onClick={() => handleSort('total_bets')}
+                >
+                  <span className="flex items-center justify-end gap-1">
+                    Paris <TopSortIcon column="total_bets" />
+                  </span>
+                </th>
+                <th 
+                  className="text-right py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors hidden md:table-cell"
+                  onClick={() => handleSort('win_rate')}
+                >
+                  <span className="flex items-center justify-end gap-1">
+                    WR <TopSortIcon column="win_rate" />
+                  </span>
+                </th>
+                <th className="text-center py-2 px-3 font-medium hidden lg:table-cell">Statut</th>
               </tr>
             </thead>
             <tbody>
-              {players.map((player, i) => (
+              {sortedPlayers.map((player, i) => (
                 <tr key={player.id} className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
                   <td className={`py-1.5 px-3 font-bold ${getMedalColor(i + 1)}`}>
                     {i + 1}
@@ -171,7 +246,10 @@ function TopPlayersTable({
                   <td className="py-1.5 px-3 text-right text-zinc-400 hidden sm:table-cell">
                     {player.total_bets}
                   </td>
-                  <td className="py-1.5 px-3 text-center hidden md:table-cell">
+                  <td className="py-1.5 px-3 text-right text-zinc-400 hidden md:table-cell">
+                    {player.win_rate}%
+                  </td>
+                  <td className="py-1.5 px-3 text-center hidden lg:table-cell">
                     {player.is_banned ? (
                       <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded text-[10px] font-medium">
                         <Ban className="w-2.5 h-2.5" /> Banni
@@ -184,9 +262,9 @@ function TopPlayersTable({
                   </td>
                 </tr>
               ))}
-              {players.length === 0 && (
+              {sortedPlayers.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-zinc-500">
+                  <td colSpan={7} className="py-8 text-center text-zinc-500">
                     Aucun joueur trouvé
                   </td>
                 </tr>
