@@ -22,8 +22,7 @@ export function WelcomeEmail({
       </Text>
       
       <Text style={emailStyles.text}>
-        Ton compte a été créé avec succès ! Tu fais maintenant partie de la communauté YOMI, 
-        la plateforme de paris prédictifs la plus fun.
+        Ton compte a été créé avec succès ! Tu fais maintenant partie de la communauté YOMI.
       </Text>
 
       <Section style={emailStyles.card}>

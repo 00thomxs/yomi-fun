@@ -26,10 +26,14 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           {/* Header with Logo */}
           <Section style={header}>
             <Link href="https://y0mi.fun" style={logoLink}>
-              {/* Text-based logo for better email compatibility */}
-              <Text style={logoText}>YOMI</Text>
-              <Text style={logoSubtext}>.fun</Text>
+              <span style={logoText}>YOMI</span>
+              <span style={logoSubtext}>.fun</span>
             </Link>
+          </Section>
+
+          {/* Decorative line */}
+          <Section style={decorativeLine}>
+            <div style={redLine}></div>
           </Section>
 
           {/* Main Content */}
@@ -41,7 +45,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              © {new Date().getFullYear()} YOMI.fun — La plateforme de paris prédictifs
+              © {new Date().getFullYear()} YOMI.fun
             </Text>
             <Text style={footerLinks}>
               <Link href="https://y0mi.fun" style={link}>Site</Link>
@@ -50,9 +54,6 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
               {' • '}
               <Link href="mailto:yomipredict.fun@gmail.com" style={link}>Support</Link>
             </Text>
-            <Text style={footerMuted}>
-              Tu reçois cet email car tu es inscrit sur YOMI.fun
-            </Text>
           </Section>
         </Container>
       </Body>
@@ -60,24 +61,30 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
   )
 }
 
-// Styles
+// Styles - YOMI Brand Colors
+const BRAND_RED = '#dc2626'
+const BRAND_RED_DARK = '#b91c1c'
+
 const main = {
   backgroundColor: '#0a0a0a',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
+  padding: '20px 0',
 }
 
 const container = {
   backgroundColor: '#111111',
   margin: '0 auto',
-  padding: '20px 0',
+  padding: '0',
   maxWidth: '560px',
-  borderRadius: '12px',
-  border: '1px solid #222',
+  borderRadius: '16px',
+  border: '1px solid #262626',
+  overflow: 'hidden' as const,
 }
 
 const header = {
-  padding: '30px 40px 20px',
+  padding: '40px 40px 25px',
   textAlign: 'center' as const,
+  backgroundColor: '#0a0a0a',
 }
 
 const logoLink = {
@@ -85,66 +92,67 @@ const logoLink = {
 }
 
 const logoText = {
-  color: '#dc2626', // Red like the YOMI brand
-  fontSize: '36px',
-  fontWeight: '800',
-  margin: '0',
-  padding: '0',
-  letterSpacing: '-1px',
-  display: 'inline',
+  color: BRAND_RED,
+  fontSize: '42px',
+  fontWeight: '900',
+  letterSpacing: '-2px',
 }
 
 const logoSubtext = {
-  color: '#888888',
-  fontSize: '24px',
+  color: '#ffffff',
+  fontSize: '28px',
   fontWeight: '400',
-  margin: '0',
-  padding: '0',
-  display: 'inline',
+}
+
+const decorativeLine = {
+  padding: '0 40px',
+  backgroundColor: '#0a0a0a',
+}
+
+const redLine = {
+  height: '3px',
+  background: `linear-gradient(90deg, transparent, ${BRAND_RED}, transparent)`,
+  borderRadius: '2px',
 }
 
 const content = {
-  padding: '20px 40px 30px',
+  padding: '30px 40px 35px',
+  backgroundColor: '#111111',
 }
 
 const hr = {
-  borderColor: '#333',
-  margin: '20px 40px',
+  borderColor: '#262626',
+  margin: '0 40px',
 }
 
 const footer = {
-  padding: '10px 40px 30px',
+  padding: '25px 40px 30px',
   textAlign: 'center' as const,
+  backgroundColor: '#0a0a0a',
 }
 
 const footerText = {
-  color: '#888',
+  color: '#666',
   fontSize: '12px',
-  margin: '0 0 10px',
+  margin: '0 0 12px',
 }
 
 const footerLinks = {
   color: '#888',
   fontSize: '12px',
-  margin: '0 0 10px',
+  margin: '0',
 }
 
 const link = {
-  color: '#00d4ff',
+  color: '#999',
   textDecoration: 'none',
 }
 
-const footerMuted = {
-  color: '#555',
-  fontSize: '11px',
-  margin: '10px 0 0',
-}
-
-// Shared styles for email templates
+// Shared styles for email templates - Using YOMI Brand Red
 export const emailStyles = {
   h1: {
     color: '#ffffff',
-    fontSize: '28px',
+    fontSize: '26px',
     fontWeight: '700',
     margin: '0 0 20px',
     padding: '0',
@@ -152,38 +160,38 @@ export const emailStyles = {
   },
   h2: {
     color: '#ffffff',
-    fontSize: '22px',
+    fontSize: '20px',
     fontWeight: '600',
     margin: '0 0 15px',
     padding: '0',
   },
   text: {
-    color: '#cccccc',
+    color: '#d4d4d4',
     fontSize: '15px',
-    lineHeight: '1.6',
-    margin: '0 0 15px',
+    lineHeight: '1.7',
+    margin: '0 0 16px',
   },
   textMuted: {
-    color: '#888888',
+    color: '#737373',
     fontSize: '14px',
     lineHeight: '1.5',
     margin: '0 0 15px',
   },
   button: {
-    backgroundColor: '#00d4ff',
-    borderRadius: '8px',
-    color: '#000000',
+    backgroundColor: BRAND_RED,
+    borderRadius: '10px',
+    color: '#ffffff',
     display: 'inline-block',
     fontSize: '15px',
     fontWeight: '600',
-    padding: '14px 28px',
+    padding: '14px 32px',
     textDecoration: 'none',
     textAlign: 'center' as const,
     margin: '10px 0',
   },
   buttonSecondary: {
-    backgroundColor: '#333333',
-    borderRadius: '8px',
+    backgroundColor: '#262626',
+    borderRadius: '10px',
     color: '#ffffff',
     display: 'inline-block',
     fontSize: '14px',
@@ -191,13 +199,14 @@ export const emailStyles = {
     padding: '12px 24px',
     textDecoration: 'none',
     textAlign: 'center' as const,
+    border: '1px solid #404040',
   },
   highlight: {
-    color: '#00d4ff',
+    color: BRAND_RED,
     fontWeight: '600',
   },
   successText: {
-    color: '#10b981',
+    color: '#22c55e',
     fontWeight: '600',
   },
   errorText: {
@@ -206,23 +215,26 @@ export const emailStyles = {
   },
   card: {
     backgroundColor: '#1a1a1a',
-    borderRadius: '8px',
+    borderRadius: '12px',
     padding: '20px',
-    margin: '15px 0',
-    border: '1px solid #333',
+    margin: '20px 0',
+    border: '1px solid #262626',
   },
   statNumber: {
     color: '#ffffff',
-    fontSize: '32px',
+    fontSize: '36px',
     fontWeight: '700',
     margin: '0',
   },
   statLabel: {
-    color: '#888888',
-    fontSize: '12px',
+    color: '#737373',
+    fontSize: '11px',
     textTransform: 'uppercase' as const,
-    letterSpacing: '1px',
-    margin: '5px 0 0',
+    letterSpacing: '1.5px',
+    margin: '8px 0 0',
+  },
+  divider: {
+    borderTop: '1px solid #262626',
+    margin: '20px 0',
   },
 }
-
