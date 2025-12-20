@@ -61,7 +61,7 @@ export type UserSearchFilters = {
   minBalance?: number
   maxBalance?: number
   isBanned?: boolean
-  sortBy?: 'total_won' | 'balance' | 'created_at' | 'username' | 'total_bets'
+  sortBy?: 'total_won' | 'balance' | 'created_at' | 'username' | 'total_bets' | 'is_banned'
   sortOrder?: 'asc' | 'desc'
   limit?: number
   offset?: number

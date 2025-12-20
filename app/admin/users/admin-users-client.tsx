@@ -70,7 +70,7 @@ function StatCard({
 }
 
 // ============================================
-// TOP PLAYERS TABLE (Enhanced)
+// TOP PLAYERS TABLE (Compact - Top 50)
 // ============================================
 function TopPlayersTable({ 
   players, 
@@ -99,86 +99,94 @@ function TopPlayersTable({
   
   return (
     <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
-      <div className="p-4 border-b border-zinc-800">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-3 border-b border-zinc-800">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-amber-500/10 rounded-lg">
-              <Trophy className="w-4 h-4 text-amber-400" />
+            <div className="p-1.5 bg-amber-500/10 rounded-lg">
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <div>
-              <h3 className="font-bold text-sm">Top 10 PNL</h3>
-              <p className="text-xs text-zinc-500">Meilleurs performers</p>
-            </div>
+            <h3 className="font-bold text-sm">Top 50 PNL</h3>
           </div>
-        </div>
-        <div className="flex gap-1 bg-zinc-800/50 p-1 rounded-lg">
-          {timeframes.map(tf => (
-            <button
-              key={tf.id}
-              onClick={() => onTimeframeChange(tf.id)}
-              className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                timeframe === tf.id
-                  ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
-              }`}
-            >
-              {tf.label}
-            </button>
-          ))}
+          <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg">
+            {timeframes.map(tf => (
+              <button
+                key={tf.id}
+                onClick={() => onTimeframeChange(tf.id)}
+                className={`px-2.5 py-1 text-xs font-medium rounded transition-all ${
+                  timeframe === tf.id
+                    ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                }`}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-zinc-500" />
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-zinc-500 text-xs border-b border-zinc-800">
-                <th className="text-left py-3 px-4 font-medium w-12">#</th>
-                <th className="text-left py-3 px-4 font-medium">Joueur</th>
-                <th className="text-right py-3 px-4 font-medium">PNL</th>
-                <th className="text-right py-3 px-4 font-medium hidden sm:table-cell">Balance</th>
-                <th className="text-right py-3 px-4 font-medium hidden md:table-cell">WR</th>
+          <table className="w-full text-xs">
+            <thead className="sticky top-0 bg-zinc-900 z-10">
+              <tr className="text-zinc-500 border-b border-zinc-800">
+                <th className="text-left py-2 px-3 font-medium w-10">#</th>
+                <th className="text-left py-2 px-3 font-medium">Joueur</th>
+                <th className="text-right py-2 px-3 font-medium">Balance</th>
+                <th className="text-right py-2 px-3 font-medium">PNL</th>
+                <th className="text-right py-2 px-3 font-medium hidden sm:table-cell">Paris</th>
+                <th className="text-center py-2 px-3 font-medium hidden md:table-cell">Statut</th>
               </tr>
             </thead>
             <tbody>
               {players.map((player, i) => (
-                <tr key={player.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                  <td className={`py-3 px-4 font-bold ${getMedalColor(i + 1)}`}>
+                <tr key={player.id} className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
+                  <td className={`py-1.5 px-3 font-bold ${getMedalColor(i + 1)}`}>
                     {i + 1}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-1.5 px-3">
                     <div className="flex items-center gap-2">
                       <img 
                         src={player.avatar_url || '/placeholder-avatar.png'} 
                         alt="" 
-                        className="w-7 h-7 rounded-full ring-2 ring-zinc-700"
+                        className="w-5 h-5 rounded-full ring-1 ring-zinc-700"
                       />
-                      <span className={`font-medium truncate max-w-[120px] ${player.is_banned ? 'text-red-400 line-through' : 'text-white'}`}>
+                      <span className={`font-medium truncate max-w-[100px] ${player.is_banned ? 'text-red-400 line-through' : 'text-white'}`}>
                         {player.username}
                       </span>
-                      {player.is_banned && <Ban className="w-3 h-3 text-red-400 shrink-0" />}
                     </div>
                   </td>
-                  <td className={`py-3 px-4 text-right font-mono font-medium ${
+                  <td className="py-1.5 px-3 text-right font-mono text-zinc-400">
+                    {player.balance.toLocaleString()}
+                  </td>
+                  <td className={`py-1.5 px-3 text-right font-mono font-medium ${
                     player.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'
                   }`}>
                     {player.total_won >= 0 ? '+' : ''}{player.total_won.toLocaleString()}
                   </td>
-                  <td className="py-3 px-4 text-right font-mono text-zinc-400 hidden sm:table-cell">
-                    {player.balance.toLocaleString()}
+                  <td className="py-1.5 px-3 text-right text-zinc-400 hidden sm:table-cell">
+                    {player.total_bets}
                   </td>
-                  <td className="py-3 px-4 text-right text-zinc-400 hidden md:table-cell">
-                    {player.win_rate}%
+                  <td className="py-1.5 px-3 text-center hidden md:table-cell">
+                    {player.is_banned ? (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded text-[10px] font-medium">
+                        <Ban className="w-2.5 h-2.5" /> Banni
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[10px] font-medium">
+                        <Zap className="w-2.5 h-2.5" /> Actif
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
               {players.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-zinc-500">
+                  <td colSpan={6} className="py-8 text-center text-zinc-500">
                     Aucun joueur trouvé
                   </td>
                 </tr>
@@ -257,7 +265,7 @@ function UserSearchTable({
     doSearch(newFilters)
   }
   
-  const SortIcon = ({ column }: { column: UserSearchFilters['sortBy'] }) => {
+  const SortIcon = ({ column }: { column: NonNullable<UserSearchFilters['sortBy']> }) => {
     if (filters.sortBy !== column) return null
     return filters.sortOrder === 'desc' 
       ? <ChevronDown className="w-3 h-3" />
@@ -389,7 +397,14 @@ function UserSearchTable({
           <table className="w-full text-sm">
             <thead>
               <tr className="text-zinc-500 text-xs border-b border-zinc-800 bg-zinc-900/50">
-                <th className="text-left py-3 px-4 font-medium whitespace-nowrap">Joueur</th>
+                <th 
+                  className="text-left py-3 px-4 font-medium cursor-pointer hover:text-white whitespace-nowrap"
+                  onClick={() => handleSort('username')}
+                >
+                  <span className="flex items-center gap-1">
+                    Joueur <SortIcon column="username" />
+                  </span>
+                </th>
                 <th 
                   className="text-right py-3 px-4 font-medium cursor-pointer hover:text-white whitespace-nowrap hidden sm:table-cell"
                   onClick={() => handleSort('balance')}
@@ -414,7 +429,14 @@ function UserSearchTable({
                     Paris <SortIcon column="total_bets" />
                   </span>
                 </th>
-                <th className="text-center py-3 px-4 font-medium whitespace-nowrap">Statut</th>
+                <th 
+                  className="text-center py-3 px-4 font-medium cursor-pointer hover:text-white whitespace-nowrap"
+                  onClick={() => handleSort('is_banned')}
+                >
+                  <span className="flex items-center justify-center gap-1">
+                    Statut <SortIcon column="is_banned" />
+                  </span>
+                </th>
                 <th 
                   className="text-right py-3 px-4 font-medium cursor-pointer hover:text-white whitespace-nowrap hidden lg:table-cell"
                   onClick={() => handleSort('created_at')}
@@ -804,7 +826,7 @@ export function AdminUsersClient({
   const handleTimeframeChange = async (tf: string) => {
     setTopPlayersTimeframe(tf)
     setLoadingTopPlayers(true)
-    const data = await getTopPlayersByPnl(tf as any, 10)
+    const data = await getTopPlayersByPnl(tf as any, 50)
     setTopPlayers(data)
     setLoadingTopPlayers(false)
   }
@@ -855,21 +877,21 @@ export function AdminUsersClient({
         </div>
       )}
       
-      {/* Stacked Layout: Top Players then User Search */}
+      {/* Stacked Layout: User Search first, then Top 50 PNL */}
       <div className="space-y-6">
-        {/* Top Players */}
+        {/* User Search (main table) */}
+        <UserSearchTable 
+          initialUsers={initialUsers}
+          initialTotal={initialTotal}
+          onSelectUser={setSelectedUser}
+        />
+        
+        {/* Top 50 PNL (compact, below) */}
         <TopPlayersTable 
           players={topPlayers}
           timeframe={topPlayersTimeframe}
           onTimeframeChange={handleTimeframeChange}
           loading={loadingTopPlayers}
-        />
-        
-        {/* User Search */}
-        <UserSearchTable 
-          initialUsers={initialUsers}
-          initialTotal={initialTotal}
-          onSelectUser={setSelectedUser}
         />
       </div>
       

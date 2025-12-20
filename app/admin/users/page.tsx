@@ -7,7 +7,7 @@ export default async function AdminUsersPage() {
   // Fetch initial data server-side
   const [stats, topPlayersAll, initialUsers] = await Promise.all([
     getPlatformStats(),
-    getTopPlayersByPnl('all', 10),
+    getTopPlayersByPnl('all', 50),
     searchUsers({ limit: 20, sortBy: 'created_at', sortOrder: 'desc' })
   ])
 
