@@ -7,7 +7,6 @@ import {
   Preview,
   Section,
   Text,
-  Hr,
 } from '@react-email/components'
 import * as React from 'react'
 
@@ -39,7 +38,6 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           </Section>
 
           {/* Footer */}
-          <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
               © {new Date().getFullYear()} YOMI.fun
@@ -116,15 +114,11 @@ const content = {
   backgroundImage: gridPattern,
 }
 
-const hr = {
-  borderColor: '#262626',
-  margin: '0 40px',
-}
-
 const footer = {
   padding: '25px 40px 30px',
   textAlign: 'center' as const,
   backgroundColor: '#0a0a0a',
+  borderTop: '1px solid #262626',
   borderBottomLeftRadius: '16px',
   borderBottomRightRadius: '16px',
 }
