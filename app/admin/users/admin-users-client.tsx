@@ -211,11 +211,12 @@ function UserSearchTable({
   initialTotal: number
   onSelectUser: (user: AdminUser) => void
 }) {
-  const [users, setUsers] = useState<AdminUser[]>(initialUsers)
+  const [users, setUsers] = useState<AdminUser[]>([]) // Start empty, show results only on search
   const [total, setTotal] = useState(initialTotal)
   const [loading, setLoading] = useState(false)
   const [query, setQuery] = useState("")
   const [showFilters, setShowFilters] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false) // Track if user has searched
   const [filters, setFilters] = useState<UserSearchFilters>({
     sortBy: 'created_at',
     sortOrder: 'desc',
@@ -225,6 +226,7 @@ function UserSearchTable({
   
   const doSearch = useCallback(async (newFilters: UserSearchFilters) => {
     setLoading(true)
+    setHasSearched(true)
     const result = await searchUsers(newFilters)
     setUsers(result.users)
     setTotal(result.total)
@@ -262,7 +264,8 @@ function UserSearchTable({
     }
     setFilters(newFilters)
     setQuery("")
-    doSearch(newFilters)
+    setUsers([])
+    setHasSearched(false)
   }
   
   const SortIcon = ({ column }: { column: NonNullable<UserSearchFilters['sortBy']> }) => {
@@ -387,7 +390,8 @@ function UserSearchTable({
         )}
       </div>
       
-      {/* Table */}
+      {/* Table - only show after search */}
+      {hasSearched && (
       <div className="overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16">
@@ -518,6 +522,7 @@ function UserSearchTable({
           </table>
         )}
       </div>
+      )}
     </div>
   )
 }
