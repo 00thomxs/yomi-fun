@@ -61,8 +61,12 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
 // Styles - YOMI Brand Colors
 const BRAND_RED = '#dc2626'
 
+// Subtle grid pattern (SVG encoded)
+const gridPattern = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E")`
+
 const main = {
   backgroundColor: '#0a0a0a',
+  backgroundImage: gridPattern,
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
   padding: '20px 0',
 }
@@ -109,6 +113,7 @@ const logoSubtext = {
 const content = {
   padding: '30px 40px 35px',
   backgroundColor: '#111111',
+  backgroundImage: gridPattern,
 }
 
 const hr = {
