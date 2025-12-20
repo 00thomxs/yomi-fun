@@ -10,8 +10,8 @@ export const resend = new Resend(process.env.RESEND_API_KEY)
 export const EMAIL_CONFIG = {
   from: {
     default: 'YOMI.fun <noreply@y0mi.fun>',
-    support: 'YOMI Support <support@y0mi.fun>',
+    support: 'YOMI Support <yomipredict.fun@gmail.com>',
   },
-  replyTo: 'support@y0mi.fun',
+  replyTo: 'yomipredict.fun@gmail.com',
 }
 

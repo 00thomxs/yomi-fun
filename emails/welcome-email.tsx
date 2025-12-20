@@ -52,7 +52,7 @@ export function WelcomeEmail({
       </Section>
 
       <Text style={emailStyles.textMuted}>
-        Si tu as des questions, réponds simplement à cet email ou contacte-nous à support@y0mi.fun
+        Si tu as des questions, réponds simplement à cet email !
       </Text>
 
       <Text style={emailStyles.text}>

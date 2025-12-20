@@ -48,7 +48,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
               {' • '}
               <Link href="https://y0mi.fun/profile" style={link}>Mon Profil</Link>
               {' • '}
-              <Link href="mailto:support@y0mi.fun" style={link}>Support</Link>
+              <Link href="mailto:yomipredict.fun@gmail.com" style={link}>Support</Link>
             </Text>
             <Text style={footerMuted}>
               Tu reçois cet email car tu es inscrit sur YOMI.fun
