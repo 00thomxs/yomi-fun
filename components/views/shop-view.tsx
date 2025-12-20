@@ -198,7 +198,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               ? 'bg-white/10 text-white border border-white/20'
               : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
           }`}
-        >
+          >
           <Palette className="w-4 h-4" />
           Cosmétiques
         </button>
@@ -209,7 +209,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               ? 'bg-primary text-white shadow-lg shadow-primary/20'
               : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
           }`}
-        >
+          >
           <Coins className="w-4 h-4" />
           Acheter des Zeny
         </button>

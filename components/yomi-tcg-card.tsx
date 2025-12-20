@@ -517,10 +517,10 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
               >
                 {rank === 'beta' && <Star className="w-2.5 h-2.5" style={{ color: '#facc15' }} />}
                 <span>
-                  {rank === 'beta' 
+                {rank === 'beta' 
                     ? 'BETA TESTEUR' 
-                    : seasonNumber === '0' 
-                      ? 'HORS SAISON'
+                  : seasonNumber === '0' 
+                    ? 'HORS SAISON'
                       : `S${seasonNumber} : ${seasonTitle}`}
                 </span>
                 {rank === 'beta' && <Star className="w-2.5 h-2.5" style={{ color: '#facc15' }} />}

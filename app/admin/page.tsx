@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
   const closedEvents = markets?.filter(m => m.status === 'closed').length || 0
   const resolvedEvents = markets?.filter(m => m.resolved_at).length || 0
   const avgVolumePerEvent = activeEvents > 0 ? Math.round(totalVolume / (activeEvents + resolvedEvents)) : 0
-  
+
   const stats = [
     { label: "Volume Total", value: totalVolume.toLocaleString('fr-FR'), suffix: <CurrencySymbol />, sub: `Moy: ${avgVolumePerEvent.toLocaleString('fr-FR')}/event` },
     { label: "Events", value: activeEvents.toString(), suffix: " actifs", sub: `${closedEvents} fermés • ${resolvedEvents} résolus` },
@@ -115,22 +115,22 @@ export default async function AdminDashboard() {
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Supply Joueurs</p>
                   <p className="text-lg font-black mt-1 font-mono flex items-center gap-1">
-                    {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
-                  </p>
+                  {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
+                </p>
                   <p className="text-[10px] text-muted-foreground mt-1">
                     {metrics.player_count} joueurs • Moy: {metrics.avg_balance.toLocaleString('fr-FR')}
-                  </p>
-                </div>
+                </p>
+              </div>
 
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Total Burned</p>
                   <p className="text-lg font-black mt-1 font-mono flex items-center gap-1 text-amber-400">
-                    {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
-                  </p>
+                  {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
+                </p>
                   <p className="text-[10px] text-muted-foreground mt-1">
-                    Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
-                  </p>
-                </div>
+                  Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
+                </p>
+              </div>
 
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Inflation (7j)</p>
@@ -147,7 +147,7 @@ export default async function AdminDashboard() {
                     ) : (
                       <><TrendingDown className="w-4 h-4" />{metrics.weekly_inflation_rate_pct.toFixed(1)}%</>
                     )}
-                  </p>
+                </p>
                   <p className="text-[10px] text-muted-foreground mt-1">
                     {metrics.supply_7d_ago ? `7j avant: ${metrics.supply_7d_ago.toLocaleString('fr-FR')}` : 'Pas assez de données'}
                   </p>
@@ -181,8 +181,8 @@ export default async function AdminDashboard() {
                         style={{ width: `${Math.min(100, (metrics.total_burned / (metrics.total_supply + metrics.total_burned)) * 100 * 5)}%` }}
                       />
                     </div>
-                  </div>
-                </div>
+              </div>
+            </div>
               )}
             </>
           ) : (
