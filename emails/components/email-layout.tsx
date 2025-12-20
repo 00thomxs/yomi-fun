@@ -26,14 +26,11 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           {/* Header with Logo */}
           <Section style={header}>
             <Link href="https://y0mi.fun" style={logoLink}>
-              <span style={logoText}>YOMI</span>
-              <span style={logoSubtext}>.fun</span>
+              <Text style={logoContainer}>
+                <span style={logoText}>YOMI</span>
+                <span style={logoSubtext}>.fun</span>
+              </Text>
             </Link>
-          </Section>
-
-          {/* Decorative line */}
-          <Section style={decorativeLine}>
-            <div style={redLine}></div>
           </Section>
 
           {/* Main Content */}
@@ -63,7 +60,6 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
 
 // Styles - YOMI Brand Colors
 const BRAND_RED = '#dc2626'
-const BRAND_RED_DARK = '#b91c1c'
 
 const main = {
   backgroundColor: '#0a0a0a',
@@ -78,41 +74,36 @@ const container = {
   maxWidth: '560px',
   borderRadius: '16px',
   border: '1px solid #262626',
-  overflow: 'hidden' as const,
 }
 
 const header = {
-  padding: '40px 40px 25px',
+  padding: '35px 40px 25px',
   textAlign: 'center' as const,
   backgroundColor: '#0a0a0a',
+  borderTopLeftRadius: '16px',
+  borderTopRightRadius: '16px',
 }
 
 const logoLink = {
   textDecoration: 'none',
 }
 
+const logoContainer = {
+  margin: '0',
+  padding: '0',
+}
+
 const logoText = {
   color: BRAND_RED,
-  fontSize: '42px',
+  fontSize: '38px',
   fontWeight: '900',
   letterSpacing: '-2px',
 }
 
 const logoSubtext = {
   color: '#ffffff',
-  fontSize: '28px',
+  fontSize: '26px',
   fontWeight: '400',
-}
-
-const decorativeLine = {
-  padding: '0 40px',
-  backgroundColor: '#0a0a0a',
-}
-
-const redLine = {
-  height: '3px',
-  background: `linear-gradient(90deg, transparent, ${BRAND_RED}, transparent)`,
-  borderRadius: '2px',
 }
 
 const content = {
@@ -129,6 +120,8 @@ const footer = {
   padding: '25px 40px 30px',
   textAlign: 'center' as const,
   backgroundColor: '#0a0a0a',
+  borderBottomLeftRadius: '16px',
+  borderBottomRightRadius: '16px',
 }
 
 const footerText = {
@@ -232,9 +225,5 @@ export const emailStyles = {
     textTransform: 'uppercase' as const,
     letterSpacing: '1.5px',
     margin: '8px 0 0',
-  },
-  divider: {
-    borderTop: '1px solid #262626',
-    margin: '20px 0',
   },
 }
