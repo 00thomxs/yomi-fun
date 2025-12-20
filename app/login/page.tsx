@@ -94,7 +94,7 @@ function LoginContent() {
         if (result.error) {
           setError(result.error)
         } else {
-          setSuccess("Compte créé ! Vérifie tes emails pour confirmer.")
+          setSuccess("ok") // Triggers success UI
           setEmail("")
           setPassword("")
           setUsername("")
@@ -211,9 +211,16 @@ function LoginContent() {
 
           {/* Success message */}
           {success && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm">
-              <span>✓</span>
-              <span>{success}</span>
+            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-sm space-y-2">
+              <div className="flex items-center gap-2 text-green-500 font-medium">
+                <span>✓</span>
+                <span>Compte créé avec succès !</span>
+              </div>
+              <p className="text-green-400/80 text-xs">
+                📧 Vérifie tes emails pour confirmer ton compte.
+                <br />
+                <span className="text-amber-400">⚠️ Pense à regarder tes spams si tu ne reçois rien !</span>
+              </p>
             </div>
           )}
 
