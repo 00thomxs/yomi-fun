@@ -289,6 +289,115 @@ export async function sendBroadcastEmail(
 }
 
 // ============================================
+// SEND PERSONALIZED EMAIL TO SPECIFIC USER (Admin only)
+// ============================================
+export async function sendPersonalizedEmail(
+  userId: string,
+  subject: string,
+  content: string,
+  ctaText?: string,
+  ctaUrl?: string
+): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await verifyAdmin()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+
+  try {
+    // Get user profile
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      return { success: false, error: 'Utilisateur non trouvé' }
+    }
+
+    // Get user email from auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+    if (authError || !authData.user?.email) {
+      return { success: false, error: 'Email non trouvé pour cet utilisateur' }
+    }
+
+    // Send the email
+    const { error } = await resend.emails.send({
+      from: EMAIL_CONFIG.from.default,
+      replyTo: EMAIL_CONFIG.replyTo,
+      to: authData.user.email,
+      subject: subject,
+      react: BroadcastEmail({ 
+        username: profile.username || 'Joueur', 
+        subject, 
+        content, 
+        ctaText, 
+        ctaUrl 
+      }),
+    })
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('[sendPersonalizedEmail] Exception:', err)
+    return { success: false, error: err.message }
+  }
+}
+
+// ============================================
+// SEARCH USERS FOR EMAIL (Admin only)
+// ============================================
+export interface UserForEmail {
+  id: string
+  username: string
+  email: string | null
+  avatar_url: string | null
+  is_banned: boolean
+}
+
+export async function searchUsersForEmail(query: string): Promise<UserForEmail[]> {
+  const { isAdmin } = await verifyAdmin()
+  if (!isAdmin) return []
+
+  if (!query || query.length < 2) return []
+
+  try {
+    // Search profiles
+    const { data: profiles, error } = await supabaseAdmin
+      .from('profiles')
+      .select('id, username, avatar_url, is_banned')
+      .ilike('username', `%${query}%`)
+      .limit(10)
+
+    if (error || !profiles) return []
+
+    // Get emails from auth
+    const { data: authData } = await supabaseAdmin.auth.admin.listUsers({
+      perPage: 1000,
+    })
+
+    // Create email map
+    const emailMap = new Map<string, string>()
+    authData?.users?.forEach(user => {
+      if (user.email) {
+        emailMap.set(user.id, user.email)
+      }
+    })
+
+    // Merge data
+    return profiles.map(p => ({
+      ...p,
+      email: emailMap.get(p.id) || null
+    }))
+  } catch (err) {
+    console.error('[searchUsersForEmail] Error:', err)
+    return []
+  }
+}
+
+// ============================================
 // GET EMAIL STATS (Admin only)
 // ============================================
 export async function getEmailStats(): Promise<{
