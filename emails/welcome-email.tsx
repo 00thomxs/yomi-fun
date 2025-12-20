@@ -28,10 +28,10 @@ export function WelcomeEmail({
 
       <Section style={emailStyles.card}>
         <Text style={{ ...emailStyles.text, margin: '0 0 10px' }}>
-          🎁 <strong>Bonus de bienvenue :</strong> Tu as reçu <span style={emailStyles.highlight}>1 000 Zeny</span> pour commencer à parier !
+          🎁 <strong>Bonus de bienvenue :</strong> Réclame ton bonus de <span style={emailStyles.highlight}>200 Zeny</span> sur la plateforme !
         </Text>
         <Text style={{ ...emailStyles.textMuted, margin: 0 }}>
-          Reviens chaque jour pour récupérer ton bonus quotidien.
+          Reviens chaque jour pour récupérer tes récompenses quotidiennes.
         </Text>
       </Section>
 
