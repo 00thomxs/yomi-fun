@@ -170,9 +170,8 @@ export async function sendBroadcastEmail(
   if (!isAdmin) return { success: false, error: 'Non autorisé' }
 
   try {
-    // Get all users with emails (or just test email)
+    // Test mode: send to admin's email only
     if (testMode && testEmail) {
-      // Send test email to admin
       const { error } = await resend.emails.send({
         from: EMAIL_CONFIG.from.default,
         to: testEmail,
@@ -193,19 +192,47 @@ export async function sendBroadcastEmail(
       return { success: true, sentCount: 1 }
     }
 
-    // Get all non-banned users with emails
-    const { data: users, error: fetchError } = await supabaseAdmin
+    // Get all non-banned users from profiles
+    const { data: profiles, error: profilesError } = await supabaseAdmin
       .from('profiles')
-      .select('id, username, email')
+      .select('id, username')
       .eq('is_banned', false)
-      .not('email', 'is', null)
 
-    if (fetchError) {
-      return { success: false, error: fetchError.message }
+    if (profilesError) {
+      return { success: false, error: profilesError.message }
     }
 
-    if (!users || users.length === 0) {
+    if (!profiles || profiles.length === 0) {
       return { success: false, error: 'Aucun utilisateur trouvé' }
+    }
+
+    // Get emails from auth.users using admin API
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers({
+      perPage: 1000,
+    })
+
+    if (authError) {
+      return { success: false, error: authError.message }
+    }
+
+    // Create a map of user id -> email
+    const emailMap = new Map<string, string>()
+    authData.users.forEach(user => {
+      if (user.email) {
+        emailMap.set(user.id, user.email)
+      }
+    })
+
+    // Merge profiles with emails
+    const usersWithEmails = profiles
+      .map(profile => ({
+        ...profile,
+        email: emailMap.get(profile.id)
+      }))
+      .filter(u => u.email) // Only users with emails
+
+    if (usersWithEmails.length === 0) {
+      return { success: false, error: 'Aucun utilisateur avec email trouvé' }
     }
 
     // Send emails in batches (Resend limit: 100/second on free plan)
@@ -213,8 +240,8 @@ export async function sendBroadcastEmail(
     const batchSize = 10
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-    for (let i = 0; i < users.length; i += batchSize) {
-      const batch = users.slice(i, i + batchSize)
+    for (let i = 0; i < usersWithEmails.length; i += batchSize) {
+      const batch = usersWithEmails.slice(i, i + batchSize)
       
       await Promise.all(
         batch.map(async (user) => {
@@ -241,7 +268,7 @@ export async function sendBroadcastEmail(
       )
 
       // Rate limiting: wait between batches
-      if (i + batchSize < users.length) {
+      if (i + batchSize < usersWithEmails.length) {
         await delay(1000)
       }
     }
@@ -266,20 +293,23 @@ export async function getEmailStats(): Promise<{
   const { isAdmin } = await verifyAdmin()
   if (!isAdmin) return { totalUsers: 0, usersWithEmail: 0 }
 
+  // Get total non-banned users
   const { count: totalUsers } = await supabaseAdmin
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('is_banned', false)
 
-  const { count: usersWithEmail } = await supabaseAdmin
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_banned', false)
-    .not('email', 'is', null)
+  // Get users with emails from auth.users
+  const { data: authData } = await supabaseAdmin.auth.admin.listUsers({
+    perPage: 1000,
+  })
+  
+  // Count users with verified emails
+  const usersWithEmail = authData?.users?.filter(u => u.email)?.length || 0
 
   return {
     totalUsers: totalUsers || 0,
-    usersWithEmail: usersWithEmail || 0,
+    usersWithEmail,
   }
 }
 

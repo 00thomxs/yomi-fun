@@ -3,7 +3,6 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -27,13 +26,9 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           {/* Header with Logo */}
           <Section style={header}>
             <Link href="https://y0mi.fun" style={logoLink}>
-              <Img
-                src="https://y0mi.fun/yomi-logo.png"
-                width="120"
-                height="40"
-                alt="YOMI.fun"
-                style={logo}
-              />
+              {/* Text-based logo for better email compatibility */}
+              <Text style={logoText}>YOMI</Text>
+              <Text style={logoSubtext}>.fun</Text>
             </Link>
           </Section>
 
@@ -89,8 +84,23 @@ const logoLink = {
   textDecoration: 'none',
 }
 
-const logo = {
-  margin: '0 auto',
+const logoText = {
+  color: '#dc2626', // Red like the YOMI brand
+  fontSize: '36px',
+  fontWeight: '800',
+  margin: '0',
+  padding: '0',
+  letterSpacing: '-1px',
+  display: 'inline',
+}
+
+const logoSubtext = {
+  color: '#888888',
+  fontSize: '24px',
+  fontWeight: '400',
+  margin: '0',
+  padding: '0',
+  display: 'inline',
 }
 
 const content = {
