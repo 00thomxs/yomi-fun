@@ -118,6 +118,12 @@ export type MonetaryMetrics = {
   weekly_inflation_rate_pct: number | null
   supply_7d_ago: number | null
   last_snapshot_at: string | null
+  admin_balance: number
+  player_count: number
+  avg_balance: number
+  health_score: number // 0-100
+  health_signal: 'healthy' | 'warning' | 'critical'
+  health_message: string
 }
 
 export type MonetarySnapshotRow = {
@@ -181,6 +187,9 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
     total_burned_fees: number
     total_burned_shop: number
     total_burned: number
+    admin_balance: number
+    player_count: number
+    avg_balance: number
   }
 
   // IMPORTANT: call RPC with the authenticated client so auth.uid() is available inside the function.
@@ -195,6 +204,9 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
   const totalFeesBurned = Number(totals.total_burned_fees || 0)
   const totalShopBurned = Number(totals.total_burned_shop || 0)
   const totalBurned = Number(totals.total_burned || 0)
+  const adminBalance = Number(totals.admin_balance || 0)
+  const playerCount = Number(totals.player_count || 0)
+  const avgBalance = Number(totals.avg_balance || 0)
 
   // 4) Snapshot logic (to compute weekly inflation rate)
   const { data: lastSnap } = await supabaseAdmin
@@ -233,6 +245,62 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
       ? ((totalSupply - supply7dAgo) / supply7dAgo) * 100
       : null
 
+  // Calculate health score and signal
+  // Factors: inflation rate, burn rate, average balance distribution
+  let healthScore = 100
+  let healthSignal: 'healthy' | 'warning' | 'critical' = 'healthy'
+  let healthMessage = 'Économie stable'
+
+  // Factor 1: Inflation rate (high inflation = bad)
+  if (weeklyInflationRatePct !== null) {
+    if (weeklyInflationRatePct > 20) {
+      healthScore -= 40
+      healthMessage = 'Inflation très élevée (+' + weeklyInflationRatePct.toFixed(1) + '%/7j)'
+    } else if (weeklyInflationRatePct > 10) {
+      healthScore -= 20
+      healthMessage = 'Inflation élevée (+' + weeklyInflationRatePct.toFixed(1) + '%/7j)'
+    } else if (weeklyInflationRatePct > 5) {
+      healthScore -= 10
+    } else if (weeklyInflationRatePct < -10) {
+      healthScore -= 15
+      healthMessage = 'Déflation importante (' + weeklyInflationRatePct.toFixed(1) + '%/7j)'
+    }
+  }
+
+  // Factor 2: Burn rate vs supply (good burn rate = healthy)
+  const burnRatio = totalSupply > 0 ? totalBurned / totalSupply : 0
+  if (burnRatio > 0.1) {
+    healthScore += 10 // Healthy burn rate
+  } else if (burnRatio < 0.01 && totalSupply > 100000) {
+    healthScore -= 10
+    if (healthMessage === 'Économie stable') {
+      healthMessage = 'Taux de burn faible'
+    }
+  }
+
+  // Factor 3: Average balance (too low = players may leave)
+  if (avgBalance < 500 && playerCount > 5) {
+    healthScore -= 15
+    if (healthMessage === 'Économie stable') {
+      healthMessage = 'Balance moyenne faible (' + avgBalance.toLocaleString() + ')'
+    }
+  }
+
+  // Clamp score
+  healthScore = Math.max(0, Math.min(100, healthScore))
+
+  // Determine signal
+  if (healthScore >= 70) {
+    healthSignal = 'healthy'
+    if (healthMessage === 'Économie stable' && weeklyInflationRatePct !== null && weeklyInflationRatePct >= 0 && weeklyInflationRatePct <= 5) {
+      healthMessage = 'Croissance saine'
+    }
+  } else if (healthScore >= 40) {
+    healthSignal = 'warning'
+  } else {
+    healthSignal = 'critical'
+  }
+
   return {
     metrics: {
       total_supply: totalSupply,
@@ -242,6 +310,12 @@ export async function getAdminMonetaryMetrics(): Promise<{ error?: string; metri
       weekly_inflation_rate_pct: weeklyInflationRatePct,
       supply_7d_ago: supply7dAgo,
       last_snapshot_at: lastSnapshotAt || null,
+      admin_balance: adminBalance,
+      player_count: playerCount,
+      avg_balance: avgBalance,
+      health_score: healthScore,
+      health_signal: healthSignal,
+      health_message: healthMessage,
     }
   }
 }
