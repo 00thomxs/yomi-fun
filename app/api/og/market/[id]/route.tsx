@@ -3,43 +3,52 @@ import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
 
-// Use direct Supabase client for edge runtime (no cookies needed for public data)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params
-
   try {
+    const { id } = await params
+
+    // Create Supabase client inside the function to ensure env vars are available
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase env vars')
+      return generateFallbackImage('Configuration Error')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     // Fetch market data (public read)
-    const { data: market } = await supabase
+    const { data: market, error } = await supabase
       .from('markets')
       .select(`
         question,
         volume,
         status,
-        image_url,
         outcomes:outcomes!market_id (name, probability, is_winner)
       `)
       .eq('id', id)
       .single()
 
-    if (!market) {
-      return new Response('Market not found', { status: 404 })
+    if (error || !market) {
+      console.error('Market fetch error:', error)
+      return generateFallbackImage('Événement introuvable')
     }
 
-    // Find OUI/NON probabilities
+    // Find OUI probability
     const ouiOutcome = market.outcomes?.find((o: any) => o.name === 'OUI')
-    const nonOutcome = market.outcomes?.find((o: any) => o.name === 'NON')
-    const probability = ouiOutcome?.probability || 50
-    const volume = market.volume || 0
+    const probability = ouiOutcome?.probability ?? 50
+    const volume = market.volume ?? 0
     const isResolved = market.status === 'resolved'
     const winner = market.outcomes?.find((o: any) => o.is_winner === true)
+
+    // Truncate question if too long
+    const question = market.question.length > 70 
+      ? market.question.substring(0, 70) + '...' 
+      : market.question
 
     return new ImageResponse(
       (
@@ -50,47 +59,32 @@ export async function GET(
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#0a0a0a',
-            padding: '50px',
-            position: 'relative',
+            padding: '60px',
+            fontFamily: 'sans-serif',
           }}
         >
-          {/* Grid background */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
-            }}
-          />
-
-          {/* Header */}
+          {/* Header with Logo */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '40px',
+              marginBottom: '50px',
             }}
           >
-            {/* Logo */}
-            <div style={{ display: 'flex', alignItems: 'baseline' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <span
                 style={{
-                  fontSize: '48px',
+                  fontSize: '52px',
                   fontWeight: 900,
                   color: '#dc2626',
-                  letterSpacing: '-2px',
                 }}
               >
                 YOMI
               </span>
               <span
                 style={{
-                  fontSize: '36px',
+                  fontSize: '40px',
                   fontWeight: 400,
                   color: '#ffffff',
                 }}
@@ -99,26 +93,24 @@ export async function GET(
               </span>
             </div>
 
-            {/* Status badge */}
-            {isResolved && (
+            {isResolved && winner && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '10px 20px',
-                  backgroundColor: winner?.name === 'OUI' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                  padding: '12px 24px',
+                  backgroundColor: winner.name === 'OUI' ? '#22c55e' : '#ef4444',
                   borderRadius: '12px',
-                  border: `2px solid ${winner?.name === 'OUI' ? '#22c55e' : '#ef4444'}`,
                 }}
               >
                 <span
                   style={{
-                    color: winner?.name === 'OUI' ? '#22c55e' : '#ef4444',
-                    fontSize: '24px',
-                    fontWeight: 700,
+                    color: '#000000',
+                    fontSize: '28px',
+                    fontWeight: 800,
                   }}
                 >
-                  {winner?.name === 'OUI' ? '✓ OUI' : '✗ NON'}
+                  {winner.name === 'OUI' ? '✓ OUI GAGNE' : '✗ NON GAGNE'}
                 </span>
               </div>
             )}
@@ -127,86 +119,74 @@ export async function GET(
           {/* Question */}
           <div
             style={{
-              fontSize: '56px',
+              fontSize: '52px',
               fontWeight: 800,
               color: '#ffffff',
-              lineHeight: 1.2,
-              marginBottom: '40px',
+              lineHeight: 1.3,
+              marginBottom: '50px',
               display: 'flex',
-              maxWidth: '1000px',
             }}
           >
-            {market.question.length > 80 
-              ? market.question.substring(0, 80) + '...' 
-              : market.question}
+            {question}
           </div>
 
-          {/* Probability bar */}
+          {/* Spacer */}
+          <div style={{ display: 'flex', flex: 1 }} />
+
+          {/* Probability Bar */}
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              marginTop: 'auto',
+              width: '100%',
+              height: '80px',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              marginBottom: '24px',
             }}
           >
-            {/* Progress bar container */}
-            <div
-              style={{
-                display: 'flex',
-                width: '100%',
-                height: '60px',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                backgroundColor: '#1a1a1a',
-              }}
-            >
-              {/* OUI side */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: `${probability}%`,
-                  backgroundColor: '#22c55e',
-                  minWidth: probability > 10 ? 'auto' : '60px',
-                }}
-              >
-                <span style={{ color: '#000', fontSize: '28px', fontWeight: 800 }}>
-                  OUI {probability}%
-                </span>
-              </div>
-              {/* NON side */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 1,
-                  backgroundColor: '#ef4444',
-                }}
-              >
-                <span style={{ color: '#000', fontSize: '28px', fontWeight: 800 }}>
-                  NON {100 - probability}%
-                </span>
-              </div>
-            </div>
-
-            {/* Volume */}
+            {/* OUI side */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                justifyContent: 'center',
+                width: `${Math.max(probability, 15)}%`,
+                backgroundColor: '#22c55e',
               }}
             >
-              <span style={{ color: '#888', fontSize: '24px' }}>
-                Volume:
-              </span>
-              <span style={{ color: '#fff', fontSize: '28px', fontWeight: 700 }}>
-                {volume.toLocaleString('fr-FR')} Zeny
+              <span style={{ color: '#000000', fontSize: '32px', fontWeight: 800 }}>
+                OUI {probability}%
               </span>
             </div>
+            {/* NON side */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: `${Math.max(100 - probability, 15)}%`,
+                backgroundColor: '#ef4444',
+              }}
+            >
+              <span style={{ color: '#000000', fontSize: '32px', fontWeight: 800 }}>
+                NON {100 - probability}%
+              </span>
+            </div>
+          </div>
+
+          {/* Volume */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{ color: '#666666', fontSize: '28px' }}>
+              Volume: 
+            </span>
+            <span style={{ color: '#ffffff', fontSize: '32px', fontWeight: 700, marginLeft: '12px' }}>
+              {Number(volume).toLocaleString('fr-FR')} Zeny
+            </span>
           </div>
         </div>
       ),
@@ -217,7 +197,42 @@ export async function GET(
     )
   } catch (error) {
     console.error('OG Image generation error:', error)
-    return new Response('Error generating image', { status: 500 })
+    return generateFallbackImage('Erreur')
   }
 }
 
+// Fallback image for errors
+function generateFallbackImage(message: string) {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#0a0a0a',
+          fontFamily: 'sans-serif',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
+          <span style={{ fontSize: '72px', fontWeight: 900, color: '#dc2626' }}>
+            YOMI
+          </span>
+          <span style={{ fontSize: '56px', fontWeight: 400, color: '#ffffff' }}>
+            .fun
+          </span>
+        </div>
+        <span style={{ color: '#666666', fontSize: '32px' }}>
+          {message}
+        </span>
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 630,
+    }
+  )
+}
