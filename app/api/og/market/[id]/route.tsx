@@ -1,7 +1,13 @@
 import { ImageResponse } from '@vercel/og'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
+
+// Use direct Supabase client for edge runtime (no cookies needed for public data)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export async function GET(
   request: Request,
@@ -10,8 +16,7 @@ export async function GET(
   const { id } = await params
 
   try {
-    // Fetch market data
-    const supabase = await createClient()
+    // Fetch market data (public read)
     const { data: market } = await supabase
       .from('markets')
       .select(`
