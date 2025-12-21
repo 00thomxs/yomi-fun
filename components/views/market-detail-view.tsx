@@ -378,8 +378,9 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           onClick={() => {
             const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://y0mi.fun'
             const marketUrl = `${siteUrl}/market/${market.id}`
+            // For binary markets, use the probability field directly
             const prob = market.type === 'binary' 
-              ? (market as BinaryMarket).outcomes.find((o: any) => o.name === 'OUI')?.probability || 50
+              ? (market as BinaryMarket).probability
               : 50
             const tweetText = `${market.question}\n\n${prob}% OUI • Parie sur YOMI.fun 🎯`
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(marketUrl)}`
