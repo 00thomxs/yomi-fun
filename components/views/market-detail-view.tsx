@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react"
-import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Plus, Trophy } from "lucide-react"
+import { ArrowLeft, Clock, HelpCircle, Lock, Eye, EyeOff, User, Maximize2, X, Plus, Trophy, Share2 } from "lucide-react"
 import Link from "next/link"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, ReferenceLine, ReferenceDot } from "recharts"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
@@ -329,7 +329,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <CategoryIcon className="w-4 h-4 text-muted-foreground" />
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{categoryDef?.label || market.category}</p>
@@ -372,6 +372,24 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
             </span>
           )}
         </div>
+        
+        {/* Share Button */}
+        <button
+          onClick={() => {
+            const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://y0mi.fun'
+            const marketUrl = `${siteUrl}/market/${market.id}`
+            const prob = market.type === 'binary' 
+              ? (market as BinaryMarket).outcomes.find((o: any) => o.name === 'OUI')?.probability || 50
+              : 50
+            const tweetText = `${market.question}\n\n${prob}% OUI • Parie sur YOMI.fun 🎯`
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(marketUrl)}`
+            window.open(twitterUrl, '_blank', 'noopener,noreferrer,width=600,height=400')
+          }}
+          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 hover:bg-white/5 transition-all shrink-0"
+          title="Partager sur X"
+        >
+          <Share2 className="w-5 h-5" />
+        </button>
       </div>
 
       {market.type === "binary" ? (
