@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
 
-const LOGO_URL = 'https://y0mi.fun/images/yomi-logo.png'
+const LOGO_URL = 'https://y0mi.fun/images/LOGO.png'
 
 export async function GET(
   request: Request,
