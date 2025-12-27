@@ -54,16 +54,15 @@ export async function GET(
     const question = market.question.length > 55 ? market.question.substring(0, 55) + '...' : market.question
     
     // Detect if binary or multiple choice
-    // Binary = exactly 2 outcomes AND they are OUI/NON
+    // Multiple = more than 2 outcomes
+    // Binary = exactly 2 outcomes (OUI/NON)
     const outcomes = market.outcomes || []
-    const hasOui = outcomes.some((o: any) => o.name === 'OUI')
-    const hasNon = outcomes.some((o: any) => o.name === 'NON')
-    const isBinary = outcomes.length === 2 && hasOui && hasNon
+    const isMultiple = outcomes.length > 2
 
-    if (isBinary) {
-      return renderBinaryMarket(market, question, volume, isResolved, id)
-    } else {
+    if (isMultiple) {
       return renderMultipleMarket(market, question, volume, isResolved)
+    } else {
+      return renderBinaryMarket(market, question, volume, isResolved, id)
     }
   } catch (error: any) {
     return errorImage(error?.message || 'Error')
