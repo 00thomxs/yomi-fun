@@ -33,15 +33,13 @@ export async function GET(
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Fetch market without is_visible filter (for OG image, we want to show even hidden markets)
+    // Fetch market data
     const { data: market, error } = await supabase
       .from('markets')
       .select(`
         question,
         volume,
         status,
-        market_type,
-        is_visible,
         outcomes:outcomes!market_id (name, probability, is_winner)
       `)
       .eq('id', id)
