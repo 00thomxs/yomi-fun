@@ -289,7 +289,6 @@ async function renderBinaryMarket(market: any, question: string, volume: number,
 // =============================================
 function renderMultipleMarket(market: any, question: string, volume: number, isResolved: boolean) {
   const outcomes = market.outcomes || []
-  const winner = outcomes.find((o: any) => o.is_winner === true)
   
   // Sort by probability descending and take top 4
   const sortedOutcomes = [...outcomes].sort((a: any, b: any) => (b.probability || 0) - (a.probability || 0)).slice(0, 4)
@@ -356,7 +355,7 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
           {question}
         </div>
 
-        {/* Options - Simple list */}
+        {/* Options - Simple list, same style for all */}
         <div
           style={{
             display: 'flex',
@@ -372,42 +371,25 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '18px 24px',
-                backgroundColor: outcome.is_winner ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.05)',
+                backgroundColor: 'rgba(255,255,255,0.05)',
                 borderRadius: '12px',
-                border: outcome.is_winner ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.1)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {outcome.is_winner && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '28px',
-                      height: '28px',
-                      backgroundColor: '#22c55e',
-                      borderRadius: '50%',
-                    }}
-                  >
-                    <span style={{ color: '#000', fontSize: '16px', fontWeight: 800 }}>W</span>
-                  </div>
-                )}
-                <span
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 600,
-                    color: outcome.is_winner ? '#22c55e' : '#ffffff',
-                  }}
-                >
-                  {outcome.name.length > 30 ? outcome.name.substring(0, 30) + '...' : outcome.name}
-                </span>
-              </div>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                }}
+              >
+                {outcome.name.length > 35 ? outcome.name.substring(0, 35) + '...' : outcome.name}
+              </span>
               <span
                 style={{
                   fontSize: '30px',
                   fontWeight: 800,
-                  color: OPTION_COLORS[index % OPTION_COLORS.length],
+                  color: '#22c55e',
                 }}
               >
                 {outcome.probability || 0}%
