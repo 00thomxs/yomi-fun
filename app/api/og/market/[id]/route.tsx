@@ -102,11 +102,11 @@ export async function GET(
                 marginBottom: '20px',
               }}
             >
-              {/* Logo - bigger */}
+              {/* Logo */}
               <img 
                 src={LOGO_URL}
-                width="180"
-                height="65"
+                width="280"
+                height="110"
                 style={{ objectFit: 'contain' }}
               />
 
