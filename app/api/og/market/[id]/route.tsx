@@ -285,18 +285,14 @@ async function renderBinaryMarket(market: any, question: string, volume: number,
 }
 
 // =============================================
-// MULTIPLE CHOICE MARKET
+// MULTIPLE CHOICE MARKET (Simplified)
 // =============================================
 function renderMultipleMarket(market: any, question: string, volume: number, isResolved: boolean) {
   const outcomes = market.outcomes || []
   const winner = outcomes.find((o: any) => o.is_winner === true)
   
-  // Sort by probability descending
-  const sortedOutcomes = [...outcomes].sort((a: any, b: any) => (b.probability || 0) - (a.probability || 0))
-  
-  // Take top 6 options max for display
-  const displayOutcomes = sortedOutcomes.slice(0, 6)
-  const hasMore = sortedOutcomes.length > 6
+  // Sort by probability descending and take top 4
+  const sortedOutcomes = [...outcomes].sort((a: any, b: any) => (b.probability || 0) - (a.probability || 0)).slice(0, 4)
 
   return new ImageResponse(
     (
@@ -307,200 +303,109 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#0a0a0a',
-          position: 'relative',
+          padding: '40px 50px',
         }}
       >
-        {/* Subtle grid */}
+        {/* Header */}
         <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
           }}
-        />
+        >
+          <img 
+            src={LOGO_URL}
+            width="280"
+            height="110"
+            style={{ objectFit: 'contain' }}
+          />
+          <div
+            style={{
+              display: 'flex',
+              padding: '12px 24px',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              border: '2px solid #3b82f6',
+              borderRadius: '12px',
+            }}
+          >
+            <span style={{ color: '#3b82f6', fontSize: '20px', fontWeight: 700 }}>
+              {outcomes.length} options
+            </span>
+          </div>
+        </div>
 
-        {/* Content */}
+        {/* Question */}
+        <div
+          style={{
+            fontSize: '42px',
+            fontWeight: 800,
+            color: '#ffffff',
+            marginBottom: '30px',
+          }}
+        >
+          {question}
+        </div>
+
+        {/* Options - Simple list */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            padding: '35px 50px',
-            height: '100%',
-            position: 'relative',
+            gap: '16px',
+            flex: 1,
           }}
         >
-          {/* Header */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '15px',
-            }}
-          >
-            {/* Logo */}
-            <img 
-              src={LOGO_URL}
-              width="240"
-              height="95"
-              style={{ objectFit: 'contain' }}
-            />
-
-            {/* Badge */}
+          {sortedOutcomes.map((outcome: any, index: number) => (
             <div
+              key={index}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '10px 20px',
-                backgroundColor: isResolved ? 'rgba(34, 197, 94, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-                border: `2px solid ${isResolved ? '#22c55e' : '#3b82f6'}`,
-                borderRadius: '10px',
+                justifyContent: 'space-between',
+                padding: '16px 24px',
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                borderRadius: '12px',
+                border: outcome.is_winner ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
               }}
             >
               <span
                 style={{
-                  color: isResolved ? '#22c55e' : '#3b82f6',
-                  fontSize: '18px',
-                  fontWeight: 700,
+                  fontSize: '22px',
+                  fontWeight: 600,
+                  color: outcome.is_winner ? '#22c55e' : '#ffffff',
                 }}
               >
-                {isResolved ? `Gagnant : ${winner?.name || '?'}` : `${outcomes.length} options`}
+                {outcome.is_winner ? '✓ ' : ''}{outcome.name.length > 35 ? outcome.name.substring(0, 35) + '...' : outcome.name}
               </span>
-            </div>
-          </div>
-
-          {/* Question */}
-          <div
-            style={{
-              fontSize: '40px',
-              fontWeight: 800,
-              color: '#ffffff',
-              lineHeight: 1.2,
-              marginBottom: '25px',
-            }}
-          >
-            {question}
-          </div>
-
-          {/* Options list */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              flex: 1,
-            }}
-          >
-            {displayOutcomes.map((outcome: any, index: number) => {
-              const color = OPTION_COLORS[index % OPTION_COLORS.length]
-              const prob = outcome.probability || 0
-              const isWinner = outcome.is_winner === true
-              const name = outcome.name.length > 30 ? outcome.name.substring(0, 30) + '...' : outcome.name
-              
-              return (
-                <div
-                  key={index}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '15px',
-                    height: '52px',
-                  }}
-                >
-                  {/* Option name */}
-                  <div
-                    style={{
-                      width: '280px',
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: isWinner ? color : '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {isWinner && (
-                      <span style={{ marginRight: '8px', fontSize: '18px' }}>✓</span>
-                    )}
-                    {name}
-                  </div>
-                  
-                  {/* Progress bar */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      flex: 1,
-                      height: '32px',
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${Math.max(prob, 2)}%`,
-                        height: '100%',
-                        backgroundColor: color,
-                        opacity: isWinner ? 1 : 0.7,
-                        borderRadius: '8px',
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Percentage */}
-                  <div
-                    style={{
-                      width: '70px',
-                      fontSize: '22px',
-                      fontWeight: 700,
-                      color: color,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {prob}%
-                  </div>
-                </div>
-              )
-            })}
-            
-            {hasMore && (
-              <div
+              <span
                 style={{
-                  fontSize: '16px',
-                  color: 'rgba(255,255,255,0.4)',
-                  marginTop: '5px',
+                  fontSize: '28px',
+                  fontWeight: 800,
+                  color: OPTION_COLORS[index % OPTION_COLORS.length],
                 }}
               >
-                +{sortedOutcomes.length - 6} autres options...
-              </div>
-            )}
-          </div>
-
-          {/* Bottom */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              marginTop: '15px',
-              paddingTop: '15px',
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            {/* Volume */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '18px' }}>Volume</span>
-              <span style={{ color: '#ffffff', fontSize: '26px', fontWeight: 700 }}>
-                {Number(volume).toLocaleString('fr-FR')} Z
+                {outcome.probability || 0}%
               </span>
             </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Volume */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginTop: '20px',
+            paddingTop: '20px',
+            borderTop: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
+          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '18px', marginRight: '12px' }}>Volume</span>
+          <span style={{ color: '#ffffff', fontSize: '26px', fontWeight: 700 }}>
+            {Number(volume).toLocaleString('fr-FR')} Z
+          </span>
         </div>
       </div>
     ),
