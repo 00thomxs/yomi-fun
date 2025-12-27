@@ -33,6 +33,7 @@ export async function GET(
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    // Fetch market without is_visible filter (for OG image, we want to show even hidden markets)
     const { data: market, error } = await supabase
       .from('markets')
       .select(`
@@ -40,13 +41,15 @@ export async function GET(
         volume,
         status,
         market_type,
+        is_visible,
         outcomes:outcomes!market_id (name, probability, is_winner)
       `)
       .eq('id', id)
       .single()
 
     if (error || !market) {
-      return errorImage('Event not found')
+      console.error('[OG Image Error]', { id, error: error?.message, market })
+      return errorImage(`Not found: ${error?.message || 'no data'}`)
     }
 
     const volume = market.volume ?? 0
