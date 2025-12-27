@@ -303,7 +303,7 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#0a0a0a',
-          padding: '40px 50px',
+          padding: '35px 50px',
         }}
       >
         {/* Header */}
@@ -312,37 +312,45 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '20px',
+            marginBottom: '15px',
           }}
         >
           <img 
             src={LOGO_URL}
-            width="280"
-            height="110"
+            width="240"
+            height="90"
             style={{ objectFit: 'contain' }}
           />
-          <div
-            style={{
-              display: 'flex',
-              padding: '12px 24px',
-              backgroundColor: 'rgba(59, 130, 246, 0.15)',
-              border: '2px solid #3b82f6',
-              borderRadius: '12px',
-            }}
-          >
-            <span style={{ color: '#3b82f6', fontSize: '20px', fontWeight: 700 }}>
-              {outcomes.length} options
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div
+              style={{
+                display: 'flex',
+                padding: '10px 20px',
+                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                border: '2px solid #3b82f6',
+                borderRadius: '10px',
+              }}
+            >
+              <span style={{ color: '#3b82f6', fontSize: '18px', fontWeight: 700 }}>
+                {outcomes.length} options
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '16px' }}>Volume</span>
+              <span style={{ color: '#ffffff', fontSize: '22px', fontWeight: 700 }}>
+                {Number(volume).toLocaleString('fr-FR')} Z
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Question */}
         <div
           style={{
-            fontSize: '42px',
+            fontSize: '38px',
             fontWeight: 800,
             color: '#ffffff',
-            marginBottom: '30px',
+            marginBottom: '25px',
           }}
         >
           {question}
@@ -353,8 +361,7 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
-            flex: 1,
+            gap: '14px',
           }}
         >
           {sortedOutcomes.map((outcome: any, index: number) => (
@@ -364,24 +371,41 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '16px 24px',
-                backgroundColor: 'rgba(255,255,255,0.05)',
+                padding: '18px 24px',
+                backgroundColor: outcome.is_winner ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.05)',
                 borderRadius: '12px',
                 border: outcome.is_winner ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
               }}
             >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {outcome.is_winner && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '28px',
+                      height: '28px',
+                      backgroundColor: '#22c55e',
+                      borderRadius: '50%',
+                    }}
+                  >
+                    <span style={{ color: '#000', fontSize: '16px', fontWeight: 800 }}>W</span>
+                  </div>
+                )}
+                <span
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 600,
+                    color: outcome.is_winner ? '#22c55e' : '#ffffff',
+                  }}
+                >
+                  {outcome.name.length > 30 ? outcome.name.substring(0, 30) + '...' : outcome.name}
+                </span>
+              </div>
               <span
                 style={{
-                  fontSize: '22px',
-                  fontWeight: 600,
-                  color: outcome.is_winner ? '#22c55e' : '#ffffff',
-                }}
-              >
-                {outcome.is_winner ? '✓ ' : ''}{outcome.name.length > 35 ? outcome.name.substring(0, 35) + '...' : outcome.name}
-              </span>
-              <span
-                style={{
-                  fontSize: '28px',
+                  fontSize: '30px',
                   fontWeight: 800,
                   color: OPTION_COLORS[index % OPTION_COLORS.length],
                 }}
@@ -390,22 +414,6 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
               </span>
             </div>
           ))}
-        </div>
-
-        {/* Volume */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginTop: '20px',
-            paddingTop: '20px',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '18px', marginRight: '12px' }}>Volume</span>
-          <span style={{ color: '#ffffff', fontSize: '26px', fontWeight: 700 }}>
-            {Number(volume).toLocaleString('fr-FR')} Z
-          </span>
         </div>
       </div>
     ),
