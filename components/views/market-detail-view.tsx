@@ -378,7 +378,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           onClick={() => {
             const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://y0mi.fun'
             const marketUrl = `${siteUrl}/market/${market.id}`
-            const tweetText = `${market.question}\n\nMontre que tu as raison sur YOMI.fun 🎯`
+            const tweetText = `${market.question}\n\nMontre que tu as raison sur YOMI.fun`
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(marketUrl)}`
             window.open(twitterUrl, '_blank', 'noopener,noreferrer,width=600,height=400')
           }}
