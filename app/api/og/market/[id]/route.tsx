@@ -5,15 +5,15 @@ export const runtime = 'edge'
 
 const LOGO_URL = 'https://y0mi.fun/images/LOGOYOMI.png'
 
-// Colors for multiple choice options
+// Colors for multiple choice options (match site colors)
 const OPTION_COLORS = [
-  '#22c55e', // green
-  '#3b82f6', // blue
-  '#f59e0b', // amber
-  '#8b5cf6', // purple
   '#ec4899', // pink
+  '#3b82f6', // blue  
+  '#a855f7', // purple
+  '#eab308', // yellow
+  '#22c55e', // green
   '#14b8a6', // teal
-  '#f43f5e', // rose
+  '#f97316', // orange
   '#6366f1', // indigo
 ]
 
@@ -355,7 +355,7 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
           {question}
         </div>
 
-        {/* Options - Simple list, same style for all */}
+        {/* Options - Each with its own color */}
         <div
           style={{
             display: 'flex',
@@ -363,39 +363,53 @@ function renderMultipleMarket(market: any, question: string, volume: number, isR
             gap: '14px',
           }}
         >
-          {sortedOutcomes.map((outcome: any, index: number) => (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '18px 24px',
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              <span
+          {sortedOutcomes.map((outcome: any, index: number) => {
+            const color = OPTION_COLORS[index % OPTION_COLORS.length]
+            return (
+              <div
+                key={index}
                 style={{
-                  fontSize: '24px',
-                  fontWeight: 600,
-                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '18px 24px',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255,255,255,0.1)',
                 }}
               >
-                {outcome.name.length > 35 ? outcome.name.substring(0, 35) + '...' : outcome.name}
-              </span>
-              <span
-                style={{
-                  fontSize: '30px',
-                  fontWeight: 800,
-                  color: '#22c55e',
-                }}
-              >
-                {outcome.probability || 0}%
-              </span>
-            </div>
-          ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  {/* Colored dot */}
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      backgroundColor: color,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 600,
+                      color: '#ffffff',
+                    }}
+                  >
+                    {outcome.name.length > 30 ? outcome.name.substring(0, 30) + '...' : outcome.name}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: '30px',
+                    fontWeight: 800,
+                    color: color,
+                  }}
+                >
+                  {outcome.probability || 0}%
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
     ),
