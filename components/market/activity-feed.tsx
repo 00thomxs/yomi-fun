@@ -56,7 +56,8 @@ export function ActivityFeed({ marketId, limit = 8, title = "En direct" }: { mar
                 <>
                   <img src={item.avatar} alt="" className="w-7 h-7 rounded object-cover shrink-0 bg-muted" />
                   <div className="min-w-0 flex-1 text-xs">
-                    <p className="truncate">
+                    <div className="flex items-baseline gap-2">
+                    <p className="truncate flex-1">
                       <span className="font-semibold">{item.username}</span>
                       <span className="text-muted-foreground"> a misé </span>
                       <span className="font-mono font-semibold">{item.amount.toLocaleString()}</span>
@@ -64,10 +65,9 @@ export function ActivityFeed({ marketId, limit = 8, title = "En direct" }: { mar
                       <span className="text-muted-foreground"> sur </span>
                       <span className={`font-semibold ${no ? "text-no" : "text-yes"}`}>{choiceLabel(item)}</span>
                     </p>
-                    <p className="truncate text-muted-foreground mt-0.5">
-                      {!marketId && <>{item.question} · </>}
-                      {timeAgo(item.createdAt)}
-                    </p>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">{timeAgo(item.createdAt)}</span>
+                    </div>
+                    {!marketId && <p className="truncate text-muted-foreground mt-0.5">{item.question}</p>}
                   </div>
                 </>
               )
