@@ -40,7 +40,7 @@ function StatCard({
   color?: "cyan" | "green" | "amber" | "red" | "purple"
 }) {
   const colorClasses = {
-    cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+    cyan: "bg-primary/10 text-primary border-primary/20",
     green: "bg-yes/10 text-yes border-yes/20",
     amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     red: "bg-red-500/10 text-red-400 border-red-500/20",
@@ -153,7 +153,7 @@ function TopPlayersTable({
                 onClick={() => onTimeframeChange(tf.id)}
                 className={`px-2.5 py-1 text-xs font-medium rounded transition-all ${
                   timeframe === tf.id
-                    ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
+                    ? 'bg-primary text-white'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
                 }`}
               >
@@ -359,8 +359,8 @@ function UserSearchTable({
       <div className="p-4 border-b border-zinc-800 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-cyan-500/10 rounded-lg">
-              <Search className="w-4 h-4 text-cyan-400" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Search className="w-4 h-4 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
@@ -385,19 +385,19 @@ function UserSearchTable({
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Rechercher par username..."
-              className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
           </div>
           <button
             onClick={handleSearch}
-            className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-cyan-500/20"
+            className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-colors"
           >
             Rechercher
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              showFilters ? 'bg-cyan-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700'
+              showFilters ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700'
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -415,7 +415,7 @@ function UserSearchTable({
                 value={filters.minPnl || ''}
                 onChange={(e) => handleFilterChange('minPnl', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="0"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
@@ -425,7 +425,7 @@ function UserSearchTable({
                 value={filters.maxPnl || ''}
                 onChange={(e) => handleFilterChange('maxPnl', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="∞"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
@@ -435,7 +435,7 @@ function UserSearchTable({
                 value={filters.minBalance || ''}
                 onChange={(e) => handleFilterChange('minBalance', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="0"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
@@ -443,7 +443,7 @@ function UserSearchTable({
               <select
                 value={filters.isBanned === undefined ? '' : filters.isBanned ? 'banned' : 'active'}
                 onChange={(e) => handleFilterChange('isBanned', e.target.value === '' ? undefined : e.target.value === 'banned')}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-primary"
               >
                 <option value="">Tous</option>
                 <option value="active">Actifs</option>
@@ -453,7 +453,7 @@ function UserSearchTable({
             <div className="flex items-end gap-2">
               <button
                 onClick={applyFilters}
-                className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium"
+                className="flex-1 px-3 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium"
               >
                 Appliquer
               </button>
@@ -577,10 +577,10 @@ function UserSearchTable({
                     <div className="flex items-center justify-center">
                       <button
                         onClick={() => onSelectUser(user)}
-                        className="p-2 hover:bg-cyan-500/10 hover:text-cyan-400 rounded-lg transition-colors group"
+                        className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors group"
                         title="Voir détails"
                       >
-                        <Eye className="w-4 h-4 text-zinc-400 group-hover:text-cyan-400" />
+                        <Eye className="w-4 h-4 text-zinc-400 group-hover:text-primary" />
                       </button>
                     </div>
                   </td>
@@ -748,7 +748,7 @@ function UserDetailModal({
           {editMode ? (
             <div className="bg-zinc-800/50 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2">
-                <Edit2 className="w-4 h-4 text-cyan-400" />
+                <Edit2 className="w-4 h-4 text-primary" />
                 Modifier les données
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -758,7 +758,7 @@ function UserDetailModal({
                     type="text"
                     value={editData.username}
                     onChange={(e) => setEditData(d => ({ ...d, username: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-primary"
                   />
                 </div>
                 <div>
@@ -767,7 +767,7 @@ function UserDetailModal({
                     type="number"
                     value={editData.balance}
                     onChange={(e) => setEditData(d => ({ ...d, balance: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-primary"
                   />
                 </div>
               </div>
@@ -775,7 +775,7 @@ function UserDetailModal({
                 <button
                   onClick={handleSave}
                   disabled={loading}
-                  className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Enregistrer
@@ -870,7 +870,7 @@ function UserDetailModal({
                         bet.status === 'won' ? 'text-yes' :
                         bet.status === 'lost' ? 'text-red-400' : 'text-amber-400'
                       }`}>
-                        {bet.status === 'won' ? '✓ Gagné' : bet.status === 'lost' ? '✗ Perdu' : '⏳ En cours'}
+                        {bet.status === 'won' ? 'Gagné' : bet.status === 'lost' ? 'Perdu' : 'En cours'}
                       </span>
                     </div>
                   </div>

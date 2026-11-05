@@ -212,7 +212,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <div className="flex items-center gap-3">
               <CheckCircle className="w-6 h-6 text-yes" />
             <div>
-              <p className="font-semibold text-yes">🎯 Saison Active</p>
+              <p className="font-semibold text-yes">Saison active</p>
               <p className="text-xs text-muted-foreground">
                 Se termine le {seasonEnd.toLocaleDateString('fr-FR')} à {seasonEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 {daysLeft > 0 && ` (dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''})`}
@@ -264,7 +264,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             <p className="font-semibold">⏸️ Aucune Saison Active</p>
             <p className="text-xs text-muted-foreground">
               {settings.rewards_distributed 
-                ? 'Dernière saison terminée, récompenses distribuées ✓'
+                ? 'Dernière saison terminée, récompenses distribuées'
                 : 'Configure les paramètres puis démarre la saison'
               }
             </p>
@@ -530,7 +530,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                                 <p className="text-xs text-muted-foreground">
                                   Fin: {new Date(market.closes_at).toLocaleDateString('fr-FR')}
                                   {!isCompatible && (
-                                    <span className="ml-2 text-amber-400">⚠️ Après la saison</span>
+                                    <span className="ml-2 text-amber-400">Après la saison</span>
                                   )}
                                 </p>
                               </div>
@@ -586,7 +586,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             className="px-6 py-3 rounded-lg bg-yes text-white font-semibold hover:bg-emerald-600 transition-all flex items-center gap-2"
           >
             {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
-            🚀 Démarrer la Saison
+            Démarrer la saison
           </button>
           )}
         </div>

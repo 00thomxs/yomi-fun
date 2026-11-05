@@ -358,12 +358,12 @@ export default function CreateMarketPage() {
             </select>
             {closesAtValue && availableSeasons.length === 0 && seasons.length > 0 && (
               <p className="text-xs text-amber-400">
-                ⚠️ Aucune saison disponible - la date de fin de l'event dépasse toutes les saisons actives.
+                Aucune saison disponible - la date de fin de l'event dépasse toutes les saisons actives.
               </p>
             )}
             {!closesAtValue && seasons.length > 0 && (
               <p className="text-xs text-muted-foreground">
-                💡 Sélectionnez d'abord une date de fin pour voir les saisons compatibles.
+                Sélectionnez d'abord une date de fin pour voir les saisons compatibles.
               </p>
             )}
             {seasons.length === 0 && (

@@ -556,8 +556,8 @@ export default function EditMarketPage({ params }: PageProps) {
           
           <p className="text-xs text-muted-foreground">
             {market.type === 'binary'
-              ? "💡 Pour ajuster la liquidité, utilisez le compte admin pour placer des paris sur l'event."
-              : "💡 Multi-choix : ces pools ne pilotent pas le prix, ils servent à suivre le flux OUI/NON (direction) pour détecter un déséquilibre."
+              ? "Pour ajuster la liquidité, utilisez le compte admin pour placer des paris sur l'event."
+              : "Multi-choix : ces pools ne pilotent pas le prix, ils servent à suivre le flux OUI/NON (direction) pour détecter un déséquilibre."
             }
           </p>
         </div>

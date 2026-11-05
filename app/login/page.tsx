@@ -156,7 +156,7 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground tactical-grid flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       {/* Noise Overlay */}
       <div
         className="fixed inset-0 opacity-[0.02] pointer-events-none z-0 mix-blend-overlay"
@@ -217,9 +217,9 @@ function LoginContent() {
                 <span>Compte créé avec succès !</span>
               </div>
               <p className="text-green-400/80 text-xs">
-                📧 Vérifie tes emails pour confirmer ton compte.
+                Vérifie tes emails pour confirmer ton compte.
                 <br />
-                <span className="text-amber-400">⚠️ Pense à regarder tes spams si tu ne reçois rien !</span>
+                <span className="text-amber-400">Pense à regarder tes spams si tu ne reçois rien !</span>
               </p>
             </div>
           )}

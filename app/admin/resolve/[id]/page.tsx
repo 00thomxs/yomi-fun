@@ -64,7 +64,7 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
 
       <h3 className="text-lg font-semibold mb-4">Définir les résultats</h3>
       <p className="text-yellow-500 mb-6 text-sm bg-yellow-500/10 p-3 rounded border border-yellow-500/20">
-        ⚠️ Définissez le résultat. Cette action déclenchera le paiement immédiat des gains.
+        Définissez le résultat. Cette action déclenchera le paiement immédiat des gains.
       </p>
 
       {market.type === 'binary' ? (

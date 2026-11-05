@@ -227,7 +227,7 @@ export function AdminEmailsClient({
           onClick={() => setEmailMode('personal')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
             emailMode === 'personal' 
-              ? 'bg-cyan-600 text-white' 
+              ? 'bg-primary text-white' 
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -244,9 +244,9 @@ export function AdminEmailsClient({
           <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 overflow-hidden">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className={`p-2 rounded-lg ${emailMode === 'personal' ? 'bg-cyan-500/10' : 'bg-red-500/10'}`}>
+                <div className={`p-2 rounded-lg ${emailMode === 'personal' ? 'bg-primary/10' : 'bg-red-500/10'}`}>
                   {emailMode === 'personal' ? (
-                    <User className="w-4 h-4 text-cyan-400" />
+                    <User className="w-4 h-4 text-primary" />
                   ) : (
                     <Send className="w-4 h-4 text-red-400" />
                   )}
@@ -272,7 +272,7 @@ export function AdminEmailsClient({
                   </label>
                   
                   {selectedUser ? (
-                    <div className="flex items-center gap-3 p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                    <div className="flex items-center gap-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
                       <img 
                         src={getAvatarUrl(selectedUser.avatar_url)} 
                         alt="" 
@@ -280,7 +280,7 @@ export function AdminEmailsClient({
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-white truncate">{selectedUser.username}</p>
-                        <p className="text-xs text-cyan-400 truncate">{selectedUser.email}</p>
+                        <p className="text-xs text-primary truncate">{selectedUser.email}</p>
                       </div>
                       <button
                         onClick={() => setSelectedUser(null)}
@@ -297,7 +297,7 @@ export function AdminEmailsClient({
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
                         placeholder="Rechercher un utilisateur..."
-                        className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20"
+                        className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       />
                       
                       {/* Search Results Dropdown */}
@@ -354,7 +354,7 @@ export function AdminEmailsClient({
                   placeholder={emailMode === 'personal' ? "Message important pour toi" : "Nouvelle fonctionnalité disponible !"}
                   className={`w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none transition-all ${
                     emailMode === 'personal' 
-                      ? 'focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20' 
+                      ? 'focus:border-primary focus:ring-1 focus:ring-primary/20' 
                       : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
                   }`}
                 />
@@ -377,7 +377,7 @@ export function AdminEmailsClient({
                   rows={6}
                   className={`w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none resize-none transition-all ${
                     emailMode === 'personal' 
-                      ? 'focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20' 
+                      ? 'focus:border-primary focus:ring-1 focus:ring-primary/20' 
                       : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
                   }`}
                 />
@@ -396,7 +396,7 @@ export function AdminEmailsClient({
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="Découvrir →"
                     className={`w-full px-3 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none ${
-                      emailMode === 'personal' ? 'focus:border-cyan-500' : 'focus:border-red-500'
+                      emailMode === 'personal' ? 'focus:border-primary' : 'focus:border-red-500'
                     }`}
                   />
                 </div>
@@ -411,7 +411,7 @@ export function AdminEmailsClient({
                     onChange={(e) => setCtaUrl(e.target.value)}
                     placeholder="https://y0mi.fun/..."
                     className={`w-full px-3 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none ${
-                      emailMode === 'personal' ? 'focus:border-cyan-500' : 'focus:border-red-500'
+                      emailMode === 'personal' ? 'focus:border-primary' : 'focus:border-red-500'
                     }`}
                   />
                 </div>
@@ -458,7 +458,7 @@ export function AdminEmailsClient({
                 {emailMode === 'personal' ? (
                   selectedUser ? (
                     <>
-                      <User className="w-4 h-4 text-cyan-400" />
+                      <User className="w-4 h-4 text-primary" />
                       Envoyer à <strong className="text-white">{selectedUser.username}</strong>
                     </>
                   ) : (
@@ -484,7 +484,7 @@ export function AdminEmailsClient({
                 }
                 className={`px-5 py-2.5 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
                   emailMode === 'personal' 
-                    ? 'bg-cyan-600 hover:bg-cyan-500' 
+                    ? 'bg-primary hover:bg-primary' 
                     : 'bg-red-600 hover:bg-red-500'
                 }`}
               >

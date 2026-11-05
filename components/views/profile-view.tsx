@@ -542,7 +542,7 @@ export function ProfileView() {
           <img
             src={user?.avatar || "/images/default-avatar.svg"}
             alt="User Avatar"
-            className="w-20 h-20 rounded-full border-4 border-primary/50 ring-4 ring-primary/20 object-cover shrink-0"
+            className="w-20 h-20 rounded-full border border-border object-cover shrink-0"
           />
           <div className="flex-1 space-y-4 w-full">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
@@ -572,7 +572,7 @@ export function ProfileView() {
                     <span className="text-muted-foreground">Niveau <span className="text-primary">{userStats.level}</span></span>
                     <span className="text-muted-foreground"><span className="text-foreground">{userStats.xp % 1000}</span> / 1000 XP</span>
                   </div>
-                  <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${(userStats.xp % 1000) / 10}%` }}
@@ -592,9 +592,9 @@ export function ProfileView() {
                     />
                   )}
                 </div>
-                <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide text-center">Balance</p>
-                  <p className="text-xl font-semibold text-center">
+                <div className="px-4 py-2 rounded-lg border border-border">
+                  <p className="text-xs text-muted-foreground">Solde</p>
+                  <p className="text-xl font-semibold">
                     <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
                     <CurrencySymbol className="text-primary" />
                   </p>
