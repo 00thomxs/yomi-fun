@@ -137,7 +137,7 @@ export default function CreateMarketPage() {
         {/* 1. Type de Marché */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <PieChart className="w-4 h-4 text-primary" />
+            <PieChart className="w-4 h-4 text-brand" />
             Type d'Event
           </h2>
           <div className="grid grid-cols-2 gap-4">
@@ -146,7 +146,7 @@ export default function CreateMarketPage() {
               onClick={() => setMarketType('binary')}
               className={`p-4 rounded-lg border transition-all text-center ${
                 marketType === 'binary' 
-                  ? 'bg-primary/10 border-primary text-primary font-bold' 
+                  ? 'bg-primary/10 border-primary text-brand font-bold' 
                   : 'bg-white/5 border-transparent hover:bg-white/10'
               }`}
             >
@@ -157,7 +157,7 @@ export default function CreateMarketPage() {
               onClick={() => setMarketType('multi')}
               className={`p-4 rounded-lg border transition-all text-center ${
                 marketType === 'multi' 
-                  ? 'bg-primary/10 border-primary text-primary font-bold' 
+                  ? 'bg-primary/10 border-primary text-brand font-bold' 
                   : 'bg-white/5 border-transparent hover:bg-white/10'
               }`}
             >
@@ -169,7 +169,7 @@ export default function CreateMarketPage() {
         {/* 2. Informations Générales */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Type className="w-4 h-4 text-primary" />
+            <Type className="w-4 h-4 text-brand" />
             Informations
           </h2>
           
@@ -310,12 +310,12 @@ export default function CreateMarketPage() {
                 type="checkbox" 
                 id="isFeatured" 
                 name="isFeatured"
-                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+                className="w-5 h-5 rounded border-border bg-background text-brand focus:ring-primary/50"
               />
             </div>
 
             <div className="flex items-center gap-3 p-4 rounded-lg bg-white/5 border border-border">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-brand">
                 <PieChart className="w-4 h-4" />
               </div>
               <div className="flex-1">
@@ -326,7 +326,7 @@ export default function CreateMarketPage() {
                 type="checkbox" 
                 id="isHeadline" 
                 name="isHeadline"
-                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+                className="w-5 h-5 rounded border-border bg-background text-brand focus:ring-primary/50"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export default function CreateMarketPage() {
         {/* 3. Saison & Liquidité */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-primary" />
+            <Trophy className="w-4 h-4 text-brand" />
             Saison & Liquidité
           </h2>
 
@@ -486,7 +486,7 @@ export default function CreateMarketPage() {
         {/* 4. Probabilités & Réponses */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <List className="w-4 h-4 text-primary" />
+            <List className="w-4 h-4 text-brand" />
             {marketType === 'binary' ? 'Probabilité Initiale' : 'Réponses Possibles'}
           </h2>
 

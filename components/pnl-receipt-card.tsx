@@ -74,7 +74,7 @@ export function PnlReceiptCard({ data = defaultData }: PnlReceiptCardProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="font-logo flex flex-col items-center gap-4">
       {/* The Receipt Card - 4:5 Aspect Ratio */}
       <div
         ref={cardRef}

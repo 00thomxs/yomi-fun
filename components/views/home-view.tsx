@@ -2,6 +2,7 @@
 
 import { Clock } from "lucide-react"
 import { MarketCard } from "@/components/market/market-card"
+import { ActivityFeed } from "@/components/market/activity-feed"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -48,7 +49,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
           <div className="p-5 md:p-6 flex flex-col gap-5 order-2 md:order-1">
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               {featuredMarket.isLive ? (
-                <span className="inline-flex items-center gap-1.5 text-primary font-medium">
+                <span className="inline-flex items-center gap-1.5 text-brand font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />
                   En direct
                 </span>
@@ -64,7 +65,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               </span>
             </div>
 
-            <h2 className="text-2xl md:text-[28px] font-semibold tracking-tight leading-tight text-balance">
+            <h2 className="text-2xl md:text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-balance">
               {featuredMarket.question || "Question indisponible"}
             </h2>
 
@@ -74,7 +75,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               return (
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-3xl font-semibold text-yes">{p}%<span className="ml-1.5 text-sm font-sans font-medium text-muted-foreground">OUI</span></span>
+                    <span className="font-display text-4xl font-bold text-yes tabular">{p}%<span className="ml-1.5 text-sm font-sans font-medium text-muted-foreground">OUI</span></span>
                     <span className="font-mono text-sm text-muted-foreground">{100 - p}% NON</span>
                   </div>
                   <div className="flex h-1.5 rounded-full overflow-hidden bg-no/30">
@@ -126,6 +127,11 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
         </article>
       )}
 
+      {/* Desktop shows the feed in the side rail */}
+      <div className="lg:hidden">
+        <ActivityFeed limit={5} />
+      </div>
+
       {/* Category Filter */}
       <div className="sticky top-16 z-40 -mx-4 px-4 lg:mx-0 lg:px-0 bg-background/95 backdrop-blur border-b border-border">
         <div role="tablist" aria-label="Catégories" className="flex gap-6 overflow-x-auto no-scrollbar">
@@ -139,7 +145,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
                 onClick={() => setActiveCategory(category.id)}
                 className={`relative shrink-0 h-11 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
                   active
-                    ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-primary"
+                    ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-brand"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -152,14 +158,14 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
 
       {/* Section Header */}
       <div className="flex items-baseline justify-between">
-        <h3 className="text-lg font-semibold tracking-tight">{activeLabel}</h3>
+        <h2 className="font-display text-lg font-bold tracking-tight">{activeLabel}</h2>
         <span className="text-sm text-muted-foreground font-mono">
           {filteredMarkets.length} marché{filteredMarkets.length > 1 ? "s" : ""}
         </span>
       </div>
 
       {/* Markets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {filteredMarkets.length > 0 ? (
           filteredMarkets.map((market) => (
             <MarketCard key={market.id} market={market} onMarketClick={onMarketClick} onBet={onBet} />

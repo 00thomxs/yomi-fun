@@ -364,9 +364,9 @@ export default function EditMarketPage({ params }: PageProps) {
 
       {hasSeasonLink && (
         <div className="rounded-lg p-4 bg-primary/10 border border-primary/30 flex items-center gap-3">
-          <Trophy className="w-5 h-5 text-primary shrink-0" />
+          <Trophy className="w-5 h-5 text-brand shrink-0" />
           <div>
-            <p className="font-semibold text-primary">Lié à une Saison</p>
+            <p className="font-semibold text-brand">Lié à une Saison</p>
             <p className="text-xs text-muted-foreground">
               Cet event fait partie de "{market.season?.name}". La date de fin ne peut pas être modifiée.
             </p>
@@ -378,7 +378,7 @@ export default function EditMarketPage({ params }: PageProps) {
         {/* Informations */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Type className="w-4 h-4 text-primary" />
+            <Type className="w-4 h-4 text-brand" />
             Informations
           </h2>
           
@@ -443,7 +443,7 @@ export default function EditMarketPage({ params }: PageProps) {
         {/* Date de fin */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-primary" />
+            <Calendar className="w-4 h-4 text-brand" />
             Date de Fin
             {hasSeasonLink && <Lock className="w-3 h-3 text-muted-foreground" />}
           </h2>
@@ -479,7 +479,7 @@ export default function EditMarketPage({ params }: PageProps) {
         {/* Options de mise en avant */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Star className="w-4 h-4 text-primary" />
+            <Star className="w-4 h-4 text-brand" />
             Mise en Avant
           </h2>
           
@@ -499,12 +499,12 @@ export default function EditMarketPage({ params }: PageProps) {
                 id="isFeatured" 
                 checked={isFeatured}
                 onChange={(e) => setIsFeatured(e.target.checked)}
-                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+                className="w-5 h-5 rounded border-border bg-background text-brand focus:ring-primary/50"
               />
             </div>
 
             <div className="flex items-center gap-3 p-4 rounded-lg bg-white/5 border border-border">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-brand">
                 <PieChart className="w-4 h-4" />
               </div>
               <div className="flex-1">
@@ -518,7 +518,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 id="isHeadline" 
                 checked={isHeadline}
                 onChange={(e) => setIsHeadline(e.target.checked)}
-                className="w-5 h-5 rounded border-border bg-background text-primary focus:ring-primary/50"
+                className="w-5 h-5 rounded border-border bg-background text-brand focus:ring-primary/50"
               />
             </div>
           </div>
@@ -527,7 +527,7 @@ export default function EditMarketPage({ params }: PageProps) {
         {/* Informations (lecture seule) */}
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
-            <Coins className="w-4 h-4 text-primary" />
+            <Coins className="w-4 h-4 text-brand" />
             Informations (lecture seule)
           </h2>
           
@@ -566,7 +566,7 @@ export default function EditMarketPage({ params }: PageProps) {
         {extendedStats && (
           <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
             <h2 className="font-semibold flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-primary" />
+              <BarChart3 className="w-4 h-4 text-brand" />
               Statistiques Avancées
             </h2>
 

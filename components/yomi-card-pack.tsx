@@ -60,7 +60,7 @@ export function YomiCardPack({
 
   if (stage === "revealed") {
     return (
-      <div className="animate-in zoom-in-95 fade-in duration-500">
+      <div className="font-logo animate-in zoom-in-95 fade-in duration-500">
         {children}
       </div>
     )

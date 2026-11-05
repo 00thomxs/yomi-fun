@@ -229,7 +229,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
               type="checkbox" 
               checked={notifWin}
               onChange={(e) => setNotifWin(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-600 bg-transparent text-primary focus:ring-offset-0"
+              className="w-5 h-5 rounded border-gray-600 bg-transparent text-brand focus:ring-offset-0"
             />
           </label>
 
@@ -239,7 +239,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
               type="checkbox" 
               checked={notifMarketing}
               onChange={(e) => setNotifMarketing(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-600 bg-transparent text-primary focus:ring-offset-0"
+              className="w-5 h-5 rounded border-gray-600 bg-transparent text-brand focus:ring-offset-0"
             />
           </label>
         </div>
@@ -255,7 +255,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2 shadow-lg"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Enregistrer

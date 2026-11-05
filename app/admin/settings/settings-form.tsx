@@ -279,7 +279,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Season Title */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-primary" /> Titre de la Saison
+            <Trophy className="w-5 h-5 text-brand" /> Titre de la Saison
           </h3>
           <div className="space-y-2">
             <input
@@ -301,7 +301,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Date & Time Selection */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" /> Date de Fin de Saison
+            <Calendar className="w-5 h-5 text-brand" /> Date de Fin de Saison
           </h3>
             <div className="space-y-2">
             <div className="relative">
@@ -418,7 +418,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Zeny Rewards */}
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Coins className="w-5 h-5 text-primary" /> Bonus Zeny (Top 10)
+            <Coins className="w-5 h-5 text-brand" /> Bonus Zeny (Top 10)
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
             Distribués automatiquement à la fin de la saison. Le 1er reçoit Cash Prize + Bonus Rang #1.
@@ -449,7 +449,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Link2 className="w-5 h-5 text-primary" /> Events de la Saison
+                <Link2 className="w-5 h-5 text-brand" /> Events de la Saison
               </h3>
               <p className="text-xs text-muted-foreground">
                 Les events liés à cette saison comptent pour le classement saisonnier. 

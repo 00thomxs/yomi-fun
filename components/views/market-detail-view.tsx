@@ -10,6 +10,7 @@ import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
 import type { MarketWinner } from "@/app/actions/market-stats"
+import { ActivityFeed } from "@/components/market/activity-feed"
 import { TopWinners } from "@/components/market/top-winners"
 import { useToast } from "@/hooks/use-toast"
 import { LowBalancePopup } from "@/components/low-balance-popup"
@@ -336,7 +337,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
             {market.isLive ? (
               <>
                 <span className="text-muted-foreground" aria-hidden>·</span>
-                <span className="inline-flex items-center gap-1.5 text-xs text-primary font-medium"><span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />En direct</span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-brand font-medium"><span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />En direct</span>
               </>
             ) : (
               <>
@@ -544,11 +545,12 @@ function BinaryMarketContent({
   }, [userBets, chartDataWithTs])
 
   return (
-    <>
+    <div className={`grid grid-cols-1 gap-6 items-start ${!isResolved ? "lg:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
+      <div className="space-y-6 min-w-0">
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+        <div className="p-4 rounded-lg bg-white/5 border border-brand/40 text-center">
           <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
@@ -565,9 +567,10 @@ function BinaryMarketContent({
       )}
 
       {/* Probability Display */}
-      <div className="text-center space-y-2">
-        <p className="text-7xl font-semibold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
-        <p className="text-sm font-medium text-muted-foreground tracking-tight">
+      <div className="flex items-baseline gap-3">
+        <p key={Math.round(market.probability)} className="font-display text-5xl md:text-6xl font-bold tracking-tight text-foreground tabular animate-in fade-in slide-in-from-bottom-1 duration-300">{Math.round(market.probability)}%</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          <span className="text-yes">OUI</span> · 
           {market.probability >= 85
             ? "Quasi Certain"
             : market.probability >= 65
@@ -580,16 +583,13 @@ function BinaryMarketContent({
 
       {/* Timeframe Selector + Chart Actions */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="seg overflow-x-auto no-scrollbar">
           {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1.5 rounded-lg font-semibold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
-              timeframe === tf
-                ? "bg-primary/10 text-primary border-primary/30"
-                : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
-            }`}
+              aria-pressed={timeframe === tf}
+              className="seg-item font-mono"
           >
             {tf}
           </button>
@@ -625,8 +625,8 @@ function BinaryMarketContent({
                 <AreaChart data={chartDataWithTs}>
                   <defs>
                     <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#dc2626" stopOpacity={0.18} />
-                      <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
+                      <stop offset="0%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0.1} />
+                      <stop offset="100%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
@@ -666,7 +666,7 @@ function BinaryMarketContent({
                   <Area
                     type="linear"
                     dataKey="price"
-                    stroke="#ffffff"
+                    stroke="oklch(0.58 0.22 25)"
                     strokeWidth={2}
                     fill="url(#chartGradientFullscreen)"
                     dot={false}
@@ -691,8 +691,8 @@ function BinaryMarketContent({
           <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#dc2626" stopOpacity={0.18} />
-                <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
+                <stop offset="0%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0.1} />
+                <stop offset="100%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
@@ -745,7 +745,7 @@ function BinaryMarketContent({
                 r={4}
                 shape={(props: any) => (
                   <g>
-                    <circle cx={props.cx} cy={props.cy} r={4} fill="#ffffff" />
+                    <circle cx={props.cx} cy={props.cy} r={4} fill="oklch(0.58 0.22 25)" />
                   </g>
                 )}
               />
@@ -848,7 +848,7 @@ function BinaryMarketContent({
             <Area
               type="linear"
               dataKey="price"
-              stroke="#ffffff"
+              stroke="oklch(0.58 0.22 25)"
               strokeWidth={2}
               fill="url(#chartGradientMonochrome)"
               dot={false}
@@ -866,29 +866,36 @@ function BinaryMarketContent({
         </div>
       </div>
 
+        <ActivityFeed marketId={market.id} title="Derniers paris" />
+      </div>
+
+      {/* Bet ticket: sticky on desktop so it stays next to the chart */}
+      <aside className="lg:sticky lg:top-[88px] space-y-4">
       {/* Betting Panel */}
       {!isResolved && (
       <div className="rounded-lg bg-card border border-border p-5 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setBetChoice("YES")}
-            className={`py-3 px-4 rounded-lg font-semibold tracking-tight transition-all cursor-pointer ${
+            aria-pressed={betChoice === "YES"}
+            className={`h-14 px-4 rounded-md text-base font-semibold transition-[color,background-color,transform] active:scale-[0.98] cursor-pointer ${
               betChoice === "YES"
-                ? "bg-yes/20 text-yes border border-yes/50"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/15"
+                ? "bg-yes text-background"
+                : "bg-yes/10 text-yes hover:bg-yes/20"
             }`}
           >
-            OUI • <span className="font-mono">{Math.round(market.probability)}%</span>
+            OUI <span className="font-mono ml-1">{Math.round(market.probability)}%</span>
           </button>
           <button
             onClick={() => setBetChoice("NO")}
-            className={`py-3 px-4 rounded-lg font-semibold tracking-tight transition-all cursor-pointer ${
+            aria-pressed={betChoice === "NO"}
+            className={`h-14 px-4 rounded-md text-base font-semibold transition-[color,background-color,transform] active:scale-[0.98] cursor-pointer ${
               betChoice === "NO"
-                  ? "bg-no/30 text-no border border-no"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/15"
+                ? "bg-no text-background"
+                : "bg-no/10 text-no hover:bg-no/20"
             }`}
           >
-              NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
+              NON <span className="font-mono ml-1">{Math.round(100 - market.probability)}%</span>
           </button>
         </div>
 
@@ -907,6 +914,8 @@ function BinaryMarketContent({
       </div>
       )}
       
+      </aside>
+
       {/* Confirm Bet Modal */}
       <ConfirmBetModal
         isOpen={showConfirmModal}
@@ -917,7 +926,7 @@ function BinaryMarketContent({
         potentialGain={calculatePayout()}
         isLoading={isPlacingBet}
       />
-    </>
+    </div>
   )
 }
 
@@ -1060,11 +1069,12 @@ function MultiMarketContent({
   }, [userBets, chartDataWithTs, visibleOutcomes, market.outcomes])
 
   return (
-    <>
+    <div className={`grid grid-cols-1 gap-6 items-start ${!isResolved ? "lg:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
+      <div className="space-y-6 min-w-0">
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+        <div className="p-4 rounded-lg bg-white/5 border border-brand/40 text-center">
           <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
@@ -1162,16 +1172,13 @@ function MultiMarketContent({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 relative z-10">
           <p className="text-sm font-semibold tracking-tight shrink-0">Evolution des cotes</p>
           <div className="flex items-center gap-2">
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="seg overflow-x-auto no-scrollbar">
               {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all whitespace-nowrap cursor-pointer border ${
-                  timeframe === tf
-                    ? "bg-primary/10 text-primary border-primary/30"
-                    : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
-                }`}
+                  aria-pressed={timeframe === tf}
+                  className="seg-item font-mono"
               >
                 {tf}
               </button>
@@ -1462,6 +1469,11 @@ function MultiMarketContent({
         </div>
       </div>
 
+        <ActivityFeed marketId={market.id} title="Derniers paris" />
+      </div>
+
+      {/* Bet ticket: sticky on desktop so it stays next to the chart */}
+      <aside className="lg:sticky lg:top-[88px] space-y-4">
       {/* Betting Panel */}
       {!isResolved && (
       <div className="rounded-lg bg-card border border-border p-5 space-y-4">
@@ -1487,6 +1499,8 @@ function MultiMarketContent({
       </div>
       )}
       
+      </aside>
+
       {/* Confirm Bet Modal */}
       <ConfirmBetModal
         isOpen={showConfirmModal}
@@ -1497,7 +1511,7 @@ function MultiMarketContent({
         potentialGain={calculatePayout()}
         isLoading={isPlacingBet}
       />
-    </>
+    </div>
   )
 }
 
@@ -1623,9 +1637,9 @@ function BetAmountInput({
             </div>
           </div>
         ) : (
-        <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+        <div className="p-3 rounded-lg bg-white/5 border border-brand/40">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Gain potentiel</p>
-          <p className="text-2xl font-semibold text-primary tracking-tight font-mono">
+          <p className="text-2xl font-semibold text-brand tracking-tight font-mono">
               {potentialGain} <CurrencySymbol />
           </p>
         </div>
@@ -1662,7 +1676,7 @@ function BetAmountInput({
         <button
           onClick={handlePlaceBet}
           disabled={!betAmount || isOverLimit || isBelowMin || isAboveAllowed}
-          className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-semibold text-lg tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-14 rounded-md bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-[color,background-color,transform] active:scale-[0.98] disabled:bg-white/5 disabled:text-muted-foreground disabled:cursor-not-allowed cursor-pointer"
         >
           Confirmer le pari
         </button>

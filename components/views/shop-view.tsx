@@ -17,6 +17,8 @@ import {
   equipCosmetic
 } from "@/app/actions/cosmetics"
 import { RARITY_INFO } from "@/lib/cosmetics-types"
+import { CardBackground, AvatarAura, parseBackgroundEffect, parseAuraEffect } from "@/components/card-cosmetics"
+import { StyledUsername, parseNametagEffect } from "@/components/ui/styled-username"
 import { useUser } from "@/contexts/user-context"
 import { ZENY_PACKS } from "@/lib/constants"
 import { createStripeCheckoutSession } from "@/app/actions/stripe"
@@ -36,6 +38,27 @@ const COSMETIC_CATEGORIES: { id: CosmeticCategory; label: string; icon: typeof P
   { id: 'packs', label: 'Packs', icon: Package },
 ]
 
+// Live preview using the same renderers as the profile card, so what you see is what you equip
+function CosmeticPreview({ item, username, avatar, large = false }: { item: CosmeticItem; username: string; avatar: string; large?: boolean }) {
+  const size = large ? "w-24 h-24" : "w-14 h-14"
+  return (
+    <div className={`relative overflow-hidden rounded-md bg-black border border-border flex items-center justify-center ${large ? "aspect-video" : "aspect-square"}`}>
+      {item.type === 'background' && <CardBackground effect={parseBackgroundEffect(item.preview_data)} />}
+      {item.type === 'aura' && (
+        <div className={`relative ${size}`}>
+          <AvatarAura effect={parseAuraEffect(item.preview_data)} />
+          <img src={avatar} alt="" className={`relative ${size} rounded-full object-cover bg-muted`} />
+        </div>
+      )}
+      {item.type === 'nametag' && (
+        <span className={`font-logo font-bold ${large ? "text-2xl" : "text-base"} px-3 text-center truncate`}>
+          <StyledUsername username={username} nametagEffect={parseNametagEffect(item.preview_data)} withAt />
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function ShopView({ initialItems }: ShopViewProps) {
   const [category, setCategory] = useState<ShopCategory>('cosmetics')
   const [cosmeticCategory, setCosmeticCategory] = useState<CosmeticCategory>('all')
@@ -46,7 +69,9 @@ export function ShopView({ initialItems }: ShopViewProps) {
   const [purchasedItem, setPurchasedItem] = useState<CosmeticItem | null>(null)
   const [isEquipping, setIsEquipping] = useState(false)
   
-  const { userBalance, setUserBalance, isAuthenticated } = useUser()
+  const { userBalance, setUserBalance, isAuthenticated, user } = useUser()
+  const previewName = user?.username || "pseudo"
+  const previewAvatar = user?.avatar || "/images/default-avatar.svg"
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -156,23 +181,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
     }
   }
 
+  // Same neutral pack look as the buy-zeny page; only the recommended pack carries the brand red
   const getZenyPackTheme = (id: string) => {
-    switch (id) {
-      case 'pack_little_player': return { 
-        iconBg: 'bg-white/5', iconColor: 'text-muted-foreground', accent: 'text-white', popular: false 
-      }
-      case 'pack_degen': return { 
-        iconBg: 'bg-primary/20', iconColor: 'text-primary', accent: 'text-primary', popular: true 
-      }
-      case 'pack_trader': return { 
-        iconBg: 'bg-purple-500/10', iconColor: 'text-purple-400', accent: 'text-purple-400', popular: false 
-      }
-      case 'pack_whale': return { 
-        iconBg: 'bg-amber-400/10', iconColor: 'text-amber-400', accent: 'text-amber-400', popular: false 
-      }
-      default: return { iconBg: 'bg-white/5', iconColor: 'text-white', accent: 'text-white', popular: false }
-    }
+    const popular = id === 'pack_degen'
+    return { iconBg: 'bg-white/5', iconColor: popular ? 'text-brand' : 'text-muted-foreground', accent: 'text-foreground', popular }
   }
+
 
   const getZenyIcon = (id: string) => {
     switch (id) {
@@ -187,28 +201,24 @@ export function ShopView({ initialItems }: ShopViewProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <h2 className="text-2xl font-semibold tracking-tight">Shop</h2>
+      <h1 className="font-display text-2xl font-bold tracking-tight">Shop</h1>
 
       {/* Main Category Tabs */}
-      <div className="flex gap-2">
+      <div role="tablist" className="flex gap-6 border-b border-border">
         <button
           onClick={() => setCategory('cosmetics')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all ${
-            category === 'cosmetics'
-              ? 'bg-white/10 text-white border border-white/20'
-              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/15'
-          }`}
+          role="tab"
+          aria-selected={category === 'cosmetics'}
+          className={`relative h-11 inline-flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer ${category === 'cosmetics' ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-brand" : "text-muted-foreground hover:text-foreground"}`}
           >
           <Palette className="w-4 h-4" />
           Cosmétiques
         </button>
         <button
           onClick={() => setCategory('zeny')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all ${
-            category === 'zeny'
-              ? 'bg-primary text-white shadow-lg '
-              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/15'
-          }`}
+          role="tab"
+          aria-selected={category === 'zeny'}
+          className={`relative h-11 inline-flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer ${category === 'zeny' ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-brand" : "text-muted-foreground hover:text-foreground"}`}
           >
           <Coins className="w-4 h-4" />
           Acheter des Zeny
@@ -219,7 +229,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {category === 'zeny' && (
         <div className="space-y-6">
           <div className="text-center space-y-2">
-            <h3 className="text-xl font-semibold">Recharge tes <span className="text-primary">Zeny</span></h3>
+            <h3 className="text-xl font-semibold">Recharge tes <span className="text-brand">Zeny</span></h3>
             <p className="text-sm text-muted-foreground max-w-lg mx-auto">
               Plus le pack est gros, plus le bonus est important !
             </p>
@@ -248,7 +258,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mx-auto mb-3`}>
                       <div className={theme.iconColor}>{getZenyIcon(pack.id)}</div>
                     </div>
-                    <h4 className="font-semibold uppercase tracking-tight">{pack.name}</h4>
+                    <h4 className="font-semibold">{pack.name}</h4>
                     <div className="text-2xl font-semibold mt-1">{pack.price}€</div>
                   </div>
                   
@@ -268,7 +278,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   <button
                     onClick={() => handleBuyZeny(pack.id)}
                     disabled={!!loadingZeny}
-                    className={`w-full py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all ${
+                    className={`w-full h-11 rounded-md font-semibold text-sm transition-colors ${
                       theme.popular
                         ? 'bg-primary text-white hover:bg-primary/90'
                         : 'bg-white/5 hover:bg-white/10 border border-border'
@@ -295,7 +305,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {category === 'cosmetics' && (
         <div className="space-y-6">
           {/* Sub-categories */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="seg max-w-full overflow-x-auto no-scrollbar">
             {COSMETIC_CATEGORIES.map(cat => {
           const Icon = cat.icon
               const count = cat.id === 'all' 
@@ -308,15 +318,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
             <button
               key={cat.id}
                   onClick={() => setCosmeticCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                    cosmeticCategory === cat.id
-                      ? 'bg-white/10 text-white border border-white/20'
-                      : 'bg-card border border-border text-muted-foreground hover:text-white'
-              }`}
+                  aria-pressed={cosmeticCategory === cat.id}
+                  className="seg-item"
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" aria-hidden />
                   {cat.label}
-                  {cat.id !== 'packs' && <span className="text-xs opacity-60">({count})</span>}
+                  {cat.id !== 'packs' && <span className="font-mono text-muted-foreground">{count}</span>}
             </button>
           )
         })}
@@ -339,7 +346,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
           
           {/* Cosmetics Grid */}
           {cosmeticCategory !== 'packs' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredItems.map(item => {
                 const rarityInfo = RARITY_INFO[item.rarity]
                 const isOwned = ownedIds.has(item.id)
@@ -350,15 +357,15 @@ export function ShopView({ initialItems }: ShopViewProps) {
           <div
             key={item.id}
                     onClick={() => setPreviewItem(item)}
-                    className={`relative rounded-xl border p-4 cursor-pointer transition-all hover:scale-[1.02] ${
+                    className={`relative rounded-lg border p-3 cursor-pointer transition-colors hover:bg-surface-hover ${
                       isOwned 
-                        ? 'bg-yes/5 border-yes/30' 
-                        : 'bg-card border-border hover:border-white/15'
+                        ? 'border-yes/40'
+                        : 'border-border'
                     }`}
                   >
                     {/* Rarity Badge */}
                     <div 
-                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-semibold uppercase"
+                      className="absolute top-5 right-5 z-10 px-1.5 py-0.5 rounded text-[11px] font-semibold uppercase bg-black/70"
                       style={{ 
                         background: `${rarityInfo.color}15`, 
                         border: `1px solid ${rarityInfo.color}40`,
@@ -370,25 +377,17 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     
                     {/* Limited Badge */}
                     {item.is_limited && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-semibold">
+                      <div className="absolute top-5 left-5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 border border-amber-500/30 text-amber-400 text-[11px] font-semibold">
                         <Clock className="w-2.5 h-2.5" />
                         Limité
                       </div>
                     )}
                     
                     {/* Preview Area */}
-                    <div 
-                      className="aspect-square rounded-lg mb-3 flex items-center justify-center"
-                      style={{ 
-                        background: `${rarityInfo.color}10`,
-                        border: `1px solid ${rarityInfo.color}20`
-                      }}
-                    >
-                      {item.type === 'background' && <Palette className="w-10 h-10" style={{ color: rarityInfo.color }} />}
-                      {item.type === 'aura' && <Sparkles className="w-10 h-10" style={{ color: rarityInfo.color }} />}
-                      {item.type === 'nametag' && <Type className="w-10 h-10" style={{ color: rarityInfo.color }} />}
+                    <div className="mb-3">
+                      <CosmeticPreview item={item} username={previewName} avatar={previewAvatar} />
                     </div>
-                    
+
                     {/* Info */}
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold text-sm truncate">{item.name}</h4>
@@ -410,7 +409,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                           Possédé
                         </span>
                       ) : (
-                        <span className={`font-mono font-semibold text-sm flex items-center gap-1 ${canAfford ? 'text-primary' : 'text-no'}`}>
+                        <span className={`font-mono font-semibold text-sm flex items-center gap-1 ${canAfford ? 'text-foreground' : 'text-no'}`}>
                           {item.price.toLocaleString()} <CurrencySymbol />
                         </span>
                       )}
@@ -464,26 +463,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
               </button>
             </div>
             
-            {/* Preview Placeholder */}
-            <div 
-              className="aspect-video rounded-lg flex items-center justify-center"
-              style={{ 
-                background: `${RARITY_INFO[previewItem.rarity].color}10`,
-                border: `1px solid ${RARITY_INFO[previewItem.rarity].color}30`
-              }}
-            >
-              <div className="text-center">
-                {previewItem.type === 'background' && <Palette className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
-                {previewItem.type === 'aura' && <Sparkles className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
-                {previewItem.type === 'nametag' && <Type className="w-16 h-16 mx-auto mb-2" style={{ color: RARITY_INFO[previewItem.rarity].color }} />}
-                <p className="text-xs text-muted-foreground">Aperçu sur votre carte</p>
-      </div>
-            </div>
+            {/* Live preview */}
+            <CosmeticPreview item={previewItem} username={previewName} avatar={previewAvatar} large />
 
             {/* Price */}
             <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-border">
               <span className="text-sm font-medium">Prix</span>
-              <span className="text-xl font-semibold text-primary flex items-center gap-1">
+              <span className="text-xl font-semibold text-brand flex items-center gap-1">
                 {previewItem.price.toLocaleString()} <CurrencySymbol />
               </span>
             </div>
@@ -508,7 +494,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 <button
                   onClick={() => handlePurchaseCosmetic(previewItem)}
                   disabled={isPurchasing === previewItem.id || userBalance < previewItem.price}
-                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2"
                 >
                   {isPurchasing === previewItem.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

@@ -33,7 +33,7 @@ export function ConfirmBetModal({
       />
       
       {/* Modal */}
-      <div className="relative bg-card border border-primary/30 rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="relative bg-card border border-brand/40 rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Glow effect */}
         
         {/* Close button */}
@@ -48,8 +48,8 @@ export function ConfirmBetModal({
         <div className="relative space-y-5">
           {/* Icon + Title */}
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 border border-primary/30">
-              <AlertCircle className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-brand/40">
+              <AlertCircle className="w-8 h-8 text-brand" />
             </div>
             <div>
               <h2 className="text-xl font-semibold tracking-tight text-white">
@@ -81,9 +81,9 @@ export function ConfirmBetModal({
           </div>
 
           {/* Potential Gain */}
-          <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
-            <p className="text-sm text-primary/70">Gain potentiel estimé</p>
-            <p className="text-3xl font-semibold text-primary font-mono flex items-center gap-1">
+          <div className="bg-white/5 rounded-lg p-4 border border-brand/40">
+            <p className="text-sm text-brand/70">Gain potentiel estimé</p>
+            <p className="text-3xl font-semibold text-brand font-mono flex items-center gap-1">
               {potentialGain.toLocaleString()} <CurrencySymbol className="w-6 h-6" />
             </p>
           </div>
@@ -100,7 +100,7 @@ export function ConfirmBetModal({
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="py-3 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-tight transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              className="py-3 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-tight transition-all cursor-pointer disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>

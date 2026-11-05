@@ -318,7 +318,7 @@ export const YomiTCGCard = forwardRef<HTMLDivElement, YomiTCGCardProps>(({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleTap}
-      className="relative cursor-pointer transition-transform duration-200 ease-out group"
+      className="font-logo relative cursor-pointer transition-transform duration-200 ease-out group"
       style={{ transform: effectiveTransform, transformStyle: "preserve-3d" }}
     >
       {/* Super Saiyan Aura Effect - excluded from download */}

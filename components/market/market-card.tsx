@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Users, Trophy } from "lucide-react"
+import { Clock, Users, Trophy, HelpCircle } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -11,7 +11,7 @@ type MarketCardProps = {
   onBet: (market: string, choice: string, amount: number, odds?: number) => void
 }
 
-const CHART_STROKE = "oklch(0.92 0 0)"
+const CHART_STROKE = "oklch(0.58 0.22 25)"
 
 function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: string }) {
   const resolved = market.status === 'resolved' || market.resolved_at
@@ -26,7 +26,7 @@ function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: 
       )}
       <span aria-hidden>·</span>
       {market.isLive ? (
-        <span className="inline-flex items-center gap-1.5 text-primary font-medium">
+        <span className="inline-flex items-center gap-1.5 text-brand font-medium">
           <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />
           En direct
         </span>
@@ -43,20 +43,18 @@ function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: 
   )
 }
 
-function Thumb({ src }: { src?: string }) {
-  if (!src) return null
-  // Background image: a dead URL degrades to a plain tile instead of a broken-image icon
+function Thumb({ src, icon: Icon }: { src?: string; icon: React.ElementType }) {
+  // Category icon underneath; the image (when the event has one) paints over it
   return (
-    <div
-      aria-hidden
-      className="w-10 h-10 rounded-md shrink-0 bg-muted bg-cover bg-center"
-      style={{ backgroundImage: `url("${src}")` }}
-    />
+    <div aria-hidden className="relative w-10 h-10 rounded-md shrink-0 bg-white/5 border border-border flex items-center justify-center overflow-hidden">
+      <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+      {src && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${src}")` }} />}
+    </div>
   )
 }
 
 const cardClass = (market: Market) =>
-  `group rounded-lg bg-card border p-4 text-left h-[300px] flex flex-col gap-3 cursor-pointer transition-colors hover:bg-surface-hover ${
+  `group rounded-lg bg-card border p-4 text-left h-[260px] flex flex-col gap-3 cursor-pointer transition-colors hover:bg-surface-hover ${
     market.season ? "border-amber-500/30" : "border-border"
   }`
 
@@ -67,6 +65,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   // Find correct icon from constants
   const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
   const categoryLabel = categoryDef?.label || market.category || "Divers"
+  const CategoryIcon = categoryDef?.icon || HelpCircle
 
   // Use real history data for chart (passed from container)
   const chartData = market.type === "binary"
@@ -95,7 +94,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <CardHeader market={market} categoryLabel={categoryLabel} />
 
         <div className="flex items-start gap-3">
-          <Thumb src={market.bgImage} />
+          <Thumb src={market.bgImage} icon={CategoryIcon} />
           <p className="font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
         </div>
 
@@ -179,16 +178,16 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       <CardHeader market={market} categoryLabel={categoryLabel} />
 
       <div className="flex items-start gap-3">
-        <Thumb src={market.bgImage} />
+        <Thumb src={market.bgImage} icon={CategoryIcon} />
         <p className="flex-1 font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
         <div className="text-right shrink-0">
-          <p className="font-mono text-xl font-semibold leading-none">{prob}%</p>
+          <p className="font-mono text-2xl font-semibold leading-none">{prob}%</p>
           <p className="mt-1 text-[11px] text-muted-foreground">OUI</p>
         </div>
       </div>
 
       {/* Real history chart */}
-      <div className="flex-1 min-h-[72px]">
+      <div className="flex-1 min-h-[48px] -mx-1">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
             <defs>

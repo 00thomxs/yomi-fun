@@ -40,7 +40,7 @@ function StatCard({
   color?: "cyan" | "green" | "amber" | "red" | "purple"
 }) {
   const colorClasses = {
-    cyan: "bg-primary/10 text-primary border-primary/20",
+    cyan: "bg-primary/10 text-brand border-primary/20",
     green: "bg-yes/10 text-yes border-yes/20",
     amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     red: "bg-red-500/10 text-red-400 border-red-500/20",
@@ -360,7 +360,7 @@ function UserSearchTable({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-primary/10 rounded-lg">
-              <Search className="w-4 h-4 text-primary" />
+              <Search className="w-4 h-4 text-brand" />
             </div>
             <div>
               <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
@@ -577,10 +577,10 @@ function UserSearchTable({
                     <div className="flex items-center justify-center">
                       <button
                         onClick={() => onSelectUser(user)}
-                        className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors group"
+                        className="p-2 hover:bg-primary/10 hover:text-brand rounded-lg transition-colors group"
                         title="Voir détails"
                       >
-                        <Eye className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                        <Eye className="w-4 h-4 text-muted-foreground group-hover:text-brand" />
                       </button>
                     </div>
                   </td>
@@ -748,7 +748,7 @@ function UserDetailModal({
           {editMode ? (
             <div className="bg-white/5 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2">
-                <Edit2 className="w-4 h-4 text-primary" />
+                <Edit2 className="w-4 h-4 text-brand" />
                 Modifier les données
               </h3>
               <div className="grid grid-cols-2 gap-4">

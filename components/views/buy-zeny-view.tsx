@@ -45,49 +45,24 @@ export function BuyZenyView() {
     }
   }
 
+  // One neutral look for every pack; only the recommended one carries the brand red
   const getTheme = (id: string) => {
-    switch (id) {
-      case 'pack_little_player': return { 
-        bg: 'bg-card',
-        border: 'border-border',
-        iconBg: 'bg-white/5',
-        iconColor: 'text-muted-foreground',
-        accent: 'text-white',
-        popular: false
-      }
-      case 'pack_degen': return { 
-        bg: 'bg-card',
-        border: 'border-primary/50',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        accent: 'text-primary',
-        popular: true
-      }
-      case 'pack_trader': return { 
-        bg: 'bg-card',
-        border: 'border-purple-500/30',
-        iconBg: 'bg-purple-500/10',
-        iconColor: 'text-purple-400',
-        accent: 'text-purple-400',
-        popular: false
-      }
-      case 'pack_whale': return { 
-        bg: 'bg-card',
-        border: 'border-amber-400/30',
-        iconBg: 'bg-amber-400/10',
-        iconColor: 'text-amber-400',
-        accent: 'text-amber-400',
-        popular: false
-      }
-      default: return { bg: 'bg-card', border: 'border-border', iconBg: 'bg-white/5', iconColor: 'text-white', accent: 'text-white', popular: false }
+    const popular = id === 'pack_degen'
+    return {
+      bg: 'bg-card',
+      border: popular ? 'border-brand/60' : 'border-border',
+      iconBg: 'bg-white/5',
+      iconColor: popular ? 'text-brand' : 'text-muted-foreground',
+      accent: 'text-foreground',
+      popular,
     }
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12">
       <div className="text-center space-y-4">
-        <h1 className="text-2xl sm:text-4xl font-semibold text-foreground tracking-tight">
-          Recharge tes <span className="text-primary">Zeny</span>
+        <h1 className="font-display text-2xl sm:text-4xl font-bold text-foreground tracking-tight">
+          Recharge tes <span className="text-brand">Zeny</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
           Achète des Zeny pour parier sur tes events préférés et grimper dans le classement.
@@ -105,7 +80,7 @@ export function BuyZenyView() {
               className={`relative rounded-lg border ${theme.border} ${theme.bg} p-6 flex flex-col h-full transition-all hover:scale-[1.02] hover:shadow-xl group`}
             >
               {theme.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-primary rounded text-[11px] font-semibold uppercase tracking-wide text-white">
                   Populaire
                 </div>
               )}
@@ -158,10 +133,10 @@ export function BuyZenyView() {
                   </li>
                   {theme.popular && (
                     <li className="flex items-center gap-3">
-                      <div className="p-1 rounded-full bg-primary/10">
-                        <Star className="w-3 h-3 text-primary" />
+                      <div className="p-1 rounded-full bg-white/5">
+                        <Star className="w-3 h-3 text-brand" />
                       </div>
-                      <span className="text-primary font-medium">Meilleure offre</span>
+                      <span className="text-brand font-medium">Meilleure offre</span>
                     </li>
                   )}
                 </ul>
@@ -171,7 +146,7 @@ export function BuyZenyView() {
               <button
                 onClick={() => handleBuy(pack.id)}
                 disabled={!!loadingId}
-                className={`mt-8 w-full py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all relative overflow-hidden
+                className={`mt-8 w-full h-11 rounded-md font-semibold text-sm transition-colors relative overflow-hidden
                   ${theme.popular
                     ? 'bg-primary text-white hover:bg-primary/90 shadow-lg ' 
                     : 'bg-white/5 hover:bg-white/10 text-foreground border border-border hover:border-border'

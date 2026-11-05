@@ -369,7 +369,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-brand/40 border-t-primary rounded-full animate-spin" />
       </div>
     )
   }
@@ -386,7 +386,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">Classement</h2>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Classement</h1>
             {viewMode === 'season' && hasSeason ? (
             <p className={`text-xs font-medium flex items-center gap-1 max-w-[250px] truncate ${isSeasonTimeElapsed ? 'text-muted-foreground' : 'text-primary'}`}>
               <Trophy className="w-3 h-3 shrink-0" /> 
@@ -401,14 +401,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         
         {/* Toggle Saison / Global */}
         {hasSeason && (
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-card border border-border">
+          <div className="seg">
             <button
               onClick={() => setViewMode('season')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                viewMode === 'season'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-muted-foreground hover:text-white'
-              }`}
+              aria-pressed={viewMode === 'season'}
+              className="seg-item"
             >
               <span className="flex items-center gap-1.5">
                 <Flame className="w-3 h-3" />
@@ -417,11 +414,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             </button>
             <button
               onClick={() => setViewMode('global')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                viewMode === 'global'
-                  ? 'bg-white/10 text-white shadow-lg'
-                  : 'text-muted-foreground hover:text-white'
-              }`}
+              aria-pressed={viewMode === 'global'}
+              className="seg-item"
             >
               <span className="flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" />
@@ -510,7 +504,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               <div className="text-right">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Cash Prize</p>
-                <p className="text-xl font-semibold text-primary flex items-center justify-end gap-1">
+                <p className="text-xl font-semibold text-brand flex items-center justify-end gap-1">
                   {(seasonSettings?.cash_prize || 0).toLocaleString()}<CurrencySymbol className="w-4 h-4" />
                 </p>
               </div>
@@ -546,11 +540,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 className="w-full flex items-center justify-between mb-3"
               >
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-primary" />
+                  <Target className="w-4 h-4 text-brand" />
                   <h4 className="text-xs font-semibold uppercase tracking-wide text-white/80">
                     Events de la saison
                   </h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
+                  <span className="px-2 py-0.5 rounded-full bg-white/5 text-[11px] font-semibold text-brand">
                     {seasonEvents.length}
                   </span>
                 </div>
@@ -618,13 +612,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top2 ? (
             <div className="w-full h-[260px] rounded-lg bg-card border border-border p-4 flex flex-col items-center justify-between relative overflow-hidden">
                             
-              <span className="text-2xl font-semibold text-white/20 absolute top-2 left-3">#2</span>
+              <span className="font-display text-lg sm:text-3xl font-bold text-muted-foreground absolute top-2 left-2.5 sm:top-3 sm:left-4">2</span>
               
               <div className="relative mt-4">
               <img
                 src={top2.avatar}
                 alt={top2.username}
-                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-white/20 object-cover relative z-10"
+                  className="w-16 h-16 rounded-full border border-border object-cover relative z-10"
               />
               </div>
               
@@ -640,12 +634,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top2.winRate}% réussite</p>
               </div>
               
               <div className="w-full pt-3 border-t border-border text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">PNL</p>
-                <p className={`text-lg font-semibold font-mono flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-no'}`}>
+                <p className="text-xs text-muted-foreground mb-1">PnL</p>
+                <p className={`font-display text-lg font-bold tabular flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-no'}`}>
                   {top2.totalWon >= 0 ? '+' : ''}{Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
@@ -672,7 +666,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 <img 
                   src={top1.avatar} 
                   alt={top1.username}
-                  className="w-20 h-20 rounded-full border-4 border-amber-500/30 ring-2 ring-amber-500/50 object-cover relative z-10"
+                  className="w-20 h-20 rounded-full border-2 border-amber-400/60 object-cover relative z-10"
                 />
               </div>
               
@@ -688,12 +682,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-amber-500/80 font-mono mt-1 font-semibold">{top1.winRate}% WR</p>
+                <p className="text-xs text-amber-500/80 font-mono mt-1 font-semibold">{top1.winRate}% réussite</p>
               </div>
               
               <div className="w-full pt-3 border-t border-amber-500/20 text-center relative z-10">
-                <p className="text-xs text-amber-500/60 uppercase tracking-wide mb-1">PNL</p>
-                <p className={`text-xl sm:text-2xl font-semibold font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-no'}`}>
+                <p className="text-xs text-amber-500/70 mb-1">PnL</p>
+                <p className={`font-display text-xl sm:text-2xl font-bold tabular flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-no'}`}>
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
@@ -711,13 +705,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top3 ? (
             <div className="w-full h-[230px] rounded-lg bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden">
                             
-              <span className="text-2xl font-semibold text-orange-500/20 absolute top-2 left-3">#3</span>
+              <span className="font-display text-lg sm:text-3xl font-bold text-muted-foreground absolute top-2 left-2.5 sm:top-3 sm:left-4">3</span>
               
               <div className="relative mt-2">
               <img
                 src={top3.avatar}
                 alt={top3.username}
-                  className="w-16 h-16 rounded-full border-4 border-card ring-2 ring-orange-500/20 object-cover relative z-10"
+                  className="w-16 h-16 rounded-full border border-border object-cover relative z-10"
               />
               </div>
               
@@ -733,12 +727,12 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top3.winRate}% réussite</p>
               </div>
               
               <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">PNL</p>
-                <p className={`text-lg font-semibold font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-no'}`}>
+                <p className="text-xs text-muted-foreground mb-1">PnL</p>
+                <p className={`font-display text-lg font-bold tabular flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-no'}`}>
                   {top3.totalWon >= 0 ? '+' : ''}{Math.abs(top3.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
@@ -774,7 +768,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 key={player.id}
                 className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-colors ${
                   isMe
-                    ? "bg-primary/5"
+                    ? "bg-white/5"
                     : "hover:bg-surface-hover"
                 }`}
               >
@@ -783,7 +777,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
                   <div className="flex flex-col min-w-0 gap-0.5">
                     <div className="flex items-center gap-1 min-w-0">
-                      <span className={`font-semibold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-primary" : "text-foreground"}`}>
+                      <span className={`font-semibold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-brand" : "text-foreground"}`}>
                         <StyledUsername username={player.username} nametagEffect={equippedNametags[player.id]} />
                       </span>
                       {/* Mobile: only 1 icon */}
@@ -796,7 +790,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
-                      <span className="text-[11px] font-semibold text-primary flex items-center gap-0.5">
+                      <span className="text-[11px] font-semibold text-brand flex items-center gap-0.5">
                         +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                       </span>
                     )}

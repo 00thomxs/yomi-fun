@@ -271,7 +271,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               
               {/* Price & Status */}
               <div className="flex items-center justify-between">
-                <span className="font-mono font-semibold text-primary flex items-center gap-1">
+                <span className="font-mono font-semibold text-brand flex items-center gap-1">
                   {item.price.toLocaleString()} <CurrencySymbol />
                 </span>
                 <div className="flex items-center gap-2">
@@ -575,7 +575,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                     type="checkbox"
                     checked={formData.is_available}
                     onChange={(e) => setFormData(prev => ({ ...prev, is_available: e.target.checked }))}
-                    className="w-4 h-4 rounded border-white/20 bg-black/40 text-primary focus:ring-primary"
+                    className="w-4 h-4 rounded border-white/20 bg-black/40 text-brand focus:ring-primary"
                   />
                   <span className="text-sm">Disponible à l'achat</span>
                 </label>
@@ -584,7 +584,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                     type="checkbox"
                     checked={formData.is_limited}
                     onChange={(e) => setFormData(prev => ({ ...prev, is_limited: e.target.checked }))}
-                    className="w-4 h-4 rounded border-white/20 bg-black/40 text-primary focus:ring-primary"
+                    className="w-4 h-4 rounded border-white/20 bg-black/40 text-brand focus:ring-primary"
                   />
                   <span className="text-sm">Édition limitée</span>
                 </label>

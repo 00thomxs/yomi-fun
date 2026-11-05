@@ -642,7 +642,7 @@ export function SeasonStatsClient({
                       <RankBadge rank={i + 1} />
                       <span className="font-medium truncate">{event.question}</span>
                     </div>
-                    <span className="font-mono text-primary flex items-center gap-0.5 ml-2">
+                    <span className="font-mono text-brand flex items-center gap-0.5 ml-2">
                       {(event.volume / 1000).toFixed(1)}K<CurrencySymbol className="w-2.5 h-2.5" />
                     </span>
                   </div>
