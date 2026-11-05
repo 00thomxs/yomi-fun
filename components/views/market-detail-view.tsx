@@ -627,8 +627,8 @@ function BinaryMarketContent({
                 <AreaChart data={chartDataWithTs}>
                   <defs>
                     <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.1} />
-                      <stop offset="100%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0} />
+                      <stop offset="0%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0.1} />
+                      <stop offset="100%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
@@ -668,7 +668,7 @@ function BinaryMarketContent({
                   <Area
                     type="linear"
                     dataKey="price"
-                    stroke="oklch(0.68 0.19 25)"
+                    stroke="oklch(0.58 0.22 25)"
                     strokeWidth={2}
                     fill="url(#chartGradientFullscreen)"
                     dot={false}
@@ -693,8 +693,8 @@ function BinaryMarketContent({
           <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.1} />
-                <stop offset="100%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0} />
+                <stop offset="0%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0.1} />
+                <stop offset="100%" stopColor="oklch(0.58 0.22 25)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
@@ -747,7 +747,7 @@ function BinaryMarketContent({
                 r={4}
                 shape={(props: any) => (
                   <g>
-                    <circle cx={props.cx} cy={props.cy} r={4} fill="oklch(0.68 0.19 25)" />
+                    <circle cx={props.cx} cy={props.cy} r={4} fill="oklch(0.58 0.22 25)" />
                   </g>
                 )}
               />
@@ -850,7 +850,7 @@ function BinaryMarketContent({
             <Area
               type="linear"
               dataKey="price"
-              stroke="oklch(0.68 0.19 25)"
+              stroke="oklch(0.58 0.22 25)"
               strokeWidth={2}
               fill="url(#chartGradientMonochrome)"
               dot={false}

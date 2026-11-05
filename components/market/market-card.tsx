@@ -11,7 +11,7 @@ type MarketCardProps = {
   onBet: (market: string, choice: string, amount: number, odds?: number) => void
 }
 
-const CHART_STROKE = "oklch(0.68 0.19 25)"
+const CHART_STROKE = "oklch(0.58 0.22 25)"
 
 function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: string }) {
   const resolved = market.status === 'resolved' || market.resolved_at

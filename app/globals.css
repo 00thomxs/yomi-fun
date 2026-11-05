@@ -22,11 +22,11 @@
   --destructive-foreground: oklch(0.95 0 0);
   --border: oklch(0.22 0 0);
   --input: oklch(0.12 0 0);
-  --ring: oklch(0.66 0.2 25);
+  --ring: oklch(0.58 0.22 25);
   --radius: 0.5rem;
   --surface-hover: oklch(0.12 0 0);
-  /* Signature red for text, lines and active states on dark; --primary stays the fill red of the logo */
-  --brand: oklch(0.68 0.19 25);
+  /* Same red as the logo (--primary), one step lighter so small text and lines stay readable on black */
+  --brand: oklch(0.58 0.22 25);
   --yes: oklch(0.76 0.15 163);
   --no: oklch(0.72 0.14 350);
   --chart-1: oklch(0.5 0.22 25);
