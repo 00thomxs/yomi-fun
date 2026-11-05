@@ -1,6 +1,13 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+// Balance writes need the service role: players can't update their own balance column.
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 import { revalidatePath } from 'next/cache'
 import { WELCOME_BONUS, DAILY_REWARDS_CONFIG, rollJackpot } from '@/lib/constants'
 
@@ -165,7 +172,7 @@ export async function claimWelcomeBonus(): Promise<WelcomeBonusResult> {
   // Give welcome bonus with CONDITIONAL check to prevent race conditions
   const newBalance = profile.balance + WELCOME_BONUS
   
-  const { error: updateError, data: updatedRows } = await supabase
+  const { error: updateError, data: updatedRows } = await supabaseAdmin
     .from('profiles')
     .update({
       balance: newBalance,
@@ -237,7 +244,7 @@ export async function claimDailyBonus(): Promise<DailyRewardResult> {
   const newBalance = profile.balance + amount
   const now = new Date().toISOString()
   
-  let updateQuery = supabase
+  let updateQuery = supabaseAdmin
     .from('profiles')
     .update({
       balance: newBalance,

@@ -175,7 +175,7 @@ export async function placeBet(
   
   // Note: PnL (total_won) is NOT updated here anymore. It's updated at resolution.
 
-  const { error: debitError } = await supabase
+  const { error: debitError } = await supabaseAdmin
     .from('profiles')
     .update({ 
       balance: profile.balance - amount, 
@@ -311,7 +311,7 @@ export async function placeBet(
 
   if (updateError) {
     // Rollback
-    await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: "Erreur mise à jour marché." }
   }
 
@@ -338,7 +338,7 @@ export async function placeBet(
 
   if (betError) {
     // Rollback hard
-    await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: `Erreur création pari: ${betError.message}` }
   }
 

@@ -87,6 +87,14 @@ supabase/migrations/add_storage_bucket.sql
 
 ---
 
+## ÉTAPE FINALE : Verrouillage sécurité (toujours en dernier)
+```
+supabase/migrations/lock_down_profiles_and_rpcs.sql
+```
+> Les joueurs ne peuvent plus modifier balance/role/stats, ni appeler reset_platform, increment_balance, etc.
+
+---
+
 ## ✅ Checklist Finale
 
 - [ ] schema.sql exécuté
