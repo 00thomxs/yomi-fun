@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import { EditProfileForm } from "@/components/profile/edit-profile-form"
 import { ChangePasswordForm } from "@/components/profile/change-password-form"
 import { DailyRewardWidget } from "@/components/daily-reward-widget"
+import { CardBackground, AvatarAura, parseBackgroundEffect, parseAuraEffect } from "@/components/card-cosmetics"
 import { getUserPnLHistory, PnlPoint } from "@/app/actions/history"
 import { BadgeDisplayCompact } from "@/components/ui/badge-display"
 import { getUserBadges, getEquippedBadges } from "@/app/actions/badges"
@@ -527,7 +528,13 @@ export function ProfileView() {
       </div>
 
       {/* Profile Header */}
-      <div className="relative rounded-lg bg-card border border-border p-4 sm:p-6">
+      <div className="relative overflow-hidden rounded-lg bg-card border border-border p-4 sm:p-6">
+        {/* Equipped card background behind the player sheet: the profile wears the player's own cosmetics */}
+        {equippedCosmetics.background && (
+          <div aria-hidden className="absolute inset-0 opacity-25 pointer-events-none [mask-image:linear-gradient(to_bottom,black,transparent)]">
+            <CardBackground effect={parseBackgroundEffect(equippedCosmetics.background.preview_data)} />
+          </div>
+        )}
         {/* Card Button - Top right on mobile only */}
         {seasonCard && (
           <div className="absolute top-3 right-3 sm:hidden">
@@ -538,24 +545,30 @@ export function ProfileView() {
           </div>
         )}
         
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <img
-            src={user?.avatar || "/images/default-avatar.svg"}
-            alt="User Avatar"
-            className="w-20 h-20 rounded-full border border-border object-cover shrink-0"
-          />
+        <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+          <div className="relative w-24 h-24 shrink-0">
+            {equippedCosmetics.aura && <AvatarAura effect={parseAuraEffect(equippedCosmetics.aura.preview_data)} />}
+            <img
+              src={user?.avatar || "/images/default-avatar.svg"}
+              alt="Avatar"
+              className="relative w-24 h-24 rounded-full border border-border object-cover"
+            />
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-primary text-primary-foreground text-[11px] font-semibold font-mono whitespace-nowrap">
+              Niv. {userStats.level}
+            </span>
+          </div>
           <div className="flex-1 space-y-4 w-full">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
-                  <h3 className="text-xl font-semibold tracking-tight">
+                  <h2 className="font-display text-2xl font-bold tracking-tight">
                     <StyledUsername 
                       key={equippedCosmetics.nametag?.id || 'default'}
                       username={user?.username || "Utilisateur"} 
                       nametagEffect={equippedCosmetics.nametag}
                       withAt
                     />
-                  </h3>
+                  </h2>
                   {/* Equipped Badges */}
                   {equippedBadges.length > 0 && (
                     <div className="flex items-center gap-1.5">
@@ -604,38 +617,38 @@ export function ProfileView() {
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Win Rate</p>
-                <p className="text-sm sm:text-base font-semibold font-mono">{userStats.winRate}%</p>
+                <p className="text-xs text-muted-foreground">Réussite</p>
+                <p className="text-base sm:text-lg font-semibold font-mono">{userStats.winRate}%</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Paris</p>
-                <p className="text-sm sm:text-base font-semibold font-mono">{userStats.totalBets}</p>
+                <p className="text-xs text-muted-foreground">Paris</p>
+                <p className="text-base sm:text-lg font-semibold font-mono">{userStats.totalBets}</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Streak</p>
-                <p className="text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-xs text-muted-foreground">Série</p>
+                <p className="text-base sm:text-lg font-semibold font-mono flex items-center justify-center sm:justify-start gap-1">
                   <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">PnL</p>
-                <p className={`text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-yes" : "text-no"}`}>
+                <p className="text-xs text-muted-foreground">PnL</p>
+                <p className={`text-base sm:text-lg font-semibold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-yes" : "text-no"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{formatCompactNumber(userStats.totalPnL)}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-xs text-muted-foreground flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Global
                 </p>
-                <p className="text-sm sm:text-base font-semibold font-mono text-brand">
+                <p className="text-base sm:text-lg font-semibold font-mono text-brand">
                   {globalRank ? `#${globalRank}` : '-'}
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-xs text-muted-foreground flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Saison
                 </p>
-                <p className="text-sm sm:text-base font-semibold font-mono text-amber-400">
+                <p className="text-base sm:text-lg font-semibold font-mono text-amber-400">
                   {seasonRank ? `#${seasonRank}` : 'N/A'}
                 </p>
               </div>
@@ -649,17 +662,18 @@ export function ProfileView() {
         <DailyRewardWidget />
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {/* Badges Button */}
       <button
         onClick={() => setShowBadgesModal(true)}
-        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/15 transition-all group"
+        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-surface-hover transition-colors group"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-            <Trophy className="w-5 h-5 text-amber-400" />
+          <div className="w-10 h-10 rounded-md border border-border flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-muted-foreground" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold">Mes Badges</p>
+            <p className="text-sm font-semibold">Mes badges</p>
             <p className="text-xs text-muted-foreground">
               {equippedBadges.length}/2 équipés
             </p>
@@ -680,11 +694,11 @@ export function ProfileView() {
       {/* Customization Button */}
       <button
         onClick={() => setShowCosmeticsModal(true)}
-        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/15 transition-all group"
+        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-surface-hover transition-colors group"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-            <Palette className="w-5 h-5 text-cyan-400" />
+          <div className="w-10 h-10 rounded-md border border-border flex items-center justify-center">
+            <Palette className="w-5 h-5 text-muted-foreground" />
           </div>
           <div className="text-left">
             <p className="text-sm font-semibold">Personnalisation</p>
@@ -697,17 +711,17 @@ export function ProfileView() {
           {(equippedCosmetics.background || equippedCosmetics.aura || equippedCosmetics.nametag) && (
             <div className="flex items-center gap-1.5">
               {equippedCosmetics.background && (
-                <span className="text-[11px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
                   Fond
                 </span>
               )}
               {equippedCosmetics.aura && (
-                <span className="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
                   Aura
                 </span>
               )}
               {equippedCosmetics.nametag && (
-                <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
                   Pseudo
                 </span>
               )}
@@ -716,6 +730,8 @@ export function ProfileView() {
           <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors shrink-0" />
         </div>
       </button>
+
+      </div>
 
       {/* Badges Modal */}
       {user && (
@@ -800,7 +816,7 @@ export function ProfileView() {
           </div>
         </div>
         {chartData.length === 0 ? (
-          <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+          <div className="h-[120px] flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <p className="text-sm">Aucun pari terminé</p>
               <p className="text-xs mt-1">Le graphique apparaîtra après ton premier pari résolu</p>
