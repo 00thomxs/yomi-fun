@@ -180,12 +180,12 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">Cosmétiques</h2>
+          <h2 className="text-xl font-semibold">Cosmétiques</h2>
           <p className="text-sm text-muted-foreground">{items.length} cosmétiques au total</p>
         </div>
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold text-sm hover:bg-primary/90 transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all"
         >
           <Plus className="w-4 h-4" />
           Ajouter
@@ -252,12 +252,12 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                     <TypeIcon className="w-4 h-4" style={{ color: typeInfo.color }} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm">{item.name}</h3>
+                    <h3 className="font-semibold text-sm">{item.name}</h3>
                     <p className="text-xs text-muted-foreground">{typeInfo.label}</p>
                   </div>
                 </div>
                 <div 
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${rarityInfo.bgColor} ${rarityInfo.borderColor} border`}
+                  className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${rarityInfo.bgColor} ${rarityInfo.borderColor} border`}
                   style={{ color: rarityInfo.color }}
                 >
                   {rarityInfo.label}
@@ -271,23 +271,23 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               
               {/* Price & Status */}
               <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-primary flex items-center gap-1">
+                <span className="font-mono font-semibold text-primary flex items-center gap-1">
                   {item.price.toLocaleString()} <CurrencySymbol />
                 </span>
                 <div className="flex items-center gap-2">
                   {item.is_limited && (
-                    <span className="flex items-center gap-1 text-[10px] text-amber-400 font-bold uppercase">
+                    <span className="flex items-center gap-1 text-[10px] text-amber-400 font-semibold uppercase">
                       <Clock className="w-3 h-3" />
                       Limité
                     </span>
                   )}
                   {item.is_available ? (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold uppercase">
+                    <span className="flex items-center gap-1 text-[10px] text-yes font-semibold uppercase">
                       <Check className="w-3 h-3" />
                       Actif
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase">
+                    <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-semibold uppercase">
                       <EyeOff className="w-3 h-3" />
                       Masqué
                     </span>
@@ -321,7 +321,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                 <button
                   onClick={() => handleDelete(item.id, item.name)}
                   disabled={isLoading}
-                  className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all"
+                  className="p-2 rounded-lg bg-no/10 hover:bg-no/20 text-no transition-all"
                   title="Supprimer"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -341,9 +341,9 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
       {/* Create/Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-card border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card">
-              <h3 className="font-bold text-lg">
+              <h3 className="font-semibold text-lg">
                 {editingItem ? 'Modifier le cosmétique' : 'Nouveau cosmétique'}
               </h3>
               <button
@@ -357,7 +357,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {/* Name */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Nom
                 </label>
                 <input
@@ -371,14 +371,14 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                       slug: editingItem ? prev.slug : generateSlug(e.target.value)
                     }))
                   }}
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50"
+                  className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50"
                   placeholder="Carbon Fiber"
                 />
               </div>
               
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Slug (URL)
                 </label>
                 <input
@@ -386,20 +386,20 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   required
                   value={formData.slug}
                   onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
+                  className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
                   placeholder="carbon-fiber"
                 />
               </div>
               
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Description (optionnel)
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 resize-none"
+                  className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50 resize-none"
                   rows={2}
                   placeholder="Description courte..."
                 />
@@ -408,13 +408,13 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Type & Rarity */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Type
                   </label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as CosmeticType }))}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50"
+                    className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50"
                   >
                     {(Object.keys(TYPE_INFO) as CosmeticType[]).map(type => (
                       <option key={type} value={type}>{TYPE_INFO[type].label}</option>
@@ -422,13 +422,13 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Rareté
                   </label>
                   <select
                     value={formData.rarity}
                     onChange={(e) => setFormData(prev => ({ ...prev, rarity: e.target.value as CosmeticRarity }))}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50"
+                    className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50"
                   >
                     {(Object.keys(RARITY_INFO) as CosmeticRarity[]).map(rarity => (
                       <option key={rarity} value={rarity}>{RARITY_INFO[rarity].label}</option>
@@ -440,7 +440,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Price & Sort Order */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Prix (Zeny)
                   </label>
                   <input
@@ -449,18 +449,18 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                     min={1}
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
+                    className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Ordre d'affichage
                   </label>
                   <input
                     type="number"
                     value={formData.sort_order}
                     onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
+                    className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono"
                   />
                 </div>
               </div>
@@ -468,7 +468,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Preview Data */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Données de preview (JSON)
                   </label>
                   <div className="flex gap-1">
@@ -559,7 +559,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                 <textarea
                   value={formData.preview_data}
                   onChange={(e) => setFormData(prev => ({ ...prev, preview_data: e.target.value }))}
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono resize-none"
+                  className="w-full bg-black/40 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary/50 font-mono resize-none"
                   rows={4}
                   placeholder='{"type": "pattern", "colors": ["#000", "#111"]}'
                 />
@@ -602,7 +602,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                 <button
                   type="submit"
                   disabled={loading === 'form'}
-                  className="flex-1 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading === 'form' && <Loader2 className="w-4 h-4 animate-spin" />}
                   {editingItem ? 'Mettre à jour' : 'Créer'}

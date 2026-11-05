@@ -322,43 +322,43 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
       )}
 
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <button
           onClick={onBack}
-          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all"
+          aria-label="Retour"
+          className="h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-md border border-border hover:bg-surface-hover transition-colors"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-[18px] h-[18px]" />
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <CategoryIcon className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{categoryDef?.label || market.category}</p>
+            <p className="text-xs text-muted-foreground">{categoryDef?.label || market.category}</p>
             {market.isLive ? (
               <>
-                <span className="text-muted-foreground">•</span>
-                <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
+                <span className="text-muted-foreground" aria-hidden>·</span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-primary font-medium"><span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />En direct</span>
               </>
             ) : (
               <>
-                <span className="text-muted-foreground">•</span>
+                <span className="text-muted-foreground" aria-hidden>·</span>
                 {market.status === 'resolved' || market.resolved_at ? (
-                <span className="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-xs font-medium text-muted-foreground">
                   Terminé
                 </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-xs font-medium text-amber-400">
                     En attente
                   </span>
                 )}
               </>
             )}
-            <span className="text-muted-foreground">•</span>
+            <span className="text-muted-foreground" aria-hidden>·</span>
             <span className="text-xs text-muted-foreground font-mono flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {market.countdown}
             </span>
           </div>
-          <h2 className="text-lg font-bold tracking-tight text-balance leading-tight">{market.question}</h2>
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-balance leading-tight">{market.question}</h1>
           {/* Season Badge */}
           {market.season && (
             <span
@@ -366,7 +366,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
               title={market.season.name}
             >
               <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider truncate">
+              <span className="text-[10px] font-semibold text-amber-400 uppercase tracking-wide truncate">
                 {market.season.name}
               </span>
             </span>
@@ -382,10 +382,11 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(marketUrl)}`
             window.open(twitterUrl, '_blank', 'noopener,noreferrer,width=600,height=400')
           }}
-          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 hover:bg-white/5 transition-all shrink-0"
+          className="h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-md border border-border hover:bg-surface-hover transition-colors"
           title="Partager sur X"
+          aria-label="Partager sur X"
         >
-          <Share2 className="w-5 h-5" />
+          <Share2 className="w-[18px] h-[18px]" />
         </button>
       </div>
 
@@ -547,15 +548,15 @@ function BinaryMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+          <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
         </div>
         ) : (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
-            <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+            <p className="text-amber-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
             <p className="text-amber-400/70 text-sm mt-1">L'event est terminé, le résultat sera bientôt annoncé</p>
@@ -565,8 +566,8 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="text-center space-y-2">
-        <p className="text-7xl font-bold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
-        <p className="text-sm font-medium text-muted-foreground tracking-tight uppercase">
+        <p className="text-7xl font-semibold tracking-tighter text-white font-mono">{Math.round(market.probability)}%</p>
+        <p className="text-sm font-medium text-muted-foreground tracking-tight">
           {market.probability >= 85
             ? "Quasi Certain"
             : market.probability >= 65
@@ -584,10 +585,10 @@ function BinaryMarketContent({
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-lg font-semibold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
               timeframe === tf
-                ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
-                : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
+                ? "bg-primary/10 text-primary border-primary/30"
+                : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
             }`}
           >
             {tf}
@@ -596,7 +597,7 @@ function BinaryMarketContent({
         </div>
         <button
           onClick={() => setIsFullscreen(true)}
-          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all cursor-pointer"
+          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:border-white/15 transition-all cursor-pointer"
           title="Plein écran"
         >
           <Maximize2 className="w-4 h-4" />
@@ -606,9 +607,9 @@ function BinaryMarketContent({
       {/* Fullscreen Modal */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-200">
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <div>
-              <h3 className="font-bold text-lg">{market.question}</h3>
+              <h3 className="font-semibold text-lg">{market.question}</h3>
               <p className="text-sm text-muted-foreground">{Math.round(market.probability)}% • {timeframe}</p>
             </div>
             <button
@@ -619,20 +620,16 @@ function BinaryMarketContent({
             </button>
           </div>
           <div className="flex-1 p-6 flex items-center justify-center">
-            <div className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
-              {/* Watermark */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
-                <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
-              </div>
+            <div className="w-full max-w-6xl bg-card rounded-lg border border-border p-6 relative">
               <ResponsiveContainer width="100%" height={500}>
                 <AreaChart data={chartDataWithTs}>
                   <defs>
                     <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#dc2626" stopOpacity={0.4} />
+                      <stop offset="0%" stopColor="#dc2626" stopOpacity={0.18} />
                       <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
                   <XAxis
                     dataKey="ts"
                     type="number"
@@ -680,7 +677,7 @@ function BinaryMarketContent({
                 <span className="text-sm text-muted-foreground">
                   {new Date(domain[0]).toLocaleDateString('fr-FR')} - {new Date(domain[1]).toLocaleDateString('fr-FR')}
                 </span>
-                <span className="text-lg font-bold font-mono">{Math.round(market.probability)}%</span>
+                <span className="text-lg font-semibold font-mono">{Math.round(market.probability)}%</span>
               </div>
             </div>
           </div>
@@ -688,21 +685,17 @@ function BinaryMarketContent({
       )}
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5 relative">
-        {/* Watermark center (always visible but very subtle) */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
-          <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
-        </div>
+      <div className="rounded-lg bg-card border border-border p-5 relative">
 
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#dc2626" stopOpacity={0.4} />
+                <stop offset="0%" stopColor="#dc2626" stopOpacity={0.18} />
                 <stop offset="100%" stopColor="#dc2626" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
             <XAxis
               dataKey="ts"
               type="number"
@@ -867,8 +860,8 @@ function BinaryMarketContent({
         </ResponsiveContainer>
 
         <div className="flex justify-end items-center gap-2 mt-2">
-          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-emerald-400" : "bg-rose-400"} animate-pulse`} />
-          <p className="text-sm font-bold text-white font-mono tracking-tight">
+          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-yes" : "bg-no"} animate-pulse`} />
+          <p className="text-sm font-semibold text-white font-mono tracking-tight">
             {Math.round(chartData[chartData.length - 1]?.price || 0)}%
           </p>
         </div>
@@ -876,24 +869,24 @@ function BinaryMarketContent({
 
       {/* Betting Panel */}
       {!isResolved && (
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+      <div className="rounded-lg bg-card border border-border p-5 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setBetChoice("YES")}
-            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all cursor-pointer ${
+            className={`py-3 px-4 rounded-lg font-semibold tracking-tight transition-all cursor-pointer ${
               betChoice === "YES"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+                ? "bg-yes/20 text-yes border border-yes/50"
+                : "bg-white/5 border border-border text-muted-foreground hover:border-white/15"
             }`}
           >
             OUI • <span className="font-mono">{Math.round(market.probability)}%</span>
           </button>
           <button
             onClick={() => setBetChoice("NO")}
-            className={`py-3 px-4 rounded-lg font-bold tracking-tight transition-all cursor-pointer ${
+            className={`py-3 px-4 rounded-lg font-semibold tracking-tight transition-all cursor-pointer ${
               betChoice === "NO"
-                  ? "bg-rose-500/30 text-rose-400 border border-rose-500"
-                : "bg-white/5 border border-border text-muted-foreground hover:border-white/20"
+                  ? "bg-no/30 text-no border border-no"
+                : "bg-white/5 border border-border text-muted-foreground hover:border-white/15"
             }`}
           >
               NON • <span className="font-mono">{Math.round(100 - market.probability)}%</span>
@@ -1072,15 +1065,15 @@ function MultiMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
-          <p className="text-red-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+          <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
         </div>
         ) : (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
-            <p className="text-amber-400 font-bold text-lg uppercase tracking-wider flex items-center justify-center gap-2">
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+            <p className="text-amber-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
             <p className="text-amber-400/70 text-sm mt-1">L'event est terminé, le résultat sera bientôt annoncé</p>
@@ -1097,8 +1090,8 @@ function MultiMarketContent({
               key={outcome.name}
               className={`p-4 rounded-xl border transition-all ${
                 betChoice === outcome.name
-                  ? "bg-white/5 border-white/30 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-                  : "bg-white/5 border-border hover:border-white/20"
+                  ? "bg-white/5 border-white/30"
+                  : "bg-white/5 border-border hover:border-white/15"
               }`}
             >
               <div className="flex items-center justify-between mb-3">
@@ -1106,7 +1099,7 @@ function MultiMarketContent({
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: outcome.color }} />
                   <span className="font-semibold">{outcome.name}</span>
                 </div>
-                <span className="text-2xl font-bold font-mono">{Math.round(outcome.probability)}%</span>
+                <span className="text-2xl font-semibold font-mono">{Math.round(outcome.probability)}%</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -1115,11 +1108,11 @@ function MultiMarketContent({
                     market.status === 'resolved' || market.resolved_at
                       ? // @ts-ignore
                     outcome.is_winner === true 
-                      ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' 
-                      : 'bg-rose-500/5 border-rose-500/30 text-rose-400'
+                      ? 'bg-yes/5 border-yes/30 text-yes' 
+                      : 'bg-no/5 border-no/30 text-no'
                       : 'bg-amber-500/5 border-amber-500/30 text-amber-400'
                   }`}>
-                    <span className="text-sm font-bold uppercase">
+                    <span className="text-sm font-semibold">
                       {market.status === 'resolved' || market.resolved_at ? (
                         // @ts-ignore
                         outcome.is_winner === true ? "Résultat : OUI" : "Résultat : NON"
@@ -1135,10 +1128,10 @@ function MultiMarketContent({
                     setBetChoice(outcome.name)
                     setBetType("OUI")
                   }}
-                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all cursor-pointer ${
+                  className={`py-2.5 px-4 rounded-lg font-semibold text-sm tracking-tight transition-all cursor-pointer ${
                     betChoice === outcome.name && betType === "OUI"
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50"
-                      : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                      ? "bg-yes/20 text-yes border border-yes/50"
+                      : "bg-yes/10 border border-yes/30 text-yes hover:bg-yes/20"
                   }`}
                 >
                       OUI • <span className="font-mono">{Math.round(outcome.probability)}%</span>
@@ -1148,10 +1141,10 @@ function MultiMarketContent({
                     setBetChoice(outcome.name)
                     setBetType("NON")
                   }}
-                  className={`py-2.5 px-4 rounded-lg font-bold text-sm tracking-tight transition-all cursor-pointer ${
+                  className={`py-2.5 px-4 rounded-lg font-semibold text-sm tracking-tight transition-all cursor-pointer ${
                     betChoice === outcome.name && betType === "NON"
-                          ? "bg-rose-500/30 text-rose-400 border border-rose-500"
-                      : "bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20"
+                          ? "bg-no/30 text-no border border-no"
+                      : "bg-no/10 border border-no/30 text-no hover:bg-no/20"
                   }`}
                 >
                       NON • <span className="font-mono">{Math.round(nonProb)}%</span>
@@ -1165,24 +1158,20 @@ function MultiMarketContent({
       </div>
 
       {/* Chart */}
-      <div className="rounded-xl bg-card border border-border p-5 relative">
-        {/* Watermark center (always visible but very subtle) */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
-          <span className="text-6xl font-black tracking-tighter">YOMI.fun</span>
-        </div>
+      <div className="rounded-lg bg-card border border-border p-5 relative">
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 relative z-10">
-          <p className="text-sm font-bold tracking-tight uppercase shrink-0">Evolution des cotes</p>
+          <p className="text-sm font-semibold tracking-tight shrink-0">Evolution des cotes</p>
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all whitespace-nowrap cursor-pointer border ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all whitespace-nowrap cursor-pointer border ${
                   timeframe === tf
-                    ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
-                    : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
                 }`}
               >
                 {tf}
@@ -1191,7 +1180,7 @@ function MultiMarketContent({
           </div>
             <button
               onClick={() => setIsFullscreen(true)}
-              className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/20 transition-all cursor-pointer"
+              className="p-1.5 rounded-lg bg-white/5 border border-border text-muted-foreground hover:text-foreground hover:border-white/15 transition-all cursor-pointer"
               title="Plein écran"
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -1202,9 +1191,9 @@ function MultiMarketContent({
         {/* Fullscreen Modal for Multi */}
         {isFullscreen && (
           <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-border">
               <div>
-                <h3 className="font-bold text-lg">{market.question}</h3>
+                <h3 className="font-semibold text-lg">{market.question}</h3>
                 <p className="text-sm text-muted-foreground">{market.outcomes.length} outcomes • {timeframe}</p>
               </div>
               <button
@@ -1215,14 +1204,10 @@ function MultiMarketContent({
               </button>
             </div>
             <div className="flex-1 p-6 flex items-center justify-center">
-              <div className="w-full max-w-6xl bg-card rounded-xl border border-border p-6 relative">
-                {/* Watermark */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] select-none">
-                  <span className="text-8xl font-black tracking-tighter">YOMI.fun</span>
-                </div>
+              <div className="w-full max-w-6xl bg-card rounded-lg border border-border p-6 relative">
                 <ResponsiveContainer width="100%" height={500}>
                   <LineChart data={chartDataWithTs}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
             <XAxis
                       dataKey="ts"
                       type="number"
@@ -1290,7 +1275,7 @@ function MultiMarketContent({
         )}
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartDataWithTs}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.06} />
             <XAxis
               dataKey="ts"
               type="number"
@@ -1322,7 +1307,7 @@ function MultiMarketContent({
                   const sortedPayload = [...payload].sort((a: any, b: any) => Number(b.value) - Number(a.value))
                   
                   return (
-                    <div className="bg-slate-900/95 border border-white/10 rounded-lg p-3 backdrop-blur-md shadow-xl">
+                    <div className="bg-slate-900/95 border border-border rounded-lg p-3 backdrop-blur shadow-xl">
                       <p className="text-[10px] text-slate-400 font-mono mb-2">{new Date(label).toLocaleString()}</p>
                       <div className="space-y-1">
                         {sortedPayload.map((entry: any) => (
@@ -1331,7 +1316,7 @@ function MultiMarketContent({
                               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                               <span className="text-xs font-medium text-slate-200">{entry.name}</span>
                             </div>
-                            <span className="text-xs font-bold font-mono text-white">{Math.round(Number(entry.value))}%</span>
+                            <span className="text-xs font-semibold font-mono text-white">{Math.round(Number(entry.value))}%</span>
                           </div>
                         ))}
                       </div>
@@ -1481,11 +1466,11 @@ function MultiMarketContent({
 
       {/* Betting Panel */}
       {!isResolved && (
-      <div className="rounded-xl bg-card border border-border p-5 space-y-4">
+      <div className="rounded-lg bg-card border border-border p-5 space-y-4">
         <div className="p-3 rounded-lg bg-white/5 border border-border">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Selection</p>
-          <p className="font-bold">
-            <span className={betType === "OUI" ? "text-emerald-400" : "text-rose-400"}>{betType}</span> - {betChoice}
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Selection</p>
+          <p className="font-semibold">
+            <span className={betType === "OUI" ? "text-yes" : "text-no"}>{betType}</span> - {betChoice}
           </p>
         </div>
 
@@ -1566,7 +1551,7 @@ function BetAmountInput({
   return (
     <>
       <div className="space-y-2">
-        <label className="text-xs text-muted-foreground font-medium tracking-wider uppercase">
+        <label className="text-xs text-muted-foreground font-medium tracking-wide uppercase">
           Montant (<CurrencySymbol />)
         </label>
         <input
@@ -1574,8 +1559,8 @@ function BetAmountInput({
           value={betAmount}
           onChange={(e) => setBetAmount(e.target.value)}
           placeholder="0"
-          className={`w-full px-4 py-3 rounded-lg bg-white/5 border outline-none text-lg font-bold tracking-tight font-mono transition-all ${
-            isOverLimit ? "border-rose-500 focus:border-rose-500 text-rose-400" : "border-border focus:border-white/30"
+          className={`w-full px-4 py-3 rounded-lg bg-white/5 border outline-none text-lg font-semibold tracking-tight font-mono transition-all ${
+            isOverLimit ? "border-no focus:border-no text-no" : "border-border focus:border-white/30"
           }`}
         />
       </div>
@@ -1583,41 +1568,41 @@ function BetAmountInput({
       <div className="flex gap-2">
         <button
           onClick={() => setBetAmount(Math.min(500, maxUserAffordable).toString())}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/15 transition-all cursor-pointer"
         >
           +500
         </button>
         <button
           onClick={() => setBetAmount(Math.min(2000, maxUserAffordable).toString())}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/15 transition-all cursor-pointer"
         >
           +2K
         </button>
         <button
           onClick={() => setBetAmount(Math.min(10000, maxUserAffordable).toString())}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/15 transition-all cursor-pointer"
         >
           +10K
         </button>
         <button
           onClick={() => setBetAmount(Math.min(25000, maxUserAffordable).toString())}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight font-mono hover:border-white/15 transition-all cursor-pointer"
         >
           +25K
         </button>
         <button
           onClick={() => setBetAmount(maxUserAffordable.toString())}
-          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight uppercase text-white hover:border-white/20 transition-all cursor-pointer"
+          className="px-3 py-2 rounded-lg bg-white/5 border border-border text-sm font-semibold tracking-tight text-white hover:border-white/15 transition-all cursor-pointer"
         >
           Max autorisé
         </button>
       </div>
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Mise min: <span className="font-mono font-bold text-white/80">{MIN_BET}</span></span>
+        <span>Mise min: <span className="font-mono font-semibold text-white/80">{MIN_BET}</span></span>
         <span>
           Max event:{" "}
-          <span className="font-mono font-bold text-white/80">
+          <span className="font-mono font-semibold text-white/80">
             {maxAmountAllowed.toLocaleString('fr-FR')}
           </span>{" "}
           <CurrencySymbol />
@@ -1626,23 +1611,23 @@ function BetAmountInput({
 
       {betAmount && (
         isOverLimit ? (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
+          <div className="p-3 rounded-lg bg-no/10 border border-no/30">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs text-rose-400 uppercase tracking-wider font-bold">Gain trop élevé</p>
+                <p className="text-xs text-no uppercase tracking-wide font-semibold">Gain trop élevé</p>
                 <p className="text-xs text-rose-300 mt-1">
                   Le gain potentiel ({potentialGain.toLocaleString()}) dépasse la limite de sécurité (100M).
                 </p>
               </div>
-              <span className="text-rose-400 font-mono font-bold text-lg">
+              <span className="text-no font-mono font-semibold text-lg">
                 &gt; 100M
               </span>
             </div>
           </div>
         ) : (
         <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Gain potentiel</p>
-          <p className="text-2xl font-bold text-primary tracking-tight font-mono">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Gain potentiel</p>
+          <p className="text-2xl font-semibold text-primary tracking-tight font-mono">
               {potentialGain} <CurrencySymbol />
           </p>
         </div>
@@ -1651,7 +1636,7 @@ function BetAmountInput({
 
       {isBelowMin ? (
         <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-          <p className="text-xs text-amber-400 uppercase tracking-wider font-bold">Mise trop faible</p>
+          <p className="text-xs text-amber-400 uppercase tracking-wide font-semibold">Mise trop faible</p>
           <p className="text-xs text-muted-foreground mt-1">
             Mise minimum: {MIN_BET.toLocaleString('fr-FR')} <CurrencySymbol />
           </p>
@@ -1659,8 +1644,8 @@ function BetAmountInput({
       ) : null}
 
       {isAboveAllowed ? (
-        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
-          <p className="text-xs text-rose-400 uppercase tracking-wider font-bold">Mise trop élevée</p>
+        <div className="p-3 rounded-lg bg-no/10 border border-no/30">
+          <p className="text-xs text-no uppercase tracking-wide font-semibold">Mise trop élevée</p>
           <p className="text-xs text-muted-foreground mt-1">
             Max pour cet event: {maxAmountAllowed.toLocaleString('fr-FR')} <CurrencySymbol />
           </p>
@@ -1670,7 +1655,7 @@ function BetAmountInput({
       {betAmount && Number.parseFloat(betAmount) > userBalance ? (
         <Link
           href="/shop/buy-zeny"
-          className="w-full py-4 rounded-lg bg-amber-500 text-black font-bold text-lg tracking-tight uppercase hover:bg-amber-400 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+          className="w-full py-4 rounded-lg bg-amber-500 text-black font-semibold text-lg tracking-tight hover:bg-amber-400 transition-all cursor-pointer flex items-center justify-center gap-2"
         >
           <Plus className="w-5 h-5" />
           Recharger (Solde insuffisant)
@@ -1679,7 +1664,7 @@ function BetAmountInput({
         <button
           onClick={handlePlaceBet}
           disabled={!betAmount || isOverLimit || isBelowMin || isAboveAllowed}
-          className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-semibold text-lg tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Confirmer le pari
         </button>

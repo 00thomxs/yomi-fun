@@ -78,7 +78,7 @@ export function LowBalancePopup({ eventName, closesAt }: LowBalancePopupProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-card border border-border rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="relative bg-card border border-border rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Close button */}
         <button
           onClick={handleDismiss}
@@ -95,7 +95,7 @@ export function LowBalancePopup({ eventName, closesAt }: LowBalancePopupProps) {
 
           {/* Title */}
           <div>
-            <h2 className="text-xl font-bold tracking-tight">
+            <h2 className="text-xl font-semibold tracking-tight">
               Solde insuffisant
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -106,13 +106,13 @@ export function LowBalancePopup({ eventName, closesAt }: LowBalancePopupProps) {
           {/* Balance display */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-border">
             <span className="text-xs text-muted-foreground">Solde:</span>
-            <span className="font-bold font-mono text-white flex items-center gap-0.5">
+            <span className="font-semibold font-mono text-white flex items-center gap-0.5">
               {userBalance}<CurrencySymbol className="w-3 h-3" />
             </span>
           </div>
 
           {/* Event info */}
-          <div className="bg-white/5 rounded-xl p-3 border border-border text-left">
+          <div className="bg-white/5 rounded-lg p-3 border border-border text-left">
             <p className="font-medium text-white text-sm line-clamp-2">{eventName}</p>
             <div className="flex items-center gap-2 mt-2 text-amber-400">
               <Clock className="w-4 h-4" />
@@ -127,7 +127,7 @@ export function LowBalancePopup({ eventName, closesAt }: LowBalancePopupProps) {
             <Link
               href="/shop#packs"
               onClick={handleDismiss}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all"
             >
               <Zap className="w-4 h-4" />
               Recharger

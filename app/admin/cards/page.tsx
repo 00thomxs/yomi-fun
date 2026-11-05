@@ -87,17 +87,17 @@ export default function AdminCardsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Cartes Profil</h1>
+        <h1 className="text-2xl font-semibold">Cartes Profil</h1>
         <p className="text-muted-foreground">Gestion des cartes profil TCG</p>
       </div>
 
-      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+      <div className="rounded-lg bg-card border border-border p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
             <CreditCard className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-bold">Attribuer les cartes retroactives</h2>
+            <h2 className="font-semibold">Attribuer les cartes retroactives</h2>
             <p className="text-sm text-muted-foreground">
               Crée les cartes pour tous les joueurs ayant participé aux saisons passées
             </p>
@@ -107,7 +107,7 @@ export default function AdminCardsPage() {
         <button
           onClick={handleAwardCards}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold transition-all disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -123,14 +123,14 @@ export default function AdminCardsPage() {
         </button>
 
         {result && (
-          <div className={`p-4 rounded-lg border ${result.success ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+          <div className={`p-4 rounded-lg border ${result.success ? 'bg-yes/10 border-yes/30' : 'bg-no/10 border-no/30'}`}>
             <div className="flex items-center gap-2 mb-2">
               {result.success ? (
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <CheckCircle className="w-5 h-5 text-yes" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-rose-500" />
+                <AlertCircle className="w-5 h-5 text-no" />
               )}
-              <p className={`font-bold ${result.success ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <p className={`font-semibold ${result.success ? 'text-yes' : 'text-no'}`}>
                 {result.message}
               </p>
             </div>
@@ -146,13 +146,13 @@ export default function AdminCardsPage() {
       </div>
 
       {/* Beta Cards Section */}
-      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+      <div className="rounded-lg bg-card border border-border p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
             <Star className="w-6 h-6 text-red-500" />
           </div>
           <div>
-            <h2 className="font-bold">Carte Beta Testeur</h2>
+            <h2 className="font-semibold">Carte Beta Testeur</h2>
             <p className="text-sm text-muted-foreground">
               Attribue une carte spéciale rouge avec "Beta Testeur" en doré à tous les utilisateurs actuels
             </p>
@@ -162,7 +162,7 @@ export default function AdminCardsPage() {
         <button
           onClick={handleAwardBetaCards}
           disabled={loadingBeta}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-all disabled:opacity-50"
         >
           {loadingBeta ? (
             <>
@@ -178,14 +178,14 @@ export default function AdminCardsPage() {
         </button>
 
         {betaResult && (
-          <div className={`p-4 rounded-lg border ${betaResult.success ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+          <div className={`p-4 rounded-lg border ${betaResult.success ? 'bg-yes/10 border-yes/30' : 'bg-no/10 border-no/30'}`}>
             <div className="flex items-center gap-2">
               {betaResult.success ? (
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <CheckCircle className="w-5 h-5 text-yes" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-rose-500" />
+                <AlertCircle className="w-5 h-5 text-no" />
               )}
-              <p className={`font-bold ${betaResult.success ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <p className={`font-semibold ${betaResult.success ? 'text-yes' : 'text-no'}`}>
                 {betaResult.message}
               </p>
             </div>
@@ -194,13 +194,13 @@ export default function AdminCardsPage() {
       </div>
 
       {/* Season Cards Section - Award Holo/Diamond/etc. based on ranking */}
-      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
+      <div className="rounded-lg bg-card border border-border p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <Trophy className="w-6 h-6 text-amber-500" />
           </div>
           <div>
-            <h2 className="font-bold">Cartes de Saison (Holo/Diamond/Gold...)</h2>
+            <h2 className="font-semibold">Cartes de Saison (Holo/Diamond/Gold...)</h2>
             <p className="text-sm text-muted-foreground">
               Attribue les cartes aux gagnants des saisons passées selon leur classement final
             </p>
@@ -210,7 +210,7 @@ export default function AdminCardsPage() {
         <button
           onClick={handleAwardSeasonCards}
           disabled={loadingSeasonCards}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-all disabled:opacity-50"
         >
           {loadingSeasonCards ? (
             <>
@@ -226,14 +226,14 @@ export default function AdminCardsPage() {
         </button>
 
         {seasonCardsResult && (
-          <div className={`p-4 rounded-lg border ${seasonCardsResult.success ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
+          <div className={`p-4 rounded-lg border ${seasonCardsResult.success ? 'bg-yes/10 border-yes/30' : 'bg-no/10 border-no/30'}`}>
             <div className="flex items-center gap-2 mb-2">
               {seasonCardsResult.success ? (
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <CheckCircle className="w-5 h-5 text-yes" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-rose-500" />
+                <AlertCircle className="w-5 h-5 text-no" />
               )}
-              <p className={`font-bold ${seasonCardsResult.success ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <p className={`font-semibold ${seasonCardsResult.success ? 'text-yes' : 'text-no'}`}>
                 {seasonCardsResult.message}
               </p>
             </div>
@@ -248,8 +248,8 @@ export default function AdminCardsPage() {
         )}
       </div>
 
-      <div className="rounded-xl bg-card border border-border p-6 space-y-4">
-        <h3 className="font-bold">Informations sur les tiers</h3>
+      <div className="rounded-lg bg-card border border-border p-6 space-y-4">
+        <h3 className="font-semibold">Informations sur les tiers</h3>
         <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
           {[
             { name: 'Fer', color: '#71717a', desc: '0-10K PnL' },
@@ -267,7 +267,7 @@ export default function AdminCardsPage() {
                 border: `1px solid ${tier.color}30` 
               }}
             >
-              <p className="font-bold" style={{ color: tier.color }}>{tier.name}</p>
+              <p className="font-semibold" style={{ color: tier.color }}>{tier.name}</p>
               <p className="text-xs text-muted-foreground">{tier.desc}</p>
             </div>
           ))}

@@ -187,16 +187,16 @@ export function ShopView({ initialItems }: ShopViewProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <h2 className="text-2xl font-bold tracking-tight uppercase">Shop</h2>
+      <h2 className="text-2xl font-semibold tracking-tight">Shop</h2>
 
       {/* Main Category Tabs */}
       <div className="flex gap-2">
         <button
           onClick={() => setCategory('cosmetics')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all ${
             category === 'cosmetics'
               ? 'bg-white/10 text-white border border-white/20'
-              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
+              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/15'
           }`}
           >
           <Palette className="w-4 h-4" />
@@ -204,10 +204,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
         </button>
         <button
           onClick={() => setCategory('zeny')}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all ${
             category === 'zeny'
-              ? 'bg-primary text-white shadow-lg shadow-primary/20'
-              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/20'
+              ? 'bg-primary text-white shadow-lg '
+              : 'bg-card border border-border text-muted-foreground hover:text-white hover:border-white/15'
           }`}
           >
           <Coins className="w-4 h-4" />
@@ -219,7 +219,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {category === 'zeny' && (
         <div className="space-y-6">
           <div className="text-center space-y-2">
-            <h3 className="text-xl font-bold">Recharge tes <span className="text-primary">Zeny</span></h3>
+            <h3 className="text-xl font-semibold">Recharge tes <span className="text-primary">Zeny</span></h3>
             <p className="text-sm text-muted-foreground max-w-lg mx-auto">
               Plus le pack est gros, plus le bonus est important !
             </p>
@@ -239,7 +239,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   }`}
                 >
                   {theme.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-bold uppercase tracking-wider text-white">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-semibold uppercase tracking-wide text-white">
                       Populaire
                     </div>
                   )}
@@ -248,16 +248,16 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mx-auto mb-3`}>
                       <div className={theme.iconColor}>{getZenyIcon(pack.id)}</div>
                     </div>
-                    <h4 className="font-bold uppercase tracking-tight">{pack.name}</h4>
-                    <div className="text-2xl font-bold mt-1">{pack.price}€</div>
+                    <h4 className="font-semibold uppercase tracking-tight">{pack.name}</h4>
+                    <div className="text-2xl font-semibold mt-1">{pack.price}€</div>
                   </div>
                   
                   <div className="p-3 rounded-lg bg-black/40 text-center mb-4">
-                    <div className={`text-xl font-bold ${theme.accent} flex items-center justify-center gap-1`}>
+                    <div className={`text-xl font-semibold ${theme.accent} flex items-center justify-center gap-1`}>
                       {pack.amount.toLocaleString()} <CurrencySymbol />
                     </div>
                     {pack.bonus > 0 ? (
-                      <div className="text-xs font-bold text-emerald-400 mt-1">
+                      <div className="text-xs font-semibold text-yes mt-1">
                         +{pack.bonus.toLocaleString()} offerts
                       </div>
                     ) : (
@@ -268,10 +268,10 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   <button
                     onClick={() => handleBuyZeny(pack.id)}
                     disabled={!!loadingZeny}
-                    className={`w-full py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all ${
+                    className={`w-full py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all ${
                       theme.popular
                         ? 'bg-primary text-white hover:bg-primary/90'
-                        : 'bg-white/5 hover:bg-white/10 border border-white/5'
+                        : 'bg-white/5 hover:bg-white/10 border border-border'
                     }`}
                   >
                     {loadingZeny === pack.id ? (
@@ -324,13 +324,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
           {/* Packs Coming Soon */}
           {cosmeticCategory === 'packs' && (
-            <div className="rounded-xl bg-card border border-border p-12 text-center">
+            <div className="rounded-lg bg-card border border-border p-12 text-center">
               <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30" />
-              <h3 className="text-xl font-bold mb-2">Packs & Bundles</h3>
+              <h3 className="text-xl font-semibold mb-2">Packs & Bundles</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
                 Des offres groupées avec des réductions exclusives arrivent bientôt !
               </p>
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold">
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold">
                 <Clock className="w-4 h-4" />
                 Bientôt disponible
               </div>
@@ -352,13 +352,13 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     onClick={() => setPreviewItem(item)}
                     className={`relative rounded-xl border p-4 cursor-pointer transition-all hover:scale-[1.02] ${
                       isOwned 
-                        ? 'bg-emerald-500/5 border-emerald-500/30' 
-                        : 'bg-card border-border hover:border-white/20'
+                        ? 'bg-yes/5 border-yes/30' 
+                        : 'bg-card border-border hover:border-white/15'
                     }`}
                   >
                     {/* Rarity Badge */}
                     <div 
-                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[9px] font-bold uppercase"
+                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[9px] font-semibold uppercase"
                       style={{ 
                         background: `${rarityInfo.color}15`, 
                         border: `1px solid ${rarityInfo.color}40`,
@@ -370,7 +370,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     
                     {/* Limited Badge */}
                     {item.is_limited && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-bold">
+                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-semibold">
                         <Clock className="w-2.5 h-2.5" />
                         Limité
                       </div>
@@ -391,7 +391,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     
                     {/* Info */}
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-sm truncate">{item.name}</h4>
+                      <h4 className="font-semibold text-sm truncate">{item.name}</h4>
                     </div>
                     <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-2">
                       {item.type === 'background' && <><Palette className="w-3 h-3" /> Fond</>}
@@ -405,12 +405,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     {/* Price / Owned */}
                     <div className="flex items-center justify-between">
                       {isOwned ? (
-                        <span className="flex items-center gap-1 text-emerald-400 text-sm font-bold">
+                        <span className="flex items-center gap-1 text-yes text-sm font-semibold">
                           <Check className="w-4 h-4" />
                           Possédé
                         </span>
                       ) : (
-                        <span className={`font-mono font-bold text-sm flex items-center gap-1 ${canAfford ? 'text-primary' : 'text-rose-400'}`}>
+                        <span className={`font-mono font-semibold text-sm flex items-center gap-1 ${canAfford ? 'text-primary' : 'text-no'}`}>
                           {item.price.toLocaleString()} <CurrencySymbol />
                         </span>
                       )}
@@ -437,14 +437,14 @@ export function ShopView({ initialItems }: ShopViewProps) {
           onClick={() => setPreviewItem(null)}
         >
           <div 
-            className="bg-card border border-border rounded-xl w-full max-w-md p-6 space-y-4"
+            className="bg-card border border-border rounded-lg w-full max-w-md p-6 space-y-4"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
                 <div 
-                  className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase mb-2"
+                  className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase mb-2"
                   style={{ 
                     background: `${RARITY_INFO[previewItem.rarity].color}15`, 
                     border: `1px solid ${RARITY_INFO[previewItem.rarity].color}40`,
@@ -453,7 +453,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 >
                   {RARITY_INFO[previewItem.rarity].label}
               </div>
-                <h3 className="text-xl font-bold">{previewItem.name}</h3>
+                <h3 className="text-xl font-semibold">{previewItem.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{previewItem.description}</p>
               </div>
               <button
@@ -466,7 +466,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
             
             {/* Preview Placeholder */}
             <div 
-              className="aspect-video rounded-xl flex items-center justify-center"
+              className="aspect-video rounded-lg flex items-center justify-center"
               style={{ 
                 background: `${RARITY_INFO[previewItem.rarity].color}10`,
                 border: `1px solid ${RARITY_INFO[previewItem.rarity].color}30`
@@ -481,9 +481,9 @@ export function ShopView({ initialItems }: ShopViewProps) {
             </div>
 
             {/* Price */}
-            <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-white/10">
+            <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-border">
               <span className="text-sm font-medium">Prix</span>
-              <span className="text-xl font-bold text-primary flex items-center gap-1">
+              <span className="text-xl font-semibold text-primary flex items-center gap-1">
                 {previewItem.price.toLocaleString()} <CurrencySymbol />
               </span>
             </div>
@@ -499,7 +499,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               {ownedIds.has(previewItem.id) ? (
                 <button
                   disabled
-                  className="flex-1 py-3 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-yes/20 text-yes font-semibold flex items-center justify-center gap-2"
                 >
                   <Check className="w-4 h-4" />
                   Possédé
@@ -508,7 +508,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 <button
                   onClick={() => handlePurchaseCosmetic(previewItem)}
                   disabled={isPurchasing === previewItem.id || userBalance < previewItem.price}
-                  className="flex-1 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isPurchasing === previewItem.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -534,7 +534,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
           onClick={() => setPurchasedItem(null)}
         >
           <div 
-            className="bg-card border rounded-2xl w-full max-w-sm p-6 text-center space-y-5 animate-in zoom-in-95"
+            className="bg-card border rounded-lg w-full max-w-sm p-6 text-center space-y-5 animate-in zoom-in-95"
             style={{ 
               borderColor: `${RARITY_INFO[purchasedItem.rarity].color}50`,
               boxShadow: `0 0 60px ${RARITY_INFO[purchasedItem.rarity].color}20`
@@ -554,12 +554,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
             
             {/* Title */}
             <div>
-              <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">Achat réussi !</p>
-              <h3 className="text-2xl font-black" style={{ color: RARITY_INFO[purchasedItem.rarity].color }}>
+              <p className="text-xs font-semibold text-yes uppercase tracking-wide mb-2">Achat réussi !</p>
+              <h3 className="text-2xl font-semibold" style={{ color: RARITY_INFO[purchasedItem.rarity].color }}>
                 {purchasedItem.name}
               </h3>
               <div 
-                className="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                className="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
                 style={{ 
                   background: `${RARITY_INFO[purchasedItem.rarity].color}15`, 
                   color: RARITY_INFO[purchasedItem.rarity].color 
@@ -578,7 +578,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               <button
                 onClick={handleEquipPurchased}
                 disabled={isEquipping}
-                className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                 style={{ 
                   background: RARITY_INFO[purchasedItem.rarity].color,
                   color: purchasedItem.rarity === 'legendary' || purchasedItem.rarity === 'common' ? '#000' : '#fff'
@@ -595,7 +595,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
               </button>
               <button
                 onClick={() => setPurchasedItem(null)}
-                className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 font-medium transition-all text-muted-foreground"
+                className="w-full py-3 rounded-lg bg-white/5 hover:bg-white/10 font-medium transition-all text-muted-foreground"
               >
                 Plus tard
               </button>

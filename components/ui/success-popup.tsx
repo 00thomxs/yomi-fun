@@ -22,9 +22,9 @@ const config = {
     icon: ShoppingBag,
     title: "Achat Confirmé !",
     subtitle: "Ta commande a bien été enregistrée",
-    color: "text-emerald-400",
-    bgGlow: "bg-emerald-500/20",
-    borderColor: "border-emerald-500/30",
+    color: "text-yes",
+    bgGlow: "bg-yes/20",
+    borderColor: "border-yes/30",
   },
   "bet-won": {
     icon: Trophy,
@@ -82,7 +82,7 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
             >
               <Sparkles 
                 className={`w-4 h-4 ${
-                  i % 3 === 0 ? 'text-amber-400' : i % 3 === 1 ? 'text-rose-400' : 'text-emerald-400'
+                  i % 3 === 0 ? 'text-amber-400' : i % 3 === 1 ? 'text-no' : 'text-yes'
                 }`} 
               />
             </div>
@@ -91,7 +91,7 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
       )}
 
       {/* Modal */}
-      <div className={`relative bg-card border ${cfg.borderColor} rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300`}>
+      <div className={`relative bg-card border ${cfg.borderColor} rounded-lg p-8 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300`}>
         {/* Close button */}
         <button
           onClick={onClose}
@@ -112,7 +112,7 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
 
           {/* Title */}
           <div>
-            <h2 className={`text-2xl font-black tracking-tight ${cfg.color}`}>
+            <h2 className={`text-2xl font-semibold tracking-tight ${cfg.color}`}>
               {cfg.title}
             </h2>
             <p className="text-muted-foreground text-sm mt-1">
@@ -122,16 +122,16 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
 
           {/* Dynamic content based on type */}
           {type === "purchase" && data?.itemName && (
-            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <div className="bg-white/5 rounded-lg p-4 border border-border">
               <p className="text-sm text-muted-foreground">Article commandé</p>
-              <p className="font-bold text-white">{data.itemName}</p>
+              <p className="font-semibold text-white">{data.itemName}</p>
             </div>
           )}
 
           {type === "bet-won" && data?.winnings && (
-            <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20">
+            <div className="bg-amber-500/10 rounded-lg p-4 border border-amber-500/20">
               <p className="text-sm text-amber-400/70">Gains</p>
-              <p className="text-3xl font-black text-amber-400 font-mono flex items-center justify-center gap-1">
+              <p className="text-3xl font-semibold text-amber-400 font-mono flex items-center justify-center gap-1">
                 +{data.winnings.toLocaleString()}<CurrencySymbol className="w-6 h-6" />
               </p>
             </div>
@@ -140,11 +140,11 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
           {/* CTA Button */}
           <button
             onClick={onClose}
-            className={`w-full py-3 px-6 rounded-xl font-bold transition-all ${
+            className={`w-full py-3 px-6 rounded-xl font-semibold transition-all ${
               type === "bet-won" 
                 ? "bg-amber-500 hover:bg-amber-400 text-black" 
                 : type === "purchase"
-                  ? "bg-emerald-500 hover:bg-emerald-400 text-black"
+                  ? "bg-yes hover:bg-yes text-black"
                   : "bg-blue-500 hover:bg-blue-400 text-white"
             }`}
           >

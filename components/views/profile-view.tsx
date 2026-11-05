@@ -463,9 +463,9 @@ export function ProfileView() {
       {/* Settings Overlay */}
       {showSettings && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-card border border-border rounded-lg w-full max-w-md shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-border bg-white/5">
-              <h3 className="font-bold">Paramètres</h3>
+              <h3 className="font-semibold">Paramètres</h3>
               <button onClick={toggleSettings} className="p-1 hover:bg-white/10 rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
@@ -481,7 +481,7 @@ export function ProfileView() {
                     <div className="flex items-center gap-3">
                       <UserCog className="w-5 h-5 text-primary" />
                       <div className="text-left">
-                        <p className="font-bold text-sm">Modifier le profil</p>
+                        <p className="font-semibold text-sm">Modifier le profil</p>
                         <p className="text-xs text-muted-foreground">Avatar, Pseudo, Notifications</p>
                       </div>
                     </div>
@@ -495,7 +495,7 @@ export function ProfileView() {
                     <div className="flex items-center gap-3">
                       <Key className="w-5 h-5 text-primary" />
                       <div className="text-left">
-                        <p className="font-bold text-sm">Sécurité</p>
+                        <p className="font-semibold text-sm">Sécurité</p>
                         <p className="text-xs text-muted-foreground">Changer le mot de passe</p>
                       </div>
                     </div>
@@ -517,17 +517,17 @@ export function ProfileView() {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight uppercase">Profil</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Profil</h2>
         <button
           onClick={toggleSettings}
-          className="p-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
+          className="p-2 rounded-lg bg-card border border-border hover:border-white/15 transition-all cursor-pointer"
         >
           <Settings className="w-5 h-5" />
         </button>
       </div>
 
       {/* Profile Header */}
-      <div className="relative rounded-xl bg-card border border-border p-4 sm:p-6">
+      <div className="relative rounded-lg bg-card border border-border p-4 sm:p-6">
         {/* Card Button - Top right on mobile only */}
         {seasonCard && (
           <div className="absolute top-3 right-3 sm:hidden">
@@ -548,7 +548,7 @@ export function ProfileView() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3">
               <div className="text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
-                  <h3 className="text-xl font-bold tracking-tight">
+                  <h3 className="text-xl font-semibold tracking-tight">
                     <StyledUsername 
                       key={equippedCosmetics.nametag?.id || 'default'}
                       username={user?.username || "Utilisateur"} 
@@ -593,8 +593,8 @@ export function ProfileView() {
                   )}
                 </div>
                 <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider text-center">Balance</p>
-                  <p className="text-xl font-bold text-center">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide text-center">Balance</p>
+                  <p className="text-xl font-semibold text-center">
                     <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
                     <CurrencySymbol className="text-primary" />
                   </p>
@@ -604,38 +604,38 @@ export function ProfileView() {
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Win Rate</p>
-                <p className="text-sm sm:text-base font-bold font-mono">{userStats.winRate}%</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Win Rate</p>
+                <p className="text-sm sm:text-base font-semibold font-mono">{userStats.winRate}%</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Paris</p>
-                <p className="text-sm sm:text-base font-bold font-mono">{userStats.totalBets}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Paris</p>
+                <p className="text-sm sm:text-base font-semibold font-mono">{userStats.totalBets}</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Streak</p>
-                <p className="text-sm sm:text-base font-bold font-mono flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Streak</p>
+                <p className="text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-1">
                   <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">PnL</p>
-                <p className={`text-sm sm:text-base font-bold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">PnL</p>
+                <p className={`text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-yes" : "text-no"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{formatCompactNumber(userStats.totalPnL)}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Global
                 </p>
-                <p className="text-sm sm:text-base font-bold font-mono text-primary">
+                <p className="text-sm sm:text-base font-semibold font-mono text-primary">
                   {globalRank ? `#${globalRank}` : '-'}
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Saison
                 </p>
-                <p className="text-sm sm:text-base font-bold font-mono text-amber-400">
+                <p className="text-sm sm:text-base font-semibold font-mono text-amber-400">
                   {seasonRank ? `#${seasonRank}` : 'N/A'}
                 </p>
               </div>
@@ -652,14 +652,14 @@ export function ProfileView() {
       {/* Badges Button */}
       <button
         onClick={() => setShowBadgesModal(true)}
-        className="w-full rounded-xl bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/20 transition-all group"
+        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/15 transition-all group"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <Trophy className="w-5 h-5 text-amber-400" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-bold">Mes Badges</p>
+            <p className="text-sm font-semibold">Mes Badges</p>
             <p className="text-xs text-muted-foreground">
               {equippedBadges.length}/2 équipés
             </p>
@@ -680,14 +680,14 @@ export function ProfileView() {
       {/* Customization Button */}
       <button
         onClick={() => setShowCosmeticsModal(true)}
-        className="w-full rounded-xl bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/20 transition-all group"
+        className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-card/80 hover:border-white/15 transition-all group"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
             <Palette className="w-5 h-5 text-cyan-400" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-bold">Personnalisation</p>
+            <p className="text-sm font-semibold">Personnalisation</p>
             <p className="text-xs text-muted-foreground">
               Cosmétiques de carte
             </p>
@@ -778,10 +778,10 @@ export function ProfileView() {
       )}
 
       {/* P&L Chart */}
-      <div className="rounded-xl bg-card border border-border p-5">
+      <div className="rounded-lg bg-card border border-border p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-sm font-bold tracking-tight uppercase">Profit & Loss</p>
+            <p className="text-sm font-semibold tracking-tight">Profit & Loss</p>
             <p className="text-xs text-muted-foreground">
               Performance {pnlTimeframe === "1J" ? "24 heures" : pnlTimeframe === "1S" ? "7 jours" : pnlTimeframe === "1M" ? "30 jours" : "totale"}
             </p>
@@ -791,10 +791,10 @@ export function ProfileView() {
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all cursor-pointer border ${
+                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
                   pnlTimeframe === tf
-                    ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
-                    : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
                 }`}
               >
                 {tf}
@@ -876,9 +876,9 @@ export function ProfileView() {
       </div>
 
       {/* Transaction History */}
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
+      <div className="rounded-lg bg-card border border-border overflow-hidden">
         <div className="p-4 border-b border-border">
-          <p className="text-sm font-bold tracking-tight uppercase">Historique des paris</p>
+          <p className="text-sm font-semibold tracking-tight">Historique des paris</p>
         </div>
         {loadingHistory ? (
           <div className="p-8 text-center">
@@ -891,7 +891,7 @@ export function ProfileView() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-12 gap-1 px-3 py-3 bg-white/5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-1 px-3 py-3 bg-white/5 text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
               <span className="col-span-3">Date</span>
               <span className="col-span-4">Event</span>
               <span className="col-span-2">Status</span>
@@ -910,7 +910,7 @@ export function ProfileView() {
                     <div className="col-span-4 flex flex-col justify-center min-w-0">
                       <span className="font-medium truncate text-[11px]">{tx.market_question}</span>
                       <span className="text-[9px] text-muted-foreground truncate flex items-center gap-0.5">
-                        <span className={tx.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}>
+                        <span className={tx.direction === 'NO' ? "text-no" : "text-yes"}>
                           {tx.direction === 'NO' ? "NON" : "OUI"}
                         </span>
                         {" "}• {tx.amount}<CurrencySymbol className="w-2 h-2" />
@@ -918,24 +918,24 @@ export function ProfileView() {
                     </div>
                     <span className="col-span-2 flex items-center">
                       {isWin && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-yes/20 text-yes">
                           <ArrowUpRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-400">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-no/20 text-no">
                           <ArrowDownRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-500/20 text-yellow-400">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-yellow-500/20 text-yellow-400">
                           <Clock className="w-2.5 h-2.5" />
                         </span>
                       )}
                     </span>
                     <div className="col-span-3 flex items-center justify-end gap-1">
-                      <span className={`font-mono font-bold text-[11px] flex items-center ${
-                        isWin ? "text-emerald-400" : isLost ? "text-rose-400" : "text-muted-foreground"
+                      <span className={`font-mono font-semibold text-[11px] flex items-center ${
+                        isWin ? "text-yes" : isLost ? "text-no" : "text-muted-foreground"
                       }`}>
                         {isWin ? `+${Math.round(tx.potential_payout - tx.amount)}` : isLost ? `-${tx.amount}` : "..."}<CurrencySymbol className="w-2.5 h-2.5 ml-0.5" />
                       </span>
@@ -953,7 +953,7 @@ export function ProfileView() {
                               date: new Date(tx.created_at).toLocaleDateString('fr-FR')
                             })
                           }}
-                          className="p-1 rounded bg-emerald-500/20 text-emerald-400"
+                          className="p-1 rounded bg-yes/20 text-yes"
                           title="Générer ma PNL Card"
                         >
                           <ImageIcon className="w-3 h-3" />

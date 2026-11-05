@@ -62,17 +62,17 @@ export default function ResolveForm({ marketId, outcomes }: { marketId: string, 
         const isFalse = results[outcome.id] === false
         
         return (
-          <div key={outcome.id} className="flex items-center justify-between bg-white/5 p-4 rounded-lg border border-white/10">
+          <div key={outcome.id} className="flex items-center justify-between bg-white/5 p-4 rounded-lg border border-border">
              <div>
-               <span className="text-lg font-bold block">{outcome.name}</span>
+               <span className="text-lg font-semibold block">{outcome.name}</span>
                <span className="text-xs text-muted-foreground">Probabilité : {Math.round(outcome.probability)}%</span>
              </div>
              <div className="flex gap-2">
                <button 
                  onClick={() => toggleResult(outcome.id, true)}
-                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 border ${
+                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border ${
                    isTrue 
-                     ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' 
+                     ? 'bg-yes/20 border-yes text-yes' 
                      : 'bg-white/5 border-transparent text-muted-foreground hover:bg-white/10'
                  }`}
                >
@@ -80,9 +80,9 @@ export default function ResolveForm({ marketId, outcomes }: { marketId: string, 
                </button>
                <button 
                  onClick={() => toggleResult(outcome.id, false)}
-                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 border ${
+                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border ${
                    isFalse 
-                     ? 'bg-rose-500/20 border-rose-500 text-rose-400' 
+                     ? 'bg-no/20 border-no text-no' 
                      : 'bg-white/5 border-transparent text-muted-foreground hover:bg-white/10'
                  }`}
                >
@@ -97,7 +97,7 @@ export default function ResolveForm({ marketId, outcomes }: { marketId: string, 
         <button 
           onClick={handleResolve}
           disabled={isLoading}
-          className="w-full py-4 bg-primary font-bold text-lg uppercase tracking-wider rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-primary/20"
+          className="w-full py-4 bg-primary font-semibold text-lg rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg"
         >
           {isLoading ? "Résolution en cours..." : "Valider et Payer les Gains"}
         </button>

@@ -173,42 +173,42 @@ export function AdminEmailsClient({
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-zinc-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wider">Total Users</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wide">Total Users</span>
           </div>
-          <p className="text-2xl font-bold">{initialStats.totalUsers}</p>
+          <p className="text-2xl font-semibold">{initialStats.totalUsers}</p>
         </div>
-        <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
           <div className="flex items-center gap-2 mb-2">
-            <Mail className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wider">Avec Email</span>
+            <Mail className="w-4 h-4 text-yes" />
+            <span className="text-xs text-zinc-500 uppercase tracking-wide">Avec Email</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-400">{initialStats.usersWithEmail}</p>
+          <p className="text-2xl font-semibold text-yes">{initialStats.usersWithEmail}</p>
         </div>
-        <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
           <div className="flex items-center gap-2 mb-2">
             <Megaphone className="w-4 h-4 text-amber-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wider">Portée</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wide">Portée</span>
           </div>
-          <p className="text-2xl font-bold">
+          <p className="text-2xl font-semibold">
             {initialStats.totalUsers > 0 
               ? Math.round((initialStats.usersWithEmail / initialStats.totalUsers) * 100) 
               : 0}%
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-red-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wider">Expéditeur</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wide">Expéditeur</span>
           </div>
           <p className="text-sm font-medium text-zinc-300 truncate">noreply@y0mi.fun</p>
         </div>
       </div>
 
       {/* Email Mode Selector */}
-      <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-xl w-fit">
+      <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-lg w-fit">
         <button
           onClick={() => {
             setEmailMode('broadcast')
@@ -241,7 +241,7 @@ export function AdminEmailsClient({
         
         {/* Left Column - Editor */}
         <div className="space-y-4">
-          <div className="rounded-xl bg-zinc-900/50 border border-zinc-800 overflow-hidden">
+          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 overflow-hidden">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className={`p-2 rounded-lg ${emailMode === 'personal' ? 'bg-cyan-500/10' : 'bg-red-500/10'}`}>
@@ -252,7 +252,7 @@ export function AdminEmailsClient({
                   )}
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm">
+                  <h3 className="font-semibold text-sm">
                     {emailMode === 'personal' ? 'Email Personnalisé' : 'Composer'}
                   </h3>
                   <p className="text-xs text-zinc-500">
@@ -421,7 +421,7 @@ export function AdminEmailsClient({
 
           {/* Test Section (only for broadcast) */}
           {emailMode === 'broadcast' && (
-            <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-4">
+            <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-4">
               <div className="flex items-start gap-3">
                 <TestTube className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
@@ -452,7 +452,7 @@ export function AdminEmailsClient({
           )}
 
           {/* Send Button */}
-          <div className="rounded-xl bg-zinc-900/50 border border-zinc-800 p-4">
+          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-zinc-400">
                 {emailMode === 'personal' ? (
@@ -511,14 +511,14 @@ export function AdminEmailsClient({
 
         {/* Right Column - Preview */}
         <div className="space-y-4">
-          <div className="rounded-xl bg-zinc-900/50 border border-zinc-800 overflow-hidden">
+          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 overflow-hidden">
             <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-zinc-700/50 rounded-lg">
                   <Eye className="w-4 h-4 text-zinc-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm">Aperçu Email</h3>
+                  <h3 className="font-semibold text-sm">Aperçu Email</h3>
                   <p className="text-xs text-zinc-500">Rendu en temps réel</p>
                 </div>
               </div>
@@ -535,7 +535,7 @@ export function AdminEmailsClient({
               <div className="p-4">
                 {/* Email Preview - Mimics actual email template */}
                 <div 
-                  className="rounded-xl overflow-hidden border border-zinc-700"
+                  className="rounded-lg overflow-hidden border border-zinc-700"
                   style={{ 
                     background: '#0a0a0a',
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E")`
@@ -543,7 +543,7 @@ export function AdminEmailsClient({
                 >
                   {/* Header */}
                   <div className="p-6 text-center bg-[#0a0a0a] border-b border-zinc-800">
-                    <span className="text-3xl font-black text-red-600 tracking-tight">YOMI</span>
+                    <span className="text-3xl font-semibold text-red-600 tracking-tight">YOMI</span>
                     <span className="text-xl text-white">.fun</span>
                   </div>
 
@@ -556,7 +556,7 @@ export function AdminEmailsClient({
                     }}
                   >
                     {/* Subject as Title */}
-                    <h2 className="text-xl font-bold text-white">
+                    <h2 className="text-xl font-semibold text-white">
                       {subject || <span className="text-zinc-500">Sujet de l'email</span>}
                     </h2>
 
@@ -603,9 +603,9 @@ export function AdminEmailsClient({
 
           {/* Templates (only for broadcast) */}
           {emailMode === 'broadcast' && (
-            <div className="rounded-xl bg-zinc-900/50 border border-zinc-800 p-4">
-              <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 p-4">
+              <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-yes" />
                 Templates rapides
               </h3>
               <div className="grid grid-cols-1 gap-2">

@@ -29,7 +29,7 @@ export function ResetButton() {
   if (showConfirm) {
     return (
       <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right-4">
-        <span className="text-sm font-bold text-rose-500 flex items-center gap-2">
+        <span className="text-sm font-semibold text-no flex items-center gap-2">
           <AlertTriangle className="w-4 h-4" />
           Sûr ? C'est irréversible !
         </span>
@@ -42,7 +42,7 @@ export function ResetButton() {
         </button>
         <button
           onClick={handleReset}
-          className="px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold transition-colors flex items-center gap-2"
+          className="px-3 py-1.5 rounded-lg bg-no hover:bg-rose-600 text-white text-xs font-semibold transition-colors flex items-center gap-2"
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
@@ -55,7 +55,7 @@ export function ResetButton() {
   return (
     <button
       onClick={() => setShowConfirm(true)}
-      className="px-4 py-2 rounded-lg border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-sm font-bold transition-colors flex items-center gap-2"
+      className="px-4 py-2 rounded-lg border border-no/30 text-no hover:bg-no/10 text-sm font-semibold transition-colors flex items-center gap-2"
     >
       <Trash2 className="w-4 h-4" />
       Réinitialiser

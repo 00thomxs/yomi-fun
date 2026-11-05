@@ -122,7 +122,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-xl font-bold">Tous les Events</h2>
+          <h2 className="text-xl font-semibold">Tous les Events</h2>
           <p className="text-xs text-muted-foreground">
             {filteredMarkets.length} event{filteredMarkets.length > 1 ? 's' : ''}
             {hasActiveFilters && ` (sur ${counts.all})`}
@@ -208,11 +208,11 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
       {/* Advanced filters panel */}
       {showFilters && (
-        <div className="p-3 rounded-xl bg-white/5 border border-border space-y-3 animate-in slide-in-from-top-2 duration-200">
+        <div className="p-3 rounded-lg bg-white/5 border border-border space-y-3 animate-in slide-in-from-top-2 duration-200">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Visibility filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Eye className="w-3 h-3" /> Visibilité
               </label>
               <select
@@ -228,7 +228,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Volume filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <BarChart3 className="w-3 h-3" /> Volume
               </label>
               <select
@@ -246,7 +246,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Category filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Tag className="w-3 h-3" /> Catégorie
               </label>
               <select
@@ -263,7 +263,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Season filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Trophy className="w-3 h-3" /> Saison
               </label>
               <select
@@ -282,10 +282,10 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
       {/* Grouped Events */}
       {groupedMarkets.map(({ monthKey, monthLabel, markets: monthMarkets }) => (
-        <div key={monthKey} className="rounded-xl bg-card border border-border overflow-hidden">
+        <div key={monthKey} className="rounded-lg bg-card border border-border overflow-hidden">
           {/* Month Header */}
           <div className="px-4 py-2 bg-white/5 border-b border-border">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground">
+            <h3 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground">
               {monthLabel}
               <span className="ml-2 font-normal">({monthMarkets.length})</span>
             </h3>
@@ -342,17 +342,17 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
                     </td>
                     <td className="px-2 py-1.5">
                       {market.status === 'open' ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-400 text-[10px] font-bold uppercase">
-                          <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="inline-flex items-center gap-1 text-yes text-[10px] font-semibold uppercase">
+                          <span className="w-1 h-1 rounded-full bg-yes animate-pulse" />
                           Live
                         </span>
                       ) : market.status === 'closed' ? (
-                        <span className="inline-flex items-center gap-1 text-amber-500 text-[10px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 text-amber-500 text-[10px] font-semibold uppercase">
                           <span className="w-1 h-1 rounded-full bg-amber-500" />
                           Attente
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-[10px] font-bold uppercase">
+                        <span className="text-muted-foreground text-[10px] font-semibold uppercase">
                           Résolu
                         </span>
                       )}
@@ -406,7 +406,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
       ))}
 
       {filteredMarkets.length === 0 && (
-        <div className="rounded-xl bg-card border border-border p-6 text-center text-muted-foreground text-sm">
+        <div className="rounded-lg bg-card border border-border p-6 text-center text-muted-foreground text-sm">
           {hasActiveFilters 
             ? "Aucun event ne correspond à ces filtres."
             : "Aucun event trouvé. Créez-en un !"

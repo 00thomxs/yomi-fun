@@ -9,10 +9,10 @@ export function TopWinners({ winners }: { winners: MarketWinner[] }) {
   const top3 = winners[2]
 
   return (
-    <div className="mt-8 mb-8 rounded-xl border border-amber-500/20 bg-gradient-to-b from-amber-500/5 to-transparent p-6">
+    <div className="mt-8 mb-8 rounded-lg border border-amber-500/20 bg-gradient-to-b from-amber-500/5 to-transparent p-6">
       <div className="flex items-center gap-2 mb-8 justify-center">
         <Trophy className="w-5 h-5 text-amber-400" />
-        <h3 className="text-sm font-bold uppercase tracking-widest text-amber-400">Top Gagnants</h3>
+        <h3 className="text-sm font-semibold text-amber-400">Top Gagnants</h3>
       </div>
 
       <div className="flex items-end justify-center gap-2 sm:gap-8">
@@ -26,12 +26,12 @@ export function TopWinners({ winners }: { winners: MarketWinner[] }) {
                   alt={top2.username}
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-zinc-400 object-cover"
                 />
-                <div className="absolute -bottom-2 -right-1 w-6 h-6 bg-zinc-600 rounded-full flex items-center justify-center text-xs font-bold border border-zinc-400 text-zinc-200 shadow-lg">
+                <div className="absolute -bottom-2 -right-1 w-6 h-6 bg-zinc-600 rounded-full flex items-center justify-center text-xs font-semibold border border-zinc-400 text-zinc-200 shadow-lg">
                   2
                 </div>
               </div>
-              <p className="text-xs font-bold truncate w-20 sm:w-24 text-center mb-1 text-zinc-300">{top2.username}</p>
-              <p className="text-xs font-mono text-zinc-300 font-bold">
+              <p className="text-xs font-semibold truncate w-20 sm:w-24 text-center mb-1 text-zinc-300">{top2.username}</p>
+              <p className="text-xs font-mono text-zinc-300 font-semibold">
                 +{top2.netProfit.toLocaleString()}
               </p>
             </div>
@@ -47,14 +47,14 @@ export function TopWinners({ winners }: { winners: MarketWinner[] }) {
                 <img 
                   src={top1.avatar} 
                   alt={top1.username}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)] object-cover relative z-10"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-amber-500 object-cover relative z-10"
                 />
-                <div className="absolute -bottom-2 -right-1 w-7 h-7 bg-amber-500 text-black rounded-full flex items-center justify-center text-sm font-black border border-amber-400 shadow-lg z-20">
+                <div className="absolute -bottom-2 -right-1 w-7 h-7 bg-amber-500 text-black rounded-full flex items-center justify-center text-sm font-semibold border border-amber-400 shadow-lg z-20">
                   1
                 </div>
               </div>
-              <p className="text-sm font-bold truncate w-24 sm:w-32 text-center mb-1 text-amber-100">{top1.username}</p>
-              <p className="text-sm font-mono text-amber-400 font-black bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+              <p className="text-sm font-semibold truncate w-24 sm:w-32 text-center mb-1 text-amber-100">{top1.username}</p>
+              <p className="text-sm font-mono text-amber-400 font-semibold bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
                 +{top1.netProfit.toLocaleString()}
               </p>
             </div>
@@ -71,12 +71,12 @@ export function TopWinners({ winners }: { winners: MarketWinner[] }) {
                   alt={top3.username}
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-orange-600 object-cover"
                 />
-                <div className="absolute -bottom-2 -right-1 w-6 h-6 bg-orange-800 rounded-full flex items-center justify-center text-xs font-bold border border-orange-600 text-orange-300 shadow-lg">
+                <div className="absolute -bottom-2 -right-1 w-6 h-6 bg-orange-800 rounded-full flex items-center justify-center text-xs font-semibold border border-orange-600 text-orange-300 shadow-lg">
                   3
                 </div>
               </div>
-              <p className="text-xs font-bold truncate w-20 sm:w-24 text-center mb-1 text-orange-300">{top3.username}</p>
-              <p className="text-xs font-mono text-orange-400 font-bold">
+              <p className="text-xs font-semibold truncate w-20 sm:w-24 text-center mb-1 text-orange-300">{top3.username}</p>
+              <p className="text-xs font-mono text-orange-400 font-semibold">
                 +{top3.netProfit.toLocaleString()}
               </p>
             </div>

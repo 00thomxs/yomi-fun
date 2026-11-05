@@ -126,7 +126,7 @@ export default function CreateMarketPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Nouvel Event</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Nouvel Event</h1>
         <p className="text-muted-foreground mt-1">
           Configuration de l'événement
         </p>
@@ -135,7 +135,7 @@ export default function CreateMarketPage() {
       <form onSubmit={handleSubmit} className="space-y-8">
         
         {/* 1. Type de Marché */}
-        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+        <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <PieChart className="w-4 h-4 text-primary" />
             Type d'Event
@@ -167,14 +167,14 @@ export default function CreateMarketPage() {
         </div>
 
         {/* 2. Informations Générales */}
-        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+        <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <Type className="w-4 h-4 text-primary" />
             Informations
           </h2>
           
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Question</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Question</label>
             <input 
               name="question"
               type="text"
@@ -185,7 +185,7 @@ export default function CreateMarketPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Description (Optionnel)</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Description (Optionnel)</label>
             <textarea 
               name="description"
               placeholder="Détails supplémentaires..."
@@ -195,7 +195,7 @@ export default function CreateMarketPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Catégorie</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Catégorie</label>
               <select name="category" className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all">
                 {MARKET_CATEGORIES.map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -205,7 +205,7 @@ export default function CreateMarketPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Image URL</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Image URL</label>
               <input 
                 name="imageUrl"
                 type="url"
@@ -217,7 +217,7 @@ export default function CreateMarketPage() {
 
           {/* Date & Heure */}
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Date de fin</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Date de fin</label>
             <div className="flex flex-col gap-2">
               <div className="relative flex-1">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -333,7 +333,7 @@ export default function CreateMarketPage() {
         </div>
 
         {/* 3. Saison & Liquidité */}
-        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+        <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <Trophy className="w-4 h-4 text-primary" />
             Saison & Liquidité
@@ -341,7 +341,7 @@ export default function CreateMarketPage() {
 
           {/* Season Selector */}
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Saison (Optionnel)
             </label>
             <select
@@ -375,7 +375,7 @@ export default function CreateMarketPage() {
 
           {/* Initial Liquidity */}
           <div className="space-y-3">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground flex items-center gap-2">
               <Coins className="w-3 h-3" />
               Liquidité Initiale (Seed)
             </label>
@@ -391,7 +391,7 @@ export default function CreateMarketPage() {
                     : 'bg-white/5 border-border hover:bg-white/10'
                 }`}
               >
-                <div className="text-lg font-bold font-mono">5K</div>
+                <div className="text-lg font-semibold font-mono">5K</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">Fun</div>
               </button>
               <button
@@ -399,11 +399,11 @@ export default function CreateMarketPage() {
                 onClick={() => setInitialLiquidity(10000)}
                 className={`p-3 rounded-lg text-center transition-all border ${
                   initialLiquidity === 10000 
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' 
+                    ? 'bg-yes/20 text-yes border-yes/50' 
                     : 'bg-white/5 border-border hover:bg-white/10'
                 }`}
               >
-                <div className="text-lg font-bold font-mono">10K</div>
+                <div className="text-lg font-semibold font-mono">10K</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">Équilibré</div>
               </button>
               <button
@@ -415,7 +415,7 @@ export default function CreateMarketPage() {
                     : 'bg-white/5 border-border hover:bg-white/10'
                 }`}
               >
-                <div className="text-lg font-bold font-mono">20K</div>
+                <div className="text-lg font-semibold font-mono">20K</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">Stable</div>
               </button>
               <button
@@ -427,7 +427,7 @@ export default function CreateMarketPage() {
                     : 'bg-white/5 border-border hover:bg-white/10'
                 }`}
               >
-                <div className="text-lg font-bold font-mono">50K</div>
+                <div className="text-lg font-semibold font-mono">50K</div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">Pro</div>
               </button>
             </div>
@@ -448,9 +448,9 @@ export default function CreateMarketPage() {
             <div className="p-3 rounded-lg bg-white/5 border border-border space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">Volatilité:</span>
-                <span className={`font-bold ${
+                <span className={`font-semibold ${
                   initialLiquidity <= 5000 ? 'text-amber-400' :
-                  initialLiquidity <= 10000 ? 'text-emerald-400' :
+                  initialLiquidity <= 10000 ? 'text-yes' :
                   initialLiquidity <= 20000 ? 'text-blue-400' : 'text-purple-400'
                 }`}>
                   {initialLiquidity <= 5000 ? 'Haute (fun)' :
@@ -460,13 +460,13 @@ export default function CreateMarketPage() {
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">Mise max/joueur:</span>
-                <span className="font-mono font-bold text-white">
+                <span className="font-mono font-semibold text-white">
                   ~{Math.floor(initialLiquidity * (marketType === 'binary' ? 0.15 : 0.20) / 0.95).toLocaleString('fr-FR')} Zeny
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">Mouvement proba (1K bet):</span>
-                <span className="font-mono font-bold text-white">
+                <span className="font-mono font-semibold text-white">
                   ~{marketType === 'binary' 
                     ? Math.round((950 / (initialLiquidity * 2)) * 100)
                     : Math.round((950 / (initialLiquidity * 2.5)) * 100)
@@ -484,7 +484,7 @@ export default function CreateMarketPage() {
         </div>
 
         {/* 4. Probabilités & Réponses */}
-        <div className="space-y-4 p-6 rounded-xl bg-card border border-border">
+        <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <List className="w-4 h-4 text-primary" />
             {marketType === 'binary' ? 'Probabilité Initiale' : 'Réponses Possibles'}
@@ -493,8 +493,8 @@ export default function CreateMarketPage() {
           {marketType === 'binary' ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-emerald-400">OUI : {binaryProb}%</span>
-                <span className="font-bold text-rose-400">NON : {100 - binaryProb}%</span>
+                <span className="font-semibold text-yes">OUI : {binaryProb}%</span>
+                <span className="font-semibold text-no">NON : {100 - binaryProb}%</span>
               </div>
               <input 
                 type="range" 
@@ -542,7 +542,7 @@ export default function CreateMarketPage() {
                     <button 
                       type="button"
                       onClick={() => removeMultiOutcome(idx)}
-                      className="p-2 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                      className="p-2 text-muted-foreground hover:text-no hover:bg-no/10 rounded-lg transition-all"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -572,7 +572,7 @@ export default function CreateMarketPage() {
           <button 
             type="submit"
             disabled={isLoading}
-            className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-2"
+            className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center gap-2"
           >
             {isLoading ? (
               <>

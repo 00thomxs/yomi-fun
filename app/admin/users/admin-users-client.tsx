@@ -41,24 +41,24 @@ function StatCard({
 }) {
   const colorClasses = {
     cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-    green: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    green: "bg-yes/10 text-yes border-yes/20",
     amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     red: "bg-red-500/10 text-red-400 border-red-500/20",
     purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-colors">
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 hover:border-zinc-700 transition-colors">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{label}</span>
+        <span className="text-xs text-zinc-500 uppercase tracking-wide font-medium">{label}</span>
         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-bold text-white tracking-tight">{value}</span>
+        <span className="text-3xl font-semibold text-white tracking-tight">{value}</span>
         {trend && (
-          <span className={`text-xs flex items-center gap-0.5 ${trend.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`text-xs flex items-center gap-0.5 ${trend.positive ? 'text-yes' : 'text-red-400'}`}>
             {trend.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
             {trend.value}%
           </span>
@@ -137,14 +137,14 @@ function TopPlayersTable({
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
       <div className="p-3 border-b border-zinc-800">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-amber-500/10 rounded-lg">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <h3 className="font-bold text-sm">Top 50 PNL</h3>
+            <h3 className="font-semibold text-sm">Top 50 PNL</h3>
           </div>
           <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg">
             {timeframes.map(tf => (
@@ -220,7 +220,7 @@ function TopPlayersTable({
             <tbody>
               {sortedPlayers.map((player, i) => (
                 <tr key={player.id} className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
-                  <td className={`py-1.5 px-3 font-bold ${getMedalColor(i + 1)}`}>
+                  <td className={`py-1.5 px-3 font-semibold ${getMedalColor(i + 1)}`}>
                     {i + 1}
                   </td>
                   <td className="py-1.5 px-3">
@@ -239,7 +239,7 @@ function TopPlayersTable({
                     {player.balance.toLocaleString()}
                   </td>
                   <td className={`py-1.5 px-3 text-right font-mono font-medium ${
-                    player.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'
+                    player.total_won >= 0 ? 'text-yes' : 'text-red-400'
                   }`}>
                     {player.total_won >= 0 ? '+' : ''}{player.total_won.toLocaleString()}
                   </td>
@@ -255,7 +255,7 @@ function TopPlayersTable({
                         <Ban className="w-2.5 h-2.5" /> Banni
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[10px] font-medium">
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yes/10 text-yes rounded text-[10px] font-medium">
                         <Zap className="w-2.5 h-2.5" /> Actif
                       </span>
                     )}
@@ -354,7 +354,7 @@ function UserSearchTable({
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
       {/* Search Header */}
       <div className="p-4 border-b border-zinc-800 space-y-4">
         <div className="flex items-center justify-between">
@@ -363,7 +363,7 @@ function UserSearchTable({
               <Search className="w-4 h-4 text-cyan-400" />
             </div>
             <div>
-              <h3 className="font-bold text-sm">Recherche Utilisateurs</h3>
+              <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
               <p className="text-xs text-zinc-500">{total} joueur{total !== 1 ? 's' : ''} au total</p>
             </div>
           </div>
@@ -552,7 +552,7 @@ function UserSearchTable({
                     {user.balance.toLocaleString()}
                   </td>
                   <td className={`py-3 px-4 text-right font-mono font-medium ${
-                    user.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'
+                    user.total_won >= 0 ? 'text-yes' : 'text-red-400'
                   }`}>
                     {user.total_won >= 0 ? '+' : ''}{user.total_won.toLocaleString()}
                   </td>
@@ -565,7 +565,7 @@ function UserSearchTable({
                         <Ban className="w-3 h-3" /> Banni
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yes/10 text-yes rounded-full text-xs font-medium">
                         <Zap className="w-3 h-3" /> Actif
                       </span>
                     )}
@@ -683,7 +683,7 @@ function UserDetailModal({
   
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
         {/* Header */}
         <div className="p-5 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
           <div className="flex items-center gap-4">
@@ -693,7 +693,7 @@ function UserDetailModal({
               className="w-14 h-14 rounded-full ring-4 ring-zinc-700"
             />
             <div>
-              <h2 className="font-bold text-xl">{user.username}</h2>
+              <h2 className="font-semibold text-xl">{user.username}</h2>
               <p className="text-xs text-zinc-500 font-mono">ID: {user.id.slice(0, 12)}...</p>
             </div>
           </div>
@@ -706,7 +706,7 @@ function UserDetailModal({
         <div className="p-5 space-y-5">
           {/* Status Banner */}
           {user.is_banned && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
               <div>
                 <p className="text-red-400 font-semibold">Utilisateur banni</p>
@@ -724,29 +724,29 @@ function UserDetailModal({
           
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-zinc-800/50 rounded-xl p-4">
+            <div className="bg-zinc-800/50 rounded-lg p-4">
               <p className="text-xs text-zinc-500 mb-1">Balance</p>
-              <p className="text-xl font-bold font-mono">{user.balance.toLocaleString()}</p>
+              <p className="text-xl font-semibold font-mono">{user.balance.toLocaleString()}</p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
+            <div className="bg-zinc-800/50 rounded-lg p-4">
               <p className="text-xs text-zinc-500 mb-1">PNL Total</p>
-              <p className={`text-xl font-bold font-mono ${user.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className={`text-xl font-semibold font-mono ${user.total_won >= 0 ? 'text-yes' : 'text-red-400'}`}>
                 {user.total_won >= 0 ? '+' : ''}{user.total_won.toLocaleString()}
               </p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
+            <div className="bg-zinc-800/50 rounded-lg p-4">
               <p className="text-xs text-zinc-500 mb-1">Win Rate</p>
-              <p className="text-xl font-bold">{user.win_rate}%</p>
+              <p className="text-xl font-semibold">{user.win_rate}%</p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
+            <div className="bg-zinc-800/50 rounded-lg p-4">
               <p className="text-xs text-zinc-500 mb-1">Paris Total</p>
-              <p className="text-xl font-bold">{user.total_bets}</p>
+              <p className="text-xl font-semibold">{user.total_bets}</p>
             </div>
           </div>
           
           {/* Edit Section */}
           {editMode ? (
-            <div className="bg-zinc-800/50 rounded-xl p-5 space-y-4">
+            <div className="bg-zinc-800/50 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2">
                 <Edit2 className="w-4 h-4 text-cyan-400" />
                 Modifier les données
@@ -789,7 +789,7 @@ function UserDetailModal({
               </div>
             </div>
           ) : banMode ? (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5 space-y-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2 text-red-400">
                 <Ban className="w-4 h-4" />
                 Bannir cet utilisateur
@@ -824,7 +824,7 @@ function UserDetailModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setEditMode(true)}
-                className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
               >
                 <Edit2 className="w-4 h-4" />
                 Modifier
@@ -833,14 +833,14 @@ function UserDetailModal({
                 <button
                   onClick={handleUnban}
                   disabled={loading}
-                  className="flex-1 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-5 py-3 bg-emerald-600 hover:bg-yes text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShieldOff className="w-4 h-4" /> Débannir</>}
                 </button>
               ) : (
                 <button
                   onClick={() => setBanMode(true)}
-                  className="flex-1 px-5 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 px-5 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
                 >
                   <Ban className="w-4 h-4" />
                   Bannir
@@ -867,7 +867,7 @@ function UserDetailModal({
                     <div className="text-right shrink-0">
                       <p className="font-mono font-medium">{bet.amount.toLocaleString()}</p>
                       <span className={`text-xs font-medium ${
-                        bet.status === 'won' ? 'text-emerald-400' :
+                        bet.status === 'won' ? 'text-yes' :
                         bet.status === 'lost' ? 'text-red-400' : 'text-amber-400'
                       }`}>
                         {bet.status === 'won' ? '✓ Gagné' : bet.status === 'lost' ? '✗ Perdu' : '⏳ En cours'}

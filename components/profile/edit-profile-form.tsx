@@ -135,23 +135,23 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
   if (showDeleteConfirm) {
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-        <div className="flex items-center gap-3 text-rose-500 mb-2">
+        <div className="flex items-center gap-3 text-no mb-2">
           <AlertTriangle className="w-6 h-6" />
-          <h3 className="font-bold text-lg">Suppression du compte</h3>
+          <h3 className="font-semibold text-lg">Suppression du compte</h3>
         </div>
         
         <p className="text-sm text-muted-foreground">
-          Cette action est <span className="font-bold text-white">irréversible</span>. Toutes vos données (paris, historique, solde) seront effacées définitivement.
+          Cette action est <span className="font-semibold text-white">irréversible</span>. Toutes vos données (paris, historique, solde) seront effacées définitivement.
         </p>
 
         <form onSubmit={handleDeleteAccount} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Confirmez votre mot de passe</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Confirmez votre mot de passe</label>
             <input 
               type="password"
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
-              className="w-full bg-white/5 border border-rose-500/30 rounded-lg px-4 py-3 outline-none focus:border-rose-500 transition-all text-rose-200"
+              className="w-full bg-white/5 border border-no/30 rounded-lg px-4 py-3 outline-none focus:border-no transition-all text-rose-200"
               required
               placeholder="Votre mot de passe actuel"
             />
@@ -169,7 +169,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
             <button 
               type="submit" 
               disabled={isDeleting || !deletePassword}
-              className="flex-1 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
               Supprimer définitivement
@@ -190,7 +190,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
             <img 
               src={avatarPreview || "/images/default-avatar.svg"} 
               alt="Avatar" 
-              className="w-24 h-24 rounded-full object-cover border-4 border-white/10 group-hover:border-primary/50 transition-all"
+              className="w-24 h-24 rounded-full object-cover border-4 border-border group-hover:border-primary/50 transition-all"
             />
             <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-8 h-8 text-white" />
@@ -208,7 +208,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
 
         {/* Username */}
         <div className="space-y-2">
-          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pseudo</label>
+          <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pseudo</label>
           <input 
             type="text"
             value={username}
@@ -220,8 +220,8 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Notifications */}
-        <div className="space-y-3 pt-4 border-t border-white/10">
-          <p className="text-sm font-bold">Notifications Email</p>
+        <div className="space-y-3 pt-4 border-t border-border">
+          <p className="text-sm font-semibold">Notifications Email</p>
           
           <label className="flex items-center justify-between p-3 rounded-lg bg-white/5 cursor-pointer">
             <span className="text-sm">Gains de paris</span>
@@ -255,7 +255,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Enregistrer
@@ -264,11 +264,11 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
       </form>
 
       {/* Delete Account Button */}
-      <div className="pt-6 border-t border-white/10">
+      <div className="pt-6 border-t border-border">
         <button 
           type="button"
           onClick={() => setShowDeleteConfirm(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-all font-semibold text-sm"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-no/10 text-no border border-no/20 hover:bg-no/20 transition-all font-semibold text-sm"
         >
           <Trash2 className="w-4 h-4" />
           Supprimer le compte

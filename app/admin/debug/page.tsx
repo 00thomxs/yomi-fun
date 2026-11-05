@@ -52,24 +52,24 @@ export default async function DebugPage() {
 
   return (
     <div className="space-y-6 text-sm">
-      <h1 className="text-2xl font-bold">🔍 Debug Shop & Orders</h1>
+      <h1 className="text-2xl font-semibold">🔍 Debug Shop & Orders</h1>
       
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg">1. Environment Variables</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg">1. Environment Variables</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto">
           {JSON.stringify(envCheck, null, 2)}
         </pre>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg">2. Current User</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg">2. Current User</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto">
           {JSON.stringify({ user: user?.email, id: user?.id, error: userError?.message }, null, 2)}
         </pre>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg">3. Profile (Role Check)</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg">3. Profile (Role Check)</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto">
           {JSON.stringify({ 
             role: profile?.role, 
@@ -79,8 +79,8 @@ export default async function DebugPage() {
         </pre>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg">4. Shop Items ({shopItems?.length || 0})</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg">4. Shop Items ({shopItems?.length || 0})</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto max-h-40">
           {JSON.stringify({ 
             count: shopItems?.length,
@@ -90,8 +90,8 @@ export default async function DebugPage() {
         </pre>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg text-yellow-400">5. Orders (Normal Client - with RLS)</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg text-yellow-400">5. Orders (Normal Client - with RLS)</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto max-h-40">
           {JSON.stringify({ 
             count: ordersNormal?.length,
@@ -101,8 +101,8 @@ export default async function DebugPage() {
         </pre>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg text-green-400">6. Orders (Admin Client - NO RLS)</h2>
+      <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg text-green-400">6. Orders (Admin Client - NO RLS)</h2>
         <pre className="bg-black/30 p-3 rounded text-xs overflow-auto max-h-40">
           {JSON.stringify({ 
             count: ordersAdmin?.length,
@@ -112,14 +112,14 @@ export default async function DebugPage() {
         </pre>
       </div>
 
-      <div className="bg-rose-900/30 border border-rose-500/50 rounded-xl p-4 space-y-2">
-        <h2 className="font-bold text-lg text-rose-400">Diagnostic</h2>
+      <div className="bg-rose-900/30 border border-no/50 rounded-lg p-4 space-y-2">
+        <h2 className="font-semibold text-lg text-no">Diagnostic</h2>
         <ul className="list-disc list-inside space-y-1 text-muted-foreground">
           {!envCheck.SERVICE_ROLE_KEY && (
-            <li className="text-rose-400">❌ SUPABASE_SERVICE_ROLE_KEY is missing! Add it to Vercel env vars.</li>
+            <li className="text-no">❌ SUPABASE_SERVICE_ROLE_KEY is missing! Add it to Vercel env vars.</li>
           )}
           {profile?.role !== 'admin' && (
-            <li className="text-rose-400">❌ Your profile role is NOT admin. Run: UPDATE profiles SET role = 'admin' WHERE id = '{user?.id}'</li>
+            <li className="text-no">❌ Your profile role is NOT admin. Run: UPDATE profiles SET role = 'admin' WHERE id = '{user?.id}'</li>
           )}
           {ordersAdmin?.length === 0 && (
             <li className="text-amber-400">⚠️ No orders in database. The INSERT is failing somewhere.</li>

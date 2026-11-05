@@ -91,12 +91,12 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[85vh] bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-2xl max-h-[85vh] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-zinc-800">
           <div className="flex items-center gap-3">
             <Trophy className="w-5 h-5 text-amber-400" />
-            <h2 className="text-lg font-bold">Mes Badges</h2>
+            <h2 className="text-lg font-semibold">Mes Badges</h2>
             <span className="text-xs text-zinc-500">
               {userBadges.length} obtenu{userBadges.length > 1 ? 's' : ''} · {equippedCount}/2 équipés
             </span>
@@ -117,7 +117,7 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
                 key={cat.key}
                 onClick={() => setSelectedCategory(cat.key)}
                 className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shrink-0',
+                  'px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all shrink-0',
                   selectedCategory === cat.key
                     ? 'bg-primary text-white'
                     : 'bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700'
@@ -140,7 +140,7 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
               {/* Owned Badges */}
               {ownedBadges.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
+                  <h3 className="text-sm font-semibold text-zinc-400">
                     Débloqués ({ownedBadges.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -155,7 +155,7 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
                           key={badge.id}
                           onClick={() => userBadge && canEquip && handleToggleEquip(userBadge.id)}
                           className={cn(
-                            'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all',
+                            'flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all',
                             isEquipped
                               ? 'bg-primary/10 border-primary/30 hover:bg-primary/15'
                               : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 hover:scale-[1.02] active:scale-[0.98]',
@@ -164,7 +164,7 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
                         >
                           <BadgeDisplay badge={badge} size="sm" showName={false} />
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-sm truncate">{badge.name}</p>
+                            <p className="font-semibold text-sm truncate">{badge.name}</p>
                             <p className="text-[10px] text-zinc-500 truncate">{badge.description}</p>
                           </div>
                           <div className="shrink-0">
@@ -190,20 +190,20 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
               {/* Locked Badges */}
               {lockedBadges.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider">
+                  <h3 className="text-sm font-semibold text-zinc-500">
                     À débloquer ({lockedBadges.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {lockedBadges.map(badge => (
                       <div
                         key={badge.id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/30 border border-zinc-800/50 opacity-50"
+                        className="flex items-center gap-3 p-3 rounded-lg bg-zinc-900/30 border border-zinc-800/50 opacity-50"
                       >
                         <div className="opacity-40">
                           <BadgeDisplay badge={badge} size="sm" showName={false} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm truncate text-zinc-500">{badge.name}</p>
+                          <p className="font-semibold text-sm truncate text-zinc-500">{badge.name}</p>
                           <p className="text-[10px] text-zinc-600 truncate">{badge.description}</p>
                         </div>
                         <div className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center">

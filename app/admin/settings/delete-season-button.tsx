@@ -33,7 +33,7 @@ export function DeleteSeasonButton({ id }: { id: string }) {
     <button 
       onClick={handleDelete}
       disabled={isLoading}
-      className="p-2 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 rounded-lg transition-all cursor-pointer"
+      className="p-2 hover:bg-no/10 text-muted-foreground hover:text-no rounded-lg transition-all cursor-pointer"
       title="Supprimer l'archive"
     >
       {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}

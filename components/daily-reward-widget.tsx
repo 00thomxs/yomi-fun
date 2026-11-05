@@ -122,16 +122,16 @@ export function DailyRewardWidget() {
       <div className={`p-3 rounded-lg border ${
         isJackpot || isWelcomeBonus
           ? 'bg-amber-500/10 border-amber-500/30'
-          : 'bg-emerald-500/10 border-emerald-500/30'
+          : 'bg-yes/10 border-yes/30'
       }`}>
         <div className="flex items-center gap-2">
-          <Check className={`w-4 h-4 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`} />
-          <span className={`text-xs font-bold ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`}>
+          <Check className={`w-4 h-4 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`} />
+          <span className={`text-xs font-semibold ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`}>
             {isWelcomeBonus ? 'Bienvenue !' : isJackpot ? `Jackpot !` : `Jour ${claimResult.streakDay}`}
           </span>
         </div>
-        <div className={`flex items-center gap-1 mt-1 text-sm font-bold font-mono ${
-          isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'
+        <div className={`flex items-center gap-1 mt-1 text-sm font-semibold font-mono ${
+          isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'
         }`}>
           +{claimResult.amount?.toLocaleString()}<CurrencySymbol className="w-3 h-3" />
         </div>
@@ -154,9 +154,9 @@ export function DailyRewardWidget() {
             ) : (
           <Gift className="w-4 h-4 text-amber-400" />
             )}
-          <span className="text-xs font-bold text-amber-400">Bienvenue !</span>
+          <span className="text-xs font-semibold text-amber-400">Bienvenue !</span>
           </div>
-          <span className="text-xs font-bold text-amber-400 font-mono flex items-center gap-0.5">
+          <span className="text-xs font-semibold text-amber-400 font-mono flex items-center gap-0.5">
             +200<CurrencySymbol className="w-3 h-3" />
           </span>
         </div>
@@ -191,12 +191,12 @@ export function DailyRewardWidget() {
           ) : (
             <Gift className="w-4 h-4 text-primary" />
           )}
-            <span className={`text-xs font-bold ${isJackpotDay ? 'text-amber-400' : 'text-primary'}`}>
+            <span className={`text-xs font-semibold ${isJackpotDay ? 'text-amber-400' : 'text-primary'}`}>
               Jour {dayDisplay}/7
             </span>
           </div>
           
-          <span className={`text-xs font-bold font-mono flex items-center gap-0.5 ${
+          <span className={`text-xs font-semibold font-mono flex items-center gap-0.5 ${
             isJackpotDay ? 'text-amber-400' : 'text-primary'
           }`}>
             {isJackpotDay ? '🎰' : `+${status.todayReward}`}
@@ -216,7 +216,7 @@ export function DailyRewardWidget() {
                 key={day}
                 className={`h-1 flex-1 rounded-full transition-all ${
                   isPast 
-                    ? 'bg-emerald-500' 
+                    ? 'bg-yes' 
                     : isCurrent
                       ? isJackpot ? 'bg-amber-500 animate-pulse' : 'bg-primary animate-pulse'
                       : 'bg-white/10'
@@ -235,7 +235,7 @@ export function DailyRewardWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Gift className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs font-bold text-muted-foreground">
+          <span className="text-xs font-semibold text-muted-foreground">
             Jour {dayDisplay}/7
           </span>
         </div>
@@ -259,7 +259,7 @@ export function DailyRewardWidget() {
               key={day}
               className={`h-1 flex-1 rounded-full transition-all ${
                 isPast 
-                  ? 'bg-emerald-500' 
+                  ? 'bg-yes' 
                     : isCurrent
                       ? 'bg-white/30'
                       : 'bg-white/10'

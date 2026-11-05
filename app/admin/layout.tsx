@@ -71,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6">
           <Link href="/" className="block">
             <YomiLogo />
-            <span className="text-[10px] font-mono text-primary uppercase tracking-widest mt-1 block">
+            <span className="text-[10px] font-mono text-primary uppercase tracking-wide mt-1 block">
               Admin Panel
             </span>
           </Link>
@@ -92,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
               A
             </div>
             <div className="flex-1 min-w-0">
@@ -102,7 +102,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <button
             onClick={signOut}
-            className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-no hover:bg-no/10 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Déconnexion
