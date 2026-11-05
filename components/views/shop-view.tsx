@@ -181,23 +181,12 @@ export function ShopView({ initialItems }: ShopViewProps) {
     }
   }
 
+  // Same neutral pack look as the buy-zeny page; only the recommended pack carries the brand red
   const getZenyPackTheme = (id: string) => {
-    switch (id) {
-      case 'pack_little_player': return { 
-        iconBg: 'bg-white/5', iconColor: 'text-muted-foreground', accent: 'text-white', popular: false 
-      }
-      case 'pack_degen': return { 
-        iconBg: 'bg-primary/20', iconColor: 'text-primary', accent: 'text-primary', popular: true 
-      }
-      case 'pack_trader': return { 
-        iconBg: 'bg-purple-500/10', iconColor: 'text-purple-400', accent: 'text-purple-400', popular: false 
-      }
-      case 'pack_whale': return { 
-        iconBg: 'bg-amber-400/10', iconColor: 'text-amber-400', accent: 'text-amber-400', popular: false 
-      }
-      default: return { iconBg: 'bg-white/5', iconColor: 'text-white', accent: 'text-white', popular: false }
-    }
+    const popular = id === 'pack_degen'
+    return { iconBg: 'bg-white/5', iconColor: popular ? 'text-brand' : 'text-muted-foreground', accent: 'text-foreground', popular }
   }
+
 
   const getZenyIcon = (id: string) => {
     switch (id) {
@@ -269,7 +258,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mx-auto mb-3`}>
                       <div className={theme.iconColor}>{getZenyIcon(pack.id)}</div>
                     </div>
-                    <h4 className="font-semibold uppercase tracking-tight">{pack.name}</h4>
+                    <h4 className="font-semibold">{pack.name}</h4>
                     <div className="text-2xl font-semibold mt-1">{pack.price}€</div>
                   </div>
                   
@@ -289,7 +278,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   <button
                     onClick={() => handleBuyZeny(pack.id)}
                     disabled={!!loadingZeny}
-                    className={`w-full py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all ${
+                    className={`w-full h-11 rounded-md font-semibold text-sm transition-colors ${
                       theme.popular
                         ? 'bg-primary text-white hover:bg-primary/90'
                         : 'bg-white/5 hover:bg-white/10 border border-border'

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import type { Market, BinaryMarket, ActiveBet } from "@/lib/types"
 
@@ -25,6 +26,8 @@ export function RightSidebar({
   topPlayers = [],
   activeBets = []
 }: RightSidebarProps) {
+  // The leaderboard page already is the full ranking
+  const showTopPlayers = usePathname() !== "/leaderboard"
   return (
     <aside className="hidden lg:block lg:sticky lg:top-[88px] space-y-8">
 
@@ -110,6 +113,7 @@ export function RightSidebar({
       </section>
 
       {/* Top Players */}
+      {showTopPlayers && (
       <section className="space-y-3">
         <div className="flex items-baseline justify-between">
           <SectionTitle>Top traders</SectionTitle>
@@ -135,6 +139,7 @@ export function RightSidebar({
           {topPlayers.length === 0 && <li className="py-3 text-xs text-muted-foreground">Classement vide</li>}
         </ol>
       </section>
+      )}
     </aside>
   )
 }
