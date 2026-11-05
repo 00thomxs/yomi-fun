@@ -50,12 +50,12 @@ export async function getUnseenBetWins(): Promise<UnseenBetWin[]> {
       direction,
       market:markets!inner(
         id,
-        title,
+        title:question,
         resolved_at
       ),
       outcome:outcomes!inner(
         id,
-        label,
+        label:name,
         is_winner
       )
     `)
