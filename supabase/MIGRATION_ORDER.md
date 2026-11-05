@@ -91,7 +91,8 @@ supabase/migrations/add_storage_bucket.sql
 ```
 supabase/migrations/lock_down_profiles_and_rpcs.sql
 ```
-> Les joueurs ne peuvent plus modifier balance/role/stats, ni appeler reset_platform, increment_balance, etc.
+> Les joueurs ne peuvent plus modifier balance/role/stats, paris, marchés, ni appeler reset_platform, increment_balance, etc.
+> ⚠️ Déployer d'abord le code qui écrit via `supabaseAdmin`, PUIS exécuter ce fichier.
 
 ---
 

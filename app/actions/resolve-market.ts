@@ -145,7 +145,7 @@ export async function resolveMarket(
       }
 
       // B. Update Bet Status
-      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabaseAdmin.from('bets').update({ status: 'won' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'won' failed:`, betUpdateError)
       }
@@ -192,7 +192,7 @@ export async function resolveMarket(
         console.error(`[RESOLVE_ERROR] RPC update_loser_stats failed for user ${bet.user_id}:`, rpcError)
       }
 
-      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabaseAdmin.from('bets').update({ status: 'lost' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'lost' failed:`, betUpdateError)
       } else {
@@ -389,7 +389,7 @@ export async function resolveMarketMulti(
         })
       }
 
-      await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      await supabaseAdmin.from('bets').update({ status: 'won' }).eq('id', bet.id)
       
       // Update Season Leaderboard (if market belongs to a season)
       if (seasonId) {
@@ -428,7 +428,7 @@ export async function resolveMarketMulti(
       
       if (rpcError) console.error(`[RESOLVE_MULTI] RPC update_loser_stats failed:`, rpcError)
 
-      await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      await supabaseAdmin.from('bets').update({ status: 'lost' }).eq('id', bet.id)
       
       // Update Season Leaderboard for losers (if market belongs to a season)
       if (seasonId) {
