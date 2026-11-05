@@ -1,6 +1,6 @@
 "use client"
 
-import { Flame, Globe, Gamepad2, Music, Wifi, Tv, Trophy, Newspaper, Clock, Zap } from "lucide-react"
+import { Clock } from "lucide-react"
 import { MarketCard } from "@/components/market/market-card"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -37,119 +37,112 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
           return m.category.toLowerCase() === activeCategory.toLowerCase()
         })
 
-  return (
-    <div className="space-y-6">
-      {/* Featured Market Hero */}
-      {featuredMarket && (
-        <div className="relative overflow-hidden rounded-xl bg-card border border-white/10 h-[380px] shadow-2xl shadow-black/50">
-          {featuredMarket.bgImage ? (
-            <img
-              src={featuredMarket.bgImage}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-              }}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
-          )}
-          
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/60" />
+  const isResolved = (m: Market) => m.status === 'resolved' || !!m.resolved_at
+  const activeLabel = CATEGORIES.find((c) => c.id === activeCategory)?.label || "Marchés"
 
-          <div className="relative h-full p-6 flex flex-col justify-end space-y-4">
-            <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-md bg-black/60 backdrop-blur-sm border border-white/10">
-              <Clock className="w-3 h-3 text-muted-foreground" />
-              <span className="text-xs font-mono text-white">{featuredMarket.countdown || "Bientôt"}</span>
+  return (
+    <div className="space-y-8">
+      {/* Featured Market */}
+      {featuredMarket && (
+        <article className="grid md:grid-cols-[minmax(0,1fr)_260px] rounded-lg border border-border bg-card overflow-hidden">
+          <div className="p-5 md:p-6 flex flex-col gap-5 order-2 md:order-1">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              {featuredMarket.isLive ? (
+                <span className="inline-flex items-center gap-1.5 text-primary font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />
+                  En direct
+                </span>
+              ) : isResolved(featuredMarket) ? (
+                <span className="font-medium">Terminé</span>
+              ) : (
+                <span className="font-medium text-amber-400">En attente</span>
+              )}
+              <span aria-hidden>·</span>
+              <span className="inline-flex items-center gap-1 font-mono">
+                <Clock className="w-3 h-3" aria-hidden />
+                {featuredMarket.countdown || "Bientôt"}
+              </span>
             </div>
 
-            {featuredMarket.isLive ? (
-              <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-bold tracking-tight uppercase">
-                <Zap className="w-3 h-3" />
-                Live Event
-              </div>
-            ) : featuredMarket.status === 'resolved' || featuredMarket.resolved_at ? (
-              <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-tight uppercase">
-                Terminé
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold tracking-tight uppercase">
-                En attente
-              </div>
-            )}
-            <h2 className="text-3xl font-bold tracking-tight text-balance leading-tight text-shadow-lg">
+            <h2 className="text-2xl md:text-[28px] font-semibold tracking-tight leading-tight text-balance">
               {featuredMarket.question || "Question indisponible"}
             </h2>
 
-            {/* Binary market: show OUI/NON bar */}
-            {featuredMarket.type === 'binary' && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm font-bold tracking-tight">
-                  <span className="text-white font-mono">{Math.round((featuredMarket as BinaryMarket).probability || 50)}% OUI</span>
-                  <span className="text-white/60 font-mono">{Math.round(100 - ((featuredMarket as BinaryMarket).probability || 50))}% NON</span>
+            {/* Binary market: OUI/NON split */}
+            {featuredMarket.type === 'binary' && (() => {
+              const p = Math.round((featuredMarket as BinaryMarket).probability || 50)
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-between">
+                    <span className="font-mono text-3xl font-semibold text-yes">{p}%<span className="ml-1.5 text-sm font-sans font-medium text-muted-foreground">OUI</span></span>
+                    <span className="font-mono text-sm text-muted-foreground">{100 - p}% NON</span>
+                  </div>
+                  <div className="flex h-1.5 rounded-full overflow-hidden bg-no/30">
+                    <div className="h-full bg-yes" style={{ width: `${p}%` }} />
+                  </div>
                 </div>
-                <div className="relative h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div
-                    className="absolute left-0 top-0 h-full bg-white rounded-full"
-                    style={{ width: `${(featuredMarket as BinaryMarket).probability || 50}%` }}
-                  />
-                </div>
-              </div>
-            )}
+              )
+            })()}
 
-            {/* Multi market: show top outcomes */}
+            {/* Multi market: top outcomes */}
             {featuredMarket.type === 'multi' && featuredMarket.outcomes && (
-              <div className="space-y-2">
+              <div className="divide-y divide-border border-y border-border">
                 {featuredMarket.outcomes.slice(0, 2).map((outcome: any, idx: number) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-white/80 truncate max-w-[200px]">{outcome.name}</span>
-                    <span className="text-white font-mono font-bold">{Math.round(outcome.probability)}%</span>
+                  <div key={idx} className="flex justify-between items-center py-2 text-sm">
+                    <span className="truncate max-w-[70%]">{outcome.name}</span>
+                    <span className="font-mono font-semibold">{Math.round(outcome.probability)}%</span>
                   </div>
                 ))}
                 {featuredMarket.outcomes.length > 2 && (
-                  <span className="text-xs text-white/50">+{featuredMarket.outcomes.length - 2} autres options</span>
+                  <p className="py-2 text-xs text-muted-foreground">+{featuredMarket.outcomes.length - 2} autres options</p>
                 )}
               </div>
             )}
 
-            {featuredMarket.isLive ? (
             <button
               onClick={() => onMarketClick(featuredMarket)}
-              className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-bold text-lg tracking-tight uppercase hover:bg-primary/90 transition-all cursor-pointer shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+              className={`mt-auto h-11 w-full sm:w-auto sm:self-start px-6 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                featuredMarket.isLive
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border border-border hover:bg-surface-hover"
+              }`}
             >
-              Predire maintenant
+              {featuredMarket.isLive ? "Prédire maintenant" : "Voir les résultats"}
             </button>
-            ) : (
-              <button
-                onClick={() => onMarketClick(featuredMarket)}
-                className="w-full py-4 rounded-lg bg-white/10 border border-white/20 text-white/80 font-bold text-lg tracking-tight uppercase hover:bg-white/15 transition-all cursor-pointer"
-              >
-                Voir les résultats
-              </button>
+          </div>
+
+          <div className="relative h-40 md:h-auto bg-muted order-1 md:order-2">
+            {featuredMarket.bgImage && (
+              <img
+                src={featuredMarket.bgImage}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
             )}
           </div>
-        </div>
+        </article>
       )}
 
       {/* Category Filter */}
-      <div className="sticky top-0 z-40 -mx-4 px-4 py-3 backdrop-blur-xl bg-background/90 border-b border-border">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+      <div className="sticky top-16 z-40 -mx-4 px-4 lg:mx-0 lg:px-0 bg-background/95 backdrop-blur border-b border-border">
+        <div role="tablist" aria-label="Catégories" className="flex gap-6 overflow-x-auto no-scrollbar">
           {CATEGORIES.map((category) => {
-            const Icon = category.icon
+            const active = activeCategory === category.id
             return (
               <button
                 key={category.id}
+                role="tab"
+                aria-selected={active}
                 onClick={() => setActiveCategory(category.id)}
-                className={`
-                  flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold tracking-tight transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer border
-                  ${
-                    activeCategory === category.id
-                      ? "bg-primary/10 text-primary border-primary/30 shadow-[0_0_10px_rgba(220,38,38,0.15)]"
-                      : "bg-transparent text-muted-foreground border-white/10 hover:border-white/20 hover:text-foreground hover:bg-white/5"
-                  }
-                `}
+                className={`relative shrink-0 h-11 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                  active
+                    ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                <Icon className="w-3.5 h-3.5" />
                 {category.label}
               </button>
             )
@@ -158,24 +151,10 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
       </div>
 
       {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold tracking-tight uppercase flex items-center gap-2">
-          {(() => {
-            const cat = CATEGORIES.find((c) => c.id === activeCategory)
-            if (cat) {
-              const Icon = cat.icon
-              return (
-                <>
-                  <Icon className="w-5 h-5 text-primary" />
-                  {cat.label}
-                </>
-              )
-            }
-            return "Events"
-          })()}
-        </h3>
-        <span className="text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 px-2 py-1 rounded-full text-muted-foreground font-mono">
-          {filteredMarkets.length} Events
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-lg font-semibold tracking-tight">{activeLabel}</h3>
+        <span className="text-sm text-muted-foreground font-mono">
+          {filteredMarkets.length} marché{filteredMarkets.length > 1 ? "s" : ""}
         </span>
       </div>
 
@@ -186,12 +165,9 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
             <MarketCard key={market.id} market={market} onMarketClick={onMarketClick} onBet={onBet} />
           ))
         ) : (
-          <div className="col-span-full py-16 flex flex-col items-center justify-center text-center text-muted-foreground bg-card/30 rounded-xl border border-white/5 border-dashed">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-              <Newspaper className="w-8 h-8 opacity-20" />
-            </div>
-            <p className="text-sm font-medium">Aucun événement disponible</p>
-            <p className="text-xs mt-1 opacity-50">Reviens plus tard pour de nouveaux paris !</p>
+          <div className="col-span-full py-16 text-center rounded-lg border border-dashed border-border">
+            <p className="text-sm font-medium">Aucun marché dans cette catégorie</p>
+            <p className="text-sm mt-1 text-muted-foreground">De nouveaux marchés arrivent régulièrement.</p>
           </div>
         )}
       </div>

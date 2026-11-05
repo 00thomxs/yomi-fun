@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { Trophy, Zap, User, LogOut, Plus } from "lucide-react"
+import { Trophy, User, LogOut, Plus } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { useUser } from "@/contexts/user-context"
@@ -26,8 +26,8 @@ export function AppHeader() {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 rounded-xl mb-6">
-        <div className="flex items-center justify-between px-5 py-4">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border -mx-4 px-4 lg:mx-0 lg:px-0 mb-6">
+        <div className="flex items-center justify-between h-16">
           <div className="lg:hidden">
             <Link href="/">
               <YomiLogo />
@@ -37,24 +37,23 @@ export function AppHeader() {
             {/* Leaderboard button - mobile only */}
             <Link
               href="/leaderboard"
-              className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all lg:hidden"
+              aria-label="Classement"
+              className="h-10 w-10 inline-flex items-center justify-center rounded-md border border-border hover:bg-surface-hover transition-colors lg:hidden"
             >
-              <Trophy className="w-5 h-5 text-white/80" />
+              <Trophy className="w-[18px] h-[18px] text-muted-foreground" />
             </Link>
 
             {/* Wallet - only show when authenticated */}
             {isAuthenticated && (
               <Link 
                 href="/shop/buy-zeny"
-                className="px-3 sm:px-4 py-2.5 rounded-lg bg-card border border-border hover:bg-primary/5 hover:border-primary/30 transition-all group flex items-center gap-2"
+                className="h-10 px-3 rounded-md border border-border hover:bg-surface-hover transition-colors flex items-center gap-2"
                 title="Recharger des Zeny"
               >
                 <span className="flex items-center gap-1 text-sm font-semibold tracking-tight">
-                  <span className="font-mono font-bold group-hover:text-primary transition-colors">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
+                  <span className="font-mono font-semibold">{userBalance.toLocaleString()}</span><CurrencySymbol className="text-primary" />
                 </span>
-                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                  <Plus className="w-3 h-3" />
-                </div>
+                <Plus className="w-4 h-4 text-muted-foreground" aria-hidden />
               </Link>
             )}
 
@@ -63,23 +62,24 @@ export function AppHeader() {
               <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
+                  aria-label="Menu du compte"
+                  className="h-10 flex items-center gap-2 pl-1 pr-3 rounded-md border border-border hover:bg-surface-hover transition-colors cursor-pointer"
                 >
                   <img
                     src={user?.avatar || "/images/default-avatar.svg"}
                     alt={user?.username}
                     className="w-7 h-7 rounded-full object-cover"
                   />
-                  <span className="text-sm font-semibold hidden sm:inline">@{user?.username}</span>
+                  <span className="text-sm font-medium hidden sm:inline">@{user?.username}</span>
                 </button>
                 
                 {/* Dropdown menu */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 py-2 rounded-xl bg-card border border-border shadow-xl z-50">
+                  <div className="absolute right-0 top-full mt-2 w-48 py-1 rounded-md bg-popover border border-border shadow-lg shadow-black/40 z-50">
                     <Link
                       href="/profile"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors cursor-pointer"
+                      className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-surface-hover transition-colors cursor-pointer"
                     >
                       <User className="w-4 h-4" />
                       Mon Profil
@@ -89,7 +89,7 @@ export function AppHeader() {
                         setIsMenuOpen(false)
                         signOut()
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-white/5 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-no hover:bg-surface-hover transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Déconnexion
@@ -100,7 +100,7 @@ export function AppHeader() {
             ) : (
               <Link
                 href="/login"
-                className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+                className="h-10 px-4 inline-flex items-center rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
               >
                 Se connecter
               </Link>
@@ -111,11 +111,11 @@ export function AppHeader() {
 
       {/* Mobile Active Bets Banner */}
       {activeBets.length > 0 && (
-        <div className="lg:hidden mb-4 rounded-xl bg-primary/10 border border-primary/20 p-3">
+        <Link href="/profile" className="lg:hidden mb-4 block rounded-lg border border-border px-3 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="text-xs font-bold uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />
+              <span className="text-xs font-medium">
                 {activeBets.length} Pari{activeBets.length > 1 ? "s" : ""} Actif{activeBets.length > 1 ? "s" : ""}
               </span>
             </div>
@@ -123,7 +123,7 @@ export function AppHeader() {
               {activeBets.reduce((sum, bet) => sum + bet.amount, 0)} <CurrencySymbol /> engagés
             </span>
           </div>
-        </div>
+        </Link>
       )}
     </>
   )

@@ -1,7 +1,7 @@
 "use client"
 
-import { Clock, Users, Activity, HelpCircle, Trophy } from "lucide-react"
-import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine, ReferenceDot } from "recharts"
+import { Clock, Users, Trophy } from "lucide-react"
+import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -11,20 +11,78 @@ type MarketCardProps = {
   onBet: (market: string, choice: string, amount: number, odds?: number) => void
 }
 
+const CHART_STROKE = "oklch(0.92 0 0)"
+
+function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: string }) {
+  const resolved = market.status === 'resolved' || market.resolved_at
+  return (
+    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <span>{categoryLabel}</span>
+      {market.season && (
+        <span title={`Saison : ${market.season.name}`} className="inline-flex items-center gap-1 text-amber-400">
+          <Trophy className="w-3 h-3" aria-hidden />
+          <span className="sr-only">Saison {market.season.name}</span>
+        </span>
+      )}
+      <span aria-hidden>·</span>
+      {market.isLive ? (
+        <span className="inline-flex items-center gap-1.5 text-primary font-medium">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden />
+          En direct
+        </span>
+      ) : resolved ? (
+        <span className="font-medium">Terminé</span>
+      ) : (
+        <span className="font-medium text-amber-400">En attente</span>
+      )}
+      <span className="ml-auto inline-flex items-center gap-1 font-mono">
+        <Clock className="w-3 h-3" aria-hidden />
+        {market.countdown || "-"}
+      </span>
+    </div>
+  )
+}
+
+function Thumb({ src }: { src?: string }) {
+  if (!src) return null
+  // Background image: a dead URL degrades to a plain tile instead of a broken-image icon
+  return (
+    <div
+      aria-hidden
+      className="w-10 h-10 rounded-md shrink-0 bg-muted bg-cover bg-center"
+      style={{ backgroundImage: `url("${src}")` }}
+    />
+  )
+}
+
+const cardClass = (market: Market) =>
+  `group rounded-lg bg-card border p-4 text-left h-[300px] flex flex-col gap-3 cursor-pointer transition-colors hover:bg-surface-hover ${
+    market.season ? "border-amber-500/30" : "border-border"
+  }`
+
+const yesBtn = "h-9 rounded-md bg-yes/10 text-yes text-sm font-medium hover:bg-yes/20 transition-colors disabled:opacity-50"
+const noBtn = "h-9 rounded-md bg-no/10 text-no text-sm font-medium hover:bg-no/20 transition-colors disabled:opacity-50"
+
 export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   // Find correct icon from constants
   const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
-  const CategoryIcon = categoryDef?.icon || HelpCircle
+  const categoryLabel = categoryDef?.label || market.category || "Divers"
 
   // Use real history data for chart (passed from container)
-  const chartData = market.type === "binary" 
-    ? (market as BinaryMarket).history24h || [] 
+  const chartData = market.type === "binary"
+    ? (market as BinaryMarket).history24h || []
     : []
+
+  const open = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onMarketClick(market)
+  }
 
   if (market.type === "multi") {
     const sortedOutcomes = [...market.outcomes].sort((a, b) => b.probability - a.probability)
     const topTwo = sortedOutcomes.slice(0, 2)
     const remainingCount = Math.max(0, market.outcomes.length - 2)
+    const resolved = market.status === 'resolved' || market.resolved_at
 
     return (
       <div
@@ -32,134 +90,50 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         tabIndex={0}
         onClick={() => onMarketClick(market)}
         onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-        className={`group relative overflow-hidden rounded-xl bg-card border transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg ${
-          market.season
-            ? "border-amber-500/30 hover:border-amber-400/50 hover:shadow-amber-500/10"
-            : "border-white/10 hover:border-white/20 hover:shadow-primary/5"
-        }`}
+        className={cardClass(market)}
       >
-        <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
-          {market.bgImage ? (
-            <img 
-              src={market.bgImage} 
-              alt="" 
-              className="w-full h-full object-cover"
-              onError={(e) => e.currentTarget.style.display = 'none'} 
-            />
-          ) : (
-            <div className="w-full h-full bg-slate-800" />
-          )}
+        <CardHeader market={market} categoryLabel={categoryLabel} />
+
+        <div className="flex items-start gap-3">
+          <Thumb src={market.bgImage} />
+          <p className="font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-card via-card/98 to-card/95" />
 
-        <div className="relative flex-1 flex flex-col p-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CategoryIcon className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                {categoryDef?.label || market.category || "Divers"}
-              </span>
-              {market.season && (
-                <span
-                  className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
-                  title={`Saison: ${market.season.name}`}
-                >
-                  <Trophy className="w-3 h-3 text-amber-400" />
-                </span>
-              )}
-              {market.isLive ? (
-                <>
-                  <span className="text-muted-foreground">•</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
+        {/* Top 2 candidates */}
+        <div className="flex-1 divide-y divide-border">
+          {topTwo.map((outcome) => {
+            const nonProb = 100 - outcome.probability
+            return (
+              <div key={outcome.name} className="flex items-center gap-3 py-2">
+                <span className="flex-1 text-sm truncate" title={outcome.name}>{outcome.name}</span>
+                <span className="font-mono font-semibold text-sm w-10 text-right">{Math.round(outcome.probability)}%</span>
+                {market.isLive ? (
+                  <div className="flex gap-1.5">
+                    <button onClick={open} className={`${yesBtn} h-8 px-2.5 text-xs`} aria-label={`OUI ${outcome.name}`}>OUI</button>
+                    <button onClick={open} className={`${noBtn} h-8 px-2.5 text-xs`} aria-label={`NON ${outcome.name}, ${Math.round(nonProb)}%`}>NON</button>
                   </div>
-                </>
-              ) : (
-                market.status === 'resolved' || market.resolved_at ? (
-                <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                  Terminé
-                </div>
+                ) : resolved ? (
+                  // @ts-ignore
+                  <span className={`text-xs font-medium w-[88px] text-right ${outcome.is_winner === true ? 'text-yes' : 'text-no'}`}>
+                    {/* @ts-ignore */}
+                    {outcome.is_winner === true ? "Gagnant" : "Perdant"}
+                  </span>
                 ) : (
-                  <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
-                    En attente
-                  </div>
-                )
-              )}
-            </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
-              <Clock className="w-3 h-3" />
-              {market.countdown || "-"}
-            </div>
-          </div>
+                  <span className="text-xs text-amber-400 w-[88px] text-right">En attente</span>
+                )}
+              </div>
+            )
+          })}
+        </div>
 
-          <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
-
-          {/* Top 2 candidates with OUI/NON buttons */}
-          <div className="flex-1 space-y-2">
-            {topTwo.map((outcome) => {
-              const nonProb = 100 - outcome.probability
-              return (
-              <div key={outcome.name} className="p-2 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium truncate max-w-[180px]" title={outcome.name}>{outcome.name}</span>
-                    <span className="font-mono font-bold text-sm">{Math.round(outcome.probability)}%</span>
-                </div>
-                  {market.isLive ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onMarketClick(market)
-                    }}
-                    className="py-1 px-2 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold hover:bg-emerald-500/20 transition-all uppercase"
-                  >
-                        OUI {Math.round(outcome.probability)}%
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onMarketClick(market)
-                    }}
-                        className="py-1 px-2 rounded bg-rose-500/20 border border-rose-500/50 text-rose-400 text-[10px] font-bold hover:bg-rose-500/30 transition-all uppercase"
-                  >
-                        NON {Math.round(nonProb)}%
-                  </button>
-                    </div>
-                  ) : (
-                    <div className={`py-1 px-2 rounded border text-center flex items-center justify-center gap-2 ${
-                      market.status === 'resolved' || market.resolved_at
-                        ? // @ts-ignore
-                      outcome.is_winner === true 
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                        : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-                    }`}>
-                      <span className="text-[10px] font-bold uppercase">
-                        {market.status === 'resolved' || market.resolved_at ? (
-                          // @ts-ignore
-                          outcome.is_winner === true ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"
-                        ) : (
-                          "En attente"
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Link to see more outcomes */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border mt-1">
-            <span className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              <span className="font-mono">{market.volume || 0}</span>
-            </span>
-            {remainingCount > 0 && (
-              <span className="text-primary font-medium hover:underline">+{remainingCount} options...</span>
-            )}
-          </div>
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border">
+          <span className="inline-flex items-center gap-1">
+            <Users className="w-3 h-3" aria-hidden />
+            <span className="font-mono">{market.volume || 0}</span>
+          </span>
+          {remainingCount > 0 && (
+            <span className="group-hover:text-foreground transition-colors">+{remainingCount} options</span>
+          )}
         </div>
       </div>
     )
@@ -177,7 +151,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   const winnerId = market.winner_outcome_id
 
   const isResolved = !market.isLive && (market.status === 'resolved' || market.resolved_at)
-  
+
   // If resolved, check who really won
   let yesWon = false
   let noWon = false
@@ -200,172 +174,68 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       tabIndex={0}
       onClick={() => onMarketClick(market)}
       onKeyDown={(e) => e.key === "Enter" && onMarketClick(market)}
-      className={`group relative overflow-hidden rounded-xl bg-card border transition-all p-4 text-left h-[320px] flex flex-col cursor-pointer hover:shadow-lg ${
-        market.season
-          ? "border-amber-500/30 hover:border-amber-400/50 hover:shadow-amber-500/10"
-          : "border-white/10 hover:border-white/20 hover:shadow-primary/5"
-      }`}
+      className={cardClass(market)}
     >
-      <div className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity">
-        {market.bgImage ? (
-          <img 
-            src={market.bgImage} 
-            alt="" 
-            className="w-full h-full object-cover"
-            onError={(e) => e.currentTarget.style.display = 'none'} 
-          />
-        ) : (
-          <div className="w-full h-full bg-slate-800" />
-        )}
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-br from-card via-card/98 to-card/95" />
+      <CardHeader market={market} categoryLabel={categoryLabel} />
 
-      <div className="relative flex-1 flex flex-col p-2 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CategoryIcon className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              {categoryDef?.label || market.category || "Divers"}
-            </span>
-            {market.season && (
-              <span
-                className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20"
-                title={`Saison: ${market.season.name}`}
-              >
-                <Trophy className="w-3 h-3 text-amber-400" />
-              </span>
-            )}
-            {market.isLive ? (
-              <>
-                <span className="text-muted-foreground">•</span>
-                <div className="flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-xs text-primary font-medium uppercase tracking-wider">Live</span>
-                </div>
-              </>
-            ) : (
-              market.status === 'resolved' || market.resolved_at ? (
-              <div className="ml-auto px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
-                Terminé
-              </div>
-              ) : (
-                <div className="ml-auto px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
-                  En attente
-                </div>
-              )
-            )}
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
-            <Clock className="w-3 h-3" />
-            {market.countdown || "-"}
-          </div>
-        </div>
-
-        <p className="font-semibold text-base tracking-tight text-balance leading-snug line-clamp-2">{market.question}</p>
-
-        {/* Real history chart */}
-        <div className="flex-1 min-h-[100px] relative overflow-visible">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 15, right: 35, bottom: 0, left: 0 }}>
-              <defs>
-                <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <YAxis domain={[0, 100]} hide />
-              <ReferenceLine y={50} stroke="#ffffff" strokeOpacity={0.1} strokeDasharray="3 3" />
-              {chartData.length > 0 && (
-                <ReferenceDot
-                  x={chartData.length - 1}
-                  y={chartData[chartData.length - 1].price}
-                  r={3}
-                  fill="#ffffff"
-                  stroke="#ffffff"
-                  strokeWidth={2}
-                  shape={(props: any) => (
-                    <g>
-                      {/* Pulsing glow */}
-                      <circle cx={props.cx} cy={props.cy} r={8} fill="#ffffff" className="animate-pulse opacity-30" />
-                      {/* Solid dot */}
-                      <circle cx={props.cx} cy={props.cy} r={4} fill="#ffffff" />
-                      {/* Percentage label next to dot */}
-                      <text
-                        x={props.cx + 12}
-                        y={props.cy + 4}
-                        fontSize="11"
-                        fontWeight="bold"
-                        fontFamily="ui-monospace, monospace"
-                        fill="#ffffff"
-                      >
-                        {Math.round(chartData[chartData.length - 1].price)}%
-                      </text>
-                    </g>
-                  )}
-                />
-              )}
-              <Area
-                type="linear"
-                dataKey="price"
-                stroke="#ffffff"
-                strokeWidth={1.5}
-                fill={`url(#gradient-${market.id})`}
-                dot={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Users className="w-3.5 h-3.5" />
-            <span className="font-mono">{market.volume || 0}</span>
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            <Activity className="w-3.5 h-3.5" />
-            <span>{binaryMarket.volatility || "Moyenne"}</span>
-          </span>
-        </div>
-
-        {/* Bigger OUI/NON buttons OR Resolved State */}
-        <div className="grid grid-cols-2 gap-3">
-          {isResolved ? (
-            <div className={`col-span-2 py-2 px-3 rounded border text-center flex items-center justify-center gap-2 ${
-              yesWon 
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-            }`}>
-              <span className="text-xs font-bold uppercase">
-                {yesWon ? "RÉSULTAT : OUI" : "RÉSULTAT : NON"}
-              </span>
-            </div>
-          ) : (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onMarketClick(market)
-                }}
-                disabled={!market.isLive}
-                className="py-2 px-3 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition-all uppercase"
-              >
-                OUI {prob}%
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onMarketClick(market)
-                }}
-                disabled={!market.isLive}
-                className="py-2 px-3 rounded bg-rose-500/20 border border-rose-500/50 text-rose-400 text-xs font-bold hover:bg-rose-500/30 transition-all uppercase"
-              >
-                NON {100 - prob}%
-              </button>
-            </>
-          )}
+      <div className="flex items-start gap-3">
+        <Thumb src={market.bgImage} />
+        <p className="flex-1 font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
+        <div className="text-right shrink-0">
+          <p className="font-mono text-xl font-semibold leading-none">{prob}%</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">OUI</p>
         </div>
       </div>
+
+      {/* Real history chart */}
+      <div className="flex-1 min-h-[72px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id={`gradient-${market.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={CHART_STROKE} stopOpacity={0.12} />
+                <stop offset="100%" stopColor={CHART_STROKE} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <YAxis domain={[0, 100]} hide />
+            <ReferenceLine y={50} stroke={CHART_STROKE} strokeOpacity={0.12} strokeDasharray="3 3" />
+            <Area
+              type="linear"
+              dataKey="price"
+              stroke={CHART_STROKE}
+              strokeWidth={1.5}
+              fill={`url(#gradient-${market.id})`}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <Users className="w-3 h-3" aria-hidden />
+          <span className="font-mono">{market.volume || 0}</span>
+        </span>
+        <span aria-hidden>·</span>
+        <span>Volatilité {(binaryMarket.volatility || "Moyenne").toLowerCase()}</span>
+      </div>
+
+      {/* OUI/NON buttons OR Resolved State */}
+      {isResolved ? (
+        <div className={`h-9 rounded-md flex items-center justify-center text-sm font-medium ${yesWon ? 'bg-yes/10 text-yes' : 'bg-no/10 text-no'}`}>
+          Résultat : {yesWon ? "OUI" : "NON"}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={open} disabled={!market.isLive} className={yesBtn}>
+            OUI <span className="font-mono">{prob}%</span>
+          </button>
+          <button onClick={open} disabled={!market.isLive} className={noBtn}>
+            NON <span className="font-mono">{100 - prob}%</span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -22,22 +22,21 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-all ${
-        active 
-          ? "bg-primary/10 text-primary shadow-[0_0_15px_rgba(220,38,38,0.15)]" 
-          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+      aria-current={active ? "page" : undefined}
+      className={`flex-1 flex flex-col items-center justify-center gap-1 h-14 transition-colors ${
+        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {icon}
-      <span className="text-[10px] font-medium">{label}</span>
+      <span className="text-[11px] font-medium">{label}</span>
     </Link>
   )
 }
 
 export function MobileNav({ activeTab, showLeaderboard }: MobileNavProps) {
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/90 border-t border-border">
-      <div className="flex justify-around items-center py-3">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t border-border pb-[env(safe-area-inset-bottom)]">
+      <div className="flex justify-around items-center">
         <NavLink
           href="/"
           icon={<Home className="w-5 h-5" />}
