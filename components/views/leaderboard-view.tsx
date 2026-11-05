@@ -438,7 +438,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       {hasSeason && viewMode === 'season' && (
         <div className="space-y-6 flex flex-col items-center">
           {/* Rewards Card - Golden Border Style */}
-          <div className="w-full max-w-[95%] rounded-lg bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-lg">
+          <div className="w-full max-w-[95%] rounded-lg bg-amber-500/5 border border-amber-500/30 p-6 relative overflow-hidden shadow-lg">
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <Trophy className="w-32 h-32 rotate-12 text-amber-500" />
@@ -492,9 +492,6 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             isSeasonTimeElapsed ? 'border-muted-foreground/30' : 'border-border'
           }`}>
             {/* Background glow */}
-            <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none ${
-              isSeasonTimeElapsed ? 'bg-muted-foreground/10' : 'bg-primary/10'
-            }`} />
             
             <div className="flex items-end justify-between mb-3 relative z-10">
               <div>
@@ -524,8 +521,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               <div 
                 className={`absolute left-0 top-0 h-full transition-all duration-1000 ease-out rounded-full ${
                   isSeasonTimeElapsed 
-                    ? 'bg-gradient-to-r from-muted-foreground/60 to-muted-foreground/40' 
-                    : 'bg-gradient-to-r from-rose-600 via-primary to-orange-500 '
+                    ? 'bg-muted-foreground/50' 
+                    : 'bg-primary'
                 }`}
                 style={{ width: `${progress}%` }}
               >
@@ -619,13 +616,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
-            <div className="w-full h-[260px] rounded-lg bg-card border border-border p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
+            <div className="w-full h-[260px] rounded-lg bg-card border border-border p-4 flex flex-col items-center justify-between relative overflow-hidden">
+                            
               <span className="text-2xl font-semibold text-white/20 absolute top-2 left-3">#2</span>
               
               <div className="relative mt-4">
-                <div className="absolute inset-0 bg-white/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
               <img
                 src={top2.avatar}
                 alt={top2.username}
@@ -666,17 +661,14 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 1st Place */}
         <div className="flex flex-col items-center w-full z-10">
           {top1 ? (
-            <div className="w-full h-[300px] rounded-lg bg-black border border-amber-500/50 p-5 flex flex-col items-center justify-between relative overflow-hidden group transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50" />
+            <div className="w-full h-[300px] rounded-lg bg-card border border-amber-500/40 p-5 flex flex-col items-center justify-between relative overflow-hidden group transition-transform duration-300">
               
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-amber-500/20 blur-2xl rounded-full" />
               
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
                 <Trophy className="w-8 h-8 text-amber-400" />
               </div>
               
               <div className="relative mt-10">
-                <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
                 <img 
                   src={top1.avatar} 
                   alt={top1.username}
@@ -717,13 +709,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 3rd Place */}
         <div className="flex flex-col items-center w-full">
           {top3 ? (
-            <div className="w-full h-[230px] rounded-lg bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
+            <div className="w-full h-[230px] rounded-lg bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden">
+                            
               <span className="text-2xl font-semibold text-orange-500/20 absolute top-2 left-3">#3</span>
               
               <div className="relative mt-2">
-                <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
               <img
                 src={top3.avatar}
                 alt={top3.username}
@@ -763,9 +753,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       </div>
 
       {/* Leaderboard Table */}
-      <div className="space-y-2 mt-4">
+      <div className="mt-4 rounded-lg border border-border overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-semibold text-muted-foreground uppercase tracking-wide sm:tracking-wide">
+        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-border bg-card">
           <span className="col-span-1">#</span>
           <span className="col-span-5">Trader</span>
           <span className="col-span-2 text-center">WR</span>
@@ -773,7 +763,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </div>
         
         {/* List */}
-        <div className="space-y-2">
+        <div className="divide-y divide-border">
           {rest.map((player, idx) => {
             const actualRank = idx + 4
             const reward = getZenyReward(actualRank)
@@ -782,13 +772,13 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             return (
               <div
                 key={player.id}
-                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center rounded-xl border transition-all ${
-                  isMe 
-                    ? "bg-primary/5 border-primary/30" 
-                    : "bg-card border-border hover:border-border"
+                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-colors ${
+                  isMe
+                    ? "bg-primary/5"
+                    : "hover:bg-surface-hover"
                 }`}
               >
-                <span className="col-span-1 font-mono text-sm font-semibold text-muted-foreground/50">#{actualRank}</span>
+                <span className="col-span-1 font-mono text-sm text-muted-foreground">{actualRank}</span>
                 <div className="col-span-5 flex items-center gap-3 min-w-0">
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
                   <div className="flex flex-col min-w-0 gap-0.5">

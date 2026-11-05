@@ -56,7 +56,7 @@ export function BuyZenyView() {
         popular: false
       }
       case 'pack_degen': return { 
-        bg: 'bg-gradient-to-b from-primary/10 to-card',
+        bg: 'bg-card',
         border: 'border-primary/50',
         iconBg: 'bg-primary/20',
         iconColor: 'text-primary',

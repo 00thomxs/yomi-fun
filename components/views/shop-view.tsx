@@ -234,7 +234,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   key={pack.id}
                   className={`relative rounded-xl border p-5 flex flex-col transition-all hover:scale-[1.02] ${
                     theme.popular 
-                      ? 'border-primary/50 bg-gradient-to-b from-primary/10 to-card' 
+                      ? 'border-primary/50 bg-card' 
                       : 'border-border bg-card'
                   }`}
                 >

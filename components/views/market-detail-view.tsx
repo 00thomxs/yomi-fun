@@ -331,7 +331,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
           <ArrowLeft className="w-[18px] h-[18px]" />
         </button>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mb-1 whitespace-nowrap">
             <p className="text-xs text-muted-foreground">{categoryDef?.label || market.category}</p>
             {market.isLive ? (
               <>

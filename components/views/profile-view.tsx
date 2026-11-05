@@ -574,7 +574,7 @@ export function ProfileView() {
                   </div>
                   <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
+                      className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${(userStats.xp % 1000) / 10}%` }}
                     />
                   </div>
