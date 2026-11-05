@@ -126,7 +126,7 @@ export async function resolveMarket(
       // A. Update User Balance, Stats, XP and Level using secure RPC
       const XP_PER_WIN = 50
       
-      const { error: rpcError } = await supabase.rpc('update_winner_stats', {
+      const { error: rpcError } = await supabaseAdmin.rpc('update_winner_stats', {
         p_user_id: bet.user_id,
         p_payout: Math.floor(payout),
         p_bet_amount: bet.amount, // Add bet amount for PnL
@@ -136,16 +136,16 @@ export async function resolveMarket(
       if (rpcError) {
         console.error(`[RESOLVE_ERROR] RPC update_winner_stats failed for user ${bet.user_id}:`, rpcError)
         // Fallback: try basic increment if stats update fails
-        await supabase.rpc('increment_balance', {
-          user_id: bet.user_id,
-          amount: payout
+        await supabaseAdmin.rpc('increment_balance', {
+          p_user_id: bet.user_id,
+          p_amount: payout
         })
       } else {
         console.log(`[RESOLVE] User ${bet.user_id} stats updated via RPC`)
       }
 
       // B. Update Bet Status
-      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabaseAdmin.from('bets').update({ status: 'won' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'won' failed:`, betUpdateError)
       }
@@ -183,7 +183,7 @@ export async function resolveMarket(
       })
 
       // Update stats via RPC (Reset streak, recalculate Win Rate)
-      const { error: rpcError } = await supabase.rpc('update_loser_stats', {
+      const { error: rpcError } = await supabaseAdmin.rpc('update_loser_stats', {
         p_user_id: bet.user_id,
         p_bet_amount: bet.amount // Add bet amount for PnL
       })
@@ -192,7 +192,7 @@ export async function resolveMarket(
         console.error(`[RESOLVE_ERROR] RPC update_loser_stats failed for user ${bet.user_id}:`, rpcError)
       }
 
-      const { error: betUpdateError } = await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      const { error: betUpdateError } = await supabaseAdmin.from('bets').update({ status: 'lost' }).eq('id', bet.id)
       if (betUpdateError) {
         console.error(`[RESOLVE_ERROR] Bet status update to 'lost' failed:`, betUpdateError)
       } else {
@@ -374,7 +374,7 @@ export async function resolveMarketMulti(
       })
       
       const XP_PER_WIN = 50
-      const { error: rpcError } = await supabase.rpc('update_winner_stats', {
+      const { error: rpcError } = await supabaseAdmin.rpc('update_winner_stats', {
         p_user_id: bet.user_id,
         p_payout: Math.floor(payout),
         p_bet_amount: bet.amount, // Add bet amount for PnL
@@ -383,13 +383,13 @@ export async function resolveMarketMulti(
 
       if (rpcError) {
         console.error(`[RESOLVE_MULTI] RPC update_winner_stats failed for user ${bet.user_id}:`, rpcError)
-        await supabase.rpc('increment_balance', {
-          user_id: bet.user_id,
-          amount: payout
+        await supabaseAdmin.rpc('increment_balance', {
+          p_user_id: bet.user_id,
+          p_amount: payout
         })
       }
 
-      await supabase.from('bets').update({ status: 'won' }).eq('id', bet.id)
+      await supabaseAdmin.from('bets').update({ status: 'won' }).eq('id', bet.id)
       
       // Update Season Leaderboard (if market belongs to a season)
       if (seasonId) {
@@ -421,14 +421,14 @@ export async function resolveMarketMulti(
         bet_id: bet.id
       })
 
-      const { error: rpcError } = await supabase.rpc('update_loser_stats', {
+      const { error: rpcError } = await supabaseAdmin.rpc('update_loser_stats', {
         p_user_id: bet.user_id,
         p_bet_amount: bet.amount // Add bet amount for PnL
       })
       
       if (rpcError) console.error(`[RESOLVE_MULTI] RPC update_loser_stats failed:`, rpcError)
 
-      await supabase.from('bets').update({ status: 'lost' }).eq('id', bet.id)
+      await supabaseAdmin.from('bets').update({ status: 'lost' }).eq('id', bet.id)
       
       // Update Season Leaderboard for losers (if market belongs to a season)
       if (seasonId) {

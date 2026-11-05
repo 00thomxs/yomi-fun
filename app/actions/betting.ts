@@ -175,7 +175,7 @@ export async function placeBet(
   
   // Note: PnL (total_won) is NOT updated here anymore. It's updated at resolution.
 
-  const { error: debitError } = await supabase
+  const { error: debitError } = await supabaseAdmin
     .from('profiles')
     .update({ 
       balance: profile.balance - amount, 
@@ -199,8 +199,8 @@ export async function placeBet(
      const probYes = Math.round((newPoolYes / total) * 100)
      const probNo = Math.round((newPoolNo / total) * 100)
      
-     await supabase.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
-     await supabase.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
+     await supabaseAdmin.from('outcomes').update({ probability: probYes }).eq('name', 'OUI').eq('market_id', marketId)
+     await supabaseAdmin.from('outcomes').update({ probability: probNo }).eq('name', 'NON').eq('market_id', marketId)
 
      // HISTORY: Insert price history for Binary
      // 0 = NON, 1 = OUI
@@ -280,7 +280,7 @@ export async function placeBet(
      // Update ALL outcomes probabilities
      await Promise.all(
        Object.entries(newProbsById).map(([outcomeId, prob]) =>
-         supabase.from('outcomes').update({ probability: prob }).eq('id', outcomeId)
+         supabaseAdmin.from('outcomes').update({ probability: prob }).eq('id', outcomeId)
        )
      )
 
@@ -304,14 +304,14 @@ export async function placeBet(
      updateData = { ...updateData, pool_yes: newPoolYes, pool_no: newPoolNo }
   }
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await supabaseAdmin
     .from('markets')
     .update(updateData)
     .eq('id', marketId)
 
   if (updateError) {
     // Rollback
-    await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: "Erreur mise à jour marché." }
   }
 
@@ -319,7 +319,7 @@ export async function placeBet(
   // Store probability and balance for special badges (DIEU, RISK TAKER, ALL IN)
   const probabilityAtBet = direction === 'YES' ? safeProb : (1 - safeProb)
   
-  const { error: betError } = await supabase
+  const { error: betError } = await supabaseAdmin
     .from('bets')
     .insert({
       user_id: user.id,
@@ -338,7 +338,7 @@ export async function placeBet(
 
   if (betError) {
     // Rollback hard
-    await supabase.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
     return { error: `Erreur création pari: ${betError.message}` }
   }
 

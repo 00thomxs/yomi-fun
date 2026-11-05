@@ -490,7 +490,7 @@ export async function resetPlatform(): Promise<{ error?: string; success?: boole
   if (profile?.role !== 'admin') return { error: "Accès refusé" }
 
   // Call the RPC function
-  const { error } = await supabase.rpc('reset_platform')
+  const { error } = await supabaseAdmin.rpc('reset_platform')
 
   if (error) {
     console.error("Reset platform error:", error)

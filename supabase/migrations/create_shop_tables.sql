@@ -49,3 +49,6 @@ INSERT INTO public.shop_items (name, description, price, image_url) VALUES
 
 
 
+
+
+

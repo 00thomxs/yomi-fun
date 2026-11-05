@@ -1,6 +1,13 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+// Players have no UPDATE right on bets (they could mark their own bets as won); filter by user.id instead.
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export interface UnseenBetWin {
   id: string
@@ -77,7 +84,7 @@ export async function markBetWinAsSeen(betId: string): Promise<{ success: boolea
     return { success: false, error: 'Non authentifié' }
   }
   
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('bets')
     .update({ win_seen_at: new Date().toISOString() })
     .eq('id', betId)
@@ -102,7 +109,7 @@ export async function markAllBetWinsAsSeen(): Promise<{ success: boolean; error?
     return { success: false, error: 'Non authentifié' }
   }
   
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('bets')
     .update({ win_seen_at: new Date().toISOString() })
     .eq('user_id', user.id)
