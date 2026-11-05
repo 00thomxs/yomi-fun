@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2, Check } from "lucide-react"
 import { signInWithGoogle } from "@/app/auth/actions"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { useUser } from "@/contexts/user-context"
@@ -156,7 +156,7 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground tactical-grid flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       {/* Noise Overlay */}
       <div
         className="fixed inset-0 opacity-[0.02] pointer-events-none z-0 mix-blend-overlay"
@@ -178,7 +178,7 @@ function LoginContent() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl bg-card border border-border p-8 space-y-6">
+        <div className="rounded-lg bg-card border border-border p-8 space-y-6">
           {/* Toggle Login/Register - hide when in forgot password mode */}
           {!showForgotPassword && (
             <div className="flex rounded-lg bg-white/5 p-1">
@@ -213,13 +213,13 @@ function LoginContent() {
           {success && (
             <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-sm space-y-2">
               <div className="flex items-center gap-2 text-green-500 font-medium">
-              <span>✓</span>
+              <Check className="w-4 h-4" aria-hidden />
                 <span>Compte créé avec succès !</span>
               </div>
               <p className="text-green-400/80 text-xs">
-                📧 Vérifie tes emails pour confirmer ton compte.
+                Vérifie tes emails pour confirmer ton compte.
                 <br />
-                <span className="text-amber-400">⚠️ Pense à regarder tes spams si tu ne reçois rien !</span>
+                <span className="text-amber-400">Pense à regarder tes spams si tu ne reçois rien !</span>
               </p>
             </div>
           )}
@@ -232,7 +232,7 @@ function LoginContent() {
               </p>
               
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                   Email
                 </label>
                 <div className="relative">
@@ -251,7 +251,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm uppercase tracking-wider hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -273,7 +273,7 @@ function LoginContent() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                     Pseudo
                   </label>
                   <div className="relative">
@@ -292,7 +292,7 @@ function LoginContent() {
               )}
 
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                   Email
                 </label>
                 <div className="relative">
@@ -309,7 +309,7 @@ function LoginContent() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                   Mot de passe
                 </label>
                 <div className="relative">
@@ -348,7 +348,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isLoading || isGoogleLoading}
-                className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm uppercase tracking-wider hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+                className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />

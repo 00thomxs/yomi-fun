@@ -66,21 +66,21 @@ const RARITY_STYLES: Record<BadgeRarity, {
     text: 'text-blue-400',
     bg: 'bg-blue-950/30',
     icon: 'text-blue-400',
-    glow: 'shadow-[0_0_10px_rgba(59,130,246,0.2)]',
+    glow: '',
   },
   epic: {
     border: 'border-purple-500/50',
     text: 'text-purple-400',
     bg: 'bg-purple-950/30',
     icon: 'text-purple-400',
-    glow: 'shadow-[0_0_15px_rgba(168,85,247,0.3)]',
+    glow: '',
   },
   legendary: {
     border: 'border-amber-500/70',
     text: 'text-amber-400',
     bg: 'bg-amber-950/30',
     icon: 'text-amber-400',
-    glow: 'shadow-[0_0_20px_rgba(245,158,11,0.4)]',
+    glow: '',
     animation: 'animate-pulse',
   },
 }
@@ -97,13 +97,13 @@ const LEVEL_STYLES: Record<number, Partial<typeof RARITY_STYLES['common']>> = {
     border: 'border-amber-500/60',
     text: 'text-amber-400',
     icon: 'text-amber-400',
-    glow: 'shadow-[0_0_12px_rgba(245,158,11,0.3)]',
+    glow: '',
   },
   4: {
     border: 'border-violet-400/70',
     text: 'text-violet-300',
     icon: 'text-violet-300',
-    glow: 'shadow-[0_0_20px_rgba(139,92,246,0.5)]',
+    glow: '',
     animation: 'animate-pulse',
   },
 }
@@ -156,7 +156,7 @@ export function BadgeDisplay({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full border font-bold uppercase tracking-wider',
+        'inline-flex items-center rounded-full border font-semibold uppercase tracking-wide',
         sizeStyles.container,
         styles.border,
         styles.bg,

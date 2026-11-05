@@ -62,7 +62,7 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Mot de passe actuel</label>
+        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Mot de passe actuel</label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 
@@ -76,7 +76,7 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Nouveau mot de passe</label>
+        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Nouveau mot de passe</label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 
@@ -91,7 +91,7 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Confirmer</label>
+        <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Confirmer</label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 
@@ -116,7 +116,7 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
           Confirmer

@@ -381,17 +381,17 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/20 transition-all cursor-pointer"
+          className="p-2.5 rounded-lg bg-card border border-border hover:border-white/15 transition-all cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-xl font-bold tracking-tight uppercase">Classement</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Classement</h2>
             {viewMode === 'season' && hasSeason ? (
             <p className={`text-xs font-medium flex items-center gap-1 max-w-[250px] truncate ${isSeasonTimeElapsed ? 'text-muted-foreground' : 'text-primary'}`}>
               <Trophy className="w-3 h-3 shrink-0" /> 
               {seasonSettings?.title || "Saison"} 
-              {isSeasonTimeElapsed && <span className="text-[10px] opacity-60">(terminée)</span>}
+              {isSeasonTimeElapsed && <span className="text-[11px] opacity-60">(terminée)</span>}
             </p>
           ) : (
               <p className="text-xs text-muted-foreground">Classement Global (All-time)</p>
@@ -401,10 +401,10 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         
         {/* Toggle Saison / Global */}
         {hasSeason && (
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-card border border-white/10">
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-card border border-border">
             <button
               onClick={() => setViewMode('season')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 viewMode === 'season'
                   ? 'bg-primary text-white shadow-lg'
                   : 'text-muted-foreground hover:text-white'
@@ -417,7 +417,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             </button>
             <button
               onClick={() => setViewMode('global')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                 viewMode === 'global'
                   ? 'bg-white/10 text-white shadow-lg'
                   : 'text-muted-foreground hover:text-white'
@@ -438,7 +438,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
       {hasSeason && viewMode === 'season' && (
         <div className="space-y-6 flex flex-col items-center">
           {/* Rewards Card - Golden Border Style */}
-          <div className="w-full max-w-[95%] rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-500/30 p-6 relative overflow-hidden shadow-2xl shadow-amber-500/5">
+          <div className="w-full max-w-[95%] rounded-lg bg-amber-500/5 border border-amber-500/30 p-6 relative overflow-hidden shadow-lg">
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <Trophy className="w-32 h-32 rotate-12 text-amber-500" />
@@ -447,40 +447,40 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-6">
                   <Gift className="w-5 h-5 text-amber-400" />
-                <h3 className="text-sm font-bold tracking-widest uppercase text-amber-400">Récompenses Saison</h3>
+                <h3 className="text-sm font-semibold text-amber-400">Récompenses Saison</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* 1st Place */}
-                  <div className="flex items-center gap-4 bg-amber-500/5 rounded-xl p-3 border border-amber-500/10">
-                  <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+                  <div className="flex items-center gap-4 bg-amber-500/5 rounded-lg p-3 border border-amber-500/10">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-2xl shrink-0">
                       <Trophy className="w-6 h-6 text-amber-400" />
                     </div>
                     <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-amber-400">1ère Place</p>
-                    <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top1_prize}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-amber-400">1ère Place</p>
+                    <p className="text-sm font-semibold text-white leading-tight">{seasonSettings?.top1_prize}</p>
                   </div>
                 </div>
 
                 {/* 2nd Place */}
-                <div className="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/5">
+                <div className="flex items-center gap-4 bg-white/5 rounded-lg p-3 border border-border">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-lg shrink-0">
                     <Medal className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-white/60">2ème Place</p>
-                    <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top2_prize}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-white/60">2ème Place</p>
+                    <p className="text-sm font-semibold text-white leading-tight">{seasonSettings?.top2_prize}</p>
                   </div>
                 </div>
 
                 {/* 3rd Place */}
-                <div className="flex items-center gap-4 bg-orange-500/5 rounded-xl p-3 border border-orange-500/10">
+                <div className="flex items-center gap-4 bg-orange-500/5 rounded-lg p-3 border border-orange-500/10">
                   <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg shrink-0">
                     <Medal className="w-5 h-5 text-orange-500" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-orange-500/80">3ème Place</p>
-                    <p className="text-sm font-bold text-white leading-tight">{seasonSettings?.top3_prize}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-orange-500/80">3ème Place</p>
+                    <p className="text-sm font-semibold text-white leading-tight">{seasonSettings?.top3_prize}</p>
                   </div>
                 </div>
               </div>
@@ -489,43 +489,40 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
           {/* Progress & Status Bar */}
           <div className={`w-full max-w-[90%] rounded-xl border bg-card p-4 relative overflow-hidden shadow-lg mb-2 ${
-            isSeasonTimeElapsed ? 'border-muted-foreground/30' : 'border-white/10'
+            isSeasonTimeElapsed ? 'border-muted-foreground/30' : 'border-border'
           }`}>
             {/* Background glow */}
-            <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none ${
-              isSeasonTimeElapsed ? 'bg-muted-foreground/10' : 'bg-primary/10'
-            }`} />
             
             <div className="flex items-end justify-between mb-3 relative z-10">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                   {isSeasonTimeElapsed ? 'Saison terminée' : 'Saison en cours'}
                 </p>
                 {isSeasonTimeElapsed ? (
-                  <p className="text-2xl font-black text-muted-foreground flex items-baseline gap-2 tabular-nums tracking-tight">
+                  <p className="text-2xl font-semibold text-muted-foreground flex items-baseline gap-2 tabular-nums tracking-tight">
                     Terminée
                   </p>
                 ) : (
-                  <p className="text-2xl font-black text-white flex items-baseline gap-2 tabular-nums tracking-tight">
-                    {getCountdown()} <span className="text-sm font-bold text-muted-foreground/50 uppercase">restants</span>
+                  <p className="text-2xl font-semibold text-white flex items-baseline gap-2 tabular-nums tracking-tight">
+                    {getCountdown()} <span className="text-sm font-semibold text-muted-foreground/50">restants</span>
                   </p>
                 )}
               </div>
               <div className="text-right">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Cash Prize</p>
-                <p className="text-xl font-black text-primary flex items-center justify-end gap-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Cash Prize</p>
+                <p className="text-xl font-semibold text-primary flex items-center justify-end gap-1">
                   {(seasonSettings?.cash_prize || 0).toLocaleString()}<CurrencySymbol className="w-4 h-4" />
                 </p>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+            <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden border border-border">
               <div 
                 className={`absolute left-0 top-0 h-full transition-all duration-1000 ease-out rounded-full ${
                   isSeasonTimeElapsed 
-                    ? 'bg-gradient-to-r from-muted-foreground/60 to-muted-foreground/40' 
-                    : 'bg-gradient-to-r from-rose-600 via-primary to-orange-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]'
+                    ? 'bg-muted-foreground/50' 
+                    : 'bg-primary'
                 }`}
                 style={{ width: `${progress}%` }}
               >
@@ -535,7 +532,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
             </div>
             
-            <div className="flex justify-between mt-2 text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider font-bold">
+            <div className="flex justify-between mt-2 text-[11px] font-mono text-muted-foreground/50 uppercase tracking-wide font-semibold">
               <span>Début</span>
               <span>Fin</span>
             </div>
@@ -543,17 +540,17 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
 
           {/* Season Events */}
           {seasonEvents.length > 0 && (
-            <div className="w-full max-w-[95%] rounded-xl border border-white/10 bg-card p-4 relative overflow-hidden">
+            <div className="w-full max-w-[95%] rounded-lg border border-border bg-card p-4 relative overflow-hidden">
               <button 
                 onClick={() => setEventsExpanded(!eventsExpanded)}
                 className="w-full flex items-center justify-between mb-3"
               >
                 <div className="flex items-center gap-2">
                   <Target className="w-4 h-4 text-primary" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-white/80">
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-white/80">
                     Events de la saison
                   </h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
                     {seasonEvents.length}
                   </span>
                 </div>
@@ -576,15 +573,15 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                         href={`/market/${event.id}`}
                         className={`flex items-center justify-between p-3 rounded-lg border transition-all hover:bg-white/5 ${
                           isResolved 
-                            ? 'bg-emerald-500/5 border-emerald-500/20' 
+                            ? 'bg-yes/5 border-yes/20' 
                             : isExpired
                               ? 'bg-amber-500/5 border-amber-500/20'
-                              : 'bg-white/5 border-white/10'
+                              : 'bg-white/5 border-border'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           {isResolved ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-yes shrink-0" />
                           ) : (
                             <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
                           )}
@@ -594,9 +591,9 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                           <span className="text-xs font-mono text-muted-foreground">
                             {event.volume?.toLocaleString() || 0} vol
                           </span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          <span className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${
                             isResolved 
-                              ? 'bg-emerald-500/10 text-emerald-400' 
+                              ? 'bg-yes/10 text-yes' 
                               : isExpired
                                 ? 'bg-amber-500/10 text-amber-400'
                                 : 'bg-primary/10 text-primary'
@@ -619,13 +616,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         {/* 2nd Place */}
         <div className="flex flex-col items-center w-full">
           {top2 ? (
-            <div className="w-full h-[260px] rounded-xl bg-card border border-white/10 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
-              <span className="text-2xl font-black text-white/20 absolute top-2 left-3">#2</span>
+            <div className="w-full h-[260px] rounded-lg bg-card border border-border p-4 flex flex-col items-center justify-between relative overflow-hidden">
+                            
+              <span className="text-2xl font-semibold text-white/20 absolute top-2 left-3">#2</span>
               
               <div className="relative mt-4">
-                <div className="absolute inset-0 bg-white/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
               <img
                 src={top2.avatar}
                 alt={top2.username}
@@ -634,7 +629,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2"><StyledUsername username={top2.username} nametagEffect={equippedNametags[top2.id]} withAt /></p>
+                <p className="font-semibold text-sm truncate px-2"><StyledUsername username={top2.username} nametagEffect={equippedNametags[top2.id]} withAt /></p>
                 {equippedBadges[top2.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top2.id].slice(0, 2).map(badge => (
@@ -645,38 +640,35 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
               </div>
               
-              <div className="w-full pt-3 border-t border-white/5 text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
-                <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-rose-400'}`}>
+              <div className="w-full pt-3 border-t border-border text-center relative z-10">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">PNL</p>
+                <p className={`text-lg font-semibold font-mono flex items-center justify-center gap-1 ${top2.totalWon >= 0 ? 'text-white' : 'text-no'}`}>
                   {top2.totalWon >= 0 ? '+' : ''}{Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-white border border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/10 text-[11px] font-semibold text-white border border-white/20">
                     +{getZenyReward(2).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
             </div>
-          ) : <div className="h-[260px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[260px] w-full bg-white/5 rounded-lg animate-pulse" />}
         </div>
 
         {/* 1st Place */}
         <div className="flex flex-col items-center w-full z-10">
           {top1 ? (
-            <div className="w-full h-[300px] rounded-xl bg-black border border-amber-500/50 p-5 flex flex-col items-center justify-between relative overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.15)] group hover:-translate-y-1 transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50" />
+            <div className="w-full h-[300px] rounded-lg bg-card border border-amber-500/40 p-5 flex flex-col items-center justify-between relative overflow-hidden group transition-transform duration-300">
               
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-24 h-24 bg-amber-500/20 blur-2xl rounded-full" />
               
               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-                <Trophy className="w-8 h-8 text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+                <Trophy className="w-8 h-8 text-amber-400" />
               </div>
               
               <div className="relative mt-10">
-                <div className="absolute inset-0 bg-amber-500/30 blur-xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
                 <img 
                   src={top1.avatar} 
                   alt={top1.username}
@@ -685,7 +677,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-black text-base truncate px-2 text-amber-100"><StyledUsername username={top1.username} nametagEffect={equippedNametags[top1.id]} withAt /></p>
+                <p className="font-semibold text-base truncate px-2 text-amber-100"><StyledUsername username={top1.username} nametagEffect={equippedNametags[top1.id]} withAt /></p>
                 {equippedBadges[top1.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top1.id].slice(0, 2).map(badge => (
@@ -696,34 +688,32 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-amber-500/80 font-mono mt-1 font-bold">{top1.winRate}% WR</p>
+                <p className="text-xs text-amber-500/80 font-mono mt-1 font-semibold">{top1.winRate}% WR</p>
               </div>
               
               <div className="w-full pt-3 border-t border-amber-500/20 text-center relative z-10">
-                <p className="text-xs text-amber-500/60 uppercase tracking-wider mb-1">PNL</p>
-                <p className={`text-xl sm:text-2xl font-black font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-rose-400'}`}>
+                <p className="text-xs text-amber-500/60 uppercase tracking-wide mb-1">PNL</p>
+                <p className={`text-xl sm:text-2xl font-semibold font-mono flex items-center justify-center gap-1 ${top1.totalWon >= 0 ? 'text-amber-400' : 'text-no'}`}>
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[11px] font-semibold text-amber-400 border border-amber-500/30">
                     +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
             </div>
-          ) : <div className="h-[300px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[300px] w-full bg-white/5 rounded-lg animate-pulse" />}
         </div>
 
         {/* 3rd Place */}
         <div className="flex flex-col items-center w-full">
           {top3 ? (
-            <div className="w-full h-[230px] rounded-xl bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden shadow-lg group hover:-translate-y-1 transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
-              <span className="text-2xl font-black text-orange-500/20 absolute top-2 left-3">#3</span>
+            <div className="w-full h-[230px] rounded-lg bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden">
+                            
+              <span className="text-2xl font-semibold text-orange-500/20 absolute top-2 left-3">#3</span>
               
               <div className="relative mt-2">
-                <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity" />
               <img
                 src={top3.avatar}
                 alt={top3.username}
@@ -732,7 +722,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               
               <div className="text-center w-full relative z-10">
-                <p className="font-bold text-sm truncate px-2"><StyledUsername username={top3.username} nametagEffect={equippedNametags[top3.id]} withAt /></p>
+                <p className="font-semibold text-sm truncate px-2"><StyledUsername username={top3.username} nametagEffect={equippedNametags[top3.id]} withAt /></p>
                 {equippedBadges[top3.id]?.length > 0 && (
                   <div className="flex justify-center gap-1 mt-1">
                     {equippedBadges[top3.id].slice(0, 2).map(badge => (
@@ -743,29 +733,29 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
               </div>
               
               <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">PNL</p>
-                <p className={`text-lg font-black font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-rose-400'}`}>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">PNL</p>
+                <p className={`text-lg font-semibold font-mono flex items-center justify-center gap-1 ${top3.totalWon >= 0 ? 'text-orange-400' : 'text-no'}`}>
                   {top3.totalWon >= 0 ? '+' : ''}{Math.abs(top3.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[10px] font-bold text-orange-400 border border-orange-500/20">
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[11px] font-semibold text-orange-400 border border-orange-500/20">
                     +{getZenyReward(3).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
               </div>
             </div>
-          ) : <div className="h-[230px] w-full bg-white/5 rounded-xl animate-pulse" />}
+          ) : <div className="h-[230px] w-full bg-white/5 rounded-lg animate-pulse" />}
         </div>
       </div>
 
       {/* Leaderboard Table */}
-      <div className="space-y-2 mt-4">
+      <div className="mt-4 rounded-lg border border-border overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider sm:tracking-widest">
+        <div className="grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-2.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-border bg-card">
           <span className="col-span-1">#</span>
           <span className="col-span-5">Trader</span>
           <span className="col-span-2 text-center">WR</span>
@@ -773,7 +763,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         </div>
         
         {/* List */}
-        <div className="space-y-2">
+        <div className="divide-y divide-border">
           {rest.map((player, idx) => {
             const actualRank = idx + 4
             const reward = getZenyReward(actualRank)
@@ -782,18 +772,18 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             return (
               <div
                 key={player.id}
-                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center rounded-xl border transition-all ${
-                  isMe 
-                    ? "bg-primary/5 border-primary/30 shadow-[0_0_15px_rgba(220,38,38,0.1)]" 
-                    : "bg-card border-white/5 hover:border-white/10"
+                className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-colors ${
+                  isMe
+                    ? "bg-primary/5"
+                    : "hover:bg-surface-hover"
                 }`}
               >
-                <span className="col-span-1 font-mono text-sm font-bold text-muted-foreground/50">#{actualRank}</span>
+                <span className="col-span-1 font-mono text-sm text-muted-foreground">{actualRank}</span>
                 <div className="col-span-5 flex items-center gap-3 min-w-0">
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
                   <div className="flex flex-col min-w-0 gap-0.5">
                     <div className="flex items-center gap-1 min-w-0">
-                      <span className={`font-bold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-primary" : "text-foreground"}`}>
+                      <span className={`font-semibold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-primary" : "text-foreground"}`}>
                         <StyledUsername username={player.username} nametagEffect={equippedNametags[player.id]} />
                       </span>
                       {/* Mobile: only 1 icon */}
@@ -806,7 +796,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
-                      <span className="text-[9px] font-bold text-primary flex items-center gap-0.5">
+                      <span className="text-[11px] font-semibold text-primary flex items-center gap-0.5">
                         +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                       </span>
                     )}
@@ -815,8 +805,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 <span className="col-span-2 text-center text-xs font-mono font-medium text-muted-foreground">
                   {player.winRate}%
                 </span>
-                <span className={`col-span-4 text-right font-mono text-sm font-bold flex items-center justify-end gap-1 ${
-                  player.totalWon >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                <span className={`col-span-4 text-right font-mono text-sm font-semibold flex items-center justify-end gap-1 ${
+                  player.totalWon >= 0 ? 'text-yes' : 'text-no'
                 }`}>
                   {player.totalWon >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                   {Math.abs(player.totalWon).toLocaleString()}
@@ -825,7 +815,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             )
           })}
           {players.length <= 3 && (
-            <div className="p-8 text-center text-sm text-muted-foreground italic border border-white/5 rounded-xl bg-card">
+            <div className="p-8 text-center text-sm text-muted-foreground italic border border-border rounded-lg bg-card">
               Le classement se remplit...
             </div>
           )}

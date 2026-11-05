@@ -56,7 +56,7 @@ export function BuyZenyView() {
         popular: false
       }
       case 'pack_degen': return { 
-        bg: 'bg-gradient-to-b from-primary/10 to-card',
+        bg: 'bg-card',
         border: 'border-primary/50',
         iconBg: 'bg-primary/20',
         iconColor: 'text-primary',
@@ -86,7 +86,7 @@ export function BuyZenyView() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12">
       <div className="text-center space-y-4">
-        <h1 className="text-2xl sm:text-4xl font-bold text-foreground uppercase tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-semibold text-foreground tracking-tight">
           Recharge tes <span className="text-primary">Zeny</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
@@ -102,35 +102,35 @@ export function BuyZenyView() {
           return (
             <div 
               key={pack.id}
-              className={`relative rounded-xl border ${theme.border} ${theme.bg} p-6 flex flex-col h-full transition-all hover:scale-[1.02] hover:shadow-xl group`}
+              className={`relative rounded-lg border ${theme.border} ${theme.bg} p-6 flex flex-col h-full transition-all hover:scale-[1.02] hover:shadow-xl group`}
             >
               {theme.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-primary/20">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg">
                   Populaire
                 </div>
               )}
 
               {/* Header Section - Fixed Height to align Amounts */}
               <div className="mb-6 text-center flex flex-col items-center justify-between min-h-[140px]">
-                <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-full ${theme.iconBg} flex items-center justify-center mb-4 transition-transform`}>
                   <div className={theme.iconColor}>{getIcon(pack.id)}</div>
                 </div>
                 <div className="flex-1 flex flex-col justify-end w-full space-y-2">
-                  <h3 className="font-bold text-lg tracking-tight uppercase">{pack.name}</h3>
+                  <h3 className="font-semibold text-lg tracking-tight">{pack.name}</h3>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl font-bold text-foreground">{pack.price}€</span>
+                    <span className="text-3xl font-semibold text-foreground">{pack.price}€</span>
                   </div>
                 </div>
               </div>
 
               {/* Amount Section */}
               <div className="mb-6">
-                <div className="p-4 rounded-lg bg-black/40 text-center border border-white/5 h-[85px] flex flex-col items-center justify-center">
-                  <div className={`text-2xl font-bold ${theme.accent} flex items-center justify-center gap-1`}>
+                <div className="p-4 rounded-lg bg-black/40 text-center border border-border h-[85px] flex flex-col items-center justify-center">
+                  <div className={`text-2xl font-semibold ${theme.accent} flex items-center justify-center gap-1`}>
                     {pack.amount.toLocaleString()} <CurrencySymbol />
                   </div>
                   {pack.bonus > 0 ? (
-                    <div className="text-xs font-bold text-emerald-400 mt-1 uppercase tracking-wide">
+                    <div className="text-xs font-semibold text-yes mt-1 uppercase tracking-wide">
                       +{pack.bonus.toLocaleString()} offerts
                     </div>
                   ) : (
@@ -171,10 +171,10 @@ export function BuyZenyView() {
               <button
                 onClick={() => handleBuy(pack.id)}
                 disabled={!!loadingId}
-                className={`mt-8 w-full py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all relative overflow-hidden
+                className={`mt-8 w-full py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all relative overflow-hidden
                   ${theme.popular
-                    ? 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none' 
-                    : 'bg-white/5 hover:bg-white/10 text-foreground border border-white/5 hover:border-white/10'
+                    ? 'bg-primary text-white hover:bg-primary/90 shadow-lg ' 
+                    : 'bg-white/5 hover:bg-white/10 text-foreground border border-border hover:border-border'
                   }
                 `}
               >

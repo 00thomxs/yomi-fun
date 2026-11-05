@@ -15,7 +15,7 @@
   --secondary: oklch(0.85 0 0);
   --secondary-foreground: oklch(0.1 0 0);
   --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.55 0 0);
+  --muted-foreground: oklch(0.62 0 0);
   --accent: oklch(0.18 0 0);
   --accent-foreground: oklch(0.92 0 0);
   --destructive: oklch(0.5 0.22 25);
@@ -23,7 +23,10 @@
   --border: oklch(0.25 0 0);
   --input: oklch(0.18 0 0);
   --ring: oklch(0.5 0.22 25);
-  --radius: 0.75rem;
+  --radius: 0.5rem;
+  --surface-hover: oklch(0.15 0 0);
+  --yes: oklch(0.76 0.15 163);
+  --no: oklch(0.7 0.17 12);
   --chart-1: oklch(0.5 0.22 25);
   --chart-2: oklch(0.9 0 0);
   --chart-3: oklch(0.4 0 0);
@@ -40,8 +43,11 @@
 }
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+  --color-surface-hover: var(--surface-hover);
+  --color-yes: var(--yes);
+  --color-no: var(--no);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -89,7 +95,25 @@
   body {
     background-color: oklch(0.08 0 0);
     color: oklch(0.92 0 0);
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Figures line up in tables, odds and balances */
+  .font-mono, .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

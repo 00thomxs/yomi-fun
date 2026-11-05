@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground tactical-grid flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       {/* Noise Overlay */}
       <div
         className="fixed inset-0 opacity-[0.02] pointer-events-none z-0 mix-blend-overlay"
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl bg-card border border-border p-8 space-y-6">
+        <div className="rounded-lg bg-card border border-border p-8 space-y-6">
           {success ? (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center">
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
 
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                     Nouveau mot de passe
                   </label>
                   <div className="relative">
@@ -133,7 +133,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                     Confirmer le mot de passe
                   </label>
                   <div className="relative">
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm uppercase tracking-wider hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />

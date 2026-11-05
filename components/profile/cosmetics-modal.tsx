@@ -134,13 +134,13 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[85vh] bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-2xl max-h-[85vh] bg-card border border-border rounded-lg overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800 shrink-0">
+        <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
             <Palette className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-bold">Personnalisation</h2>
-            <span className="text-xs text-zinc-500">
+            <h2 className="text-lg font-semibold">Personnalisation</h2>
+            <span className="text-xs text-muted-foreground">
               {ownedCount} possédé{ownedCount > 1 ? 's' : ''} • {equippedCount} équipé{equippedCount > 1 ? 's' : ''}
             </span>
           </div>
@@ -154,10 +154,10 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
 
         {/* Currently Equipped Summary */}
         {equippedCount > 0 && (
-          <div className="p-4 border-b border-zinc-800 bg-emerald-500/5 shrink-0">
+          <div className="p-4 border-b border-border bg-yes/5 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Équipés:</span>
+                <span className="text-xs font-semibold text-yes uppercase tracking-wide">Équipés:</span>
                 <div className="flex items-center gap-3">
                   {equipped.background && (
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
@@ -182,7 +182,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
               <button
                 onClick={handleUnequipAll}
                 disabled={togglingId === 'unequip-all'}
-                className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white transition-all disabled:opacity-50"
               >
                 {togglingId === 'unequip-all' ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -193,7 +193,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
         )}
 
         {/* Categories */}
-        <div className="flex gap-2 p-4 border-b border-zinc-800 overflow-x-auto shrink-0">
+        <div className="flex gap-2 p-4 border-b border-border overflow-x-auto shrink-0">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon
             const count = cat.key === 'all' 
@@ -208,7 +208,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                   "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all",
                   selectedCategory === cat.key
                     ? "bg-white/10 text-white border border-white/20"
-                    : "bg-zinc-900 text-zinc-500 hover:text-white hover:bg-zinc-800"
+                    : "bg-muted text-muted-foreground hover:text-white hover:bg-white/10"
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -223,10 +223,10 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
         <div className="flex-1 overflow-y-auto p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-zinc-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
           ) : displayCosmetics.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500">
+            <div className="text-center py-12 text-muted-foreground">
               Aucun cosmétique dans cette catégorie.
             </div>
           ) : (
@@ -234,7 +234,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
               {/* Owned Section */}
               {ownedCosmetics.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3">
+                  <h3 className="text-xs font-semibold text-yes uppercase tracking-wide mb-3">
                     Possédés ({ownedCosmetics.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -250,10 +250,10 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                           onClick={() => handleToggleEquip(cosmetic)}
                           disabled={isToggling}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                            "flex items-center gap-3 p-3 rounded-lg transition-all text-left",
                             isEquipped
-                              ? "bg-emerald-500/10 border-2 border-emerald-500/50"
-                              : "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800"
+                              ? "bg-yes/10 border-2 border-yes/50"
+                              : "bg-muted border border-border hover:border-border hover:bg-white/10"
                           )}
                         >
                           <div 
@@ -267,9 +267,9 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm truncate">{cosmetic.name}</span>
+                              <span className="font-semibold text-sm truncate">{cosmetic.name}</span>
                               <span 
-                                className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
+                                className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded shrink-0"
                                 style={{ 
                                   background: `${rarityInfo.color}15`, 
                                   color: rarityInfo.color 
@@ -278,15 +278,15 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                                 {rarityInfo.label}
                               </span>
                             </div>
-                            <p className="text-[10px] text-zinc-500">{typeInfo.label}</p>
+                            <p className="text-[11px] text-muted-foreground">{typeInfo.label}</p>
                           </div>
                           <div className="shrink-0">
                             {isToggling ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
                             ) : isEquipped ? (
-                              <Check className="w-5 h-5 text-emerald-400" />
+                              <Check className="w-5 h-5 text-yes" />
                             ) : (
-                              <span className="text-xs text-zinc-500">Équiper</span>
+                              <span className="text-xs text-muted-foreground">Équiper</span>
                             )}
                           </div>
                         </button>
@@ -299,7 +299,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
               {/* Locked Section */}
               {lockedCosmetics.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-bold text-zinc-600 uppercase tracking-wider mb-3">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                     Non possédés ({lockedCosmetics.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -310,7 +310,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                       return (
                         <div
                           key={cosmetic.id}
-                          className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/50 opacity-50"
+                          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border opacity-50"
                         >
                           <div 
                             className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
@@ -319,13 +319,13 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                               border: `1px solid ${rarityInfo.color}20` 
                             }}
                           >
-                            <Lock className="w-4 h-4 text-zinc-600" />
+                            <Lock className="w-4 h-4 text-muted-foreground" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm text-zinc-500 truncate">{cosmetic.name}</span>
+                              <span className="font-medium text-sm text-muted-foreground truncate">{cosmetic.name}</span>
                               <span 
-                                className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
+                                className="text-[11px] font-semibold uppercase px-1.5 py-0.5 rounded shrink-0"
                                 style={{ 
                                   background: `${rarityInfo.color}10`, 
                                   color: `${rarityInfo.color}80` 
@@ -334,9 +334,9 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
                                 {rarityInfo.label}
                               </span>
                             </div>
-                            <p className="text-[10px] text-zinc-600">{typeInfo.label}</p>
+                            <p className="text-[11px] text-muted-foreground">{typeInfo.label}</p>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-zinc-600 shrink-0">
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                             <span className="font-mono">{cosmetic.price.toLocaleString()}</span>
                             <CurrencySymbol className="w-3 h-3" />
                           </div>
@@ -351,11 +351,11 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-zinc-800 shrink-0">
+        <div className="p-4 border-t border-border shrink-0">
           <Link
             href="/shop"
             onClick={onClose}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/20 border border-primary/50 text-primary font-bold text-sm hover:bg-primary/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/20 border border-primary/50 text-primary font-semibold text-sm hover:bg-primary/30 transition-all"
           >
             <Sparkles className="w-4 h-4" />
             Acheter des cosmétiques

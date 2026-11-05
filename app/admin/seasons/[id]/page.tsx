@@ -81,7 +81,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
         
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+            <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3">
               <Trophy className="w-8 h-8 text-amber-400" />
               {season.name}
             </h1>
@@ -103,39 +103,39 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+        <div className="p-4 rounded-lg bg-card border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
             <Users className="w-4 h-4" /> Participants
           </div>
-          <p className="text-2xl font-bold mt-1">{leaderboard?.length || 0}</p>
+          <p className="text-2xl font-semibold mt-1">{leaderboard?.length || 0}</p>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+        <div className="p-4 rounded-lg bg-card border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
             <Target className="w-4 h-4" /> Events
           </div>
-          <p className="text-2xl font-bold mt-1">{events?.length || 0}</p>
+          <p className="text-2xl font-semibold mt-1">{events?.length || 0}</p>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+        <div className="p-4 rounded-lg bg-card border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
             <TrendingUp className="w-4 h-4" /> Volume Total
           </div>
-          <p className="text-2xl font-bold mt-1 flex items-center gap-1">
+          <p className="text-2xl font-semibold mt-1 flex items-center gap-1">
             {totalVolume.toLocaleString()}
             <CurrencySymbol className="w-5 h-5" />
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+        <div className="p-4 rounded-lg bg-card border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
             <Award className="w-4 h-4" /> Paris Totaux
           </div>
-          <p className="text-2xl font-bold mt-1">{bets.length}</p>
+          <p className="text-2xl font-semibold mt-1">{bets.length}</p>
         </div>
       </div>
 
       {/* Podium */}
       {leaderboard && leaderboard.length >= 3 && (
-        <div className="p-6 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+        <div className="p-6 rounded-lg bg-amber-500/5 border border-amber-500/30">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-400" />
             Podium Final
           </h2>
@@ -143,29 +143,29 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             {/* 2nd Place */}
             <div className="text-center order-1">
               <div className="w-16 h-16 mx-auto rounded-full bg-zinc-400/20 border-2 border-zinc-400 flex items-center justify-center mb-2">
-                <span className="text-2xl font-black text-zinc-300">#2</span>
+                <span className="text-2xl font-semibold text-foreground/80">#2</span>
               </div>
-              <p className="font-bold">{leaderboard[1]?.profiles?.username}</p>
-              <p className="text-sm text-zinc-400 font-mono">
+              <p className="font-semibold">{leaderboard[1]?.profiles?.username}</p>
+              <p className="text-sm text-muted-foreground font-mono">
                 {leaderboard[1]?.points >= 0 ? '+' : ''}{leaderboard[1]?.points?.toLocaleString()}
               </p>
             </div>
             {/* 1st Place */}
             <div className="text-center order-0 md:order-1 -mt-4">
               <div className="w-20 h-20 mx-auto rounded-full bg-amber-400/20 border-2 border-amber-400 flex items-center justify-center mb-2">
-                <span className="text-3xl font-black text-amber-400">#1</span>
+                <span className="text-3xl font-semibold text-amber-400">#1</span>
               </div>
-              <p className="font-bold text-lg text-amber-400">{leaderboard[0]?.profiles?.username}</p>
-              <p className="text-sm text-amber-400 font-mono font-bold">
+              <p className="font-semibold text-lg text-amber-400">{leaderboard[0]?.profiles?.username}</p>
+              <p className="text-sm text-amber-400 font-mono font-semibold">
                 {leaderboard[0]?.points >= 0 ? '+' : ''}{leaderboard[0]?.points?.toLocaleString()}
               </p>
             </div>
             {/* 3rd Place */}
             <div className="text-center order-2">
               <div className="w-16 h-16 mx-auto rounded-full bg-orange-600/20 border-2 border-orange-600 flex items-center justify-center mb-2">
-                <span className="text-2xl font-black text-orange-400">#3</span>
+                <span className="text-2xl font-semibold text-orange-400">#3</span>
               </div>
-              <p className="font-bold">{leaderboard[2]?.profiles?.username}</p>
+              <p className="font-semibold">{leaderboard[2]?.profiles?.username}</p>
               <p className="text-sm text-orange-400 font-mono">
                 {leaderboard[2]?.points >= 0 ? '+' : ''}{leaderboard[2]?.points?.toLocaleString()}
               </p>

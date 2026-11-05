@@ -70,7 +70,7 @@ export function LowBalanceBanner() {
   const minutesRemaining = Math.max(0, Math.floor((closesAt.getTime() - Date.now()) / (1000 * 60)) % 60)
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-card border border-border p-3 animate-in slide-in-from-top-2 duration-300">
+    <div className="relative overflow-hidden rounded-lg bg-card border border-border p-3 animate-in slide-in-from-top-2 duration-300">
       {/* Close button */}
       <button
         onClick={() => setDismissed(true)}
@@ -102,7 +102,7 @@ export function LowBalanceBanner() {
         {/* CTA */}
         <Link
           href="/shop#packs"
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs transition-all"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs transition-all"
         >
           <Zap className="w-3.5 h-3.5" />
           Recharger

@@ -34,7 +34,7 @@ export function VisibilityToggle({ marketId, isVisible: initialVisible }: Visibi
       disabled={isLoading}
       className={`p-2 rounded-lg transition-colors ${
         isVisible 
-          ? 'hover:bg-white/10 text-emerald-400 hover:text-emerald-300' 
+          ? 'hover:bg-white/10 text-yes hover:text-emerald-300' 
           : 'hover:bg-white/10 text-muted-foreground hover:text-white'
       }`}
       title={isVisible ? "Cacher l'event" : "Afficher l'event"}

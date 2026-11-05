@@ -29,19 +29,19 @@ const RARITY_ACCENT: Record<string, { border: string; glow: string; text: string
   },
   rare: { 
     border: 'border-blue-500/50', 
-    glow: 'shadow-[0_0_80px_rgba(59,130,246,0.3)]', 
+    glow: '', 
     text: 'text-blue-400',
     bg: 'from-blue-950/50 via-zinc-900/80 to-black'
   },
   epic: { 
     border: 'border-purple-500/50', 
-    glow: 'shadow-[0_0_80px_rgba(168,85,247,0.4)]', 
+    glow: '', 
     text: 'text-purple-400',
     bg: 'from-purple-950/50 via-zinc-900/80 to-black'
   },
   legendary: { 
     border: 'border-amber-500/60', 
-    glow: 'shadow-[0_0_100px_rgba(245,158,11,0.5)]', 
+    glow: '', 
     text: 'text-amber-400',
     bg: 'from-amber-950/40 via-zinc-900/80 to-black'
   },
@@ -125,7 +125,7 @@ export function BadgeEarnedPopup() {
       {/* Popup */}
       <div 
         className={cn(
-          'relative max-w-[340px] w-full rounded-2xl border-2 overflow-hidden transition-all duration-500',
+          'relative max-w-[340px] w-full rounded-lg border-2 overflow-hidden transition-all duration-500',
           accent.border,
           accent.glow,
           isVisible 
@@ -181,7 +181,7 @@ export function BadgeEarnedPopup() {
         <div className="relative p-6 text-center">
           {/* Trophy icon */}
           <div className={cn(
-            "w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center",
+            "w-12 h-12 mx-auto mb-4 rounded-lg flex items-center justify-center",
             rarity === 'legendary' ? "bg-amber-500/20" : 
             rarity === 'epic' ? "bg-purple-500/20" :
             rarity === 'rare' ? "bg-blue-500/20" : "bg-zinc-800"
@@ -194,7 +194,7 @@ export function BadgeEarnedPopup() {
             <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium">
               Badge Débloqué
             </p>
-            <p className={cn("text-xl font-black tracking-tight", accent.text)}>
+            <p className={cn("text-xl font-semibold tracking-tight", accent.text)}>
               {badge.name}
             </p>
           </div>
@@ -206,7 +206,7 @@ export function BadgeEarnedPopup() {
 
           {/* Badge Info */}
           <div className="space-y-1 mb-6">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
               {categoryLabel}
             </p>
             <p className="text-sm text-zinc-400">
@@ -233,7 +233,7 @@ export function BadgeEarnedPopup() {
           <div className="flex gap-2">
             <button
               onClick={handleClose}
-              className="flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10"
+              className="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all bg-white/5 hover:bg-white/10 text-zinc-300 border border-border"
             >
               Fermer
             </button>
@@ -241,10 +241,10 @@ export function BadgeEarnedPopup() {
               onClick={handleEquip}
               disabled={isEquipping}
               className={cn(
-                'flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all',
+                'flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all',
                 'bg-primary hover:bg-primary/90 text-white',
                 'flex items-center justify-center gap-2',
-                'shadow-lg shadow-primary/20',
+                'shadow-lg ',
                 isEquipping && 'opacity-50 cursor-not-allowed'
               )}
             >

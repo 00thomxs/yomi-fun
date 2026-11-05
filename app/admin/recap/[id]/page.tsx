@@ -27,31 +27,29 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           <Link href="/admin/settings" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-2xl font-bold uppercase tracking-tight">Récapitulatif Saison</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Récapitulatif Saison</h1>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-all cursor-pointer">
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all cursor-pointer">
           <Share2 className="w-4 h-4" />
           Partager
         </button>
       </div>
 
       {/* The "Shareable" Card Container */}
-      <div className="relative overflow-hidden rounded-3xl border-4 border-primary/20 bg-[#0a0a0a] shadow-2xl">
+      <div className="relative overflow-hidden rounded-lg border-4 border-primary/20 bg-[#0a0a0a] shadow-lg">
         
         {/* Background Elements */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-        <div className="absolute bottom-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
 
         {/* Card Content */}
         <div className="relative z-10 p-6 md:p-10">
           
           {/* Season Title */}
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tight">
               {season.title || "Saison"}
             </h2>
-            <p className="text-primary font-bold tracking-widest uppercase text-sm mt-2">
+            <p className="text-primary font-semibold text-sm mt-2">
               Classement Final
             </p>
           </div>
@@ -68,11 +66,11 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                   alt={top2?.username} 
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gray-400 object-cover relative z-10"
                 />
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gray-700 border border-gray-500 text-gray-200 text-xs font-bold px-2 py-0.5 rounded-full z-20">
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gray-700 border border-gray-500 text-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full z-20">
                   #2
                 </div>
               </div>
-              <p className="font-bold text-sm md:text-base text-gray-200 truncate max-w-[100px] text-center mt-3">
+              <p className="font-semibold text-sm md:text-base text-gray-200 truncate max-w-[100px] text-center mt-3">
                 {top2?.username || "N/A"}
               </p>
               <p className="text-xs font-mono text-gray-400 flex items-center gap-0.5">
@@ -86,20 +84,19 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                 <div className="absolute -top-9 left-1/2 -translate-x-1/2">
                   <Crown className="w-9 h-9 text-amber-400 fill-amber-400/30" />
                 </div>
-                <div className="absolute -inset-2 bg-amber-500/30 rounded-full blur-xl" />
                 <img 
                   src={top1?.avatar || "/images/default-avatar.svg"} 
                   alt={top1?.username} 
-                  className="w-28 h-28 md:w-32 md:h-32 rounded-full border-[5px] border-amber-400 object-cover relative z-10 shadow-[0_0_30px_rgba(251,191,36,0.3)]"
+                  className="w-28 h-28 md:w-32 md:h-32 rounded-full border-[5px] border-amber-400 object-cover relative z-10"
                 />
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-black px-2.5 py-0.5 rounded-full z-20 shadow-lg">
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-semibold px-2.5 py-0.5 rounded-full z-20 shadow-lg">
                   #1
                 </div>
               </div>
-              <p className="font-black text-lg md:text-xl text-amber-400 truncate max-w-[120px] text-center mt-3">
+              <p className="font-semibold text-lg md:text-xl text-amber-400 truncate max-w-[120px] text-center mt-3">
                 {top1?.username || "N/A"}
               </p>
-              <p className="text-sm font-mono font-bold text-amber-400 flex items-center gap-0.5">
+              <p className="text-sm font-mono font-semibold text-amber-400 flex items-center gap-0.5">
                 +{top1?.reward?.toLocaleString() || 0}<CurrencySymbol className="w-3 h-3 ml-0.5" />
               </p>
             </div>
@@ -113,11 +110,11 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                   alt={top3?.username} 
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-orange-600 object-cover relative z-10"
                 />
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-orange-800 border border-orange-600 text-orange-300 text-xs font-bold px-2 py-0.5 rounded-full z-20">
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-orange-800 border border-orange-600 text-orange-300 text-xs font-semibold px-2 py-0.5 rounded-full z-20">
                   #3
                 </div>
               </div>
-              <p className="font-bold text-sm md:text-base text-orange-200 truncate max-w-[100px] text-center mt-3">
+              <p className="font-semibold text-sm md:text-base text-orange-200 truncate max-w-[100px] text-center mt-3">
                 {top3?.username || "N/A"}
               </p>
               <p className="text-xs font-mono text-orange-300/70 flex items-center gap-0.5">
@@ -129,8 +126,8 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
 
           {/* Positions 4-10 */}
           {others.length > 0 && (
-            <div className="border-t border-white/10 pt-6 mt-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-widest text-center mb-4">
+            <div className="border-t border-border pt-6 mt-4">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide text-center mb-4">
                 Autres Gagnants
               </p>
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
@@ -138,7 +135,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                   <div key={player.rank} className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground font-mono">#{player.rank}</span>
                     <span className="font-medium text-white/80">{player.username}</span>
-                    <span className="text-xs font-mono text-emerald-400/70 flex items-center gap-0.5">
+                    <span className="text-xs font-mono text-yes/70 flex items-center gap-0.5">
                       +{player.reward?.toLocaleString() || 0}<CurrencySymbol className="w-2 h-2 ml-0.5" />
                     </span>
                   </div>
@@ -148,9 +145,9 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           )}
 
           {/* Footer */}
-          <div className="flex justify-between items-end mt-8 pt-4 border-t border-white/5">
+          <div className="flex justify-between items-end mt-8 pt-4 border-t border-border">
             <div className="opacity-50">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Saison terminée le</p>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Saison terminée le</p>
               <p className="text-sm font-mono text-white">{new Date(season.end_date).toLocaleDateString('fr-FR')}</p>
             </div>
             <YomiLogo className="opacity-70" />

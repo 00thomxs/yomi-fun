@@ -105,7 +105,7 @@ export function BetWinPopup() {
         {/* Backdrop with glow effect */}
         <div 
           className={cn(
-            "absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity duration-300",
+            "absolute inset-0 bg-black/85 backdrop-blur transition-opacity duration-300",
             isVisible ? "opacity-100" : "opacity-0"
           )}
           onClick={handleClose}
@@ -114,7 +114,7 @@ export function BetWinPopup() {
         {/* Victory glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-yes/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
         </div>
         
         {/* Confetti */}
@@ -133,7 +133,7 @@ export function BetWinPopup() {
                 {i % 4 === 0 ? (
                   <Sparkles className="w-5 h-5 text-amber-400" />
                 ) : i % 4 === 1 ? (
-                  <div className="w-3 h-3 bg-emerald-400 rounded-full" />
+                  <div className="w-3 h-3 bg-yes rounded-full" />
                 ) : i % 4 === 2 ? (
                   <div className="w-2 h-4 bg-amber-400 rotate-45" />
                 ) : (
@@ -147,7 +147,7 @@ export function BetWinPopup() {
         {/* Modal */}
         <div 
           className={cn(
-            "relative bg-zinc-950 border-2 border-amber-500/40 rounded-2xl max-w-md w-full shadow-2xl shadow-amber-500/20 overflow-hidden transition-all duration-500",
+            "relative bg-zinc-950 border-2 border-amber-500/40 rounded-lg max-w-md w-full shadow-lg overflow-hidden transition-all duration-500",
             isVisible 
               ? "opacity-100 scale-100 translate-y-0" 
               : "opacity-0 scale-95 translate-y-4"
@@ -177,7 +177,7 @@ export function BetWinPopup() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/40 mb-3">
                 <Trophy className="w-8 h-8 text-amber-400" />
               </div>
-              <h2 className="text-2xl font-black text-amber-400 tracking-tight">
+              <h2 className="text-2xl font-semibold text-amber-400 tracking-tight">
                 TU AS GAGNÉ !
               </h2>
               <p className="text-zinc-400 text-sm mt-1 flex items-center justify-center gap-1.5">
@@ -194,7 +194,7 @@ export function BetWinPopup() {
               )}
             >
               <div 
-                className="relative rounded-xl border border-zinc-700 overflow-hidden"
+                className="relative rounded-lg border border-zinc-700 overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
                 }}
@@ -214,16 +214,16 @@ export function BetWinPopup() {
                 <div className="relative p-5 space-y-4">
                   {/* PNL Display */}
                   <div className="text-center">
-                    <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Gains</p>
+                    <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Gains</p>
                     <p 
-                      className="text-4xl font-black text-emerald-400 font-mono"
+                      className="text-4xl font-semibold text-yes font-mono"
                       style={{
                         textShadow: "0 0 30px rgba(52, 211, 153, 0.5)",
                       }}
                     >
                       {pnlDisplay}
                     </p>
-                    <p className="text-lg font-bold text-emerald-400 flex items-center justify-center gap-1 mt-1">
+                    <p className="text-lg font-semibold text-yes flex items-center justify-center gap-1 mt-1">
                       +{winnings.toLocaleString('fr-FR')} <CurrencySymbol className="w-4 h-4" />
                     </p>
                   </div>
@@ -236,7 +236,7 @@ export function BetWinPopup() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-500">CHOIX</span>
-                      <span className={sens === 'OUI' ? 'text-emerald-400' : 'text-red-400'}>
+                      <span className={sens === 'OUI' ? 'text-yes' : 'text-red-400'}>
                         {sens}
                       </span>
                     </div>
@@ -280,14 +280,14 @@ export function BetWinPopup() {
             >
               <button
                 onClick={handleShare}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Share2 className="w-4 h-4" />
                 Partager
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium border border-zinc-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-medium border border-zinc-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Check className="w-4 h-4" />
                 {unseenWins.length > 1 && currentIndex < unseenWins.length - 1 

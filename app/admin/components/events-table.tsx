@@ -122,7 +122,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-xl font-bold">Tous les Events</h2>
+          <h2 className="text-xl font-semibold">Tous les Events</h2>
           <p className="text-xs text-muted-foreground">
             {filteredMarkets.length} event{filteredMarkets.length > 1 ? 's' : ''}
             {hasActiveFilters && ` (sur ${counts.all})`}
@@ -140,7 +140,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
             <button
               key={key}
               onClick={() => setStatusFilter(key)}
-              className={`px-2 py-1 text-[10px] font-medium rounded-md transition-all ${
+              className={`px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
                 statusFilter === key 
                   ? `${color} bg-white/10` 
                   : 'text-muted-foreground hover:text-white hover:bg-white/5'
@@ -187,7 +187,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
           <Layers className="w-3.5 h-3.5" />
           Filtres
           {hasActiveFilters && (
-            <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-[11px]">
               {[statusFilter !== 'all', visibilityFilter !== 'all', volumeFilter !== 'all', categoryFilter !== 'all', seasonFilter !== 'all', searchQuery !== ''].filter(Boolean).length}
             </span>
           )}
@@ -208,11 +208,11 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
       {/* Advanced filters panel */}
       {showFilters && (
-        <div className="p-3 rounded-xl bg-white/5 border border-border space-y-3 animate-in slide-in-from-top-2 duration-200">
+        <div className="p-3 rounded-lg bg-white/5 border border-border space-y-3 animate-in slide-in-from-top-2 duration-200">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Visibility filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Eye className="w-3 h-3" /> Visibilité
               </label>
               <select
@@ -228,7 +228,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Volume filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <BarChart3 className="w-3 h-3" /> Volume
               </label>
               <select
@@ -246,7 +246,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Category filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Tag className="w-3 h-3" /> Catégorie
               </label>
               <select
@@ -263,7 +263,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Season filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
                 <Trophy className="w-3 h-3" /> Saison
               </label>
               <select
@@ -282,10 +282,10 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
       {/* Grouped Events */}
       {groupedMarkets.map(({ monthKey, monthLabel, markets: monthMarkets }) => (
-        <div key={monthKey} className="rounded-xl bg-card border border-border overflow-hidden">
+        <div key={monthKey} className="rounded-lg bg-card border border-border overflow-hidden">
           {/* Month Header */}
           <div className="px-4 py-2 bg-white/5 border-b border-border">
-            <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground">
+            <h3 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground">
               {monthLabel}
               <span className="ml-2 font-normal">({monthMarkets.length})</span>
             </h3>
@@ -293,7 +293,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
           
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-white/5 text-muted-foreground font-medium uppercase text-[10px]">
+              <thead className="bg-white/5 text-muted-foreground font-medium uppercase text-[11px]">
                 <tr>
                   <th className="px-2 py-2 w-6"></th>
                   <th className="px-2 py-2">Question</th>
@@ -330,11 +330,11 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
                       {market.question}
                     </td>
                     <td className="px-2 py-1.5">
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-white/10">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-white/10">
                         {market.category}
                       </span>
                     </td>
-                    <td className="px-2 py-1.5 font-mono text-[10px]">
+                    <td className="px-2 py-1.5 font-mono text-[11px]">
                       {market.volume >= 1000 
                         ? `${(market.volume / 1000).toFixed(market.volume >= 10000 ? 0 : 1)}K`
                         : market.volume
@@ -342,22 +342,22 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
                     </td>
                     <td className="px-2 py-1.5">
                       {market.status === 'open' ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-400 text-[10px] font-bold uppercase">
-                          <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="inline-flex items-center gap-1 text-yes text-[11px] font-semibold uppercase">
+                          <span className="w-1 h-1 rounded-full bg-yes animate-pulse" />
                           Live
                         </span>
                       ) : market.status === 'closed' ? (
-                        <span className="inline-flex items-center gap-1 text-amber-500 text-[10px] font-bold uppercase">
+                        <span className="inline-flex items-center gap-1 text-amber-500 text-[11px] font-semibold uppercase">
                           <span className="w-1 h-1 rounded-full bg-amber-500" />
                           Attente
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-[10px] font-bold uppercase">
+                        <span className="text-muted-foreground text-[11px] font-semibold uppercase">
                           Résolu
                         </span>
                       )}
                     </td>
-                    <td className="px-2 py-1.5 text-muted-foreground text-[10px]">
+                    <td className="px-2 py-1.5 text-muted-foreground text-[11px]">
                       {new Date(market.closes_at).toLocaleDateString('fr-FR', { 
                         day: 'numeric', 
                         month: 'short', 
@@ -406,7 +406,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
       ))}
 
       {filteredMarkets.length === 0 && (
-        <div className="rounded-xl bg-card border border-border p-6 text-center text-muted-foreground text-sm">
+        <div className="rounded-lg bg-card border border-border p-6 text-center text-muted-foreground text-sm">
           {hasActiveFilters 
             ? "Aucun event ne correspond à ces filtres."
             : "Aucun event trouvé. Créez-en un !"

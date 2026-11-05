@@ -52,23 +52,23 @@ export default function ResolveBinaryForm({ marketId, outcomes }: { marketId: st
       <button
         onClick={() => handleResolve('OUI')}
         disabled={isLoading}
-        className="py-12 rounded-xl bg-emerald-500/10 border-2 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all flex flex-col items-center gap-4 group disabled:opacity-50"
+        className="py-12 rounded-lg bg-yes/10 border-2 border-yes/30 hover:bg-yes/20 hover:border-yes transition-all flex flex-col items-center gap-4 group disabled:opacity-50"
       >
-        <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <Check className="w-8 h-8 text-emerald-500" />
+        <div className="w-16 h-16 rounded-full bg-yes/20 flex items-center justify-center transition-transform">
+          <Check className="w-8 h-8 text-yes" />
         </div>
-        <span className="text-2xl font-bold text-emerald-400">OUI GAGNANT</span>
+        <span className="text-2xl font-semibold text-yes">OUI GAGNANT</span>
       </button>
 
       <button
         onClick={() => handleResolve('NON')}
         disabled={isLoading}
-        className="py-12 rounded-xl bg-rose-500/10 border-2 border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500 transition-all flex flex-col items-center gap-4 group disabled:opacity-50"
+        className="py-12 rounded-lg bg-no/10 border-2 border-no/30 hover:bg-no/20 hover:border-no transition-all flex flex-col items-center gap-4 group disabled:opacity-50"
       >
-        <div className="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <X className="w-8 h-8 text-rose-500" />
+        <div className="w-16 h-16 rounded-full bg-no/20 flex items-center justify-center transition-transform">
+          <X className="w-8 h-8 text-no" />
         </div>
-        <span className="text-2xl font-bold text-rose-400">NON GAGNANT</span>
+        <span className="text-2xl font-semibold text-no">NON GAGNANT</span>
       </button>
     </div>
   )

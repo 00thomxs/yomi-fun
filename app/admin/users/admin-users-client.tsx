@@ -40,31 +40,31 @@ function StatCard({
   color?: "cyan" | "green" | "amber" | "red" | "purple"
 }) {
   const colorClasses = {
-    cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-    green: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    cyan: "bg-primary/10 text-primary border-primary/20",
+    green: "bg-yes/10 text-yes border-yes/20",
     amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     red: "bg-red-500/10 text-red-400 border-red-500/20",
     purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-colors">
+    <div className="bg-muted/50 border border-border rounded-lg p-4 hover:border-border transition-colors">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">{label}</span>
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</span>
         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-bold text-white tracking-tight">{value}</span>
+        <span className="text-3xl font-semibold text-white tracking-tight">{value}</span>
         {trend && (
-          <span className={`text-xs flex items-center gap-0.5 ${trend.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`text-xs flex items-center gap-0.5 ${trend.positive ? 'text-yes' : 'text-red-400'}`}>
             {trend.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
             {trend.value}%
           </span>
         )}
       </div>
-      {subtitle && <p className="text-xs text-zinc-500 mt-2">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-muted-foreground mt-2">{subtitle}</p>}
     </div>
   )
 }
@@ -97,9 +97,9 @@ function TopPlayersTable({
   
   const getMedalColor = (rank: number) => {
     if (rank === 1) return 'text-amber-400'
-    if (rank === 2) return 'text-zinc-300'
+    if (rank === 2) return 'text-foreground/80'
     if (rank === 3) return 'text-amber-600'
-    return 'text-zinc-500'
+    return 'text-muted-foreground'
   }
   
   const handleSort = (column: TopSortColumn) => {
@@ -137,24 +137,24 @@ function TopPlayersTable({
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
-      <div className="p-3 border-b border-zinc-800">
+    <div className="bg-muted/50 border border-border rounded-lg overflow-hidden">
+      <div className="p-3 border-b border-border">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-amber-500/10 rounded-lg">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <h3 className="font-bold text-sm">Top 50 PNL</h3>
+            <h3 className="font-semibold text-sm">Top 50 PNL</h3>
           </div>
-          <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg">
+          <div className="flex gap-1 bg-white/5 p-0.5 rounded-lg">
             {timeframes.map(tf => (
               <button
                 key={tf.id}
                 onClick={() => onTimeframeChange(tf.id)}
                 className={`px-2.5 py-1 text-xs font-medium rounded transition-all ${
                   timeframe === tf.id
-                    ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-700'
+                    ? 'bg-primary text-white'
+                    : 'text-muted-foreground hover:text-white hover:bg-white/15'
                 }`}
               >
                 {tf.label}
@@ -167,12 +167,12 @@ function TopPlayersTable({
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-5 h-5 animate-spin text-zinc-500" />
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-zinc-900 z-10">
-              <tr className="text-zinc-500 border-b border-zinc-800">
+            <thead className="sticky top-0 bg-muted z-10">
+              <tr className="text-muted-foreground border-b border-border">
                 <th className="text-left py-2 px-3 font-medium w-10">#</th>
                 <th 
                   className="text-left py-2 px-3 font-medium cursor-pointer hover:text-white transition-colors"
@@ -219,8 +219,8 @@ function TopPlayersTable({
             </thead>
             <tbody>
               {sortedPlayers.map((player, i) => (
-                <tr key={player.id} className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors">
-                  <td className={`py-1.5 px-3 font-bold ${getMedalColor(i + 1)}`}>
+                <tr key={player.id} className="border-b border-border hover:bg-white/5 transition-colors">
+                  <td className={`py-1.5 px-3 font-semibold ${getMedalColor(i + 1)}`}>
                     {i + 1}
                   </td>
                   <td className="py-1.5 px-3">
@@ -235,27 +235,27 @@ function TopPlayersTable({
                       </span>
                     </div>
                   </td>
-                  <td className="py-1.5 px-3 text-right font-mono text-zinc-400">
+                  <td className="py-1.5 px-3 text-right font-mono text-muted-foreground">
                     {player.balance.toLocaleString()}
                   </td>
                   <td className={`py-1.5 px-3 text-right font-mono font-medium ${
-                    player.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'
+                    player.total_won >= 0 ? 'text-yes' : 'text-red-400'
                   }`}>
                     {player.total_won >= 0 ? '+' : ''}{player.total_won.toLocaleString()}
                   </td>
-                  <td className="py-1.5 px-3 text-right text-zinc-400 hidden sm:table-cell">
+                  <td className="py-1.5 px-3 text-right text-muted-foreground hidden sm:table-cell">
                     {player.total_bets}
                   </td>
-                  <td className="py-1.5 px-3 text-right text-zinc-400 hidden md:table-cell">
+                  <td className="py-1.5 px-3 text-right text-muted-foreground hidden md:table-cell">
                     {player.win_rate}%
                   </td>
                   <td className="py-1.5 px-3 text-center hidden lg:table-cell">
                     {player.is_banned ? (
-                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded text-[10px] font-medium">
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded text-[11px] font-medium">
                         <Ban className="w-2.5 h-2.5" /> Banni
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[10px] font-medium">
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yes/10 text-yes rounded text-[11px] font-medium">
                         <Zap className="w-2.5 h-2.5" /> Actif
                       </span>
                     )}
@@ -264,7 +264,7 @@ function TopPlayersTable({
               ))}
               {sortedPlayers.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-zinc-500">
+                  <td colSpan={7} className="py-8 text-center text-muted-foreground">
                     Aucun joueur trouvé
                   </td>
                 </tr>
@@ -354,22 +354,22 @@ function UserSearchTable({
   }
   
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="bg-muted/50 border border-border rounded-lg overflow-hidden">
       {/* Search Header */}
-      <div className="p-4 border-b border-zinc-800 space-y-4">
+      <div className="p-4 border-b border-border space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-cyan-500/10 rounded-lg">
-              <Search className="w-4 h-4 text-cyan-400" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Search className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h3 className="font-bold text-sm">Recherche Utilisateurs</h3>
-              <p className="text-xs text-zinc-500">{total} joueur{total !== 1 ? 's' : ''} au total</p>
+              <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
+              <p className="text-xs text-muted-foreground">{total} joueur{total !== 1 ? 's' : ''} au total</p>
             </div>
           </div>
           <button 
             onClick={() => doSearch(filters)} 
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Actualiser
@@ -378,26 +378,26 @@ function UserSearchTable({
         
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Rechercher par username..."
-              className="w-full pl-10 pr-4 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-border rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
           </div>
           <button
             onClick={handleSearch}
-            className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-cyan-500/20"
+            className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-colors"
           >
             Rechercher
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
-              showFilters ? 'bg-cyan-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700'
+              showFilters ? 'bg-primary text-white' : 'bg-white/10 text-muted-foreground hover:text-white hover:bg-white/15'
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -407,43 +407,43 @@ function UserSearchTable({
         
         {/* Expandable Filters */}
         {showFilters && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-4 border-t border-zinc-800">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-4 border-t border-border">
             <div>
-              <label className="text-xs text-zinc-500 block mb-1.5">PNL Min</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">PNL Min</label>
               <input
                 type="number"
                 value={filters.minPnl || ''}
                 onChange={(e) => handleFilterChange('minPnl', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="0"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-white/10 border border-border rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500 block mb-1.5">PNL Max</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">PNL Max</label>
               <input
                 type="number"
                 value={filters.maxPnl || ''}
                 onChange={(e) => handleFilterChange('maxPnl', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="∞"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-white/10 border border-border rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500 block mb-1.5">Balance Min</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Balance Min</label>
               <input
                 type="number"
                 value={filters.minBalance || ''}
                 onChange={(e) => handleFilterChange('minBalance', e.target.value ? Number(e.target.value) : undefined)}
                 placeholder="0"
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-white/10 border border-border rounded-lg text-sm focus:border-primary"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500 block mb-1.5">Statut</label>
+              <label className="text-xs text-muted-foreground block mb-1.5">Statut</label>
               <select
                 value={filters.isBanned === undefined ? '' : filters.isBanned ? 'banned' : 'active'}
                 onChange={(e) => handleFilterChange('isBanned', e.target.value === '' ? undefined : e.target.value === 'banned')}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                className="w-full px-3 py-2 bg-white/10 border border-border rounded-lg text-sm focus:border-primary"
               >
                 <option value="">Tous</option>
                 <option value="active">Actifs</option>
@@ -453,13 +453,13 @@ function UserSearchTable({
             <div className="flex items-end gap-2">
               <button
                 onClick={applyFilters}
-                className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium"
+                className="flex-1 px-3 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium"
               >
                 Appliquer
               </button>
               <button
                 onClick={clearFilters}
-                className="px-3 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm"
+                className="px-3 py-2 bg-white/15 hover:bg-zinc-600 text-white rounded-lg text-sm"
               >
                 Reset
               </button>
@@ -473,12 +473,12 @@ function UserSearchTable({
       <div className="overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-zinc-500 text-xs border-b border-zinc-800 bg-zinc-900/50">
+              <tr className="text-muted-foreground text-xs border-b border-border bg-muted/50">
                 <th 
                   className="text-left py-3 px-4 font-medium cursor-pointer hover:text-white whitespace-nowrap"
                   onClick={() => handleSort('username')}
@@ -532,7 +532,7 @@ function UserSearchTable({
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                <tr key={user.id} className="border-b border-border hover:bg-white/5 transition-colors">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <img 
@@ -544,19 +544,19 @@ function UserSearchTable({
                         <span className={`font-medium block ${user.is_banned ? 'text-red-400 line-through' : 'text-white'}`}>
                           {user.username}
                         </span>
-                        <span className="text-xs text-zinc-500">Lvl {user.level}</span>
+                        <span className="text-xs text-muted-foreground">Lvl {user.level}</span>
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-right font-mono text-zinc-300 hidden sm:table-cell">
+                  <td className="py-3 px-4 text-right font-mono text-foreground/80 hidden sm:table-cell">
                     {user.balance.toLocaleString()}
                   </td>
                   <td className={`py-3 px-4 text-right font-mono font-medium ${
-                    user.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'
+                    user.total_won >= 0 ? 'text-yes' : 'text-red-400'
                   }`}>
                     {user.total_won >= 0 ? '+' : ''}{user.total_won.toLocaleString()}
                   </td>
-                  <td className="py-3 px-4 text-right text-zinc-400 hidden md:table-cell">
+                  <td className="py-3 px-4 text-right text-muted-foreground hidden md:table-cell">
                     {user.total_bets}
                   </td>
                   <td className="py-3 px-4 text-center">
@@ -565,22 +565,22 @@ function UserSearchTable({
                         <Ban className="w-3 h-3" /> Banni
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yes/10 text-yes rounded-full text-xs font-medium">
                         <Zap className="w-3 h-3" /> Actif
                       </span>
                     )}
                   </td>
-                  <td className="py-3 px-4 text-right text-zinc-500 text-xs hidden lg:table-cell">
+                  <td className="py-3 px-4 text-right text-muted-foreground text-xs hidden lg:table-cell">
                     {new Date(user.created_at).toLocaleDateString('fr-FR')}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center justify-center">
                       <button
                         onClick={() => onSelectUser(user)}
-                        className="p-2 hover:bg-cyan-500/10 hover:text-cyan-400 rounded-lg transition-colors group"
+                        className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors group"
                         title="Voir détails"
                       >
-                        <Eye className="w-4 h-4 text-zinc-400 group-hover:text-cyan-400" />
+                        <Eye className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
                       </button>
                     </div>
                   </td>
@@ -588,9 +588,9 @@ function UserSearchTable({
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-zinc-500">
+                  <td colSpan={7} className="py-16 text-center text-muted-foreground">
                     <div className="flex flex-col items-center gap-2">
-                      <Users className="w-8 h-8 text-zinc-600" />
+                      <Users className="w-8 h-8 text-muted-foreground" />
                       <span>Aucun utilisateur trouvé</span>
                     </div>
                   </td>
@@ -683,9 +683,9 @@ function UserDetailModal({
   
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-muted border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
         {/* Header */}
-        <div className="p-5 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
+        <div className="p-5 border-b border-border flex items-center justify-between sticky top-0 bg-muted z-10">
           <div className="flex items-center gap-4">
             <img 
               src={user.avatar_url || '/placeholder-avatar.png'} 
@@ -693,11 +693,11 @@ function UserDetailModal({
               className="w-14 h-14 rounded-full ring-4 ring-zinc-700"
             />
             <div>
-              <h2 className="font-bold text-xl">{user.username}</h2>
-              <p className="text-xs text-zinc-500 font-mono">ID: {user.id.slice(0, 12)}...</p>
+              <h2 className="font-semibold text-xl">{user.username}</h2>
+              <p className="text-xs text-muted-foreground font-mono">ID: {user.id.slice(0, 12)}...</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -706,15 +706,15 @@ function UserDetailModal({
         <div className="p-5 space-y-5">
           {/* Status Banner */}
           {user.is_banned && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
               <div>
                 <p className="text-red-400 font-semibold">Utilisateur banni</p>
-                <p className="text-sm text-zinc-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {user.ban_reason || 'Aucune raison spécifiée'}
                 </p>
                 {user.banned_at && (
-                  <p className="text-xs text-zinc-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Banni le {new Date(user.banned_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 )}
@@ -724,50 +724,50 @@ function UserDetailModal({
           
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-zinc-800/50 rounded-xl p-4">
-              <p className="text-xs text-zinc-500 mb-1">Balance</p>
-              <p className="text-xl font-bold font-mono">{user.balance.toLocaleString()}</p>
+            <div className="bg-white/5 rounded-lg p-4">
+              <p className="text-xs text-muted-foreground mb-1">Balance</p>
+              <p className="text-xl font-semibold font-mono">{user.balance.toLocaleString()}</p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
-              <p className="text-xs text-zinc-500 mb-1">PNL Total</p>
-              <p className={`text-xl font-bold font-mono ${user.total_won >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            <div className="bg-white/5 rounded-lg p-4">
+              <p className="text-xs text-muted-foreground mb-1">PNL Total</p>
+              <p className={`text-xl font-semibold font-mono ${user.total_won >= 0 ? 'text-yes' : 'text-red-400'}`}>
                 {user.total_won >= 0 ? '+' : ''}{user.total_won.toLocaleString()}
               </p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
-              <p className="text-xs text-zinc-500 mb-1">Win Rate</p>
-              <p className="text-xl font-bold">{user.win_rate}%</p>
+            <div className="bg-white/5 rounded-lg p-4">
+              <p className="text-xs text-muted-foreground mb-1">Win Rate</p>
+              <p className="text-xl font-semibold">{user.win_rate}%</p>
             </div>
-            <div className="bg-zinc-800/50 rounded-xl p-4">
-              <p className="text-xs text-zinc-500 mb-1">Paris Total</p>
-              <p className="text-xl font-bold">{user.total_bets}</p>
+            <div className="bg-white/5 rounded-lg p-4">
+              <p className="text-xs text-muted-foreground mb-1">Paris Total</p>
+              <p className="text-xl font-semibold">{user.total_bets}</p>
             </div>
           </div>
           
           {/* Edit Section */}
           {editMode ? (
-            <div className="bg-zinc-800/50 rounded-xl p-5 space-y-4">
+            <div className="bg-white/5 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2">
-                <Edit2 className="w-4 h-4 text-cyan-400" />
+                <Edit2 className="w-4 h-4 text-primary" />
                 Modifier les données
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-zinc-500 block mb-2">Username</label>
+                  <label className="text-xs text-muted-foreground block mb-2">Username</label>
                   <input
                     type="text"
                     value={editData.username}
                     onChange={(e) => setEditData(d => ({ ...d, username: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm focus:border-primary"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-500 block mb-2">Balance</label>
+                  <label className="text-xs text-muted-foreground block mb-2">Balance</label>
                   <input
                     type="number"
                     value={editData.balance}
                     onChange={(e) => setEditData(d => ({ ...d, balance: Number(e.target.value) }))}
-                    className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-cyan-500"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-sm focus:border-primary"
                   />
                 </div>
               </div>
@@ -775,33 +775,33 @@ function UserDetailModal({
                 <button
                   onClick={handleSave}
                   disabled={loading}
-                  className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Enregistrer
                 </button>
                 <button
                   onClick={() => setEditMode(false)}
-                  className="px-5 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm"
+                  className="px-5 py-2.5 bg-white/15 hover:bg-zinc-600 text-white rounded-lg text-sm"
                 >
                   Annuler
                 </button>
               </div>
             </div>
           ) : banMode ? (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5 space-y-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-5 space-y-4">
               <h3 className="font-semibold text-sm flex items-center gap-2 text-red-400">
                 <Ban className="w-4 h-4" />
                 Bannir cet utilisateur
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-muted-foreground">
                 L&apos;utilisateur ne pourra plus se connecter et sera exclu de tous les classements.
               </p>
               <textarea
                 value={banReason}
                 onChange={(e) => setBanReason(e.target.value)}
                 placeholder="Raison du bannissement (obligatoire)..."
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-sm resize-none h-24 focus:border-red-500"
+                className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm resize-none h-24 focus:border-red-500"
               />
               <div className="flex gap-2">
                 <button
@@ -814,7 +814,7 @@ function UserDetailModal({
                 </button>
                 <button
                   onClick={() => setBanMode(false)}
-                  className="px-5 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-sm"
+                  className="px-5 py-2.5 bg-white/15 hover:bg-zinc-600 text-white rounded-lg text-sm"
                 >
                   Annuler
                 </button>
@@ -824,7 +824,7 @@ function UserDetailModal({
             <div className="flex gap-3">
               <button
                 onClick={() => setEditMode(true)}
-                className="flex-1 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 px-5 py-3 bg-white/10 hover:bg-white/15 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
               >
                 <Edit2 className="w-4 h-4" />
                 Modifier
@@ -833,14 +833,14 @@ function UserDetailModal({
                 <button
                   onClick={handleUnban}
                   disabled={loading}
-                  className="flex-1 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-5 py-3 bg-emerald-600 hover:bg-yes text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShieldOff className="w-4 h-4" /> Débannir</>}
                 </button>
               ) : (
                 <button
                   onClick={() => setBanMode(true)}
-                  className="flex-1 px-5 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 px-5 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
                 >
                   <Ban className="w-4 h-4" />
                   Bannir
@@ -850,34 +850,34 @@ function UserDetailModal({
           )}
           
           {/* Recent Bets */}
-          <div className="border-t border-zinc-800 pt-5">
+          <div className="border-t border-border pt-5">
             <h3 className="font-semibold text-sm mb-4">Derniers paris</h3>
             {loadingBets ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 animate-spin text-zinc-500" />
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               </div>
             ) : bets.length > 0 ? (
               <div className="space-y-2 max-h-52 overflow-y-auto">
                 {bets.map(bet => (
-                  <div key={bet.id} className="bg-zinc-800/50 rounded-lg p-3 flex items-center justify-between text-sm">
+                  <div key={bet.id} className="bg-white/5 rounded-lg p-3 flex items-center justify-between text-sm">
                     <div className="truncate flex-1 mr-3">
-                      <p className="text-zinc-300 truncate font-medium">{bet.markets?.question || 'Event'}</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">{new Date(bet.created_at).toLocaleDateString('fr-FR')}</p>
+                      <p className="text-foreground/80 truncate font-medium">{bet.markets?.question || 'Event'}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{new Date(bet.created_at).toLocaleDateString('fr-FR')}</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="font-mono font-medium">{bet.amount.toLocaleString()}</p>
                       <span className={`text-xs font-medium ${
-                        bet.status === 'won' ? 'text-emerald-400' :
+                        bet.status === 'won' ? 'text-yes' :
                         bet.status === 'lost' ? 'text-red-400' : 'text-amber-400'
                       }`}>
-                        {bet.status === 'won' ? '✓ Gagné' : bet.status === 'lost' ? '✗ Perdu' : '⏳ En cours'}
+                        {bet.status === 'won' ? 'Gagné' : bet.status === 'lost' ? 'Perdu' : 'En cours'}
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-zinc-500 text-sm text-center py-8">Aucun pari récent</p>
+              <p className="text-muted-foreground text-sm text-center py-8">Aucun pari récent</p>
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Home, User, ShoppingBag, Trophy, Zap, Clock } from "lucide-react"
+import { Home, User, ShoppingBag, Trophy } from "lucide-react"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { DailyRewardWidget } from "@/components/daily-reward-widget"
@@ -27,14 +27,15 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-        active 
-          ? "bg-primary/10 text-primary border-l-2 border-primary shadow-[0_0_15px_rgba(220,38,38,0.15)]" 
-          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+      aria-current={active ? "page" : undefined}
+      className={`relative w-full flex items-center gap-3 px-3 h-10 rounded-md transition-colors ${
+        active
+          ? "bg-surface-hover text-foreground before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary"
+          : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
       }`}
     >
       {icon}
-      <span className="text-sm font-semibold tracking-tight">{label}</span>
+      <span className="text-sm font-medium">{label}</span>
     </Link>
   )
 }
@@ -46,8 +47,8 @@ export function LeftSidebar({
 }: LeftSidebarProps) {
   return (
     <aside className="hidden lg:block lg:col-span-2 lg:sticky lg:top-4 lg:h-fit">
-      <div className="space-y-4">
-        <div className="p-4">
+      <div className="space-y-6">
+        <div className="h-16 flex items-center px-3">
           <Link href="/">
             <YomiLogo />
           </Link>
@@ -85,21 +86,18 @@ export function LeftSidebar({
 
         {/* Active Predictions Widget */}
         {activeBets.length > 0 && (
-          <div className="rounded-xl bg-card border border-border p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <h3 className="text-xs font-bold tracking-tight uppercase">Mes Prédictions</h3>
-            </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2">
+            <h3 className="px-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Mes prédictions</h3>
+            <div className="max-h-64 overflow-y-auto divide-y divide-border border-y border-border">
               {activeBets.slice(0, 5).map((bet) => (
                 <Link 
                   key={bet.id}
                   href={`/market/${bet.market_id}`}
-                  className="block p-2 rounded-lg border text-xs bg-white/5 border-border hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
+                  className="block px-3 py-2.5 text-xs hover:bg-surface-hover transition-colors cursor-pointer"
                 >
-                  <p className="font-medium truncate">{bet.market}</p>
+                  <p className="font-medium truncate text-foreground/90">{bet.market}</p>
                   <div className="flex justify-between items-center mt-1">
-                    <span className={`font-bold ${bet.direction === 'NO' ? "text-rose-400" : "text-emerald-400"}`}>
+                    <span className={`font-semibold ${bet.direction === 'NO' ? "text-no" : "text-yes"}`}>
                       {(() => {
                         // Clean up display for binary markets (OUI OUI -> OUI)
                         const isBinaryOutcome = bet.choice === "OUI" || bet.choice === "NON"
@@ -109,15 +107,8 @@ export function LeftSidebar({
                         return `${bet.direction === 'NO' ? "NON " : "OUI "}${bet.choice}`
                       })()}
                     </span>
-                    <span className="font-mono font-bold text-muted-foreground flex items-center gap-0.5">
+                    <span className="font-mono text-muted-foreground flex items-center gap-0.5">
                       {bet.amount}<CurrencySymbol />
-                    </span>
-                  </div>
-                  {/* Status Badge */}
-                  <div className="mt-1.5 flex items-center gap-1">
-                    <span className="flex items-center gap-1 text-[10px] text-yellow-400">
-                      <Clock className="w-3 h-3" />
-                      En cours
                     </span>
                   </div>
                 </Link>

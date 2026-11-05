@@ -90,7 +90,7 @@ export default async function AdminSeasonsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3">
             <Trophy className="w-8 h-8 text-amber-400" />
             Gestion des Saisons
           </h1>
@@ -100,7 +100,7 @@ export default async function AdminSeasonsPage() {
         </div>
         <Link
           href="/admin/settings"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-all"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all"
         >
           Paramètres Saison
         </Link>
@@ -110,14 +110,14 @@ export default async function AdminSeasonsPage() {
       {activeSeason ? (
         <div className="space-y-6">
           {/* Season Header Card */}
-          <div className="rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 p-6">
+          <div className="rounded-lg bg-amber-500/5 border border-amber-500/30 p-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase">
+                  <span className="px-2 py-0.5 rounded-full bg-yes/20 text-yes text-xs font-semibold uppercase">
                     En cours
                   </span>
-                  <h2 className="text-2xl font-bold">{activeSeason.name}</h2>
+                  <h2 className="text-2xl font-semibold">{activeSeason.name}</h2>
                 </div>
                 <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -133,13 +133,13 @@ export default async function AdminSeasonsPage() {
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Récompenses</p>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="flex items-center gap-1 text-amber-400 font-bold">
+                  <span className="flex items-center gap-1 text-amber-400 font-semibold">
                     <Trophy className="w-4 h-4" /> {seasonSettings?.first_place_reward?.toLocaleString() || 0}<CurrencySymbol className="w-3 h-3" />
                   </span>
-                  <span className="flex items-center gap-1 text-gray-400 font-bold text-sm">
+                  <span className="flex items-center gap-1 text-gray-400 font-semibold text-sm">
                     {seasonSettings?.second_place_reward?.toLocaleString() || 0}<CurrencySymbol className="w-3 h-3" />
                   </span>
-                  <span className="flex items-center gap-1 text-amber-700 font-bold text-sm">
+                  <span className="flex items-center gap-1 text-amber-700 font-semibold text-sm">
                     {seasonSettings?.third_place_reward?.toLocaleString() || 0}<CurrencySymbol className="w-3 h-3" />
                   </span>
                 </div>
@@ -149,37 +149,37 @@ export default async function AdminSeasonsPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+            <div className="p-4 rounded-lg bg-card border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
                 <Users className="w-4 h-4" /> Participants
               </div>
-              <p className="text-2xl font-bold mt-1">{seasonLeaderboard.length}</p>
+              <p className="text-2xl font-semibold mt-1">{seasonLeaderboard.length}</p>
             </div>
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+            <div className="p-4 rounded-lg bg-card border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
                 <Target className="w-4 h-4" /> Events
               </div>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-2xl font-semibold mt-1">
                 {seasonEvents.length}
                 <span className="text-sm font-normal text-muted-foreground ml-1">
                   ({seasonEvents.filter(e => e.status === 'resolved').length} terminés)
                 </span>
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+            <div className="p-4 rounded-lg bg-card border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
                 <BarChart3 className="w-4 h-4" /> Volume Total
               </div>
-              <p className="text-2xl font-bold mt-1 flex items-center gap-1">
+              <p className="text-2xl font-semibold mt-1 flex items-center gap-1">
                 {seasonEvents.reduce((sum, e) => sum + (e.volume || 0), 0).toLocaleString()}
                 <CurrencySymbol className="w-5 h-5" />
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+            <div className="p-4 rounded-lg bg-card border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
                 <TrendingUp className="w-4 h-4" /> Paris Totaux
               </div>
-              <p className="text-2xl font-bold mt-1">{seasonBets.length}</p>
+              <p className="text-2xl font-semibold mt-1">{seasonBets.length}</p>
             </div>
           </div>
 
@@ -193,15 +193,15 @@ export default async function AdminSeasonsPage() {
           />
         </div>
       ) : (
-        <div className="rounded-xl bg-card border border-border p-8 text-center">
+        <div className="rounded-lg bg-card border border-border p-8 text-center">
           <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-bold">Aucune saison en cours</h2>
+          <h2 className="text-xl font-semibold">Aucune saison en cours</h2>
           <p className="text-muted-foreground mt-1">
             Démarrez une nouvelle saison depuis les paramètres.
           </p>
           <Link
             href="/admin/settings"
-            className="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm"
+            className="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm"
           >
             Créer une saison
           </Link>
@@ -211,7 +211,7 @@ export default async function AdminSeasonsPage() {
       {/* Past Seasons */}
       {pastSeasons.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
             <Award className="w-5 h-5 text-muted-foreground" />
             Saisons Passées
           </h2>
@@ -220,11 +220,11 @@ export default async function AdminSeasonsPage() {
               <Link
                 key={season.id}
                 href={`/admin/seasons/${season.id}`}
-                className="block p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
+                className="block p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold">{season.name}</h3>
+                    <h3 className="font-semibold">{season.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {new Date(season.start_date).toLocaleDateString('fr-FR')} - {new Date(season.end_date).toLocaleDateString('fr-FR')}
                     </p>

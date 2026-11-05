@@ -88,8 +88,8 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 animate-in fade-in duration-300">
-        <span className="text-sm text-rose-400">{error}</span>
+      <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-no/10 border border-no/30 animate-in fade-in duration-300">
+        <span className="text-sm text-no">{error}</span>
       </div>
     )
   }
@@ -112,19 +112,19 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       <div 
         className={`flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all animate-in fade-in duration-300 ${
           isJackpot || isWelcomeBonus
-            ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30' 
-            : 'bg-emerald-500/10 border border-emerald-500/30'
+            ? 'bg-amber-500/10 border border-amber-500/30' 
+            : 'bg-yes/10 border border-yes/30'
         }`}
       >
         {isJackpot ? (
           <Trophy className="w-5 h-5 text-amber-400" />
         ) : (
-          <Gift className={`w-5 h-5 ${isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`} />
+          <Gift className={`w-5 h-5 ${isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`} />
         )}
-        <span className={`font-bold ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`}>
+        <span className={`font-semibold ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`}>
           {successLabel} récupéré !
         </span>
-        <span className={`font-mono font-bold flex items-center gap-1 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-emerald-400'}`}>
+        <span className={`font-mono font-semibold flex items-center gap-1 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`}>
           +{claimResult.amount?.toLocaleString()}<CurrencySymbol className="w-4 h-4" />
         </span>
       </div>
@@ -134,16 +134,16 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   // Welcome Bonus Banner
   if (status.canClaimWelcome) {
     return (
-      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">
+      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
         <div className="flex items-center gap-3">
           <Gift className="w-5 h-5 text-amber-400" />
-          <span className="font-bold text-amber-400">Bonus de bienvenue</span>
+          <span className="font-semibold text-amber-400">Bonus de bienvenue</span>
           <span className="text-sm text-muted-foreground hidden sm:inline">Récupère tes premiers Zeny</span>
         </div>
         <button
           onClick={handleClaimWelcome}
           disabled={isClaiming}
-          className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm transition-all disabled:opacity-50 flex items-center gap-2"
+          className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-all disabled:opacity-50 flex items-center gap-2"
         >
           {isClaiming ? (
             <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
@@ -165,7 +165,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
     <div 
       className={`flex items-center justify-between gap-4 px-4 py-3 rounded-xl transition-all ${
         isJackpotDay
-          ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30'
+          ? 'bg-amber-500/10 border border-amber-500/30'
           : 'bg-card border border-border'
       }`}
     >
@@ -175,7 +175,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
         ) : (
           <Gift className="w-5 h-5 text-primary" />
         )}
-        <span className={`font-bold ${isJackpotDay ? 'text-amber-400' : 'text-foreground'}`}>
+        <span className={`font-semibold ${isJackpotDay ? 'text-amber-400' : 'text-foreground'}`}>
           Jour {(status.currentStreak ?? 0) + 1}/7
         </span>
         <span className="text-sm text-muted-foreground hidden sm:inline">
@@ -186,9 +186,9 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       <button
         onClick={handleClaimDaily}
         disabled={isClaiming}
-        className={`px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 flex items-center gap-2 ${
+        className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 flex items-center gap-2 ${
           isJackpotDay
-            ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:from-amber-400 hover:to-orange-400'
+            ? 'bg-amber-500 text-black hover:bg-amber-400'
             : 'bg-primary hover:bg-primary/90 text-primary-foreground'
         }`}
       >

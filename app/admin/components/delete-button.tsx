@@ -12,10 +12,10 @@ function DeleteButton() {
     <button 
       type="submit" 
       disabled={pending}
-      className="p-2 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-400 rounded-lg transition-colors disabled:opacity-50"
+      className="p-2 hover:bg-no/10 text-muted-foreground hover:text-no rounded-lg transition-colors disabled:opacity-50"
     >
       {pending ? (
-        <div className="w-4 h-4 border-2 border-rose-400/30 border-t-rose-400 rounded-full animate-spin" />
+        <div className="w-4 h-4 border-2 border-no/30 border-t-rose-400 rounded-full animate-spin" />
       ) : (
         <Trash className="w-4 h-4" />
       )}

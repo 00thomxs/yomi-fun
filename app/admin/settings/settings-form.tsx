@@ -100,7 +100,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
       }
       toast.success("Event ajouté à la saison")
     } else {
-      toast.error("Erreur: " + error.message)
+      toast.error("Erreur:" + error.message)
     }
   }
   
@@ -122,7 +122,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
       }
       toast.success("Event retiré de la saison")
     } else {
-      toast.error("Erreur: " + error.message)
+      toast.error("Erreur:" + error.message)
     }
   }
   
@@ -171,7 +171,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
       }
     } catch (error) {
       console.error('Start season error:', error)
-      toast.error("Erreur lors du démarrage: " + String(error))
+      toast.error("Erreur lors du démarrage:" + String(error))
     } finally {
       setIsStarting(false)
     }
@@ -208,11 +208,11 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
     <div className="space-y-8">
       {/* Season Status Banner */}
       {isSeasonActive ? (
-        <div className="rounded-xl p-4 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+        <div className="rounded-lg p-4 bg-yes/10 border border-yes/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-emerald-500" />
+              <CheckCircle className="w-6 h-6 text-yes" />
             <div>
-              <p className="font-bold text-emerald-400">🎯 Saison Active</p>
+              <p className="font-semibold text-yes">Saison active</p>
               <p className="text-xs text-muted-foreground">
                 Se termine le {seasonEnd.toLocaleDateString('fr-FR')} à {seasonEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                 {daysLeft > 0 && ` (dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''})`}
@@ -225,7 +225,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               <button
                 type="button"
                 onClick={() => setShowEndConfirm(true)}
-                className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold transition-all flex items-center gap-2"
+                className="px-4 py-2 rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-semibold transition-all flex items-center gap-2"
               >
                 <StopCircle className="w-4 h-4" />
                 Terminer
@@ -248,7 +248,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                   type="button"
                   onClick={handleEndSeason}
                   disabled={isEnding}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold text-xs flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 text-black font-semibold text-xs flex items-center gap-1"
                 >
                   {isEnding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trophy className="w-3 h-3" />}
                   DISTRIBUER
@@ -257,14 +257,14 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             )}
           </div>
       ) : (
-      <div className="rounded-xl p-4 bg-white/5 border border-white/10 flex items-center justify-between">
+      <div className="rounded-lg p-4 bg-white/5 border border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           <XCircle className="w-6 h-6 text-muted-foreground" />
           <div>
-            <p className="font-bold">⏸️ Aucune Saison Active</p>
+            <p className="font-semibold">⏸️ Aucune Saison Active</p>
             <p className="text-xs text-muted-foreground">
               {settings.rewards_distributed 
-                ? 'Dernière saison terminée, récompenses distribuées ✓'
+                ? 'Dernière saison terminée, récompenses distribuées'
                 : 'Configure les paramètres puis démarre la saison'
               }
             </p>
@@ -278,7 +278,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
         {/* Season Title */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary" /> Titre de la Saison
           </h3>
           <div className="space-y-2">
@@ -286,7 +286,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               type="text"
               name="title"
               defaultValue={settings.title || "Saison Régulière"}
-              className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none text-xl font-bold"
+              className="w-full px-4 py-3 rounded-lg bg-black/20 border border-border focus:border-primary outline-none text-xl font-semibold"
               placeholder="Ex: Saison Hiver 2025"
               required
             />
@@ -300,7 +300,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
         {/* Date & Time Selection */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" /> Date de Fin de Saison
           </h3>
             <div className="space-y-2">
@@ -310,7 +310,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                 type="datetime-local"
                 value={seasonEndDateTime}
                 onChange={(e) => setSeasonEndDateTime(e.target.value)}
-                className="w-full bg-black/20 border border-white/10 rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none text-white scheme-dark font-mono text-lg"
+                className="w-full bg-black/20 border border-border rounded-lg pl-11 pr-4 py-3 outline-none focus:border-primary/50 transition-all appearance-none text-white scheme-dark font-mono text-lg"
                 required
               />
             </div>
@@ -353,7 +353,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
         {/* Cash Prize */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
             <Coins className="w-5 h-5 text-amber-400" /> Cash Prize (1ère Place)
           </h3>
           <div className="space-y-2">
@@ -361,7 +361,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               type="number"
               name="cash_prize"
               defaultValue={settings.cash_prize}
-              className="w-full px-4 py-3 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none font-mono text-xl"
+              className="w-full px-4 py-3 rounded-lg bg-black/20 border border-border focus:border-primary outline-none font-mono text-xl"
               placeholder="10000"
               required
             />
@@ -375,39 +375,39 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
         {/* Physical Prizes */}
         <div>
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-500" /> Prix Physiques (Top 3)
           </h3>
           <p className="text-xs text-muted-foreground mb-4">Ces prix sont à distribuer manuellement par l'admin.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-amber-400 uppercase tracking-wider">#1 - 1ère Place</label>
+              <label className="text-xs font-semibold text-amber-400 uppercase tracking-wide">#1 - 1ère Place</label>
               <input
                 type="text"
                 name="top1_prize"
                 defaultValue={settings.top1_prize}
                 placeholder="Ex: PS5"
-                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none"
+                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-border focus:border-primary outline-none"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">#2 - 2ème Place</label>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">#2 - 2ème Place</label>
               <input
                 type="text"
                 name="top2_prize"
                 defaultValue={settings.top2_prize}
                 placeholder="Ex: AirPods"
-                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none"
+                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-border focus:border-primary outline-none"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-orange-400 uppercase tracking-wider">#3 - 3ème Place</label>
+              <label className="text-xs font-semibold text-orange-400 uppercase tracking-wide">#3 - 3ème Place</label>
               <input
                 type="text"
                 name="top3_prize"
                 defaultValue={settings.top3_prize}
                 placeholder="Ex: Bon d'achat"
-                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none"
+                className="w-full px-4 py-2 rounded-lg bg-black/20 border border-border focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -417,7 +417,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
 
         {/* Zeny Rewards */}
         <div>
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Coins className="w-5 h-5 text-primary" /> Bonus Zeny (Top 10)
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
@@ -426,7 +426,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i} className="space-y-1">
-                <label className={`text-[10px] font-medium uppercase ${
+                <label className={`text-[11px] font-medium uppercase ${
                   i === 0 ? 'text-yellow-500' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-500' : 'text-muted-foreground'
                 }`}>
                   #{i + 1}
@@ -435,7 +435,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                   type="number"
                   name={`zeny_rank_${i + 1}`}
                   defaultValue={settings.zeny_rewards?.[i] || 0}
-                  className="w-full px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 focus:border-primary outline-none font-mono text-sm"
+                  className="w-full px-3 py-1.5 rounded-lg bg-black/20 border border-border focus:border-primary outline-none font-mono text-sm"
                 />
               </div>
             ))}
@@ -448,7 +448,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             <div className="h-px bg-border" />
             
             <div className="space-y-4">
-              <h3 className="text-lg font-bold flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Link2 className="w-5 h-5 text-primary" /> Events de la Saison
               </h3>
               <p className="text-xs text-muted-foreground">
@@ -464,7 +464,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                 <div className="space-y-4">
                   {/* Events currently in season */}
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-emerald-400 flex items-center gap-2">
+                    <p className="text-sm font-medium text-yes flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
                       Events liés ({seasonMarkets.length})
                     </p>
@@ -473,7 +473,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                         {seasonMarkets.map(market => (
                           <div 
                             key={market.id} 
-                            className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20"
+                            className="flex items-center justify-between p-3 rounded-lg bg-yes/5 border border-yes/20"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{market.question}</p>
@@ -487,7 +487,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                             <button
                               type="button"
                               onClick={() => handleUnlinkMarket(market.id)}
-                              className="ml-2 p-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-all"
+                              className="ml-2 p-2 rounded-lg text-no hover:bg-no/10 transition-all"
                               title="Retirer de la saison"
                             >
                               <Unlink className="w-4 h-4" />
@@ -521,7 +521,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                               key={market.id} 
                               className={`flex items-center justify-between p-3 rounded-lg border ${
                                 isCompatible 
-                                  ? 'bg-white/5 border-white/10 hover:border-white/20' 
+                                  ? 'bg-white/5 border-border hover:border-white/15' 
                                   : 'bg-amber-500/5 border-amber-500/20 opacity-60'
                               }`}
                             >
@@ -530,7 +530,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                                 <p className="text-xs text-muted-foreground">
                                   Fin: {new Date(market.closes_at).toLocaleDateString('fr-FR')}
                                   {!isCompatible && (
-                                    <span className="ml-2 text-amber-400">⚠️ Après la saison</span>
+                                    <span className="ml-2 text-amber-400">Après la saison</span>
                                   )}
                                 </p>
                               </div>
@@ -540,7 +540,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
                                 disabled={!isCompatible}
                                 className={`ml-2 p-2 rounded-lg transition-all ${
                                   isCompatible 
-                                    ? 'text-emerald-400 hover:bg-emerald-500/10' 
+                                    ? 'text-yes hover:bg-yes/10' 
                                     : 'text-muted-foreground cursor-not-allowed'
                                 }`}
                                 title={isCompatible ? "Ajouter à la saison" : "Date incompatible"}
@@ -583,10 +583,10 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
             type="button"
             onClick={handleStartSeason}
             disabled={isStarting}
-            className="px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            className="px-6 py-3 rounded-lg bg-yes text-white font-semibold hover:bg-emerald-600 transition-all flex items-center gap-2"
           >
             {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
-            🚀 Démarrer la Saison
+            Démarrer la saison
           </button>
           )}
         </div>

@@ -17,7 +17,7 @@ function formatDayLabel(iso: string) {
 export function MonetaryChart({ points }: { points: MonetarySnapshotPoint[] }) {
   if (!points || points.length < 2) {
     return (
-      <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-sm text-muted-foreground italic">
+      <div className="p-6 rounded-lg bg-white/5 border border-border text-sm text-muted-foreground italic">
         Pas assez de snapshots pour afficher un graphe (il faut au moins 2 jours).
       </div>
     )
@@ -33,13 +33,13 @@ export function MonetaryChart({ points }: { points: MonetarySnapshotPoint[] }) {
   const maxY = Math.max(...data.map((d) => d.supply), ...data.map((d) => d.burned))
 
   return (
-    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+    <div className="p-5 rounded-lg bg-white/5 border border-border">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Tendance (30j)</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Tendance (30j)</p>
           <p className="text-sm text-muted-foreground">
-            <span className="text-white/80 font-bold">Supply</span> vs{" "}
-            <span className="text-amber-400 font-bold">Burn</span>
+            <span className="text-white/80 font-semibold">Supply</span> vs{" "}
+            <span className="text-amber-400 font-semibold">Burn</span>
           </p>
         </div>
         <div className="text-xs text-muted-foreground font-mono">
@@ -87,7 +87,7 @@ export function MonetaryChart({ points }: { points: MonetarySnapshotPoint[] }) {
                 const v = Number(value || 0).toLocaleString("fr-FR")
                 const label = name === "supply" ? "Supply" : "Burn"
                 return [
-                  <span key={name} className="font-mono font-bold text-white/90 flex items-center gap-1">
+                  <span key={name} className="font-mono font-semibold text-white/90 flex items-center gap-1">
                     {v} <CurrencySymbol />
                   </span>,
                   label,
