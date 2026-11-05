@@ -2,6 +2,7 @@
 
 import { Clock } from "lucide-react"
 import { MarketCard } from "@/components/market/market-card"
+import { ActivityFeed } from "@/components/market/activity-feed"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 
@@ -125,6 +126,11 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
           </div>
         </article>
       )}
+
+      {/* Desktop shows the feed in the side rail */}
+      <div className="lg:hidden">
+        <ActivityFeed limit={5} />
+      </div>
 
       {/* Category Filter */}
       <div className="sticky top-16 z-40 -mx-4 px-4 lg:mx-0 lg:px-0 bg-background/95 backdrop-blur border-b border-border">

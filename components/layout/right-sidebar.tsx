@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
+import { ActivityFeed } from "@/components/market/activity-feed"
 import type { Market, BinaryMarket, ActiveBet } from "@/lib/types"
 
 type RightSidebarProps = {
@@ -88,6 +89,8 @@ export function RightSidebar({
           </div>
         </section>
       )}
+
+      <ActivityFeed />
 
       {/* Trending Markets */}
       <section className="space-y-3">

@@ -10,6 +10,7 @@ import type { Market, BinaryMarket, MultiOutcomeMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
 import Image from "next/image"
 import type { MarketWinner } from "@/app/actions/market-stats"
+import { ActivityFeed } from "@/components/market/activity-feed"
 import { TopWinners } from "@/components/market/top-winners"
 import { useToast } from "@/hooks/use-toast"
 import { LowBalancePopup } from "@/components/low-balance-popup"
@@ -865,6 +866,7 @@ function BinaryMarketContent({
         </div>
       </div>
 
+        <ActivityFeed marketId={market.id} title="Derniers paris" />
       </div>
 
       {/* Bet ticket: sticky on desktop so it stays next to the chart */}
@@ -1467,6 +1469,7 @@ function MultiMarketContent({
         </div>
       </div>
 
+        <ActivityFeed marketId={market.id} title="Derniers paris" />
       </div>
 
       {/* Bet ticket: sticky on desktop so it stays next to the chart */}
