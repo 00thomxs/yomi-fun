@@ -74,7 +74,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
               return (
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-4xl font-semibold text-yes">{p}%<span className="ml-1.5 text-sm font-sans font-medium text-muted-foreground">OUI</span></span>
+                    <span className="font-display text-4xl font-bold text-yes tabular">{p}%<span className="ml-1.5 text-sm font-sans font-medium text-muted-foreground">OUI</span></span>
                     <span className="font-mono text-sm text-muted-foreground">{100 - p}% NON</span>
                   </div>
                   <div className="flex h-1.5 rounded-full overflow-hidden bg-no/30">
@@ -152,7 +152,7 @@ export function HomeView({ markets, onBet, onMarketClick, activeCategory, setAct
 
       {/* Section Header */}
       <div className="flex items-baseline justify-between">
-        <h3 className="text-lg font-semibold tracking-tight">{activeLabel}</h3>
+        <h2 className="font-display text-lg font-bold tracking-tight">{activeLabel}</h2>
         <span className="text-sm text-muted-foreground font-mono">
           {filteredMarkets.length} marché{filteredMarkets.length > 1 ? "s" : ""}
         </span>

@@ -111,7 +111,7 @@ export function CosmeticCustomizer({
   
   return (
     <div 
-      className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="font-logo fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <div 

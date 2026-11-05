@@ -386,7 +386,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">Classement</h2>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Classement</h1>
             {viewMode === 'season' && hasSeason ? (
             <p className={`text-xs font-medium flex items-center gap-1 max-w-[250px] truncate ${isSeasonTimeElapsed ? 'text-muted-foreground' : 'text-primary'}`}>
               <Trophy className="w-3 h-3 shrink-0" /> 
@@ -401,14 +401,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
         
         {/* Toggle Saison / Global */}
         {hasSeason && (
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-card border border-border">
+          <div className="seg">
             <button
               onClick={() => setViewMode('season')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                viewMode === 'season'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-muted-foreground hover:text-white'
-              }`}
+              aria-pressed={viewMode === 'season'}
+              className="seg-item"
             >
               <span className="flex items-center gap-1.5">
                 <Flame className="w-3 h-3" />
@@ -417,11 +414,8 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             </button>
             <button
               onClick={() => setViewMode('global')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                viewMode === 'global'
-                  ? 'bg-white/10 text-white shadow-lg'
-                  : 'text-muted-foreground hover:text-white'
-              }`}
+              aria-pressed={viewMode === 'global'}
+              className="seg-item"
             >
               <span className="flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" />

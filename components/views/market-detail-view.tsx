@@ -567,7 +567,7 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="flex items-baseline gap-3">
-        <p className="text-6xl font-semibold tracking-tighter text-foreground font-mono">{Math.round(market.probability)}%</p>
+        <p className="font-display text-5xl md:text-6xl font-bold tracking-tight text-foreground tabular">{Math.round(market.probability)}%</p>
         <p className="text-sm font-medium text-muted-foreground">
           <span className="text-yes">OUI</span> · 
           {market.probability >= 85
@@ -582,16 +582,13 @@ function BinaryMarketContent({
 
       {/* Timeframe Selector + Chart Actions */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="seg overflow-x-auto no-scrollbar">
           {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1.5 rounded-lg font-semibold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
-              timeframe === tf
-                ? "bg-white/5 text-brand border-brand/40"
-                : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
-            }`}
+              aria-pressed={timeframe === tf}
+              className="seg-item font-mono"
           >
             {tf}
           </button>
@@ -1173,16 +1170,13 @@ function MultiMarketContent({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 relative z-10">
           <p className="text-sm font-semibold tracking-tight shrink-0">Evolution des cotes</p>
           <div className="flex items-center gap-2">
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="seg overflow-x-auto no-scrollbar">
               {(["1H", "6H", "1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all whitespace-nowrap cursor-pointer border ${
-                  timeframe === tf
-                    ? "bg-white/5 text-brand border-brand/40"
-                    : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
-                }`}
+                  aria-pressed={timeframe === tf}
+                  className="seg-item font-mono"
               >
                 {tf}
               </button>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Users, Trophy } from "lucide-react"
+import { Clock, Users, Trophy, HelpCircle } from "lucide-react"
 import { AreaChart, Area, ResponsiveContainer, YAxis, ReferenceLine } from "recharts"
 import type { Market, BinaryMarket } from "@/lib/types"
 import { CATEGORIES } from "@/lib/constants"
@@ -43,15 +43,13 @@ function CardHeader({ market, categoryLabel }: { market: Market; categoryLabel: 
   )
 }
 
-function Thumb({ src }: { src?: string }) {
-  if (!src) return null
-  // Background image: a dead URL degrades to a plain tile instead of a broken-image icon
+function Thumb({ src, icon: Icon }: { src?: string; icon: React.ElementType }) {
+  // Category icon underneath; the image (when the event has one) paints over it
   return (
-    <div
-      aria-hidden
-      className="w-10 h-10 rounded-md shrink-0 bg-muted bg-cover bg-center"
-      style={{ backgroundImage: `url("${src}")` }}
-    />
+    <div aria-hidden className="relative w-10 h-10 rounded-md shrink-0 bg-white/5 border border-border flex items-center justify-center overflow-hidden">
+      <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+      {src && <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${src}")` }} />}
+    </div>
   )
 }
 
@@ -67,6 +65,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
   // Find correct icon from constants
   const categoryDef = CATEGORIES.find(c => c.id === market.category) || CATEGORIES.find(c => c.label === market.category)
   const categoryLabel = categoryDef?.label || market.category || "Divers"
+  const CategoryIcon = categoryDef?.icon || HelpCircle
 
   // Use real history data for chart (passed from container)
   const chartData = market.type === "binary"
@@ -95,7 +94,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
         <CardHeader market={market} categoryLabel={categoryLabel} />
 
         <div className="flex items-start gap-3">
-          <Thumb src={market.bgImage} />
+          <Thumb src={market.bgImage} icon={CategoryIcon} />
           <p className="font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
         </div>
 
@@ -179,7 +178,7 @@ export function MarketCard({ market, onMarketClick, onBet }: MarketCardProps) {
       <CardHeader market={market} categoryLabel={categoryLabel} />
 
       <div className="flex items-start gap-3">
-        <Thumb src={market.bgImage} />
+        <Thumb src={market.bgImage} icon={CategoryIcon} />
         <p className="flex-1 font-medium text-[15px] leading-snug line-clamp-2">{market.question}</p>
         <div className="text-right shrink-0">
           <p className="font-mono text-2xl font-semibold leading-none">{prob}%</p>

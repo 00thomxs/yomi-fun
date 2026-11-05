@@ -517,7 +517,7 @@ export function ProfileView() {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold tracking-tight">Profil</h2>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Profil</h1>
         <button
           onClick={toggleSettings}
           className="p-2 rounded-lg bg-card border border-border hover:border-white/15 transition-all cursor-pointer"
@@ -786,16 +786,13 @@ export function ProfileView() {
               Performance {pnlTimeframe === "1J" ? "24 heures" : pnlTimeframe === "1S" ? "7 jours" : pnlTimeframe === "1M" ? "30 jours" : "totale"}
             </p>
           </div>
-          <div className="flex gap-1">
+          <div className="seg">
             {(["1J", "1S", "1M", "TOUT"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
-                  pnlTimeframe === tf
-                    ? "bg-white/5 text-brand border-brand/40"
-                    : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
-                }`}
+                aria-pressed={pnlTimeframe === tf}
+                className="seg-item font-mono"
               >
                 {tf}
               </button>
