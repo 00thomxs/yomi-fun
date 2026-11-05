@@ -229,7 +229,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
               type="checkbox" 
               checked={notifWin}
               onChange={(e) => setNotifWin(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-600 bg-transparent text-primary focus:ring-offset-0"
+              className="w-5 h-5 rounded border-gray-600 bg-transparent text-brand focus:ring-offset-0"
             />
           </label>
 
@@ -239,7 +239,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
               type="checkbox" 
               checked={notifMarketing}
               onChange={(e) => setNotifMarketing(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-600 bg-transparent text-primary focus:ring-offset-0"
+              className="w-5 h-5 rounded border-gray-600 bg-transparent text-brand focus:ring-offset-0"
             />
           </label>
         </div>

@@ -173,7 +173,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
         {isJackpotDay ? (
           <Trophy className="w-5 h-5 text-amber-400" />
         ) : (
-          <Gift className="w-5 h-5 text-primary" />
+          <Gift className="w-5 h-5 text-brand" />
         )}
         <span className={`font-semibold ${isJackpotDay ? 'text-amber-400' : 'text-foreground'}`}>
           Jour {(status.currentStreak ?? 0) + 1}/7

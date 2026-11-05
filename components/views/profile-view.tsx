@@ -479,7 +479,7 @@ export function ProfileView() {
                     className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <UserCog className="w-5 h-5 text-primary" />
+                      <UserCog className="w-5 h-5 text-brand" />
                       <div className="text-left">
                         <p className="font-semibold text-sm">Modifier le profil</p>
                         <p className="text-xs text-muted-foreground">Avatar, Pseudo, Notifications</p>
@@ -493,7 +493,7 @@ export function ProfileView() {
                     className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <Key className="w-5 h-5 text-primary" />
+                      <Key className="w-5 h-5 text-brand" />
                       <div className="text-left">
                         <p className="font-semibold text-sm">Sécurité</p>
                         <p className="text-xs text-muted-foreground">Changer le mot de passe</p>
@@ -569,7 +569,7 @@ export function ProfileView() {
                 {/* Level & XP Progress */}
                 <div className="mt-2 space-y-1.5 min-w-[180px] sm:min-w-[200px]">
                   <div className="flex justify-between text-xs font-medium">
-                    <span className="text-muted-foreground">Niveau <span className="text-primary">{userStats.level}</span></span>
+                    <span className="text-muted-foreground">Niveau <span className="text-brand">{userStats.level}</span></span>
                     <span className="text-muted-foreground"><span className="text-foreground">{userStats.xp % 1000}</span> / 1000 XP</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
@@ -596,7 +596,7 @@ export function ProfileView() {
                   <p className="text-xs text-muted-foreground">Solde</p>
                   <p className="text-xl font-semibold">
                     <span className="font-mono">{userBalance.toLocaleString()}</span>{" "}
-                    <CurrencySymbol className="text-primary" />
+                    <CurrencySymbol className="text-brand" />
                   </p>
                 </div>
               </div>
@@ -627,7 +627,7 @@ export function ProfileView() {
                 <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Global
                 </p>
-                <p className="text-sm sm:text-base font-semibold font-mono text-primary">
+                <p className="text-sm sm:text-base font-semibold font-mono text-brand">
                   {globalRank ? `#${globalRank}` : '-'}
                 </p>
               </div>
@@ -793,7 +793,7 @@ export function ProfileView() {
                 onClick={() => setPnlTimeframe(tf)}
                 className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
                   pnlTimeframe === tf
-                    ? "bg-primary/10 text-primary border-primary/30"
+                    ? "bg-primary/10 text-brand border-primary/30"
                     : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
                 }`}
               >

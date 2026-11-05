@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { LeftSidebar } from "@/components/layout/left-sidebar"
 import { RightSidebar } from "@/components/layout/right-sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppHeader } from "@/components/layout/app-header"
@@ -95,32 +94,30 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const activeTab = getActiveTab()
   const showLeaderboard = pathname === "/leaderboard"
+  const showRail = pathname === "/" || showLeaderboard
 
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden">
-      {/* Main Layout */}
-      <div className="relative z-10 max-w-[1440px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-6 py-4">
-        {/* Left Sidebar - Desktop */}
-        <LeftSidebar
-          activeTab={activeTab}
-          showLeaderboard={showLeaderboard}
-          activeBets={activeBets}
-        />
+      <AppHeader />
 
-        {/* Main Content */}
-        <main className="col-span-1 lg:col-span-7">
-          <AppHeader />
-          <div className="pb-24 lg:pb-6">{children}</div>
-        </main>
+      {/* Home and leaderboard get a side rail; market pages use the full width for chart + bet ticket */}
+      <div
+        className={`max-w-[1320px] mx-auto w-full px-4 lg:px-6 pt-6 pb-24 lg:pb-10 ${
+          showRail ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 items-start" : ""
+        }`}
+      >
+        <main className="min-w-0">{children}</main>
 
-        {/* Right Sidebar - Desktop */}
-        <RightSidebar
-          trendingMarkets={trendingMarkets}
-          userBalance={userBalance}
-          userPnL={profile?.total_won}
-          isAuthenticated={isAuthenticated}
-          topPlayers={topPlayers}
-        />
+        {showRail && (
+          <RightSidebar
+            trendingMarkets={trendingMarkets}
+            userBalance={userBalance}
+            userPnL={profile?.total_won}
+            isAuthenticated={isAuthenticated}
+            topPlayers={topPlayers}
+            activeBets={activeBets}
+          />
+        )}
       </div>
 
       {/* Mobile Navigation */}

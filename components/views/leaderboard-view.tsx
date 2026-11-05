@@ -510,7 +510,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
               <div className="text-right">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Cash Prize</p>
-                <p className="text-xl font-semibold text-primary flex items-center justify-end gap-1">
+                <p className="text-xl font-semibold text-brand flex items-center justify-end gap-1">
                   {(seasonSettings?.cash_prize || 0).toLocaleString()}<CurrencySymbol className="w-4 h-4" />
                 </p>
               </div>
@@ -546,11 +546,11 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 className="w-full flex items-center justify-between mb-3"
               >
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-primary" />
+                  <Target className="w-4 h-4 text-brand" />
                   <h4 className="text-xs font-semibold uppercase tracking-wide text-white/80">
                     Events de la saison
                   </h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-brand">
                     {seasonEvents.length}
                   </span>
                 </div>
@@ -783,7 +783,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   <img src={player.avatar} alt={player.username} className="w-8 h-8 rounded-full shrink-0 object-cover bg-white/5" />
                   <div className="flex flex-col min-w-0 gap-0.5">
                     <div className="flex items-center gap-1 min-w-0">
-                      <span className={`font-semibold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-primary" : "text-foreground"}`}>
+                      <span className={`font-semibold text-sm truncate max-w-[60px] sm:max-w-none ${isMe ? "text-brand" : "text-foreground"}`}>
                         <StyledUsername username={player.username} nametagEffect={equippedNametags[player.id]} />
                       </span>
                       {/* Mobile: only 1 icon */}
@@ -796,7 +796,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
-                      <span className="text-[11px] font-semibold text-primary flex items-center gap-0.5">
+                      <span className="text-[11px] font-semibold text-brand flex items-center gap-0.5">
                         +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                       </span>
                     )}

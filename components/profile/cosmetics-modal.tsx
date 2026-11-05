@@ -355,7 +355,7 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
           <Link
             href="/shop"
             onClick={onClose}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/20 border border-primary/50 text-primary font-semibold text-sm hover:bg-primary/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/20 border border-primary/50 text-brand font-semibold text-sm hover:bg-primary/30 transition-all"
           >
             <Sparkles className="w-4 h-4" />
             Acheter des cosmétiques

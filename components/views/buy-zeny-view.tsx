@@ -87,7 +87,7 @@ export function BuyZenyView() {
     <div className="max-w-5xl mx-auto space-y-8 pb-12">
       <div className="text-center space-y-4">
         <h1 className="text-2xl sm:text-4xl font-semibold text-foreground tracking-tight">
-          Recharge tes <span className="text-primary">Zeny</span>
+          Recharge tes <span className="text-brand">Zeny</span>
         </h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
           Achète des Zeny pour parier sur tes events préférés et grimper dans le classement.
@@ -159,9 +159,9 @@ export function BuyZenyView() {
                   {theme.popular && (
                     <li className="flex items-center gap-3">
                       <div className="p-1 rounded-full bg-primary/10">
-                        <Star className="w-3 h-3 text-primary" />
+                        <Star className="w-3 h-3 text-brand" />
                       </div>
-                      <span className="text-primary font-medium">Meilleure offre</span>
+                      <span className="text-brand font-medium">Meilleure offre</span>
                     </li>
                   )}
                 </ul>

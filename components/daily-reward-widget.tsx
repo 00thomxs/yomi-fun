@@ -189,7 +189,7 @@ export function DailyRewardWidget() {
             ) : isJackpotDay ? (
             <Trophy className="w-4 h-4 text-amber-400" />
           ) : (
-            <Gift className="w-4 h-4 text-primary" />
+            <Gift className="w-4 h-4 text-brand" />
           )}
             <span className={`text-xs font-semibold ${isJackpotDay ? 'text-amber-400' : 'text-primary'}`}>
               Jour {dayDisplay}/7

@@ -219,7 +219,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {category === 'zeny' && (
         <div className="space-y-6">
           <div className="text-center space-y-2">
-            <h3 className="text-xl font-semibold">Recharge tes <span className="text-primary">Zeny</span></h3>
+            <h3 className="text-xl font-semibold">Recharge tes <span className="text-brand">Zeny</span></h3>
             <p className="text-sm text-muted-foreground max-w-lg mx-auto">
               Plus le pack est gros, plus le bonus est important !
             </p>
@@ -483,7 +483,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
             {/* Price */}
             <div className="bg-white/5 rounded-lg p-4 flex justify-between items-center border border-border">
               <span className="text-sm font-medium">Prix</span>
-              <span className="text-xl font-semibold text-primary flex items-center gap-1">
+              <span className="text-xl font-semibold text-brand flex items-center gap-1">
                 {previewItem.price.toLocaleString()} <CurrencySymbol />
               </span>
             </div>

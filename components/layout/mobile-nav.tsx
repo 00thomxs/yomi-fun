@@ -24,7 +24,7 @@ function NavLink({
       href={href}
       aria-current={active ? "page" : undefined}
       className={`flex-1 flex flex-col items-center justify-center gap-1 h-14 transition-colors ${
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+        active ? "text-brand" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {icon}

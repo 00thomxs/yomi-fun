@@ -49,7 +49,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tight">
               {season.title || "Saison"}
             </h2>
-            <p className="text-primary font-semibold text-sm mt-2">
+            <p className="text-brand font-semibold text-sm mt-2">
               Classement Final
             </p>
           </div>

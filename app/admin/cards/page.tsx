@@ -94,7 +94,7 @@ export default function AdminCardsPage() {
       <div className="rounded-lg bg-card border border-border p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <CreditCard className="w-6 h-6 text-primary" />
+            <CreditCard className="w-6 h-6 text-brand" />
           </div>
           <div>
             <h2 className="font-semibold">Attribuer les cartes retroactives</h2>

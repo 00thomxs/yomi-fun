@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
-import type { Market, BinaryMarket } from "@/lib/types"
+import type { Market, BinaryMarket, ActiveBet } from "@/lib/types"
 
 type RightSidebarProps = {
   trendingMarkets: Market[]
@@ -10,6 +10,7 @@ type RightSidebarProps = {
   userPnL?: number
   isAuthenticated?: boolean
   topPlayers: { rank: number; username: string; points: number; avatar?: string }[]
+  activeBets?: ActiveBet[]
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -21,10 +22,12 @@ export function RightSidebar({
   userBalance,
   userPnL = 0,
   isAuthenticated = false,
-  topPlayers = []
+  topPlayers = [],
+  activeBets = []
 }: RightSidebarProps) {
   return (
-    <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-0 lg:h-fit pt-16 space-y-8">
+    <aside className="hidden lg:block lg:sticky lg:top-[88px] space-y-8">
+
       {/* Wallet - only show when authenticated */}
       {isAuthenticated && (
         <section className="rounded-lg border border-border bg-card">
@@ -33,7 +36,7 @@ export function RightSidebar({
               <p className="text-xs text-muted-foreground">Solde</p>
               <p className="mt-1 text-xl font-semibold flex items-baseline gap-1">
                 <span className="font-mono">{userBalance.toLocaleString()}</span>
-                <CurrencySymbol className="text-primary text-base" />
+                <CurrencySymbol className="text-brand text-base" />
               </p>
             </div>
             <div className="p-4">
@@ -49,6 +52,37 @@ export function RightSidebar({
           >
             Recharger des Zeny
           </Link>
+        </section>
+      )}
+
+      {/* Active predictions */}
+      {activeBets.length > 0 && (
+        <section className="space-y-3">
+          <SectionTitle>Mes prédictions</SectionTitle>
+          <div className="max-h-64 overflow-y-auto divide-y divide-border border-y border-border">
+            {activeBets.slice(0, 5).map((bet) => (
+              <Link
+                key={bet.id}
+                href={`/market/${bet.market_id}`}
+                className="block py-2.5 text-xs hover:bg-surface-hover transition-colors"
+              >
+                <p className="font-medium truncate text-foreground/90">{bet.market}</p>
+                <div className="flex justify-between items-center mt-1">
+                  <span className={`font-semibold ${bet.direction === 'NO' ? "text-no" : "text-yes"}`}>
+                    {(() => {
+                      // Clean up display for binary markets (OUI OUI -> OUI)
+                      const isBinaryOutcome = bet.choice === "OUI" || bet.choice === "NON"
+                      if (isBinaryOutcome && bet.direction === 'YES') return bet.choice
+                      return `${bet.direction === 'NO' ? "NON " : "OUI "}${bet.choice}`
+                    })()}
+                  </span>
+                  <span className="font-mono text-muted-foreground flex items-center gap-0.5">
+                    {bet.amount}<CurrencySymbol />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 
@@ -86,7 +120,7 @@ export function RightSidebar({
         <ol className="divide-y divide-border border-y border-border">
           {topPlayers.map((player) => (
             <li key={player.rank} className="flex items-center gap-3 py-2.5">
-              <span className={`w-4 text-sm font-mono ${player.rank === 1 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+              <span className={`w-4 text-sm font-mono ${player.rank === 1 ? "text-brand font-semibold" : "text-muted-foreground"}`}>
                 {player.rank}
               </span>
               {player.avatar && (

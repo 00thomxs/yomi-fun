@@ -338,7 +338,7 @@ function LoginContent() {
                   <button 
                     type="button" 
                     onClick={() => { setShowForgotPassword(true); setError(null); setSuccess(null) }}
-                    className="text-xs text-primary hover:underline"
+                    className="text-xs text-brand hover:underline"
                   >
                     Mot de passe oublié ?
                   </button>
@@ -411,8 +411,8 @@ function LoginContent() {
           {!isLogin && !showForgotPassword && (
             <p className="text-xs text-center text-muted-foreground">
               En créant un compte, tu acceptes nos{" "}
-              <button className="text-primary hover:underline">CGU</button> et notre{" "}
-              <button className="text-primary hover:underline">Politique de confidentialité</button>
+              <button className="text-brand hover:underline">CGU</button> et notre{" "}
+              <button className="text-brand hover:underline">Politique de confidentialité</button>
             </p>
           )}
         </div>

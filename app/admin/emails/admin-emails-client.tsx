@@ -246,7 +246,7 @@ export function AdminEmailsClient({
               <div className="flex items-center gap-2">
                 <div className={`p-2 rounded-lg ${emailMode === 'personal' ? 'bg-primary/10' : 'bg-red-500/10'}`}>
                   {emailMode === 'personal' ? (
-                    <User className="w-4 h-4 text-primary" />
+                    <User className="w-4 h-4 text-brand" />
                   ) : (
                     <Send className="w-4 h-4 text-red-400" />
                   )}
@@ -280,7 +280,7 @@ export function AdminEmailsClient({
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-white truncate">{selectedUser.username}</p>
-                        <p className="text-xs text-primary truncate">{selectedUser.email}</p>
+                        <p className="text-xs text-brand truncate">{selectedUser.email}</p>
                       </div>
                       <button
                         onClick={() => setSelectedUser(null)}
@@ -458,7 +458,7 @@ export function AdminEmailsClient({
                 {emailMode === 'personal' ? (
                   selectedUser ? (
                     <>
-                      <User className="w-4 h-4 text-primary" />
+                      <User className="w-4 h-4 text-brand" />
                       Envoyer à <strong className="text-white">{selectedUser.username}</strong>
                     </>
                   ) : (
