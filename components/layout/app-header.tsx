@@ -151,7 +151,7 @@ export function AppHeader() {
 
       {/* Mobile Active Bets Banner */}
       {activeBets.length > 0 && (
-        <Link href="/profile" className="lg:hidden mx-4 mt-4 block rounded-lg border border-border px-3 py-2.5">
+        <Link href="/profile" className="lg:hidden mx-4 mt-3 block rounded-md border border-border px-3 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-brand" aria-hidden />

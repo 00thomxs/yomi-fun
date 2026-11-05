@@ -567,7 +567,7 @@ function BinaryMarketContent({
 
       {/* Probability Display */}
       <div className="flex items-baseline gap-3">
-        <p className="font-display text-5xl md:text-6xl font-bold tracking-tight text-foreground tabular">{Math.round(market.probability)}%</p>
+        <p key={Math.round(market.probability)} className="font-display text-5xl md:text-6xl font-bold tracking-tight text-foreground tabular animate-in fade-in slide-in-from-bottom-1 duration-300">{Math.round(market.probability)}%</p>
         <p className="text-sm font-medium text-muted-foreground">
           <span className="text-yes">OUI</span> · 
           {market.probability >= 85
@@ -876,7 +876,7 @@ function BinaryMarketContent({
           <button
             onClick={() => setBetChoice("YES")}
             aria-pressed={betChoice === "YES"}
-            className={`h-14 px-4 rounded-md text-base font-semibold transition-colors cursor-pointer ${
+            className={`h-14 px-4 rounded-md text-base font-semibold transition-[color,background-color,transform] active:scale-[0.98] cursor-pointer ${
               betChoice === "YES"
                 ? "bg-yes text-background"
                 : "bg-yes/10 text-yes hover:bg-yes/20"
@@ -887,7 +887,7 @@ function BinaryMarketContent({
           <button
             onClick={() => setBetChoice("NO")}
             aria-pressed={betChoice === "NO"}
-            className={`h-14 px-4 rounded-md text-base font-semibold transition-colors cursor-pointer ${
+            className={`h-14 px-4 rounded-md text-base font-semibold transition-[color,background-color,transform] active:scale-[0.98] cursor-pointer ${
               betChoice === "NO"
                 ? "bg-no text-background"
                 : "bg-no/10 text-no hover:bg-no/20"
@@ -1673,7 +1673,7 @@ function BetAmountInput({
         <button
           onClick={handlePlaceBet}
           disabled={!betAmount || isOverLimit || isBelowMin || isAboveAllowed}
-          className="w-full h-14 rounded-md bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-colors disabled:bg-white/5 disabled:text-muted-foreground disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-14 rounded-md bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-[color,background-color,transform] active:scale-[0.98] disabled:bg-white/5 disabled:text-muted-foreground disabled:cursor-not-allowed cursor-pointer"
         >
           Confirmer le pari
         </button>

@@ -612,7 +612,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top2 ? (
             <div className="w-full h-[260px] rounded-lg bg-card border border-border p-4 flex flex-col items-center justify-between relative overflow-hidden">
                             
-              <span className="font-display text-3xl font-bold text-muted-foreground absolute top-3 left-4">2</span>
+              <span className="font-display text-lg sm:text-3xl font-bold text-muted-foreground absolute top-2 left-2.5 sm:top-3 sm:left-4">2</span>
               
               <div className="relative mt-4">
               <img
@@ -705,7 +705,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
           {top3 ? (
             <div className="w-full h-[230px] rounded-lg bg-card border border-orange-500/20 p-4 flex flex-col items-center justify-between relative overflow-hidden">
                             
-              <span className="font-display text-3xl font-bold text-muted-foreground absolute top-3 left-4">3</span>
+              <span className="font-display text-lg sm:text-3xl font-bold text-muted-foreground absolute top-2 left-2.5 sm:top-3 sm:left-4">3</span>
               
               <div className="relative mt-2">
               <img
