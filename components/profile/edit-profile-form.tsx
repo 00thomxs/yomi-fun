@@ -255,7 +255,7 @@ export function EditProfileForm({ onClose }: { onClose: () => void }) {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+            className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2 shadow-lg"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Enregistrer

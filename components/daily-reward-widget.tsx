@@ -179,7 +179,7 @@ export function DailyRewardWidget() {
         className={`w-full p-3 rounded-lg border transition-all text-left disabled:opacity-50 ${
           isJackpotDay 
             ? 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20' 
-            : 'bg-primary/10 border-primary/30 hover:bg-primary/20'
+            : 'bg-primary/10 border-brand/40 hover:bg-primary/20'
         }`}
       >
       <div className="flex items-center justify-between">

@@ -369,7 +369,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-brand/40 border-t-primary rounded-full animate-spin" />
       </div>
     )
   }
@@ -550,7 +550,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   <h4 className="text-xs font-semibold uppercase tracking-wide text-white/80">
                     Events de la saison
                   </h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-brand">
+                  <span className="px-2 py-0.5 rounded-full bg-white/5 text-[11px] font-semibold text-brand">
                     {seasonEvents.length}
                   </span>
                 </div>
@@ -774,7 +774,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 key={player.id}
                 className={`grid grid-cols-12 gap-1 sm:gap-2 px-3 sm:px-4 py-3 items-center transition-colors ${
                   isMe
-                    ? "bg-primary/5"
+                    ? "bg-white/5"
                     : "hover:bg-surface-hover"
                 }`}
               >

@@ -508,7 +508,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 <button
                   onClick={() => handlePurchaseCosmetic(previewItem)}
                   disabled={isPurchasing === previewItem.id || userBalance < previewItem.price}
-                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2"
                 >
                   {isPurchasing === previewItem.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

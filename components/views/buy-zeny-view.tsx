@@ -158,7 +158,7 @@ export function BuyZenyView() {
                   </li>
                   {theme.popular && (
                     <li className="flex items-center gap-3">
-                      <div className="p-1 rounded-full bg-primary/10">
+                      <div className="p-1 rounded-full bg-white/5">
                         <Star className="w-3 h-3 text-brand" />
                       </div>
                       <span className="text-brand font-medium">Meilleure offre</span>

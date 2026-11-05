@@ -549,7 +549,7 @@ function BinaryMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+        <div className="p-4 rounded-lg bg-white/5 border border-brand/40 text-center">
           <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
@@ -589,7 +589,7 @@ function BinaryMarketContent({
             onClick={() => setTimeframe(tf)}
               className={`px-3 py-1.5 rounded-lg font-semibold text-xs tracking-tight transition-all font-mono whitespace-nowrap cursor-pointer border ${
               timeframe === tf
-                ? "bg-primary/10 text-brand border-primary/30"
+                ? "bg-white/5 text-brand border-brand/40"
                 : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
             }`}
           >
@@ -627,7 +627,7 @@ function BinaryMarketContent({
                 <AreaChart data={chartDataWithTs}>
                   <defs>
                     <linearGradient id="chartGradientFullscreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.18} />
+                      <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.1} />
                       <stop offset="100%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -693,7 +693,7 @@ function BinaryMarketContent({
           <AreaChart data={chartDataWithTs}>
             <defs>
               <linearGradient id="chartGradientMonochrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.18} />
+                <stop offset="0%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0.1} />
                 <stop offset="100%" stopColor="oklch(0.68 0.19 25)" stopOpacity={0} />
               </linearGradient>
             </defs>
@@ -1075,7 +1075,7 @@ function MultiMarketContent({
       {/* Resolved Banner */}
       {isResolved && (
         market.status === 'resolved' || market.resolved_at ? (
-        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+        <div className="p-4 rounded-lg bg-white/5 border border-brand/40 text-center">
           <p className="text-red-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" /> Event Terminé
           </p>
@@ -1180,7 +1180,7 @@ function MultiMarketContent({
                 onClick={() => setTimeframe(tf)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all whitespace-nowrap cursor-pointer border ${
                   timeframe === tf
-                    ? "bg-primary/10 text-brand border-primary/30"
+                    ? "bg-white/5 text-brand border-brand/40"
                     : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
                 }`}
               >
@@ -1640,7 +1640,7 @@ function BetAmountInput({
             </div>
           </div>
         ) : (
-        <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+        <div className="p-3 rounded-lg bg-white/5 border border-brand/40">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Gain potentiel</p>
           <p className="text-2xl font-semibold text-brand tracking-tight font-mono">
               {potentialGain} <CurrencySymbol />
@@ -1679,7 +1679,7 @@ function BetAmountInput({
         <button
           onClick={handlePlaceBet}
           disabled={!betAmount || isOverLimit || isBelowMin || isAboveAllowed}
-          className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-semibold text-lg tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-14 rounded-md bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-colors disabled:bg-white/5 disabled:text-muted-foreground disabled:cursor-not-allowed cursor-pointer"
         >
           Confirmer le pari
         </button>

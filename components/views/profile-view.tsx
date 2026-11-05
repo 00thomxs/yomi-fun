@@ -793,7 +793,7 @@ export function ProfileView() {
                 onClick={() => setPnlTimeframe(tf)}
                 className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
                   pnlTimeframe === tf
-                    ? "bg-primary/10 text-brand border-primary/30"
+                    ? "bg-white/5 text-brand border-brand/40"
                     : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
                 }`}
               >
@@ -882,7 +882,7 @@ export function ProfileView() {
         </div>
         {loadingHistory ? (
           <div className="p-8 text-center">
-            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+            <div className="w-6 h-6 border-2 border-brand/40 border-t-primary rounded-full animate-spin mx-auto" />
           </div>
         ) : history.length === 0 ? (
           <div className="p-8 text-center">
