@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle, Loader2, Check } from "lucide-react"
 import { signInWithGoogle } from "@/app/auth/actions"
 import { YomiLogo } from "@/components/ui/yomi-logo"
 import { useUser } from "@/contexts/user-context"
@@ -213,7 +213,7 @@ function LoginContent() {
           {success && (
             <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-sm space-y-2">
               <div className="flex items-center gap-2 text-green-500 font-medium">
-              <span>✓</span>
+              <Check className="w-4 h-4" aria-hidden />
                 <span>Compte créé avec succès !</span>
               </div>
               <p className="text-green-400/80 text-xs">

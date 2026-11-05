@@ -71,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6">
           <Link href="/" className="block">
             <YomiLogo />
-            <span className="text-[10px] font-mono text-primary uppercase tracking-wide mt-1 block">
+            <span className="text-[11px] font-mono text-primary uppercase tracking-wide mt-1 block">
               Admin Panel
             </span>
           </Link>

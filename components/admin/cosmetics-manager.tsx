@@ -257,7 +257,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   </div>
                 </div>
                 <div 
-                  className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${rarityInfo.bgColor} ${rarityInfo.borderColor} border`}
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${rarityInfo.bgColor} ${rarityInfo.borderColor} border`}
                   style={{ color: rarityInfo.color }}
                 >
                   {rarityInfo.label}
@@ -276,18 +276,18 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                 </span>
                 <div className="flex items-center gap-2">
                   {item.is_limited && (
-                    <span className="flex items-center gap-1 text-[10px] text-amber-400 font-semibold uppercase">
+                    <span className="flex items-center gap-1 text-[11px] text-amber-400 font-semibold uppercase">
                       <Clock className="w-3 h-3" />
                       Limité
                     </span>
                   )}
                   {item.is_available ? (
-                    <span className="flex items-center gap-1 text-[10px] text-yes font-semibold uppercase">
+                    <span className="flex items-center gap-1 text-[11px] text-yes font-semibold uppercase">
                       <Check className="w-3 h-3" />
                       Actif
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-semibold uppercase">
+                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground font-semibold uppercase">
                       <EyeOff className="w-3 h-3" />
                       Masqué
                     </span>
@@ -477,21 +477,21 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'pattern', pattern: 'carbon', colors: ['#1a1a1a', '#2d2d2d'] }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Pattern
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'animated', effect: 'electric', colors: ['#00d4ff', '#0066ff', '#000033'] }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Animé
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'gradient', effect: 'shimmer', colors: ['#ffd700', '#ffb800', '#cc9900'] }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Dégradé
                         </button>
@@ -502,21 +502,21 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'rotating', effect: 'radar', color: '#00ff00', speed: '3s' }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Rotation
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'floating', effect: 'halo', color: '#ffffff', glow: true }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Flottant
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'animated', effect: 'flame', colors: ['#ff4500', '#ff8c00', '#ffd700'] }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Animé
                         </button>
@@ -527,28 +527,28 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'glow', effect: 'neon', useRankColor: true, intensity: 15 }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Glow
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'font', fontFamily: 'pixel' }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Police
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'gradient', colors: ['#00d4ff', '#ff00ff'], direction: 'to right' }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Gradient
                         </button>
                         <button
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, preview_data: JSON.stringify({ type: 'animated', effect: 'shine', color: '#ffffff', interval: '3s' }, null, 2) }))}
-                          className="px-2 py-0.5 text-[10px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
+                          className="px-2 py-0.5 text-[11px] rounded bg-white/5 hover:bg-white/10 text-muted-foreground"
                         >
                           Shine
                         </button>
@@ -563,7 +563,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   rows={4}
                   placeholder='{"type": "pattern", "colors": ["#000", "#111"]}'
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   Cliquez sur les templates ci-dessus pour pré-remplir selon le type de cosmétique.
                 </p>
               </div>

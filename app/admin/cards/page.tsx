@@ -137,7 +137,7 @@ export default function AdminCardsPage() {
             {result.details && (
               <div className="mt-3 p-3 rounded-lg bg-black/20 font-mono text-xs space-y-1 max-h-[200px] overflow-y-auto">
                 {result.details.map((line, i) => (
-                  <p key={i} className="text-zinc-400">{line}</p>
+                  <p key={i} className="text-muted-foreground">{line}</p>
                 ))}
               </div>
             )}
@@ -240,7 +240,7 @@ export default function AdminCardsPage() {
             {seasonCardsResult.details.length > 0 && (
               <div className="mt-3 p-3 rounded-lg bg-black/20 font-mono text-xs space-y-1">
                 {seasonCardsResult.details.map((line, i) => (
-                  <p key={i} className="text-zinc-400">{line}</p>
+                  <p key={i} className="text-muted-foreground">{line}</p>
                 ))}
               </div>
             )}

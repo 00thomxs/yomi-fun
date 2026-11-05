@@ -134,7 +134,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
 
       {/* Podium */}
       {leaderboard && leaderboard.length >= 3 && (
-        <div className="p-6 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30">
+        <div className="p-6 rounded-lg bg-amber-500/5 border border-amber-500/30">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-400" />
             Podium Final
@@ -143,10 +143,10 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             {/* 2nd Place */}
             <div className="text-center order-1">
               <div className="w-16 h-16 mx-auto rounded-full bg-zinc-400/20 border-2 border-zinc-400 flex items-center justify-center mb-2">
-                <span className="text-2xl font-semibold text-zinc-300">#2</span>
+                <span className="text-2xl font-semibold text-foreground/80">#2</span>
               </div>
               <p className="font-semibold">{leaderboard[1]?.profiles?.username}</p>
-              <p className="text-sm text-zinc-400 font-mono">
+              <p className="text-sm text-muted-foreground font-mono">
                 {leaderboard[1]?.points >= 0 ? '+' : ''}{leaderboard[1]?.points?.toLocaleString()}
               </p>
             </div>

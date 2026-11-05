@@ -112,7 +112,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
       <div 
         className={`flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all animate-in fade-in duration-300 ${
           isJackpot || isWelcomeBonus
-            ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30' 
+            ? 'bg-amber-500/10 border border-amber-500/30' 
             : 'bg-yes/10 border border-yes/30'
         }`}
       >
@@ -134,7 +134,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
   // Welcome Bonus Banner
   if (status.canClaimWelcome) {
     return (
-      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">
+      <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
         <div className="flex items-center gap-3">
           <Gift className="w-5 h-5 text-amber-400" />
           <span className="font-semibold text-amber-400">Bonus de bienvenue</span>
@@ -165,7 +165,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
     <div 
       className={`flex items-center justify-between gap-4 px-4 py-3 rounded-xl transition-all ${
         isJackpotDay
-          ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30'
+          ? 'bg-amber-500/10 border border-amber-500/30'
           : 'bg-card border border-border'
       }`}
     >
@@ -188,7 +188,7 @@ export function DailyRewardBanner({ onClaim }: DailyRewardBannerProps) {
         disabled={isClaiming}
         className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 flex items-center gap-2 ${
           isJackpotDay
-            ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:from-amber-400 hover:to-orange-400'
+            ? 'bg-amber-500 text-black hover:bg-amber-400'
             : 'bg-primary hover:bg-primary/90 text-primary-foreground'
         }`}
       >

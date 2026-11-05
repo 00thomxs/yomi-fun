@@ -35,7 +35,6 @@ export function ConfirmBetModal({
       {/* Modal */}
       <div className="relative bg-card border border-primary/30 rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Glow effect */}
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-primary/20 blur-3xl rounded-full opacity-50" />
         
         {/* Close button */}
         <button

@@ -18,7 +18,7 @@ export function NavButton({ icon, label, active, onClick }: NavButtonProps) {
       }`}
     >
       {icon}
-      <span className="text-[10px] font-medium">{label}</span>
+      <span className="text-[11px] font-medium">{label}</span>
     </button>
   )
 }

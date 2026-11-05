@@ -573,13 +573,13 @@ export default function EditMarketPage({ params }: PageProps) {
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
                   <Users className="w-3 h-3" /> Parieurs Uniques
                 </div>
                 <p className="text-xl font-semibold">{extendedStats.uniqueBettors}</p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
                   <Target className="w-3 h-3" /> Mise Moyenne
                 </div>
                 <p className="text-xl font-semibold flex items-center gap-0.5">
@@ -587,7 +587,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
                   <TrendingUp className="w-3 h-3" /> Mise Médiane
                 </div>
                 <p className="text-xl font-semibold flex items-center gap-0.5">
@@ -595,7 +595,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
                   <Trophy className="w-3 h-3 text-amber-400" /> Top 3 = Volume
                 </div>
                 <p className={`text-xl font-semibold ${extendedStats.whaleConcentration > 50 ? 'text-amber-400' : ''}`}>
@@ -636,7 +636,7 @@ export default function EditMarketPage({ params }: PageProps) {
                         <Legend 
                           verticalAlign="bottom"
                           height={50}
-                          formatter={(value: string) => <span className="text-[10px] text-muted-foreground">{value}</span>}
+                          formatter={(value: string) => <span className="text-[11px] text-muted-foreground">{value}</span>}
                         />
                       </RechartsPie>
                     </ResponsiveContainer>
@@ -652,19 +652,19 @@ export default function EditMarketPage({ params }: PageProps) {
                     <h4 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">OUI vs NON</h4>
                     <div className="flex h-6 rounded-lg overflow-hidden">
                       <div 
-                        className="bg-yes flex items-center justify-center text-[10px] font-semibold text-white"
+                        className="bg-yes flex items-center justify-center text-[11px] font-semibold text-white"
                         style={{ width: `${(extendedStats.yesVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100}%` }}
                       >
                         {extendedStats.yesVolume > 0 && `OUI ${Math.round((extendedStats.yesVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100)}%`}
                       </div>
                       <div 
-                        className="bg-no flex items-center justify-center text-[10px] font-semibold text-white"
+                        className="bg-no flex items-center justify-center text-[11px] font-semibold text-white"
                         style={{ width: `${(extendedStats.noVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100}%` }}
                       >
                         {extendedStats.noVolume > 0 && `NON ${Math.round((extendedStats.noVolume / (extendedStats.yesVolume + extendedStats.noVolume)) * 100)}%`}
                       </div>
                     </div>
-                    <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
+                    <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
                       <span>{extendedStats.yesVolume.toLocaleString()} Zeny</span>
                       <span>{extendedStats.noVolume.toLocaleString()} Zeny</span>
                     </div>
@@ -724,7 +724,7 @@ export default function EditMarketPage({ params }: PageProps) {
 
           <div className="text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 font-semibold text-[10px] uppercase tracking-wide">
+              <span className="px-2 py-0.5 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 font-semibold text-[11px] uppercase tracking-wide">
                 Whale
               </span>
               = pari ≥ <span className="font-mono font-semibold text-white/80">{WHALE_BET_THRESHOLD.toLocaleString()}</span>
@@ -790,11 +790,11 @@ export default function EditMarketPage({ params }: PageProps) {
                       {/* Badges */}
                       <div className="flex items-center justify-end gap-1.5 mb-1">
                         {isWhale && (
-                          <span className="px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-semibold text-[9px] uppercase">
+                          <span className="px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-semibold text-[11px] uppercase">
                             Whale
                           </span>
                         )}
-                        <span className={`px-1.5 py-0.5 rounded border text-[9px] font-semibold uppercase ${status.cls}`}>
+                        <span className={`px-1.5 py-0.5 rounded border text-[11px] font-semibold uppercase ${status.cls}`}>
                           {status.label}
                         </span>
                       </div>
@@ -805,7 +805,7 @@ export default function EditMarketPage({ params }: PageProps) {
                       </p>
                       
                       {/* Details (mise + multiplier) */}
-                      <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
+                      <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
                         Mise: {b.amount.toLocaleString()} • x{Number(b.odds_at_bet).toFixed(2)}
                       </p>
                     </div>

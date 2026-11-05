@@ -239,7 +239,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   }`}
                 >
                   {theme.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-semibold uppercase tracking-wide text-white">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[11px] font-semibold uppercase tracking-wide text-white">
                       Populaire
                     </div>
                   )}
@@ -358,7 +358,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                   >
                     {/* Rarity Badge */}
                     <div 
-                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[9px] font-semibold uppercase"
+                      className="absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-semibold uppercase"
                       style={{ 
                         background: `${rarityInfo.color}15`, 
                         border: `1px solid ${rarityInfo.color}40`,
@@ -370,7 +370,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     
                     {/* Limited Badge */}
                     {item.is_limited && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-semibold">
+                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-semibold">
                         <Clock className="w-2.5 h-2.5" />
                         Limité
                       </div>
@@ -393,7 +393,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold text-sm truncate">{item.name}</h4>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-2">
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mb-2">
                       {item.type === 'background' && <><Palette className="w-3 h-3" /> Fond</>}
                       {item.type === 'aura' && <><Sparkles className="w-3 h-3" /> Aura</>}
                       {item.type === 'nametag' && <><Type className="w-3 h-3" /> Pseudo</>}
@@ -444,7 +444,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
             <div className="flex items-start justify-between">
               <div>
                 <div 
-                  className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase mb-2"
+                  className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold uppercase mb-2"
                   style={{ 
                     background: `${RARITY_INFO[previewItem.rarity].color}15`, 
                     border: `1px solid ${RARITY_INFO[previewItem.rarity].color}40`,
@@ -559,7 +559,7 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 {purchasedItem.name}
               </h3>
               <div 
-                className="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
+                className="inline-block mt-2 px-2 py-0.5 rounded text-[11px] font-semibold uppercase"
                 style={{ 
                   background: `${RARITY_INFO[purchasedItem.rarity].color}15`, 
                   color: RARITY_INFO[purchasedItem.rarity].color 

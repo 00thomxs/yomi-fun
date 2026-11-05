@@ -105,7 +105,7 @@ export function BuyZenyView() {
               className={`relative rounded-lg border ${theme.border} ${theme.bg} p-6 flex flex-col h-full transition-all hover:scale-[1.02] hover:shadow-xl group`}
             >
               {theme.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[10px] font-semibold uppercase tracking-wide text-white shadow-lg">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary rounded-full text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg">
                   Populaire
                 </div>
               )}

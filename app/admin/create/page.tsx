@@ -392,7 +392,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-semibold font-mono">5K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Fun</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">Fun</div>
               </button>
               <button
                 type="button"
@@ -404,7 +404,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-semibold font-mono">10K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Équilibré</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">Équilibré</div>
               </button>
               <button
                 type="button"
@@ -416,7 +416,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-semibold font-mono">20K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Stable</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">Stable</div>
               </button>
               <button
                 type="button"
@@ -428,7 +428,7 @@ export default function CreateMarketPage() {
                 }`}
               >
                 <div className="text-lg font-semibold font-mono">50K</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Pro</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">Pro</div>
               </button>
             </div>
 

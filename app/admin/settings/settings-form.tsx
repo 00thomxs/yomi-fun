@@ -391,7 +391,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">#2 - 2ème Place</label>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">#2 - 2ème Place</label>
               <input
                 type="text"
                 name="top2_prize"
@@ -426,7 +426,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i} className="space-y-1">
-                <label className={`text-[10px] font-medium uppercase ${
+                <label className={`text-[11px] font-medium uppercase ${
                   i === 0 ? 'text-yellow-500' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-500' : 'text-muted-foreground'
                 }`}>
                   #{i + 1}

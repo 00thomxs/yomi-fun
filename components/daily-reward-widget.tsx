@@ -160,7 +160,7 @@ export function DailyRewardWidget() {
             +200<CurrencySymbol className="w-3 h-3" />
           </span>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1">
+        <p className="text-[11px] text-muted-foreground mt-1">
           Clique pour récupérer
         </p>
       </button>
@@ -199,7 +199,7 @@ export function DailyRewardWidget() {
           <span className={`text-xs font-semibold font-mono flex items-center gap-0.5 ${
             isJackpotDay ? 'text-amber-400' : 'text-primary'
           }`}>
-            {isJackpotDay ? '🎰' : `+${status.todayReward}`}
+            {isJackpotDay ? 'Jackpot' : `+${status.todayReward}`}
             {!isJackpotDay && <CurrencySymbol className="w-3 h-3" />}
           </span>
         </div>
@@ -241,7 +241,7 @@ export function DailyRewardWidget() {
         </div>
         
         {countdown && (
-          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
             <Clock className="w-3 h-3" />
             <span className="font-mono">{countdown}</span>
           </div>

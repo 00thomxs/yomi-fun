@@ -604,27 +604,27 @@ export function ProfileView() {
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 pt-4 border-t border-border">
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Win Rate</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Win Rate</p>
                 <p className="text-sm sm:text-base font-semibold font-mono">{userStats.winRate}%</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Paris</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Paris</p>
                 <p className="text-sm sm:text-base font-semibold font-mono">{userStats.totalBets}</p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Streak</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">Streak</p>
                 <p className="text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-1">
                   <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" /> {userStats.currentStreak}
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">PnL</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide">PnL</p>
                 <p className={`text-sm sm:text-base font-semibold font-mono flex items-center justify-center sm:justify-start gap-0.5 ${userStats.totalPnL >= 0 ? "text-yes" : "text-no"}`}>
                   {userStats.totalPnL >= 0 ? "+" : ""}{formatCompactNumber(userStats.totalPnL)}<CurrencySymbol className="w-3 h-3 sm:w-4 sm:h-4" />
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Global
                 </p>
                 <p className="text-sm sm:text-base font-semibold font-mono text-primary">
@@ -632,7 +632,7 @@ export function ProfileView() {
                 </p>
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
+                <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wide flex items-center justify-center sm:justify-start gap-1">
                   <Trophy className="w-3 h-3" /> Saison
                 </p>
                 <p className="text-sm sm:text-base font-semibold font-mono text-amber-400">
@@ -697,17 +697,17 @@ export function ProfileView() {
           {(equippedCosmetics.background || equippedCosmetics.aura || equippedCosmetics.nametag) && (
             <div className="flex items-center gap-1.5">
               {equippedCosmetics.background && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">
                   Fond
                 </span>
               )}
               {equippedCosmetics.aura && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">
                   Aura
                 </span>
               )}
               {equippedCosmetics.nametag && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">
                   Pseudo
                 </span>
               )}
@@ -791,7 +791,7 @@ export function ProfileView() {
               <button
                 key={tf}
                 onClick={() => setPnlTimeframe(tf)}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
+                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold font-mono transition-all cursor-pointer border ${
                   pnlTimeframe === tf
                     ? "bg-primary/10 text-primary border-primary/30"
                     : "bg-transparent text-muted-foreground border-border hover:border-white/15 hover:text-foreground hover:bg-white/5"
@@ -891,7 +891,7 @@ export function ProfileView() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-12 gap-1 px-3 py-3 bg-white/5 text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="grid grid-cols-12 gap-1 px-3 py-3 bg-white/5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
               <span className="col-span-3">Date</span>
               <span className="col-span-4">Event</span>
               <span className="col-span-2">Status</span>
@@ -906,10 +906,10 @@ export function ProfileView() {
                 
                 return (
                   <div key={tx.id} className={`grid grid-cols-12 gap-1 px-3 py-2.5 text-sm ${idx % 2 === 1 ? "bg-white/5" : ""}`}>
-                    <span className="col-span-3 font-mono text-muted-foreground text-[10px] flex items-center">{date}</span>
+                    <span className="col-span-3 font-mono text-muted-foreground text-[11px] flex items-center">{date}</span>
                     <div className="col-span-4 flex flex-col justify-center min-w-0">
                       <span className="font-medium truncate text-[11px]">{tx.market_question}</span>
-                      <span className="text-[9px] text-muted-foreground truncate flex items-center gap-0.5">
+                      <span className="text-[11px] text-muted-foreground truncate flex items-center gap-0.5">
                         <span className={tx.direction === 'NO' ? "text-no" : "text-yes"}>
                           {tx.direction === 'NO' ? "NON" : "OUI"}
                         </span>
@@ -918,17 +918,17 @@ export function ProfileView() {
                     </div>
                     <span className="col-span-2 flex items-center">
                       {isWin && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-yes/20 text-yes">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-yes/20 text-yes">
                           <ArrowUpRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isLost && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-no/20 text-no">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-no/20 text-no">
                           <ArrowDownRight className="w-2.5 h-2.5" />
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-yellow-500/20 text-yellow-400">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-yellow-500/20 text-yellow-400">
                           <Clock className="w-2.5 h-2.5" />
                         </span>
                       )}

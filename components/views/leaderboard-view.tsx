@@ -391,7 +391,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             <p className={`text-xs font-medium flex items-center gap-1 max-w-[250px] truncate ${isSeasonTimeElapsed ? 'text-muted-foreground' : 'text-primary'}`}>
               <Trophy className="w-3 h-3 shrink-0" /> 
               {seasonSettings?.title || "Saison"} 
-              {isSeasonTimeElapsed && <span className="text-[10px] opacity-60">(terminée)</span>}
+              {isSeasonTimeElapsed && <span className="text-[11px] opacity-60">(terminée)</span>}
             </p>
           ) : (
               <p className="text-xs text-muted-foreground">Classement Global (All-time)</p>
@@ -495,7 +495,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
             
             <div className="flex items-end justify-between mb-3 relative z-10">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                   {isSeasonTimeElapsed ? 'Saison terminée' : 'Saison en cours'}
                 </p>
                 {isSeasonTimeElapsed ? (
@@ -509,7 +509,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                 )}
               </div>
               <div className="text-right">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Cash Prize</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Cash Prize</p>
                 <p className="text-xl font-semibold text-primary flex items-center justify-end gap-1">
                   {(seasonSettings?.cash_prize || 0).toLocaleString()}<CurrencySymbol className="w-4 h-4" />
                 </p>
@@ -532,7 +532,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
               </div>
             </div>
             
-            <div className="flex justify-between mt-2 text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wide font-semibold">
+            <div className="flex justify-between mt-2 text-[11px] font-mono text-muted-foreground/50 uppercase tracking-wide font-semibold">
               <span>Début</span>
               <span>Fin</span>
             </div>
@@ -550,7 +550,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   <h4 className="text-xs font-semibold uppercase tracking-wide text-white/80">
                     Events de la saison
                   </h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
                     {seasonEvents.length}
                   </span>
                 </div>
@@ -591,7 +591,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                           <span className="text-xs font-mono text-muted-foreground">
                             {event.volume?.toLocaleString() || 0} vol
                           </span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+                          <span className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${
                             isResolved 
                               ? 'bg-yes/10 text-yes' 
                               : isExpired
@@ -640,7 +640,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top2.winRate}% WR</p>
               </div>
               
               <div className="w-full pt-3 border-t border-border text-center relative z-10">
@@ -649,7 +649,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   {top2.totalWon >= 0 ? '+' : ''}{Math.abs(top2.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(2) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-semibold text-white border border-white/20">
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-white/10 text-[11px] font-semibold text-white border border-white/20">
                     +{getZenyReward(2).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
@@ -697,7 +697,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   {top1.totalWon >= 0 ? '+' : ''}{Math.abs(top1.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(1) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-semibold text-amber-400 border border-amber-500/30">
+                  <span className="inline-flex items-center gap-1 mt-2 px-3 py-0.5 rounded-full bg-amber-500/20 text-[11px] font-semibold text-amber-400 border border-amber-500/30">
                     +{getZenyReward(1).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
@@ -733,7 +733,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                     ))}
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
+                <p className="text-[11px] text-muted-foreground font-mono mt-1">{top3.winRate}% WR</p>
               </div>
               
               <div className="w-full pt-3 border-t border-orange-500/10 text-center relative z-10">
@@ -742,7 +742,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                   {top3.totalWon >= 0 ? '+' : ''}{Math.abs(top3.totalWon).toLocaleString()}
                 </p>
                 {hasSeason && getZenyReward(3) > 0 && (
-                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[10px] font-semibold text-orange-400 border border-orange-500/20">
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-orange-500/10 text-[11px] font-semibold text-orange-400 border border-orange-500/20">
                     +{getZenyReward(3).toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                   </span>
                 )}
@@ -796,7 +796,7 @@ export function LeaderboardView({ onBack }: LeaderboardViewProps) {
                       ))}
                     </div>
                     {hasSeason && reward > 0 && (
-                      <span className="text-[9px] font-semibold text-primary flex items-center gap-0.5">
+                      <span className="text-[11px] font-semibold text-primary flex items-center gap-0.5">
                         +{reward.toLocaleString()}<CurrencySymbol className="w-2 h-2" />
                       </span>
                     )}

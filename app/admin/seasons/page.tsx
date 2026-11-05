@@ -110,7 +110,7 @@ export default async function AdminSeasonsPage() {
       {activeSeason ? (
         <div className="space-y-6">
           {/* Season Header Card */}
-          <div className="rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 p-6">
+          <div className="rounded-lg bg-amber-500/5 border border-amber-500/30 p-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="flex items-center gap-2">

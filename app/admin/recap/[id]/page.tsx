@@ -40,8 +40,6 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
         
         {/* Background Elements */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-        <div className="absolute bottom-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
 
         {/* Card Content */}
         <div className="relative z-10 p-6 md:p-10">
@@ -86,7 +84,6 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
                 <div className="absolute -top-9 left-1/2 -translate-x-1/2">
                   <Crown className="w-9 h-9 text-amber-400 fill-amber-400/30" />
                 </div>
-                <div className="absolute -inset-2 bg-amber-500/30 rounded-full blur-xl" />
                 <img 
                   src={top1?.avatar || "/images/default-avatar.svg"} 
                   alt={top1?.username} 
@@ -150,7 +147,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           {/* Footer */}
           <div className="flex justify-between items-end mt-8 pt-4 border-t border-border">
             <div className="opacity-50">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Saison terminée le</p>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Saison terminée le</p>
               <p className="text-sm font-mono text-white">{new Date(season.end_date).toLocaleDateString('fr-FR')}</p>
             </div>
             <YomiLogo className="opacity-70" />

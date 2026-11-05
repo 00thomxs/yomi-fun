@@ -157,7 +157,7 @@ export function AdminEmailsClient({
 
   // Parse content for preview (bold text)
   const renderFormattedContent = (text: string) => {
-    if (!text) return <span className="text-zinc-500 italic">Ton message apparaîtra ici...</span>
+    if (!text) return <span className="text-muted-foreground italic">Ton message apparaîtra ici...</span>
     
     return text.split('\n').map((line, lineIndex) => (
       <span key={lineIndex}>
@@ -173,24 +173,24 @@ export function AdminEmailsClient({
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-zinc-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wide">Total Users</span>
+            <Users className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total Users</span>
           </div>
           <p className="text-2xl font-semibold">{initialStats.totalUsers}</p>
         </div>
-        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Mail className="w-4 h-4 text-yes" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wide">Avec Email</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Avec Email</span>
           </div>
           <p className="text-2xl font-semibold text-yes">{initialStats.usersWithEmail}</p>
         </div>
-        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Megaphone className="w-4 h-4 text-amber-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wide">Portée</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Portée</span>
           </div>
           <p className="text-2xl font-semibold">
             {initialStats.totalUsers > 0 
@@ -198,17 +198,17 @@ export function AdminEmailsClient({
               : 0}%
           </p>
         </div>
-        <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
+        <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-red-400" />
-            <span className="text-xs text-zinc-500 uppercase tracking-wide">Expéditeur</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Expéditeur</span>
           </div>
-          <p className="text-sm font-medium text-zinc-300 truncate">noreply@y0mi.fun</p>
+          <p className="text-sm font-medium text-foreground/80 truncate">noreply@y0mi.fun</p>
         </div>
       </div>
 
       {/* Email Mode Selector */}
-      <div className="flex gap-2 p-1 bg-zinc-900/50 border border-zinc-800 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-muted/50 border border-border rounded-lg w-fit">
         <button
           onClick={() => {
             setEmailMode('broadcast')
@@ -217,7 +217,7 @@ export function AdminEmailsClient({
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
             emailMode === 'broadcast' 
               ? 'bg-red-600 text-white' 
-              : 'text-zinc-400 hover:text-white'
+              : 'text-muted-foreground hover:text-white'
           }`}
         >
           <Megaphone className="w-4 h-4" />
@@ -228,7 +228,7 @@ export function AdminEmailsClient({
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
             emailMode === 'personal' 
               ? 'bg-primary text-white' 
-              : 'text-zinc-400 hover:text-white'
+              : 'text-muted-foreground hover:text-white'
           }`}
         >
           <User className="w-4 h-4" />
@@ -241,8 +241,8 @@ export function AdminEmailsClient({
         
         {/* Left Column - Editor */}
         <div className="space-y-4">
-          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 overflow-hidden">
-            <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+          <div className="rounded-lg bg-muted/50 border border-border overflow-hidden">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className={`p-2 rounded-lg ${emailMode === 'personal' ? 'bg-primary/10' : 'bg-red-500/10'}`}>
                   {emailMode === 'personal' ? (
@@ -255,7 +255,7 @@ export function AdminEmailsClient({
                   <h3 className="font-semibold text-sm">
                     {emailMode === 'personal' ? 'Email Personnalisé' : 'Composer'}
                   </h3>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-muted-foreground">
                     {emailMode === 'personal' ? 'Envoyer à un utilisateur' : 'Crée ton email'}
                   </p>
                 </div>
@@ -266,7 +266,7 @@ export function AdminEmailsClient({
               {/* User Search (only in personal mode) */}
               {emailMode === 'personal' && (
                 <div>
-                  <label className="text-xs text-zinc-400 flex items-center gap-1.5 mb-2">
+                  <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
                     <AtSign className="w-3 h-3" />
                     Destinataire *
                   </label>
@@ -286,25 +286,25 @@ export function AdminEmailsClient({
                         onClick={() => setSelectedUser(null)}
                         className="p-1 hover:bg-white/10 rounded transition-colors"
                       >
-                        <X className="w-4 h-4 text-zinc-400" />
+                        <X className="w-4 h-4 text-muted-foreground" />
                       </button>
                     </div>
                   ) : (
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type="text"
                         value={userSearch}
                         onChange={(e) => setUserSearch(e.target.value)}
                         placeholder="Rechercher un utilisateur..."
-                        className="w-full pl-10 pr-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-border rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       />
                       
                       {/* Search Results Dropdown */}
                       {(searchResults.length > 0 || isSearching) && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-muted border border-border rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto">
                           {isSearching ? (
-                            <div className="p-4 text-center text-zinc-500 text-sm">
+                            <div className="p-4 text-center text-muted-foreground text-sm">
                               <Loader2 className="w-4 h-4 animate-spin mx-auto mb-1" />
                               Recherche...
                             </div>
@@ -313,7 +313,7 @@ export function AdminEmailsClient({
                               <button
                                 key={user.id}
                                 onClick={() => selectUser(user)}
-                                className="w-full flex items-center gap-3 p-3 hover:bg-zinc-800 transition-colors text-left"
+                                className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
                               >
                                 <img 
                                   src={getAvatarUrl(user.avatar_url)} 
@@ -323,7 +323,7 @@ export function AdminEmailsClient({
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-sm text-white truncate">{user.username}</p>
                                   {user.email ? (
-                                    <p className="text-xs text-zinc-400 truncate">{user.email}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                                   ) : (
                                     <p className="text-xs text-red-400">Pas d'email</p>
                                   )}
@@ -343,7 +343,7 @@ export function AdminEmailsClient({
 
               {/* Subject */}
               <div>
-                <label className="text-xs text-zinc-400 flex items-center gap-1.5 mb-2">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
                   <Type className="w-3 h-3" />
                   Sujet *
                 </label>
@@ -352,7 +352,7 @@ export function AdminEmailsClient({
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder={emailMode === 'personal' ? "Message important pour toi" : "Nouvelle fonctionnalité disponible !"}
-                  className={`w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none transition-all ${
+                  className={`w-full px-4 py-3 bg-white/5 border border-border rounded-lg text-sm focus:outline-none transition-all ${
                     emailMode === 'personal' 
                       ? 'focus:border-primary focus:ring-1 focus:ring-primary/20' 
                       : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
@@ -362,10 +362,10 @@ export function AdminEmailsClient({
 
               {/* Content */}
               <div>
-                <label className="text-xs text-zinc-400 flex items-center gap-1.5 mb-2">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
                   <Mail className="w-3 h-3" />
                   Message *
-                  <span className="text-zinc-600 ml-1">(**gras**)</span>
+                  <span className="text-muted-foreground ml-1">(**gras**)</span>
                 </label>
                 <textarea
                   value={content}
@@ -375,7 +375,7 @@ export function AdminEmailsClient({
                     : "Écris ton message ici...\n\nTu peux utiliser **texte en gras** pour mettre en avant."
                   }
                   rows={6}
-                  className={`w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none resize-none transition-all ${
+                  className={`w-full px-4 py-3 bg-white/5 border border-border rounded-lg text-sm focus:outline-none resize-none transition-all ${
                     emailMode === 'personal' 
                       ? 'focus:border-primary focus:ring-1 focus:ring-primary/20' 
                       : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
@@ -386,7 +386,7 @@ export function AdminEmailsClient({
               {/* CTA */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-zinc-400 flex items-center gap-1.5 mb-2">
+                  <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
                     <Sparkles className="w-3 h-3" />
                     Bouton
                   </label>
@@ -395,13 +395,13 @@ export function AdminEmailsClient({
                     value={ctaText}
                     onChange={(e) => setCtaText(e.target.value)}
                     placeholder="Découvrir →"
-                    className={`w-full px-3 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none ${
+                    className={`w-full px-3 py-2.5 bg-white/5 border border-border rounded-lg text-sm focus:outline-none ${
                       emailMode === 'personal' ? 'focus:border-primary' : 'focus:border-red-500'
                     }`}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400 flex items-center gap-1.5 mb-2">
+                  <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
                     <Link2 className="w-3 h-3" />
                     URL
                   </label>
@@ -410,7 +410,7 @@ export function AdminEmailsClient({
                     value={ctaUrl}
                     onChange={(e) => setCtaUrl(e.target.value)}
                     placeholder="https://y0mi.fun/..."
-                    className={`w-full px-3 py-2.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm focus:outline-none ${
+                    className={`w-full px-3 py-2.5 bg-white/5 border border-border rounded-lg text-sm focus:outline-none ${
                       emailMode === 'personal' ? 'focus:border-primary' : 'focus:border-red-500'
                     }`}
                   />
@@ -426,7 +426,7 @@ export function AdminEmailsClient({
                 <TestTube className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-amber-400">Teste d'abord !</p>
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Envoie un email de test avant d'envoyer à tous.
                   </p>
                   <div className="flex gap-2 mt-3">
@@ -435,7 +435,7 @@ export function AdminEmailsClient({
                       value={testEmail}
                       onChange={(e) => setTestEmail(e.target.value)}
                       placeholder="ton@email.com"
-                      className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm focus:border-amber-500"
+                      className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:border-amber-500"
                     />
                     <button
                       onClick={handleSendTest}
@@ -452,9 +452,9 @@ export function AdminEmailsClient({
           )}
 
           {/* Send Button */}
-          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 p-4">
+          <div className="rounded-lg bg-muted/50 border border-border p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 {emailMode === 'personal' ? (
                   selectedUser ? (
                     <>
@@ -463,7 +463,7 @@ export function AdminEmailsClient({
                     </>
                   ) : (
                     <>
-                      <User className="w-4 h-4 text-zinc-500" />
+                      <User className="w-4 h-4 text-muted-foreground" />
                       Sélectionne un utilisateur
                     </>
                   )
@@ -511,20 +511,20 @@ export function AdminEmailsClient({
 
         {/* Right Column - Preview */}
         <div className="space-y-4">
-          <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 overflow-hidden">
-            <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+          <div className="rounded-lg bg-muted/50 border border-border overflow-hidden">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-zinc-700/50 rounded-lg">
-                  <Eye className="w-4 h-4 text-zinc-400" />
+                <div className="p-2 bg-white/15 rounded-lg">
+                  <Eye className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">Aperçu Email</h3>
-                  <p className="text-xs text-zinc-500">Rendu en temps réel</p>
+                  <p className="text-xs text-muted-foreground">Rendu en temps réel</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-xs text-zinc-500 hover:text-white flex items-center gap-1 transition-colors"
+                className="text-xs text-muted-foreground hover:text-white flex items-center gap-1 transition-colors"
               >
                 {showPreview ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 {showPreview ? "Masquer" : "Afficher"}
@@ -535,14 +535,14 @@ export function AdminEmailsClient({
               <div className="p-4">
                 {/* Email Preview - Mimics actual email template */}
                 <div 
-                  className="rounded-lg overflow-hidden border border-zinc-700"
+                  className="rounded-lg overflow-hidden border border-border"
                   style={{ 
                     background: '#0a0a0a',
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E")`
                   }}
                 >
                   {/* Header */}
-                  <div className="p-6 text-center bg-[#0a0a0a] border-b border-zinc-800">
+                  <div className="p-6 text-center bg-[#0a0a0a] border-b border-border">
                     <span className="text-3xl font-semibold text-red-600 tracking-tight">YOMI</span>
                     <span className="text-xl text-white">.fun</span>
                   </div>
@@ -557,7 +557,7 @@ export function AdminEmailsClient({
                   >
                     {/* Subject as Title */}
                     <h2 className="text-xl font-semibold text-white">
-                      {subject || <span className="text-zinc-500">Sujet de l'email</span>}
+                      {subject || <span className="text-muted-foreground">Sujet de l'email</span>}
                     </h2>
 
                     {/* Greeting */}
@@ -582,17 +582,17 @@ export function AdminEmailsClient({
                     )}
 
                     {/* Signature */}
-                    <p className="text-zinc-500 text-sm pt-2">
+                    <p className="text-muted-foreground text-sm pt-2">
                       — L'équipe YOMI.fun
                     </p>
                   </div>
 
                   {/* Footer */}
-                  <div className="p-4 text-center bg-[#0a0a0a] border-t border-zinc-800">
-                    <p className="text-zinc-600 text-xs">
+                  <div className="p-4 text-center bg-[#0a0a0a] border-t border-border">
+                    <p className="text-muted-foreground text-xs">
                       © 2025 YOMI.fun
                     </p>
-                    <p className="text-zinc-600 text-xs mt-1">
+                    <p className="text-muted-foreground text-xs mt-1">
                       Site • Mon Profil • Support
                     </p>
                   </div>
@@ -603,7 +603,7 @@ export function AdminEmailsClient({
 
           {/* Templates (only for broadcast) */}
           {emailMode === 'broadcast' && (
-            <div className="rounded-lg bg-zinc-900/50 border border-zinc-800 p-4">
+            <div className="rounded-lg bg-muted/50 border border-border p-4">
               <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-yes" />
                 Templates rapides
@@ -616,13 +616,13 @@ export function AdminEmailsClient({
                     setCtaText("Découvrir →")
                     setCtaUrl("https://y0mi.fun")
                   }}
-                  className="p-3 text-left rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 transition-colors"
+                  className="p-3 text-left rounded-lg bg-white/5 hover:bg-white/10 border border-border transition-colors"
                 >
                   <p className="font-medium text-sm flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     Nouvelle fonctionnalité
                   </p>
-                  <p className="text-xs text-zinc-500 mt-0.5 ml-6">Annonce une mise à jour</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 ml-6">Annonce une mise à jour</p>
                 </button>
                 <button
                   onClick={() => {
@@ -631,13 +631,13 @@ export function AdminEmailsClient({
                     setCtaText("")
                     setCtaUrl("")
                   }}
-                  className="p-3 text-left rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 transition-colors"
+                  className="p-3 text-left rounded-lg bg-white/5 hover:bg-white/10 border border-border transition-colors"
                 >
                   <p className="font-medium text-sm flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
                     Maintenance
                   </p>
-                  <p className="text-xs text-zinc-500 mt-0.5 ml-6">Prévenir d'une interruption</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 ml-6">Prévenir d'une interruption</p>
                 </button>
               </div>
             </div>

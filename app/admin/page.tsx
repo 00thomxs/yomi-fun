@@ -71,14 +71,14 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map((stat, i) => (
           <div key={i} className="p-4 rounded-lg bg-card border border-border">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
               {stat.label}
             </p>
             <p className="text-xl font-semibold mt-1 flex items-center gap-1">
               {stat.value}{stat.suffix}
             </p>
             {stat.sub && (
-              <p className="text-[10px] text-muted-foreground mt-1 truncate">{stat.sub}</p>
+              <p className="text-[11px] text-muted-foreground mt-1 truncate">{stat.sub}</p>
             )}
           </div>
         ))}
@@ -113,27 +113,27 @@ export default async function AdminDashboard() {
               {/* Main Stats - 4 columns compact */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Supply Joueurs</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Supply Joueurs</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1">
                   {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
-                  <p className="text-[10px] text-muted-foreground mt-1">
+                  <p className="text-[11px] text-muted-foreground mt-1">
                     {metrics.player_count} joueurs • Moy: {metrics.avg_balance.toLocaleString('fr-FR')}
                 </p>
               </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Total Burned</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Total Burned</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-amber-400">
                   {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
-                  <p className="text-[10px] text-muted-foreground mt-1">
+                  <p className="text-[11px] text-muted-foreground mt-1">
                   Fees: {metrics.total_burned_fees.toLocaleString('fr-FR')} • Shop: {metrics.total_burned_shop.toLocaleString('fr-FR')}
                 </p>
               </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Inflation (7j)</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Inflation (7j)</p>
                   <p className={`text-lg font-black mt-1 font-mono flex items-center gap-1.5 ${
                     metrics.weekly_inflation_rate_pct === null ? '' :
                     metrics.weekly_inflation_rate_pct > 10 ? 'text-red-400' :
@@ -148,17 +148,17 @@ export default async function AdminDashboard() {
                       <><TrendingDown className="w-4 h-4" />{metrics.weekly_inflation_rate_pct.toFixed(1)}%</>
                     )}
                 </p>
-                  <p className="text-[10px] text-muted-foreground mt-1">
+                  <p className="text-[11px] text-muted-foreground mt-1">
                     {metrics.supply_7d_ago ? `7j avant: ${metrics.supply_7d_ago.toLocaleString('fr-FR')}` : 'Pas assez de données'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Réserve Admin</p>
-                  <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-zinc-400">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Réserve Admin</p>
+                  <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-muted-foreground">
                     {metrics.admin_balance.toLocaleString('fr-FR')} <CurrencySymbol />
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-1">
+                  <p className="text-[11px] text-muted-foreground mt-1">
                     Non compté dans la supply
                   </p>
                 </div>
@@ -175,9 +175,9 @@ export default async function AdminDashboard() {
                         {((metrics.total_burned / (metrics.total_supply + metrics.total_burned)) * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="mt-1.5 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="mt-1.5 h-1.5 bg-white/10 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all"
+                        className="h-full bg-amber-500 rounded-full transition-all"
                         style={{ width: `${Math.min(100, (metrics.total_burned / (metrics.total_supply + metrics.total_burned)) * 100 * 5)}%` }}
                       />
                     </div>
@@ -215,7 +215,7 @@ export default async function AdminDashboard() {
         <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 overflow-hidden">
           <div className="p-4 border-b border-amber-500/20 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-500 animate-pulse">
+              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-500">
                 <Gavel className="w-5 h-5" />
               </div>
               <div>

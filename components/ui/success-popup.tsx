@@ -101,7 +101,6 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
         </button>
 
         {/* Glow effect */}
-        <div className={`absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 ${cfg.bgGlow} blur-3xl rounded-full opacity-50`} />
 
         {/* Content */}
         <div className="relative text-center space-y-4">

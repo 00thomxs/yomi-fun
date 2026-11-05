@@ -366,7 +366,7 @@ export function MarketDetailView({ market, onBack, onBet, userBalance, userBets 
               title={market.season.name}
             >
               <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="text-[10px] font-semibold text-amber-400 uppercase tracking-wide truncate">
+              <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wide truncate">
                 {market.season.name}
               </span>
             </span>
@@ -555,7 +555,7 @@ function BinaryMarketContent({
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
         </div>
         ) : (
-          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center">
             <p className="text-amber-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
@@ -745,7 +745,6 @@ function BinaryMarketContent({
                 r={4}
                 shape={(props: any) => (
                   <g>
-                    <circle cx={props.cx} cy={props.cy} r={8} fill="#ffffff" className="animate-pulse opacity-30" />
                     <circle cx={props.cx} cy={props.cy} r={4} fill="#ffffff" />
                   </g>
                 )}
@@ -814,7 +813,7 @@ function BinaryMarketContent({
                             />
                           </>
                         ) : (
-                          <text x={props.cx} y={avatarY + 3.5} textAnchor="middle" fontSize="10">💰</text>
+                          <text x={props.cx} y={avatarY + 3.5} textAnchor="middle" fontSize="10" fontWeight="600" fill="#a3a3a3">Ƶ</text>
                         )}
 
                         {/* Bet Amount Label (pill shape) */}
@@ -860,7 +859,7 @@ function BinaryMarketContent({
         </ResponsiveContainer>
 
         <div className="flex justify-end items-center gap-2 mt-2">
-          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-yes" : "bg-no"} animate-pulse`} />
+          <div className={`w-2 h-2 rounded-full ${trend === "up" ? "bg-yes" : "bg-no"}`} />
           <p className="text-sm font-semibold text-white font-mono tracking-tight">
             {Math.round(chartData[chartData.length - 1]?.price || 0)}%
           </p>
@@ -1072,7 +1071,7 @@ function MultiMarketContent({
             <p className="text-red-400/70 text-sm mt-1">Le résultat est connu et les gains distribués</p>
         </div>
         ) : (
-          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center animate-pulse">
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-center">
             <p className="text-amber-400 font-semibold text-lg flex items-center justify-center gap-2">
               <Clock className="w-4 h-4" /> En attente du résultat
             </p>
@@ -1308,7 +1307,7 @@ function MultiMarketContent({
                   
                   return (
                     <div className="bg-slate-900/95 border border-border rounded-lg p-3 backdrop-blur shadow-xl">
-                      <p className="text-[10px] text-slate-400 font-mono mb-2">{new Date(label).toLocaleString()}</p>
+                      <p className="text-[11px] text-slate-400 font-mono mb-2">{new Date(label).toLocaleString()}</p>
                       <div className="space-y-1">
                         {sortedPayload.map((entry: any) => (
                           <div key={entry.name} className="flex items-center justify-between gap-4">
@@ -1335,7 +1334,6 @@ function MultiMarketContent({
                 r={4}
                 shape={(props: any) => (
                   <g>
-                    <circle cx={props.cx} cy={props.cy} r={8} fill={outcome.color} className="animate-pulse opacity-30" />
                     <circle cx={props.cx} cy={props.cy} r={4} fill={outcome.color} stroke="#fff" strokeWidth={1} />
                   </g>
                 )}
@@ -1401,7 +1399,7 @@ function MultiMarketContent({
                             />
                           </>
                         ) : (
-                          <text x={props.cx} y={avatarY + 3} textAnchor="middle" fontSize="9" fill={markerColor}>💰</text>
+                          <text x={props.cx} y={avatarY + 3} textAnchor="middle" fontSize="9" fontWeight="600" fill={markerColor}>Ƶ</text>
                         )}
                       </g>
                     </g>
