@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Trophy, Share2, Sparkles, Check, Target } from "lucide-react"
+import { X, Trophy, Share2 } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 import { PnlCardModal } from "@/components/pnl-card-modal"
-import { YomiLogo } from "@/components/ui/yomi-logo"
 import { getUnseenBetWins, markBetWinAsSeen, type UnseenBetWin } from "@/app/actions/bet-wins"
 import { cn } from "@/lib/utils"
 
@@ -58,16 +57,13 @@ export function BetWinPopup() {
     ? new Date(currentWin.resolved_at).toLocaleDateString('fr-FR')
     : new Date(currentWin.created_at).toLocaleDateString('fr-FR')
 
-  // Truncate event name
   const eventName = (currentWin.market as any)?.title || 'Événement'
-  const truncatedEvent = eventName.length > 35 
-    ? eventName.substring(0, 35) + "..." 
-    : eventName
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setIsVisible(false)
-    await markBetWinAsSeen(currentWin.id)
-    
+    // Fire and forget: if it fails, the win simply shows again next visit; the UI must not wait on it
+    markBetWinAsSeen(currentWin.id).catch(() => {})
+
     setTimeout(() => {
       if (currentIndex < unseenWins.length - 1) {
         setCurrentIndex(currentIndex + 1)
@@ -98,208 +94,128 @@ export function BetWinPopup() {
 
   // Get sens based on direction
   const sens = currentWin.direction === 'YES' ? 'OUI' : 'NON'
+  // Multi-outcome markets: say which outcome ("NON Lamine Yamal"), binary ones already are OUI/NON
+  const outcomeLabel = currentWin.outcome?.label
+  const choice = outcomeLabel && outcomeLabel !== 'OUI' && outcomeLabel !== 'NON' ? `${sens} ${outcomeLabel}` : sens
+
+  const hasNext = unseenWins.length > 1 && currentIndex < unseenWins.length - 1
+  const reveal = (phase: number) =>
+    cn("transition-all duration-500", animationPhase >= phase ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3")
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        {/* Backdrop with glow effect */}
-        <div 
+      {/* Hidden while the share card is open so the card is never stacked under the popup */}
+      {!showPnlModal && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="win-title">
+        <div
           className={cn(
-            "absolute inset-0 bg-black/85 backdrop-blur transition-opacity duration-300",
+            "absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300",
             isVisible ? "opacity-100" : "opacity-0"
           )}
           onClick={handleClose}
         />
-        
-        {/* Victory glow */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-yes/10 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
-        </div>
-        
-        {/* Confetti */}
-        {showConfetti && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {[...Array(30)].map((_, i) => (
-              <div
+
+        {/* Confetti: short burst, tied to the popup's own visibility */}
+        {showConfetti && isVisible && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+            {[...Array(18)].map((_, i) => (
+              <span
                 key={i}
-                className="absolute animate-confetti"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 0.8}s`,
-                  animationDuration: `${2 + Math.random() * 1.5}s`,
-                }}
-              >
-                {i % 4 === 0 ? (
-                  <Sparkles className="w-5 h-5 text-amber-400" />
-                ) : i % 4 === 1 ? (
-                  <div className="w-3 h-3 bg-yes rounded-full" />
-                ) : i % 4 === 2 ? (
-                  <div className="w-2 h-4 bg-amber-400 rotate-45" />
-                ) : (
-                  <Trophy className="w-4 h-4 text-yellow-400" />
+                className={cn(
+                  "absolute top-0 animate-confetti rounded-[1px]",
+                  i % 3 === 0 ? "w-1.5 h-3 bg-yes" : i % 3 === 1 ? "w-1.5 h-1.5 bg-amber-400" : "w-1 h-3 bg-brand"
                 )}
-              </div>
+                style={{
+                  left: `${(i * 37) % 100}%`,
+                  animationDelay: `${(i % 6) * 0.12}s`,
+                  animationDuration: `${2.2 + (i % 4) * 0.35}s`,
+                }}
+              />
             ))}
           </div>
         )}
 
-        {/* Modal */}
-        <div 
+        <div
           className={cn(
-            "relative bg-zinc-950 border-2 border-amber-500/40 rounded-lg max-w-md w-full shadow-lg overflow-hidden transition-all duration-500",
-            isVisible 
-              ? "opacity-100 scale-100 translate-y-0" 
-              : "opacity-0 scale-95 translate-y-4"
+            "relative w-full max-w-sm rounded-lg border border-border bg-card shadow-2xl shadow-black/60 transition-all duration-300",
+            isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] translate-y-2"
           )}
         >
-          
-          {/* Top Glow Bar */}
-          <div className="h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
-          
-          {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors z-10"
+            aria-label="Fermer"
+            className="absolute top-3 right-3 h-8 w-8 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
-          <div className="p-6 space-y-5">
-            
-            {/* Victory Header */}
-            <div 
-              className={cn(
-                "text-center transition-all duration-500",
-                animationPhase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              )}
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/40 mb-3">
-                <Trophy className="w-8 h-8 text-amber-400" />
-              </div>
-              <h2 className="text-2xl font-semibold text-amber-400 tracking-tight">
-                TU AS GAGNÉ !
+          <div className="p-6 space-y-6">
+            {/* Header */}
+            <div className={reveal(1)}>
+              <p className="inline-flex items-center gap-1.5 text-xs font-medium text-yes">
+                <Trophy className="w-3.5 h-3.5" aria-hidden />
+                Pari gagné
+                {unseenWins.length > 1 && (
+                  <span className="text-muted-foreground font-mono">· {currentIndex + 1}/{unseenWins.length}</span>
+                )}
+              </p>
+              <h2 id="win-title" className="mt-2 pr-8 text-base font-semibold leading-snug line-clamp-2">
+                {eventName}
               </h2>
-              <p className="text-zinc-400 text-sm mt-1 flex items-center justify-center gap-1.5">
-                Félicitations pour ta prédiction
-                <Target className="w-4 h-4 text-amber-400" />
+            </div>
+
+            {/* Gain */}
+            <div className={cn(reveal(2), "delay-75")}>
+              <p className="font-display text-5xl font-bold tracking-tight text-yes tabular flex items-baseline gap-1.5">
+                +{pnlAmount.toLocaleString("fr-FR")}
+                <CurrencySymbol className="text-3xl" />
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Bénéfice · <span className="font-mono text-yes">{pnlDisplay}</span> sur ta mise
               </p>
             </div>
 
-            {/* Mini PNL Card Preview */}
-            <div 
-              className={cn(
-                "transition-all duration-500 delay-100",
-                animationPhase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              )}
-            >
-              <div 
-                className="relative rounded-lg border border-zinc-700 overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
-                }}
-              >
-                {/* Grid Pattern */}
-                <div 
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage: `
-                      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-                    `,
-                    backgroundSize: "20px 20px",
-                  }}
-                />
-
-                <div className="relative p-5 space-y-4">
-                  {/* PNL Display */}
-                  <div className="text-center">
-                    <p className="text-xs text-zinc-500 uppercase tracking-wide mb-1">Gains</p>
-                    <p 
-                      className="text-4xl font-semibold text-yes font-mono"
-                      style={{
-                        textShadow: "0 0 30px rgba(52, 211, 153, 0.5)",
-                      }}
-                    >
-                      {pnlDisplay}
-                    </p>
-                    <p className="text-lg font-semibold text-yes flex items-center justify-center gap-1 mt-1">
-                      +{winnings.toLocaleString('fr-FR')} <CurrencySymbol className="w-4 h-4" />
-                    </p>
-                  </div>
-
-                  {/* Event Info */}
-                  <div className="space-y-2 text-sm font-mono">
-                    <div className="flex justify-between items-start gap-2">
-                      <span className="text-zinc-500 shrink-0">EVENT</span>
-                      <span className="text-white text-right truncate">{truncatedEvent}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">CHOIX</span>
-                      <span className={sens === 'OUI' ? 'text-yes' : 'text-red-400'}>
-                        {sens}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">MISE</span>
-                      <span className="text-white flex items-center gap-1">
-                        {mise.toLocaleString('fr-FR')} <CurrencySymbol className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* YOMI Logo */}
-                  <div className="flex justify-center pt-2 opacity-50">
-                    <YomiLogo className="text-lg" />
-                  </div>
-                </div>
+            {/* Details */}
+            <dl className={cn(reveal(2), "delay-100 divide-y divide-border border-y border-border text-sm")}>
+              <div className="flex justify-between py-2.5">
+                <dt className="text-muted-foreground">Ton choix</dt>
+                <dd className={cn("font-semibold text-right truncate ml-4", sens === "OUI" ? "text-yes" : "text-no")}>{choice}</dd>
               </div>
-            </div>
-
-            {/* Counter if multiple wins */}
-            {unseenWins.length > 1 && (
-              <div className="flex justify-center gap-1.5">
-                {unseenWins.map((_, i) => (
-                  <div 
-                    key={i}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all",
-                      i === currentIndex ? "bg-amber-400" : "bg-zinc-700"
-                    )}
-                  />
-                ))}
+              <div className="flex justify-between py-2.5">
+                <dt className="text-muted-foreground">Mise</dt>
+                <dd className="font-mono flex items-center gap-1">
+                  {mise.toLocaleString("fr-FR")} <CurrencySymbol />
+                </dd>
               </div>
-            )}
+              <div className="flex justify-between py-2.5">
+                <dt className="text-muted-foreground">Récupéré</dt>
+                <dd className="font-mono flex items-center gap-1">
+                  {winnings.toLocaleString("fr-FR")} <CurrencySymbol />
+                </dd>
+              </div>
+            </dl>
 
-            {/* Action Buttons */}
-            <div 
-              className={cn(
-                "flex gap-3 transition-all duration-500 delay-200",
-                animationPhase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              )}
-            >
+            {/* Actions */}
+            <div className={cn(reveal(3), "delay-150 grid grid-cols-2 gap-2")}>
               <button
                 onClick={handleShare}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="h-11 inline-flex items-center justify-center gap-2 rounded-md border border-border text-sm font-medium hover:bg-surface-hover transition-colors active:scale-[0.98]"
               >
-                <Share2 className="w-4 h-4" />
+                <Share2 className="w-4 h-4" aria-hidden />
                 Partager
               </button>
               <button
                 onClick={handleClose}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-medium border border-zinc-700 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                autoFocus
+                className="h-11 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors active:scale-[0.98]"
               >
-                <Check className="w-4 h-4" />
-                {unseenWins.length > 1 && currentIndex < unseenWins.length - 1 
-                  ? 'Suivant' 
-                  : 'Continuer'
-                }
+                {hasNext ? "Suivant" : "Continuer"}
               </button>
             </div>
-
           </div>
         </div>
       </div>
+      )}
 
       {/* Full PNL Card Modal for sharing */}
       <PnlCardModal
