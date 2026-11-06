@@ -1,6 +1,6 @@
 "use client"
 
-import { X, AlertCircle } from "lucide-react"
+import { X } from "lucide-react"
 import { CurrencySymbol } from "@/components/ui/currency-symbol"
 
 type ConfirmBetModalProps = {
@@ -24,102 +24,65 @@ export function ConfirmBetModal({
 }: ConfirmBetModalProps) {
   if (!isOpen) return null
 
+  const isNo = betChoice.trim().toUpperCase().startsWith("NON")
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-card border border-brand/40 rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
-        {/* Glow effect */}
-        
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-white transition-colors cursor-pointer"
-        >
-          <X className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-bet-title">
+      <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={onClose} />
+
+      <div className="modal-panel w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+        <button onClick={onClose} aria-label="Fermer" className="modal-close">
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Content */}
-        <div className="relative space-y-5">
-          {/* Icon + Title */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-brand/40">
-              <AlertCircle className="w-8 h-8 text-brand" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight text-white">
-                Confirmer le pari ?
-              </h2>
-              <p className="text-muted-foreground text-sm mt-1">
-                Vérifie les détails avant de valider
-              </p>
-            </div>
-          </div>
-          
-          {/* Bet Summary */}
-          <div className="bg-white/5 rounded-lg p-4 border border-border space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Tu mises</span>
-              <span className="text-xl font-semibold font-mono text-white flex items-center gap-1">
-                {betAmount.toLocaleString()} <CurrencySymbol className="w-4 h-4" />
-              </span>
-            </div>
-            
-            <div className="h-px bg-border" />
-            
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Sur</span>
-              <span className="text-lg font-semibold text-white">
-                {betChoice}
-              </span>
-            </div>
-          </div>
+        <h2 id="confirm-bet-title" className="text-base font-semibold pr-8">Confirmer le pari</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Une fois confirmé, il ne peut plus être annulé.</p>
 
-          {/* Potential Gain */}
-          <div className="bg-white/5 rounded-lg p-4 border border-brand/40">
-            <p className="text-sm text-brand/70">Gain potentiel estimé</p>
-            <p className="text-3xl font-semibold text-brand font-mono flex items-center gap-1">
-              {potentialGain.toLocaleString()} <CurrencySymbol className="w-6 h-6" />
-            </p>
+        <dl className="mt-5 divide-y divide-border border-y border-border text-sm">
+          <div className="flex justify-between items-center py-3">
+            <dt className="text-muted-foreground">Ton choix</dt>
+            <dd className={`font-semibold text-right ml-4 truncate ${isNo ? "text-no" : "text-yes"}`}>{betChoice}</dd>
           </div>
+          <div className="flex justify-between items-center py-3">
+            <dt className="text-muted-foreground">Mise</dt>
+            <dd className="font-mono font-semibold flex items-center gap-1">
+              {betAmount.toLocaleString()} <CurrencySymbol />
+            </dd>
+          </div>
+        </dl>
 
-          {/* Actions */}
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="py-3 px-4 rounded-lg bg-white/5 border border-border text-white font-semibold tracking-tight hover:bg-white/10 hover:border-white/15 transition-all cursor-pointer disabled:opacity-50"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isLoading}
-              className="py-3 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-tight transition-all cursor-pointer disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  En cours...
-                </>
-              ) : (
-                "Confirmer"
-              )}
-            </button>
-          </div>
-          
-          {/* Warning */}
-          <p className="text-xs text-muted-foreground text-center">
-            Une fois confirmé, le pari ne pourra pas être annulé.
+        <div className="mt-5">
+          <p className="text-xs text-muted-foreground">Gain potentiel estimé</p>
+          <p className="mt-1 font-display text-3xl font-bold tabular flex items-baseline gap-1">
+            {potentialGain.toLocaleString()} <CurrencySymbol className="text-brand text-2xl" />
           </p>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-2">
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="h-11 rounded-md border border-border text-sm font-medium hover:bg-surface-hover transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            autoFocus
+            className="h-11 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-[color,background-color,transform] active:scale-[0.98] cursor-pointer disabled:bg-white/5 disabled:text-muted-foreground flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden />
+                En cours…
+              </>
+            ) : (
+              "Confirmer"
+            )}
+          </button>
         </div>
       </div>
     </div>
   )
 }
-

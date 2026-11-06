@@ -85,43 +85,37 @@ export function BadgesModal({ isOpen, onClose, userId }: BadgesModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[85vh] bg-card border border-border rounded-lg overflow-hidden flex flex-col">
+      <div className="modal-panel w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <Trophy className="w-5 h-5 text-amber-400" />
-            <h2 className="text-lg font-semibold">Mes Badges</h2>
+            <Trophy className="w-4 h-4 text-muted-foreground" aria-hidden />
+            <h2 className="text-base font-semibold">Mes Badges</h2>
             <span className="text-xs text-muted-foreground">
               {userBadges.length} obtenu{userBadges.length > 1 ? 's' : ''} · {equippedCount}/2 équipés
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            aria-label="Fermer"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Category Tabs - Fixed scrollable */}
-        <div className="border-b border-border bg-muted/50">
-          <div className="flex gap-1 p-2 overflow-x-auto">
+        <div className="border-b border-border px-4 py-3">
+          <div className="seg max-w-full overflow-x-auto no-scrollbar">
             {CATEGORIES.map(cat => (
               <button
                 key={cat.key}
                 onClick={() => setSelectedCategory(cat.key)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all shrink-0',
-                  selectedCategory === cat.key
-                    ? 'bg-primary text-white'
-                    : 'bg-white/10 text-muted-foreground hover:text-white hover:bg-white/15'
-                )}
+                aria-pressed={selectedCategory === cat.key}
+                className="seg-item shrink-0"
               >
                 {cat.label}
               </button>

@@ -463,12 +463,13 @@ export function ProfileView() {
     <div className="space-y-6 relative">
       {/* Settings Overlay */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border rounded-lg w-full max-w-md shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-border bg-white/5">
-              <h3 className="font-semibold">Paramètres</h3>
-              <button onClick={toggleSettings} className="p-1 hover:bg-white/10 rounded-full transition-colors">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={toggleSettings} />
+          <div className="modal-panel w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-border">
+              <h3 id="settings-title" className="text-base font-semibold">Paramètres</h3>
+              <button onClick={toggleSettings} aria-label="Fermer" className="h-8 w-8 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
             
@@ -477,30 +478,30 @@ export function ProfileView() {
                 <div className="space-y-3">
                   <button 
                     onClick={() => setActiveSettingsTab('edit')}
-                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
+                    className="w-full flex items-center justify-between p-4 rounded-md border border-border hover:bg-surface-hover transition-colors group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <UserCog className="w-5 h-5 text-brand" />
+                      <UserCog className="w-5 h-5 text-muted-foreground" aria-hidden />
                       <div className="text-left">
                         <p className="font-semibold text-sm">Modifier le profil</p>
-                        <p className="text-xs text-muted-foreground">Avatar, Pseudo, Notifications</p>
+                        <p className="text-xs text-muted-foreground">Avatar, pseudo, notifications</p>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                    <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden />
                   </button>
 
                   <button 
                     onClick={() => setActiveSettingsTab('password')}
-                    className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 border border-border hover:bg-white/10 transition-all group cursor-pointer"
+                    className="w-full flex items-center justify-between p-4 rounded-md border border-border hover:bg-surface-hover transition-colors group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <Key className="w-5 h-5 text-brand" />
+                      <Key className="w-5 h-5 text-muted-foreground" aria-hidden />
                       <div className="text-left">
                         <p className="font-semibold text-sm">Sécurité</p>
                         <p className="text-xs text-muted-foreground">Changer le mot de passe</p>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                    <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden />
                   </button>
                 </div>
               )}

@@ -128,51 +128,49 @@ export function CosmeticsModal({ isOpen, onClose, onEquipChange }: CosmeticsModa
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[85vh] bg-card border border-border rounded-lg overflow-hidden flex flex-col">
+      <div className="modal-panel w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
-            <Palette className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-semibold">Personnalisation</h2>
+            <Palette className="w-4 h-4 text-muted-foreground" aria-hidden />
+            <h2 className="text-base font-semibold">Personnalisation</h2>
             <span className="text-xs text-muted-foreground">
               {ownedCount} possédé{ownedCount > 1 ? 's' : ''} • {equippedCount} équipé{equippedCount > 1 ? 's' : ''}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            aria-label="Fermer"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Currently Equipped Summary */}
         {equippedCount > 0 && (
-          <div className="p-4 border-b border-border bg-yes/5 shrink-0">
+          <div className="px-4 py-3 border-b border-border shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-xs font-semibold text-yes uppercase tracking-wide">Équipés:</span>
+                <span className="text-xs text-muted-foreground">Équipés</span>
                 <div className="flex items-center gap-3">
                   {equipped.background && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                      <Palette className="w-3 h-3 text-cyan-400" />
-                      <span className="text-xs font-medium text-cyan-400">{equipped.background.name}</span>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border">
+                      <Palette className="w-3 h-3 text-foreground/80" />
+                      <span className="text-xs font-medium text-foreground/80">{equipped.background.name}</span>
                     </div>
                   )}
                   {equipped.aura && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                      <Sparkles className="w-3 h-3 text-purple-400" />
-                      <span className="text-xs font-medium text-purple-400">{equipped.aura.name}</span>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border">
+                      <Sparkles className="w-3 h-3 text-foreground/80" />
+                      <span className="text-xs font-medium text-foreground/80">{equipped.aura.name}</span>
                     </div>
                   )}
                   {equipped.nametag && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border">
                       <Type className="w-3 h-3 text-amber-400" />
                       <span className="text-xs font-medium text-amber-400">{equipped.nametag.name}</span>
                     </div>

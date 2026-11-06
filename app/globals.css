@@ -318,3 +318,36 @@ html {
     color: var(--foreground);
   }
 }
+
+/* One look for every dialog: dimmed page, black panel with hairline border */
+@layer components {
+  .modal-scrim {
+    background: oklch(0 0 0 / 0.8);
+    backdrop-filter: blur(4px);
+  }
+  .modal-panel {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 64px -16px oklch(0 0 0 / 0.7);
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--muted-foreground);
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+  .modal-close:hover {
+    color: var(--foreground);
+    background: var(--surface-hover);
+  }
+}

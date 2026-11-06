@@ -121,8 +121,8 @@ export function DailyRewardWidget() {
     return (
       <div className={`p-3 rounded-lg border ${
         isJackpot || isWelcomeBonus
-          ? 'bg-amber-500/10 border-amber-500/30'
-          : 'bg-yes/10 border-yes/30'
+          ? 'bg-card border-amber-500/40'
+          : 'bg-card border-yes/40'
       }`}>
         <div className="flex items-center gap-2">
           <Check className={`w-4 h-4 ${isJackpot || isWelcomeBonus ? 'text-amber-400' : 'text-yes'}`} />
@@ -145,7 +145,7 @@ export function DailyRewardWidget() {
       <button
         onClick={handleClaimWelcome}
         disabled={isClaiming}
-        className="w-full p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all text-left disabled:opacity-50"
+        className="w-full p-3 rounded-lg bg-card border border-amber-500/40 hover:bg-amber-500/20 transition-all text-left disabled:opacity-50"
       >
         <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export function DailyRewardWidget() {
         disabled={isClaiming}
         className={`w-full p-3 rounded-lg border transition-all text-left disabled:opacity-50 ${
           isJackpotDay 
-            ? 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20' 
+            ? 'bg-card border-amber-500/40 hover:bg-amber-500/20' 
             : 'bg-primary/10 border-brand/40 hover:bg-primary/20'
         }`}
       >
