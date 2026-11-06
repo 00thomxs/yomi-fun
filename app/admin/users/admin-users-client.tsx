@@ -39,24 +39,25 @@ function StatCard({
   subtitle?: string
   color?: "cyan" | "green" | "amber" | "red" | "purple"
 }) {
+  // Neutral tiles everywhere; the figure is what matters, not the icon colour
   const colorClasses = {
-    cyan: "bg-primary/10 text-brand border-primary/20",
-    green: "bg-yes/10 text-yes border-yes/20",
-    amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    red: "bg-red-500/10 text-red-400 border-red-500/20",
-    purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    cyan: "text-muted-foreground border-border",
+    green: "text-muted-foreground border-border",
+    amber: "text-muted-foreground border-border",
+    red: "text-muted-foreground border-border",
+    purple: "text-muted-foreground border-border",
   }
   
   return (
     <div className="bg-muted/50 border border-border rounded-lg p-4 hover:border-border transition-colors">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</span>
+        <span className="text-xs text-muted-foreground font-medium">{label}</span>
         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-semibold text-white tracking-tight">{value}</span>
+        <span className="font-display text-2xl font-bold tracking-tight tabular">{value}</span>
         {trend && (
           <span className={`text-xs flex items-center gap-0.5 ${trend.positive ? 'text-yes' : 'text-red-400'}`}>
             {trend.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -363,7 +364,7 @@ function UserSearchTable({
               <Search className="w-4 h-4 text-brand" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
+              <h3 className="font-semibold text-sm">Recherche</h3>
               <p className="text-xs text-muted-foreground">{total} joueur{total !== 1 ? 's' : ''} au total</p>
             </div>
           </div>

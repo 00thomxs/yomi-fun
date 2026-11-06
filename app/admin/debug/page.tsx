@@ -52,7 +52,7 @@ export default async function DebugPage() {
 
   return (
     <div className="space-y-6 text-sm">
-      <h1 className="text-2xl font-semibold">🔍 Debug Shop & Orders</h1>
+      <h1 className="font-display text-2xl font-bold tracking-tight">🔍 Debug Shop & Orders</h1>
       
       <div className="bg-card border border-border rounded-lg p-4 space-y-2">
         <h2 className="font-semibold text-lg">1. Environment Variables</h2>

@@ -41,7 +41,7 @@ export default function ResolveButton({
         <span className="text-sm text-red-400 mr-2">Confirmer {outcomeName} ?</span>
         <button 
           onClick={() => setShowConfirm(false)}
-          className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded"
+          className="h-8 px-3 text-sm rounded-md border border-border hover:bg-surface-hover transition-colors"
           disabled={isLoading}
         >
           Annuler
@@ -61,7 +61,7 @@ export default function ResolveButton({
   return (
     <button
       onClick={() => setShowConfirm(true)}
-      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+      className="h-10 px-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-semibold text-sm transition-colors flex items-center gap-2"
     >
       <CheckCircle className="h-4 w-4" />
       Déclarer Vainqueur

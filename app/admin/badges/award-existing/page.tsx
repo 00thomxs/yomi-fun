@@ -44,7 +44,7 @@ export default function AwardExistingBadgesPage() {
       <div className="flex items-center gap-3">
         <Trophy className="w-8 h-8 text-amber-400" />
         <div>
-          <h1 className="text-2xl font-semibold">Attribution des Badges</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Attribution des Badges</h1>
           <p className="text-sm text-muted-foreground">
             Attribuer les badges mérités aux joueurs existants
           </p>
@@ -91,7 +91,7 @@ export default function AwardExistingBadgesPage() {
         <button
           onClick={handleAwardAdmins}
           disabled={isProcessing || processingAdmin}
-          className="w-full py-3 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-black font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 px-4 rounded-md border border-border hover:bg-surface-hover text-foreground font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {processingAdmin ? (
             <>

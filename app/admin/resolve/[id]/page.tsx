@@ -42,18 +42,18 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="container max-w-4xl mx-auto py-10">
-      <h1 className="text-3xl font-semibold mb-6">Résolution du Marché</h1>
+      <h1 className="font-display text-2xl font-bold tracking-tight mb-6">Résolution du Marché</h1>
       
-      <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-8">
+      <div className="bg-card p-6 rounded-lg border border-border mb-8">
         <h2 className="text-xl font-semibold mb-2">{market.question}</h2>
         <p className="text-gray-400 mb-4">ID: {market.id}</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white/5 p-4 rounded-lg">
             <span className="block text-sm text-gray-400">Volume</span>
             <span className="text-xl font-mono">{market.volume} Zeny</span>
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white/5 p-4 rounded-lg">
              <span className="block text-sm text-gray-400">Status actuel</span>
              <span className={`text-xl font-semibold ${market.isLive ? 'text-green-500' : 'text-red-500'}`}>
                 {market.isLive ? 'EN COURS' : 'TERMINÉ'}

@@ -90,9 +90,9 @@ export default async function AdminSeasonsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3">
+          <h1 className="font-display text-2xl font-bold tracking-tight flex items-center gap-3">
             <Trophy className="w-8 h-8 text-amber-400" />
-            Gestion des Saisons
+            Gestion des saisons
           </h1>
           <p className="text-muted-foreground mt-1">
             Stats, classements et historique des saisons
@@ -102,7 +102,7 @@ export default async function AdminSeasonsPage() {
           href="/admin/settings"
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all"
         >
-          Paramètres Saison
+          Paramètres saison
         </Link>
       </div>
 
@@ -150,16 +150,16 @@ export default async function AdminSeasonsPage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <Users className="w-4 h-4" /> Participants
               </div>
-              <p className="text-2xl font-semibold mt-1">{seasonLeaderboard.length}</p>
+              <p className="font-display text-2xl font-bold tabular mt-1">{seasonLeaderboard.length}</p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <Target className="w-4 h-4" /> Events
               </div>
-              <p className="text-2xl font-semibold mt-1">
+              <p className="font-display text-2xl font-bold tabular mt-1">
                 {seasonEvents.length}
                 <span className="text-sm font-normal text-muted-foreground ml-1">
                   ({seasonEvents.filter(e => e.status === 'resolved').length} terminés)
@@ -167,19 +167,19 @@ export default async function AdminSeasonsPage() {
               </p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <BarChart3 className="w-4 h-4" /> Volume Total
               </div>
-              <p className="text-2xl font-semibold mt-1 flex items-center gap-1">
+              <p className="font-display text-2xl font-bold tabular mt-1 flex items-center gap-1">
                 {seasonEvents.reduce((sum, e) => sum + (e.volume || 0), 0).toLocaleString()}
                 <CurrencySymbol className="w-5 h-5" />
               </p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <TrendingUp className="w-4 h-4" /> Paris Totaux
               </div>
-              <p className="text-2xl font-semibold mt-1">{seasonBets.length}</p>
+              <p className="font-display text-2xl font-bold tabular mt-1">{seasonBets.length}</p>
             </div>
           </div>
 
@@ -213,7 +213,7 @@ export default async function AdminSeasonsPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Award className="w-5 h-5 text-muted-foreground" />
-            Saisons Passées
+            Saisons passées
           </h2>
           <div className="grid gap-4">
             {pastSeasons.map(season => (

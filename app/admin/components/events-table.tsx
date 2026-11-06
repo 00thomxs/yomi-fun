@@ -212,7 +212,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {/* Visibility filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                 <Eye className="w-3 h-3" /> Visibilité
               </label>
               <select
@@ -228,7 +228,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Volume filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                 <BarChart3 className="w-3 h-3" /> Volume
               </label>
               <select
@@ -246,7 +246,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Category filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                 <Tag className="w-3 h-3" /> Catégorie
               </label>
               <select
@@ -263,7 +263,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
 
             {/* Season filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
                 <Trophy className="w-3 h-3" /> Saison
               </label>
               <select
@@ -285,7 +285,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
         <div key={monthKey} className="rounded-lg bg-card border border-border overflow-hidden">
           {/* Month Header */}
           <div className="px-4 py-2 bg-white/5 border-b border-border">
-            <h3 className="font-semibold text-xs uppercase tracking-wide text-muted-foreground">
+            <h3 className="font-semibold text-xs text-muted-foreground">
               {monthLabel}
               <span className="ml-2 font-normal">({monthMarkets.length})</span>
             </h3>
@@ -293,7 +293,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
           
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-white/5 text-muted-foreground font-medium uppercase text-[11px]">
+              <thead className="bg-white/5 text-muted-foreground font-medium text-xs">
                 <tr>
                   <th className="px-2 py-2 w-6"></th>
                   <th className="px-2 py-2">Question</th>
@@ -343,7 +343,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
                     <td className="px-2 py-1.5">
                       {market.status === 'open' ? (
                         <span className="inline-flex items-center gap-1 text-yes text-[11px] font-semibold uppercase">
-                          <span className="w-1 h-1 rounded-full bg-yes animate-pulse" />
+                          <span className="w-1 h-1 rounded-full bg-yes" />
                           Live
                         </span>
                       ) : market.status === 'closed' ? (
@@ -352,7 +352,7 @@ export function AdminEventsTable({ markets }: { markets: Market[] }) {
                           Attente
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-[11px] font-semibold uppercase">
+                        <span className="text-muted-foreground text-xs font-semibold">
                           Résolu
                         </span>
                       )}

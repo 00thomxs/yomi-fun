@@ -126,7 +126,7 @@ export default function CreateMarketPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Nouvel Event</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Nouvel event</h1>
         <p className="text-muted-foreground mt-1">
           Configuration de l'événement
         </p>
@@ -138,7 +138,7 @@ export default function CreateMarketPage() {
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <PieChart className="w-4 h-4 text-brand" />
-            Type d'Event
+            Type d'event
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -174,7 +174,7 @@ export default function CreateMarketPage() {
           </h2>
           
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Question</label>
+            <label className="text-xs font-medium text-muted-foreground">Question</label>
             <input 
               name="question"
               type="text"
@@ -185,7 +185,7 @@ export default function CreateMarketPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Description (Optionnel)</label>
+            <label className="text-xs font-medium text-muted-foreground">Description (Optionnel)</label>
             <textarea 
               name="description"
               placeholder="Détails supplémentaires..."
@@ -195,7 +195,7 @@ export default function CreateMarketPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Catégorie</label>
+              <label className="text-xs font-medium text-muted-foreground">Catégorie</label>
               <select name="category" className="w-full bg-white/5 border border-border rounded-lg px-4 py-3 outline-none focus:border-primary/50 transition-all">
                 {MARKET_CATEGORIES.map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -205,7 +205,7 @@ export default function CreateMarketPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Image URL</label>
+              <label className="text-xs font-medium text-muted-foreground">Image URL</label>
               <input 
                 name="imageUrl"
                 type="url"
@@ -217,7 +217,7 @@ export default function CreateMarketPage() {
 
           {/* Date & Heure */}
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Date de fin</label>
+            <label className="text-xs font-medium text-muted-foreground">Date de fin</label>
             <div className="flex flex-col gap-2">
               <div className="relative flex-1">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -341,7 +341,7 @@ export default function CreateMarketPage() {
 
           {/* Season Selector */}
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <label className="text-xs font-medium text-muted-foreground">
               Saison (Optionnel)
             </label>
             <select
@@ -375,7 +375,7 @@ export default function CreateMarketPage() {
 
           {/* Initial Liquidity */}
           <div className="space-y-3">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
               <Coins className="w-3 h-3" />
               Liquidité Initiale (Seed)
             </label>
