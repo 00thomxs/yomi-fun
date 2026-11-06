@@ -432,11 +432,11 @@ export function ShopView({ initialItems }: ShopViewProps) {
       {/* Preview/Purchase Modal */}
       {previewItem && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center modal-scrim p-4 animate-in fade-in duration-200"
           onClick={() => setPreviewItem(null)}
         >
           <div 
-            className="bg-card border border-border rounded-lg w-full max-w-md p-6 space-y-4"
+            className="modal-panel w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -452,14 +452,15 @@ export function ShopView({ initialItems }: ShopViewProps) {
                 >
                   {RARITY_INFO[previewItem.rarity].label}
               </div>
-                <h3 className="text-xl font-semibold">{previewItem.name}</h3>
+                <h3 className="font-display text-xl font-bold">{previewItem.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{previewItem.description}</p>
               </div>
               <button
                 onClick={() => setPreviewItem(null)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-all"
+                aria-label="Fermer"
+                className="h-8 w-8 shrink-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors"
               >
-                <X className="w-5 h-5 text-muted-foreground" />
+                <X className="w-4 h-4" />
               </button>
             </div>
             
@@ -515,75 +516,47 @@ export function ShopView({ initialItems }: ShopViewProps) {
 
       {/* Purchase Success Modal */}
       {purchasedItem && (
-        <div 
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in"
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center modal-scrim p-4 animate-in fade-in duration-200"
           onClick={() => setPurchasedItem(null)}
         >
-          <div 
-            className="bg-card border rounded-lg w-full max-w-sm p-6 text-center space-y-5 animate-in zoom-in-95"
-            style={{ 
-              borderColor: `${RARITY_INFO[purchasedItem.rarity].color}50`,
-              boxShadow: `0 0 60px ${RARITY_INFO[purchasedItem.rarity].color}20`
-            }}
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="purchase-title"
+            className="modal-panel w-full max-w-sm p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
-            {/* Celebration Icon */}
-            <div 
-              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
-              style={{ 
-                background: `${RARITY_INFO[purchasedItem.rarity].color}15`,
-                border: `2px solid ${RARITY_INFO[purchasedItem.rarity].color}40`
-              }}
-            >
-              <PartyPopper className="w-10 h-10" style={{ color: RARITY_INFO[purchasedItem.rarity].color }} />
-            </div>
-            
-            {/* Title */}
             <div>
-              <p className="text-xs font-semibold text-yes uppercase tracking-wide mb-2">Achat réussi !</p>
-              <h3 className="text-2xl font-semibold" style={{ color: RARITY_INFO[purchasedItem.rarity].color }}>
-                {purchasedItem.name}
-              </h3>
-              <div 
-                className="inline-block mt-2 px-2 py-0.5 rounded text-[11px] font-semibold uppercase"
-                style={{ 
-                  background: `${RARITY_INFO[purchasedItem.rarity].color}15`, 
-                  color: RARITY_INFO[purchasedItem.rarity].color 
-                }}
-              >
+              <p className="inline-flex items-center gap-1.5 text-xs font-medium text-yes">
+                <PartyPopper className="w-3.5 h-3.5" aria-hidden />
+                Achat réussi
+              </p>
+              <h3 id="purchase-title" className="mt-2 font-display text-xl font-bold">{purchasedItem.name}</h3>
+              <p className="mt-1 text-xs font-medium" style={{ color: RARITY_INFO[purchasedItem.rarity].color }}>
                 {RARITY_INFO[purchasedItem.rarity].label}
-              </div>
+              </p>
             </div>
-            
-            <p className="text-sm text-muted-foreground">
-              Ce cosmétique a été ajouté à votre collection. Voulez-vous l'équiper maintenant ?
-            </p>
-            
-            {/* Actions */}
-            <div className="space-y-2">
+
+            <CosmeticPreview item={purchasedItem} username={previewName} avatar={previewAvatar} large />
+
+            <p className="text-sm text-muted-foreground">Ajouté à ta collection. Tu veux l'équiper maintenant ?</p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setPurchasedItem(null)}
+                className="h-11 rounded-md border border-border text-sm font-medium hover:bg-surface-hover transition-colors"
+              >
+                Plus tard
+              </button>
               <button
                 onClick={handleEquipPurchased}
                 disabled={isEquipping}
-                className="w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
-                style={{ 
-                  background: RARITY_INFO[purchasedItem.rarity].color,
-                  color: purchasedItem.rarity === 'legendary' || purchasedItem.rarity === 'common' ? '#000' : '#fff'
-                }}
+                autoFocus
+                className="h-11 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:bg-white/5 disabled:text-muted-foreground"
               >
-                {isEquipping ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Équiper maintenant
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => setPurchasedItem(null)}
-                className="w-full py-3 rounded-lg bg-white/5 hover:bg-white/10 font-medium transition-all text-muted-foreground"
-              >
-                Plus tard
+                {isEquipping ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : <Sparkles className="w-4 h-4" aria-hidden />}
+                Équiper
               </button>
             </div>
           </div>

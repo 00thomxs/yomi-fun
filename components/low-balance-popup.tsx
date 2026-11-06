@@ -70,76 +70,52 @@ export function LowBalancePopup({ eventName, closesAt }: LowBalancePopupProps) {
   const minutesRemaining = Math.max(0, Math.floor((closesDate.getTime() - Date.now()) / (1000 * 60)) % 60)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={handleDismiss}
-      />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="low-balance-title">
+      <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={handleDismiss} />
 
-      {/* Modal */}
-      <div className="relative bg-card border border-border rounded-lg p-6 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
-        {/* Close button */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-white transition-colors z-10"
-        >
-          <X className="w-5 h-5" />
+      <div className="modal-panel w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+        <button onClick={handleDismiss} aria-label="Fermer" className="modal-close">
+          <X className="w-4 h-4" />
         </button>
 
-        <div className="relative text-center space-y-4">
-          {/* Icon */}
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/30">
-            <Wallet className="w-8 h-8 text-amber-400" />
-          </div>
+        <p className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-400">
+          <Wallet className="w-3.5 h-3.5" aria-hidden />
+          Solde insuffisant
+        </p>
+        <h2 id="low-balance-title" className="mt-2 pr-8 text-base font-semibold leading-snug">Recharge pour participer à cet event</h2>
 
-          {/* Title */}
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              Solde insuffisant
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Recharge pour participer à cet event
-            </p>
+        <dl className="mt-5 divide-y divide-border border-y border-border text-sm">
+          <div className="py-3">
+            <dt className="sr-only">Event</dt>
+            <dd className="font-medium line-clamp-2">{eventName}</dd>
+            <dd className="mt-1 inline-flex items-center gap-1.5 text-xs text-amber-400">
+              <Clock className="w-3.5 h-3.5" aria-hidden />
+              Ferme dans {hoursRemaining}h{minutesRemaining.toString().padStart(2, '0')}
+            </dd>
           </div>
-
-          {/* Balance display */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-border">
-            <span className="text-xs text-muted-foreground">Solde:</span>
-            <span className="font-semibold font-mono text-white flex items-center gap-0.5">
-              {userBalance}<CurrencySymbol className="w-3 h-3" />
-            </span>
+          <div className="flex justify-between items-center py-3">
+            <dt className="text-muted-foreground">Ton solde</dt>
+            <dd className="font-mono font-semibold flex items-center gap-1">
+              {userBalance.toLocaleString()} <CurrencySymbol />
+            </dd>
           </div>
+        </dl>
 
-          {/* Event info */}
-          <div className="bg-white/5 rounded-lg p-3 border border-border text-left">
-            <p className="font-medium text-white text-sm line-clamp-2">{eventName}</p>
-            <div className="flex items-center gap-2 mt-2 text-amber-400">
-              <Clock className="w-4 h-4" />
-              <span className="text-xs font-medium">
-                Ferme dans {hoursRemaining}h{minutesRemaining.toString().padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="space-y-2 pt-1">
-            <Link
-              href="/shop#packs"
-              onClick={handleDismiss}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all"
-            >
-              <Zap className="w-4 h-4" />
-              Recharger
-            </Link>
-
-            <button
-              onClick={handleDismiss}
-              className="w-full py-2 text-sm text-muted-foreground hover:text-white transition-colors"
-            >
-              Plus tard
-            </button>
-          </div>
+        <div className="mt-6 grid grid-cols-2 gap-2">
+          <button
+            onClick={handleDismiss}
+            className="h-11 rounded-md border border-border text-sm font-medium hover:bg-surface-hover transition-colors"
+          >
+            Plus tard
+          </button>
+          <Link
+            href="/shop#packs"
+            onClick={handleDismiss}
+            className="h-11 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <Zap className="w-4 h-4" aria-hidden />
+            Recharger
+          </Link>
         </div>
       </div>
     </div>

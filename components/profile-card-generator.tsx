@@ -252,7 +252,7 @@ export function ProfileCardGenerator({
   return (
     <>
       {/* Minimal overlay - click to close */}
-      <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm" onClick={handleClose}/>
+      <div className="fixed inset-0 z-[100] modal-scrim" onClick={handleClose}/>
       
       {/* Content */}
       <div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
@@ -523,7 +523,7 @@ export function NewTierUnlockedPopup({ tier, isOpen, onClose, onGenerateCard }: 
   if (!isOpen) return null
 
   return (
-    <div className="font-logo fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="font-logo fixed inset-0 z-[110] flex items-center justify-center p-4 modal-scrim" onClick={onClose}>
       <div 
         className="relative w-full max-w-sm rounded-2xl overflow-hidden animate-in zoom-in-95 duration-300"
         style={{ background: `linear-gradient(145deg, ${tierInfo.color}15 0%, rgba(0,0,0,0.95) 50%)`, border: `2px solid ${tierInfo.color}50`, boxShadow: `0 0 60px ${tierInfo.color}30` }}

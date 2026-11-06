@@ -23,24 +23,25 @@ export function PnlCardModal({ isOpen, onClose, data }: PnlCardModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+        className="absolute inset-0 modal-scrim animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-zinc-950 border border-zinc-800 rounded-2xl p-4 sm:p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 max-h-[85vh] overflow-y-auto">
+      <div className="modal-panel p-4 sm:p-6 max-w-lg w-full animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-zinc-500 hover:text-white transition-colors z-10"
+          aria-label="Fermer"
+          className="modal-close"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
         <div className="text-center mb-3">
-          <h2 className="text-base sm:text-lg font-bold text-white">Génère ta PNL Card</h2>
-          <p className="text-xs sm:text-sm text-zinc-500">Personnalise le fond et télécharge</p>
+          <h2 className="text-base font-semibold">Génère ta carte PnL</h2>
+          <p className="text-sm text-muted-foreground">Personnalise le fond et télécharge</p>
         </div>
 
         {/* PNL Card */}

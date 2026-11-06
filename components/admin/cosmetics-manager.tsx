@@ -340,8 +340,8 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
       
       {/* Create/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center modal-scrim p-4">
+          <div className="modal-panel w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card">
               <h3 className="font-semibold text-lg">
                 {editingItem ? 'Modifier le cosmétique' : 'Nouveau cosmétique'}

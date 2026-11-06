@@ -111,17 +111,17 @@ export function CosmeticCustomizer({
   
   return (
     <div 
-      className="font-logo fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="font-logo fixed inset-0 z-[130] flex items-center justify-center p-4 modal-scrim"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-lg max-h-[85vh] rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden shadow-2xl flex flex-col"
+        className="modal-panel w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10 flex items-center justify-between shrink-0">
+        <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
           <div>
-            <h3 className="text-lg font-bold">Personnaliser ma carte</h3>
+            <h3 className="text-base font-semibold">Personnaliser ma carte</h3>
             <p className="text-sm text-muted-foreground">Équipe tes cosmétiques</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5">

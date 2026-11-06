@@ -22,9 +22,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 // Rarity accent colors
 const RARITY_ACCENT: Record<string, { border: string; glow: string; text: string; bg: string }> = {
   common: { 
-    border: 'border-zinc-600', 
+    border: 'border-border', 
     glow: '', 
-    text: 'text-zinc-400',
+    text: 'text-muted-foreground',
     bg: 'from-zinc-800/50 via-zinc-900/80 to-black'
   },
   rare: { 
@@ -80,10 +80,11 @@ export function BadgeEarnedPopup() {
   const categoryLabel = CATEGORY_LABELS[badge.category] || badge.category
   const accent = RARITY_ACCENT[rarity] || RARITY_ACCENT.common
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setIsVisible(false)
-    await markBadgeAsSeen(currentBadge.id)
-    
+    // Fire and forget: the popup must not stay on screen while the server answers
+    markBadgeAsSeen(currentBadge.id).catch(() => {})
+
     setTimeout(() => {
       if (currentIndex < unseenBadges.length - 1) {
         setCurrentIndex(currentIndex + 1)
@@ -111,151 +112,55 @@ export function BadgeEarnedPopup() {
     handleClose()
   }
 
+  const reveal = isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] translate-y-2"
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className={cn(
-          "absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity duration-300",
-          isVisible ? "opacity-100" : "opacity-0"
-        )}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="badge-title">
+      <div
+        className={cn("absolute inset-0 modal-scrim transition-opacity duration-300", isVisible ? "opacity-100" : "opacity-0")}
         onClick={handleClose}
       />
 
-      {/* Popup */}
-      <div 
-        className={cn(
-          'relative max-w-[340px] w-full rounded-lg border-2 overflow-hidden transition-all duration-500',
-          accent.border,
-          accent.glow,
-          isVisible 
-            ? "opacity-100 scale-100 translate-y-0" 
-            : "opacity-0 scale-95 translate-y-4"
-        )}
-      >
-        {/* Background gradient */}
-        <div className={cn(
-          'absolute inset-0 bg-gradient-to-b',
-          accent.bg
-        )} />
-        
-        {/* Tactical grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '20px 20px'
-          }}
-        />
-
-        {/* Sparkle effects for legendary/epic */}
-        {(rarity === 'legendary' || rarity === 'epic') && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className={cn(
-              "absolute top-6 left-6 w-1 h-1 rounded-full animate-ping",
-              rarity === 'legendary' ? "bg-amber-400" : "bg-purple-400"
-            )} />
-            <div className={cn(
-              "absolute top-12 right-10 w-1.5 h-1.5 rounded-full animate-ping delay-300",
-              rarity === 'legendary' ? "bg-amber-300" : "bg-purple-300"
-            )} />
-            <div className={cn(
-              "absolute bottom-20 left-10 w-1 h-1 rounded-full animate-ping delay-700",
-              rarity === 'legendary' ? "bg-amber-400" : "bg-purple-400"
-            )} />
-          </div>
-        )}
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-white transition-all"
-        >
+      {/* Only the frame carries the rarity colour */}
+      <div className={cn("modal-panel w-full max-w-sm p-6 transition-all duration-300", accent.border, reveal)}>
+        <button onClick={handleClose} aria-label="Fermer" className="modal-close">
           <X className="w-4 h-4" />
         </button>
 
-        {/* Content */}
-        <div className="relative p-6 text-center">
-          {/* Trophy icon */}
-          <div className={cn(
-            "w-12 h-12 mx-auto mb-4 rounded-lg flex items-center justify-center",
-            rarity === 'legendary' ? "bg-amber-500/20" : 
-            rarity === 'epic' ? "bg-purple-500/20" :
-            rarity === 'rare' ? "bg-blue-500/20" : "bg-zinc-800"
-          )}>
-            <Trophy className={cn("w-6 h-6", accent.text)} />
-          </div>
-
-          {/* Header */}
-          <div className="space-y-1 mb-6">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium">
-              Badge Débloqué
-            </p>
-            <p className={cn("text-xl font-semibold tracking-tight", accent.text)}>
-              {badge.name}
-            </p>
-          </div>
-
-          {/* Badge Display - Centered */}
-          <div className="flex justify-center mb-6">
-            <BadgeDisplay badge={badge} size="lg" />
-          </div>
-
-          {/* Badge Info */}
-          <div className="space-y-1 mb-6">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-              {categoryLabel}
-            </p>
-            <p className="text-sm text-zinc-400">
-              {badge.description}
-            </p>
-          </div>
-
-          {/* Counter if multiple */}
+        <p className={cn("inline-flex items-center gap-1.5 text-xs font-medium", accent.text)}>
+          <Trophy className="w-3.5 h-3.5" aria-hidden />
+          Badge débloqué
           {unseenBadges.length > 1 && (
-            <div className="flex justify-center gap-1 mb-4">
-              {unseenBadges.map((_, i) => (
-                <div 
-                  key={i}
-                  className={cn(
-                    "w-1.5 h-1.5 rounded-full transition-all",
-                    i === currentIndex ? accent.text.replace('text-', 'bg-') : "bg-zinc-700"
-                  )}
-                />
-              ))}
-            </div>
+            <span className="text-muted-foreground font-mono">· {currentIndex + 1}/{unseenBadges.length}</span>
           )}
+        </p>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={handleClose}
-              className="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all bg-white/5 hover:bg-white/10 text-zinc-300 border border-border"
-            >
-              Fermer
-            </button>
-            <button
-              onClick={handleEquip}
-              disabled={isEquipping}
-              className={cn(
-                'flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all',
-                'bg-primary hover:bg-primary/90 text-white',
-                'flex items-center justify-center gap-2',
-                'shadow-lg ',
-                isEquipping && 'opacity-50 cursor-not-allowed'
-              )}
-            >
-              {isEquipping ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Check className="w-4 h-4" />
-              )}
-              Équiper
-            </button>
-          </div>
+        <div className="mt-6 flex justify-center">
+          <BadgeDisplay badge={badge} size="lg" />
+        </div>
+
+        <div className="mt-6 text-center">
+          <h2 id="badge-title" className={cn("font-display text-xl font-bold tracking-tight", accent.text)}>{badge.name}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">{categoryLabel}</p>
+          {badge.description && <p className="mt-3 text-sm text-foreground/80">{badge.description}</p>}
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-2">
+          <button
+            onClick={handleClose}
+            className="h-11 rounded-md border border-border text-sm font-medium hover:bg-surface-hover transition-colors"
+          >
+            Fermer
+          </button>
+          <button
+            onClick={handleEquip}
+            disabled={isEquipping}
+            autoFocus
+            className="h-11 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:bg-white/5 disabled:text-muted-foreground"
+          >
+            {isEquipping ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : <Check className="w-4 h-4" aria-hidden />}
+            Équiper
+          </button>
         </div>
       </div>
     </div>

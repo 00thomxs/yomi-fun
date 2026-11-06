@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { X, CheckCircle2, Trophy, ShoppingBag, User, Sparkles } from "lucide-react"
+import { X, Trophy, ShoppingBag, User } from "lucide-react"
 import { CurrencySymbol } from "./currency-symbol"
 
 type PopupType = "purchase" | "bet-won" | "profile"
@@ -18,30 +18,9 @@ interface SuccessPopupProps {
 }
 
 const config = {
-  "purchase": {
-    icon: ShoppingBag,
-    title: "Achat Confirmé !",
-    subtitle: "Ta commande a bien été enregistrée",
-    color: "text-yes",
-    bgGlow: "bg-yes/20",
-    borderColor: "border-yes/30",
-  },
-  "bet-won": {
-    icon: Trophy,
-    title: "Tu as Gagné !",
-    subtitle: "Félicitations pour ta victoire",
-    color: "text-amber-400",
-    bgGlow: "bg-amber-500/20",
-    borderColor: "border-amber-500/30",
-  },
-  "profile": {
-    icon: User,
-    title: "Profil Mis à Jour !",
-    subtitle: "Tes modifications ont été sauvegardées",
-    color: "text-blue-400",
-    bgGlow: "bg-blue-500/20",
-    borderColor: "border-blue-500/30",
-  },
+  "purchase": { icon: ShoppingBag, title: "Achat confirmé", subtitle: "Ta commande a bien été enregistrée." },
+  "bet-won": { icon: Trophy, title: "Pari gagné", subtitle: "Félicitations pour ta prédiction." },
+  "profile": { icon: User, title: "Profil mis à jour", subtitle: "Tes modifications sont enregistrées." },
 }
 
 export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps) {
@@ -60,98 +39,54 @@ export function SuccessPopup({ type, isOpen, onClose, data }: SuccessPopupProps)
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      
-      {/* Confetti effect for bet-won */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="success-title">
+      <div className="absolute inset-0 modal-scrim animate-in fade-in duration-200" onClick={onClose} />
+
+      {/* Short confetti burst for wins only */}
       {showConfetti && type === "bet-won" && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(20)].map((_, i) => (
-            <div
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+          {[...Array(14)].map((_, i) => (
+            <span
               key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: `${1.5 + Math.random()}s`,
-              }}
-            >
-              <Sparkles 
-                className={`w-4 h-4 ${
-                  i % 3 === 0 ? 'text-amber-400' : i % 3 === 1 ? 'text-no' : 'text-yes'
-                }`} 
-              />
-            </div>
+              className={`absolute top-0 animate-confetti rounded-[1px] ${i % 3 === 0 ? "w-1.5 h-3 bg-yes" : i % 3 === 1 ? "w-1.5 h-1.5 bg-amber-400" : "w-1 h-3 bg-brand"}`}
+              style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i % 5) * 0.1}s`, animationDuration: `${1.8 + (i % 3) * 0.3}s` }}
+            />
           ))}
         </div>
       )}
 
-      {/* Modal */}
-      <div className={`relative bg-card border ${cfg.borderColor} rounded-lg p-8 max-w-sm w-full shadow-lg animate-in zoom-in-95 slide-in-from-bottom-4 duration-300`}>
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
+      <div className="modal-panel w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+        <button onClick={onClose} aria-label="Fermer" className="modal-close">
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Glow effect */}
+        <p className="inline-flex items-center gap-1.5 text-xs font-medium text-yes">
+          <Icon className="w-3.5 h-3.5" aria-hidden />
+          {cfg.title}
+        </p>
+        <h2 id="success-title" className="mt-2 pr-8 text-base font-semibold">{cfg.subtitle}</h2>
 
-        {/* Content */}
-        <div className="relative text-center space-y-4">
-          {/* Icon */}
-          <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${cfg.bgGlow} border ${cfg.borderColor} mb-2`}>
-            <Icon className={`w-10 h-10 ${cfg.color}`} />
+        {type === "purchase" && data?.itemName && (
+          <div className="mt-5 border-y border-border py-3 text-sm flex justify-between gap-4">
+            <span className="text-muted-foreground">Article</span>
+            <span className="font-medium text-right truncate">{data.itemName}</span>
           </div>
+        )}
 
-          {/* Title */}
-          <div>
-            <h2 className={`text-2xl font-semibold tracking-tight ${cfg.color}`}>
-              {cfg.title}
-            </h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              {cfg.subtitle}
-            </p>
-          </div>
+        {type === "bet-won" && data?.winnings && (
+          <p className="mt-5 font-display text-4xl font-bold text-yes tabular flex items-baseline gap-1">
+            +{data.winnings.toLocaleString()} <CurrencySymbol className="text-2xl" />
+          </p>
+        )}
 
-          {/* Dynamic content based on type */}
-          {type === "purchase" && data?.itemName && (
-            <div className="bg-white/5 rounded-lg p-4 border border-border">
-              <p className="text-sm text-muted-foreground">Article commandé</p>
-              <p className="font-semibold text-white">{data.itemName}</p>
-            </div>
-          )}
-
-          {type === "bet-won" && data?.winnings && (
-            <div className="bg-amber-500/10 rounded-lg p-4 border border-amber-500/20">
-              <p className="text-sm text-amber-400/70">Gains</p>
-              <p className="text-3xl font-semibold text-amber-400 font-mono flex items-center justify-center gap-1">
-                +{data.winnings.toLocaleString()}<CurrencySymbol className="w-6 h-6" />
-              </p>
-            </div>
-          )}
-
-          {/* CTA Button */}
-          <button
-            onClick={onClose}
-            className={`w-full py-3 px-6 rounded-xl font-semibold transition-all ${
-              type === "bet-won" 
-                ? "bg-amber-500 hover:bg-amber-400 text-black" 
-                : type === "purchase"
-                  ? "bg-yes hover:bg-yes text-black"
-                  : "bg-blue-500 hover:bg-blue-400 text-white"
-            }`}
-          >
-            {type === "bet-won" ? "Continuer à Gagner" : "Parfait !"}
-          </button>
-        </div>
+        <button
+          onClick={onClose}
+          autoFocus
+          className="mt-6 w-full h-11 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Continuer
+        </button>
       </div>
     </div>
   )
 }
-
