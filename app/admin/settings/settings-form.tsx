@@ -391,7 +391,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">#2 - 2ème Place</label>
+              <label className="text-xs font-semibold text-muted-foreground">#2 - 2ème Place</label>
               <input
                 type="text"
                 name="top2_prize"

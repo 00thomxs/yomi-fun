@@ -351,3 +351,59 @@ html {
     background: var(--surface-hover);
   }
 }
+
+/*
+  Admin: one field and one table style for every page.
+  Deliberately unlayered so it overrides the per-page utility classes those pages were built with.
+  Inputs that carry a left icon (pl-*) keep their own padding.
+*/
+.admin-ui :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), select, textarea) {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--foreground);
+  font-size: 14px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.admin-ui :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), select) {
+  min-height: 40px;
+}
+.admin-ui :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]):not([class*="pl-"]), select, textarea) {
+  padding-inline: 12px;
+}
+.admin-ui textarea {
+  padding-block: 10px;
+}
+.admin-ui :is(input, select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px oklch(0.58 0.22 25 / 0.2);
+}
+.admin-ui :is(input, textarea)::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.7;
+}
+.admin-ui table {
+  font-variant-numeric: tabular-nums;
+}
+.admin-ui thead,
+.admin-ui thead tr {
+  background: transparent;
+}
+.admin-ui th {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  text-transform: none;
+  letter-spacing: 0;
+  border-bottom: 1px solid var(--border);
+}
+.admin-ui tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+.admin-ui tbody tr:last-child {
+  border-bottom: 0;
+}
+.admin-ui tbody tr:hover {
+  background: var(--surface-hover);
+}

@@ -87,7 +87,7 @@ export default function AdminCardsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Cartes Profil</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Cartes Profil</h1>
         <p className="text-muted-foreground">Gestion des cartes profil TCG</p>
       </div>
 

@@ -44,7 +44,7 @@ export default function AwardExistingBadgesPage() {
       <div className="flex items-center gap-3">
         <Trophy className="w-8 h-8 text-amber-400" />
         <div>
-          <h1 className="text-2xl font-semibold">Attribution des Badges</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Attribution des Badges</h1>
           <p className="text-sm text-muted-foreground">
             Attribuer les badges mérités aux joueurs existants
           </p>

@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
             Vue d'ensemble de la plateforme YOMI.fun
           </p>
@@ -71,10 +71,10 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stats.map((stat, i) => (
           <div key={i} className="p-4 rounded-lg bg-card border border-border">
-            <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
+            <p className="text-xs text-muted-foreground font-medium">
               {stat.label}
             </p>
-            <p className="text-xl font-semibold mt-1 flex items-center gap-1">
+            <p className="font-display text-xl font-bold mt-1 flex items-center gap-1 tabular">
               {stat.value}{stat.suffix}
             </p>
             {stat.sub && (
@@ -113,7 +113,7 @@ export default async function AdminDashboard() {
               {/* Main Stats - 4 columns compact */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Supply Joueurs</p>
+                  <p className="text-xs text-muted-foreground font-medium">Supply Joueurs</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1">
                   {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
@@ -123,7 +123,7 @@ export default async function AdminDashboard() {
               </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Total Burned</p>
+                  <p className="text-xs text-muted-foreground font-medium">Total Burned</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-amber-400">
                   {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
@@ -133,7 +133,7 @@ export default async function AdminDashboard() {
               </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Inflation (7j)</p>
+                  <p className="text-xs text-muted-foreground font-medium">Inflation (7j)</p>
                   <p className={`text-lg font-black mt-1 font-mono flex items-center gap-1.5 ${
                     metrics.weekly_inflation_rate_pct === null ? '' :
                     metrics.weekly_inflation_rate_pct > 10 ? 'text-red-400' :
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
                 </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">Réserve Admin</p>
+                  <p className="text-xs text-muted-foreground font-medium">Réserve Admin</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-muted-foreground">
                     {metrics.admin_balance.toLocaleString('fr-FR')} <CurrencySymbol />
                   </p>

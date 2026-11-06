@@ -287,7 +287,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                       Actif
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground font-semibold uppercase">
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground font-semibold">
                       <EyeOff className="w-3 h-3" />
                       Masqué
                     </span>
@@ -357,7 +357,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {/* Name */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <label className="text-xs font-medium text-muted-foreground">
                   Nom
                 </label>
                 <input
@@ -378,7 +378,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               
               {/* Slug */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <label className="text-xs font-medium text-muted-foreground">
                   Slug (URL)
                 </label>
                 <input
@@ -393,7 +393,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <label className="text-xs font-medium text-muted-foreground">
                   Description (optionnel)
                 </label>
                 <textarea
@@ -408,7 +408,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Type & Rarity */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <label className="text-xs font-medium text-muted-foreground">
                     Type
                   </label>
                   <select
@@ -422,7 +422,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <label className="text-xs font-medium text-muted-foreground">
                     Rareté
                   </label>
                   <select
@@ -440,7 +440,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Price & Sort Order */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <label className="text-xs font-medium text-muted-foreground">
                     Prix (Zeny)
                   </label>
                   <input
@@ -453,7 +453,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <label className="text-xs font-medium text-muted-foreground">
                     Ordre d'affichage
                   </label>
                   <input
@@ -468,7 +468,7 @@ export function CosmeticsManager({ initialItems }: CosmeticsManagerProps) {
               {/* Preview Data */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <label className="text-xs font-medium text-muted-foreground">
                     Données de preview (JSON)
                   </label>
                   <div className="flex gap-1">

@@ -36,7 +36,7 @@ export function MonetaryChart({ points }: { points: MonetarySnapshotPoint[] }) {
     <div className="p-5 rounded-lg bg-white/5 border border-border">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Tendance (30j)</p>
+          <p className="text-xs text-muted-foreground font-medium">Tendance (30j)</p>
           <p className="text-sm text-muted-foreground">
             <span className="text-white/80 font-semibold">Supply</span> vs{" "}
             <span className="text-amber-400 font-semibold">Burn</span>

@@ -42,7 +42,7 @@ export default async function ResolvePage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="container max-w-4xl mx-auto py-10">
-      <h1 className="text-3xl font-semibold mb-6">Résolution du Marché</h1>
+      <h1 className="font-display text-2xl font-bold tracking-tight mb-6">Résolution du Marché</h1>
       
       <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-8">
         <h2 className="text-xl font-semibold mb-2">{market.question}</h2>

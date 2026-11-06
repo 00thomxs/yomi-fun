@@ -81,7 +81,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
         
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3">
+            <h1 className="font-display text-2xl font-bold tracking-tight flex items-center gap-3">
               <Trophy className="w-8 h-8 text-amber-400" />
               {season.name}
             </h1>
@@ -104,31 +104,31 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-lg bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <Users className="w-4 h-4" /> Participants
           </div>
-          <p className="text-2xl font-semibold mt-1">{leaderboard?.length || 0}</p>
+          <p className="font-display text-2xl font-bold tabular mt-1">{leaderboard?.length || 0}</p>
         </div>
         <div className="p-4 rounded-lg bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <Target className="w-4 h-4" /> Events
           </div>
-          <p className="text-2xl font-semibold mt-1">{events?.length || 0}</p>
+          <p className="font-display text-2xl font-bold tabular mt-1">{events?.length || 0}</p>
         </div>
         <div className="p-4 rounded-lg bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <TrendingUp className="w-4 h-4" /> Volume Total
           </div>
-          <p className="text-2xl font-semibold mt-1 flex items-center gap-1">
+          <p className="font-display text-2xl font-bold tabular mt-1 flex items-center gap-1">
             {totalVolume.toLocaleString()}
             <CurrencySymbol className="w-5 h-5" />
           </p>
         </div>
         <div className="p-4 rounded-lg bg-card border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <Award className="w-4 h-4" /> Paris Totaux
           </div>
-          <p className="text-2xl font-semibold mt-1">{bets.length}</p>
+          <p className="font-display text-2xl font-bold tabular mt-1">{bets.length}</p>
         </div>
       </div>
 

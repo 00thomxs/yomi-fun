@@ -90,7 +90,7 @@ export default async function AdminSeasonsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-3">
+          <h1 className="font-display text-2xl font-bold tracking-tight flex items-center gap-3">
             <Trophy className="w-8 h-8 text-amber-400" />
             Gestion des Saisons
           </h1>
@@ -150,16 +150,16 @@ export default async function AdminSeasonsPage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <Users className="w-4 h-4" /> Participants
               </div>
-              <p className="text-2xl font-semibold mt-1">{seasonLeaderboard.length}</p>
+              <p className="font-display text-2xl font-bold tabular mt-1">{seasonLeaderboard.length}</p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <Target className="w-4 h-4" /> Events
               </div>
-              <p className="text-2xl font-semibold mt-1">
+              <p className="font-display text-2xl font-bold tabular mt-1">
                 {seasonEvents.length}
                 <span className="text-sm font-normal text-muted-foreground ml-1">
                   ({seasonEvents.filter(e => e.status === 'resolved').length} terminés)
@@ -167,19 +167,19 @@ export default async function AdminSeasonsPage() {
               </p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <BarChart3 className="w-4 h-4" /> Volume Total
               </div>
-              <p className="text-2xl font-semibold mt-1 flex items-center gap-1">
+              <p className="font-display text-2xl font-bold tabular mt-1 flex items-center gap-1">
                 {seasonEvents.reduce((sum, e) => sum + (e.volume || 0), 0).toLocaleString()}
                 <CurrencySymbol className="w-5 h-5" />
               </p>
             </div>
             <div className="p-4 rounded-lg bg-card border border-border">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <TrendingUp className="w-4 h-4" /> Paris Totaux
               </div>
-              <p className="text-2xl font-semibold mt-1">{seasonBets.length}</p>
+              <p className="font-display text-2xl font-bold tabular mt-1">{seasonBets.length}</p>
             </div>
           </div>
 

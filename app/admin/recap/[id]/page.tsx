@@ -27,7 +27,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           <Link href="/admin/settings" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">Récapitulatif Saison</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Récapitulatif Saison</h1>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all cursor-pointer">
           <Share2 className="w-4 h-4" />
@@ -60,7 +60,6 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             {/* 2nd Place */}
             <div className="flex flex-col items-center pt-6">
               <div className="relative mb-2">
-                <div className="absolute -inset-1 bg-gray-400/20 rounded-full blur-md" />
                 <img 
                   src={top2?.avatar || "/images/default-avatar.svg"} 
                   alt={top2?.username} 
@@ -104,7 +103,6 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
             {/* 3rd Place */}
             <div className="flex flex-col items-center pt-8">
               <div className="relative mb-2">
-                <div className="absolute -inset-1 bg-orange-600/20 rounded-full blur-md" />
                 <img 
                   src={top3?.avatar || "/images/default-avatar.svg"} 
                   alt={top3?.username} 
@@ -127,7 +125,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           {/* Positions 4-10 */}
           {others.length > 0 && (
             <div className="border-t border-border pt-6 mt-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide text-center mb-4">
+              <p className="text-xs text-muted-foreground text-center mb-4">
                 Autres Gagnants
               </p>
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
@@ -147,7 +145,7 @@ export default async function SeasonRecapPage({ params }: { params: Promise<{ id
           {/* Footer */}
           <div className="flex justify-between items-end mt-8 pt-4 border-t border-border">
             <div className="opacity-50">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Saison terminée le</p>
+              <p className="text-xs text-muted-foreground">Saison terminée le</p>
               <p className="text-sm font-mono text-white">{new Date(season.end_date).toLocaleDateString('fr-FR')}</p>
             </div>
             <YomiLogo className="opacity-70" />

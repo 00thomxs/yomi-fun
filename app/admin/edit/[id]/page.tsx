@@ -342,7 +342,7 @@ export default function EditMarketPage({ params }: PageProps) {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Modifier l'Event</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Modifier l'Event</h1>
           <p className="text-muted-foreground mt-1">
             ID: {market.id.slice(0, 8)}...
           </p>
@@ -383,7 +383,7 @@ export default function EditMarketPage({ params }: PageProps) {
           </h2>
           
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <label className="text-xs font-medium text-muted-foreground">
               Question
             </label>
             <input 
@@ -397,7 +397,7 @@ export default function EditMarketPage({ params }: PageProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <label className="text-xs font-medium text-muted-foreground">
               Description (Optionnel)
             </label>
             <textarea 
@@ -410,7 +410,7 @@ export default function EditMarketPage({ params }: PageProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <label className="text-xs font-medium text-muted-foreground">
                 Catégorie
               </label>
               <select 
@@ -426,7 +426,7 @@ export default function EditMarketPage({ params }: PageProps) {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <label className="text-xs font-medium text-muted-foreground">
                 Image URL
               </label>
               <input 
@@ -533,19 +533,19 @@ export default function EditMarketPage({ params }: PageProps) {
           
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Type</p>
+              <p className="text-xs text-muted-foreground mb-1">Type</p>
               <p className="font-semibold">{market.type === 'binary' ? 'Binaire (Oui/Non)' : 'Choix Multiple'}</p>
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Status</p>
+              <p className="text-xs text-muted-foreground mb-1">Status</p>
               <p className="font-semibold capitalize">{market.status}</p>
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Volume</p>
+              <p className="text-xs text-muted-foreground mb-1">Volume</p>
               <p className="font-semibold font-mono">{market.volume?.toLocaleString() || 0}</p>
             </div>
             <div className="p-4 rounded-lg bg-white/5 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              <p className="text-xs text-muted-foreground mb-1">
                 {market.type === 'binary' ? 'Liquidité Pools' : 'Flux OUI/NON (direction)'}
               </p>
               <p className="font-semibold font-mono text-sm">
@@ -573,13 +573,13 @@ export default function EditMarketPage({ params }: PageProps) {
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1">
                   <Users className="w-3 h-3" /> Parieurs Uniques
                 </div>
                 <p className="text-xl font-semibold">{extendedStats.uniqueBettors}</p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1">
                   <Target className="w-3 h-3" /> Mise Moyenne
                 </div>
                 <p className="text-xl font-semibold flex items-center gap-0.5">
@@ -587,7 +587,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1">
                   <TrendingUp className="w-3 h-3" /> Mise Médiane
                 </div>
                 <p className="text-xl font-semibold flex items-center gap-0.5">
@@ -595,7 +595,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-border">
-                <div className="flex items-center gap-1.5 text-muted-foreground text-[11px] uppercase tracking-wide mb-1">
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1">
                   <Trophy className="w-3 h-3 text-amber-400" /> Top 3 = Volume
                 </div>
                 <p className={`text-xl font-semibold ${extendedStats.whaleConcentration > 50 ? 'text-amber-400' : ''}`}>
@@ -609,7 +609,7 @@ export default function EditMarketPage({ params }: PageProps) {
               {/* Distribution by Outcome */}
               {extendedStats.outcomeDistribution.length > 0 && (
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <h4 className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Volume par Choix</h4>
+                  <h4 className="text-xs text-muted-foreground mb-3">Volume par Choix</h4>
                   <div className="h-56">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
@@ -649,7 +649,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 {/* YES/NO Bar for Binary */}
                 {market?.type === 'binary' && (extendedStats.yesVolume > 0 || extendedStats.noVolume > 0) && (
                   <div className="p-4 rounded-lg bg-white/5 border border-border">
-                    <h4 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">OUI vs NON</h4>
+                    <h4 className="text-xs text-muted-foreground mb-2">OUI vs NON</h4>
                     <div className="flex h-6 rounded-lg overflow-hidden">
                       <div 
                         className="bg-yes flex items-center justify-center text-[11px] font-semibold text-white"
@@ -674,7 +674,7 @@ export default function EditMarketPage({ params }: PageProps) {
                 {/* Peak Hour */}
                 {extendedStats.peakHour && (
                   <div className="p-4 rounded-lg bg-white/5 border border-border">
-                    <h4 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Heure de Pointe</h4>
+                    <h4 className="text-xs text-muted-foreground mb-2">Heure de Pointe</h4>
                     <p className="text-lg font-semibold">
                       {extendedStats.peakHour.hour}h00 - {(extendedStats.peakHour.hour + 1) % 24}h00
                     </p>

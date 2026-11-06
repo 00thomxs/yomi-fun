@@ -176,23 +176,23 @@ export function AdminEmailsClient({
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total Users</span>
+            <span className="text-xs text-muted-foreground">Total Users</span>
           </div>
-          <p className="text-2xl font-semibold">{initialStats.totalUsers}</p>
+          <p className="font-display text-2xl font-bold tabular">{initialStats.totalUsers}</p>
         </div>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Mail className="w-4 h-4 text-yes" />
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Avec Email</span>
+            <span className="text-xs text-muted-foreground">Avec Email</span>
           </div>
-          <p className="text-2xl font-semibold text-yes">{initialStats.usersWithEmail}</p>
+          <p className="font-display text-2xl font-bold tabular text-yes">{initialStats.usersWithEmail}</p>
         </div>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Megaphone className="w-4 h-4 text-amber-400" />
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Portée</span>
+            <span className="text-xs text-muted-foreground">Portée</span>
           </div>
-          <p className="text-2xl font-semibold">
+          <p className="font-display text-2xl font-bold tabular">
             {initialStats.totalUsers > 0 
               ? Math.round((initialStats.usersWithEmail / initialStats.totalUsers) * 100) 
               : 0}%
@@ -201,7 +201,7 @@ export function AdminEmailsClient({
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-red-400" />
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Expéditeur</span>
+            <span className="text-xs text-muted-foreground">Expéditeur</span>
           </div>
           <p className="text-sm font-medium text-foreground/80 truncate">noreply@y0mi.fun</p>
         </div>

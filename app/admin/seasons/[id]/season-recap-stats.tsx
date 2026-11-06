@@ -248,7 +248,7 @@ export function SeasonRecapStats({
       {/* Position Evolution Chart */}
       {positionChartData.length > 0 ? (
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-3">Évolution des Positions (Top 10)</h4>
+          <h4 className="text-xs text-muted-foreground mb-3">Évolution des Positions (Top 10)</h4>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={positionChartData}>
@@ -290,7 +290,7 @@ export function SeasonRecapStats({
       {/* Podium Duration */}
       {podiumDuration.length > 0 && (
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Clock className="w-3 h-3" /> Durée sur le Podium
           </h4>
           <div className="space-y-1.5">
@@ -311,7 +311,7 @@ export function SeasonRecapStats({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {/* Top WR */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Target className="w-3 h-3 text-blue-400" /> Win Rate
           </h4>
           <div className="space-y-1.5">
@@ -330,7 +330,7 @@ export function SeasonRecapStats({
 
         {/* Top ROI */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Percent className="w-3 h-3 text-yes" /> Meilleur ROI
           </h4>
           <div className="space-y-1.5">
@@ -349,7 +349,7 @@ export function SeasonRecapStats({
 
         {/* Worst ROI */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <TrendingDown className="w-3 h-3 text-no" /> Pire ROI
           </h4>
           <div className="space-y-1.5">
@@ -368,7 +368,7 @@ export function SeasonRecapStats({
 
         {/* Top Gainers */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <TrendingUp className="w-3 h-3 text-yes" /> Meilleurs Gains
           </h4>
           <div className="space-y-1.5">
@@ -388,7 +388,7 @@ export function SeasonRecapStats({
 
         {/* Top Losers */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <TrendingDown className="w-3 h-3 text-no" /> Pires Pertes
           </h4>
           <div className="space-y-1.5">
@@ -409,7 +409,7 @@ export function SeasonRecapStats({
 
         {/* Top Whales */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Zap className="w-3 h-3 text-purple-400" /> Plus Gros Volumes
           </h4>
           <div className="space-y-1.5">
@@ -429,7 +429,7 @@ export function SeasonRecapStats({
 
         {/* Most Active */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <BarChart3 className="w-3 h-3 text-orange-400" /> Plus Actifs
           </h4>
           <div className="space-y-1.5">
@@ -447,7 +447,7 @@ export function SeasonRecapStats({
 
         {/* Top Wins */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Medal className="w-3 h-3 text-amber-400" /> Plus de Victoires
           </h4>
           <div className="space-y-1.5">
@@ -467,7 +467,7 @@ export function SeasonRecapStats({
       {/* Biggest Single Wins */}
       {stats.biggestWins.length > 0 && (
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
             <Trophy className="w-3 h-3 text-amber-400" /> Plus Gros Gains (Pari Unique)
           </h4>
           <div className="space-y-1.5">
@@ -490,7 +490,7 @@ export function SeasonRecapStats({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Événements les Plus Populaires */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">Événements les Plus Populaires</h4>
+          <h4 className="text-xs text-muted-foreground mb-2">Événements les Plus Populaires</h4>
           <div className="space-y-1.5">
             {stats.popularEvents.map((event, i) => (
               <div key={event.id} className="flex items-center justify-between text-xs py-1 border-b border-border last:border-0">
@@ -506,7 +506,7 @@ export function SeasonRecapStats({
 
         {/* Plus Gros Volume Events */}
         <div className="p-3 rounded-lg bg-black/20 border border-border">
-          <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">Plus Gros Volume</h4>
+          <h4 className="text-xs text-muted-foreground mb-2">Plus Gros Volume</h4>
           <div className="space-y-1.5">
             {stats.highVolumeEvents.map((event, i) => (
               <div key={event.id} className="flex items-center justify-between text-xs py-1 border-b border-border last:border-0">
@@ -525,7 +525,7 @@ export function SeasonRecapStats({
 
       {/* Distribution des PnL */}
       <div className="p-3 rounded-lg bg-black/20 border border-border">
-        <h4 className="text-[11px] uppercase tracking-wide text-muted-foreground mb-3">Distribution des PnL</h4>
+        <h4 className="text-xs text-muted-foreground mb-3">Distribution des PnL</h4>
         <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={pnlDistribution}>
@@ -544,13 +544,13 @@ export function SeasonRecapStats({
       {/* Full Leaderboard */}
       <div className="rounded-lg bg-black/20 border border-border overflow-hidden">
         <div className="px-3 py-2 bg-white/5 border-b border-border">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-xs font-medium text-muted-foreground">
             Classement Final
           </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-white/5 text-muted-foreground uppercase tracking-wide">
+            <thead className="bg-white/5 text-muted-foreground">
               <tr>
                 <th className="px-3 py-2 text-left w-12">#</th>
                 <th className="px-3 py-2 text-left">Joueur</th>
