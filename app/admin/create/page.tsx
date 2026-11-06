@@ -126,7 +126,7 @@ export default function CreateMarketPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">Nouvel Event</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Nouvel event</h1>
         <p className="text-muted-foreground mt-1">
           Configuration de l'événement
         </p>
@@ -138,7 +138,7 @@ export default function CreateMarketPage() {
         <div className="space-y-4 p-6 rounded-lg bg-card border border-border">
           <h2 className="font-semibold flex items-center gap-2">
             <PieChart className="w-4 h-4 text-brand" />
-            Type d'Event
+            Type d'event
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <button

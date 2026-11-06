@@ -91,7 +91,7 @@ export default function AwardExistingBadgesPage() {
         <button
           onClick={handleAwardAdmins}
           disabled={isProcessing || processingAdmin}
-          className="w-full py-3 px-4 rounded-lg bg-amber-500 hover:bg-amber-600 text-black font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 px-4 rounded-md border border-border hover:bg-surface-hover text-foreground font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {processingAdmin ? (
             <>

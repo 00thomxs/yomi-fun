@@ -364,7 +364,7 @@ function UserSearchTable({
               <Search className="w-4 h-4 text-brand" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm">Recherche Utilisateurs</h3>
+              <h3 className="font-semibold text-sm">Recherche</h3>
               <p className="text-xs text-muted-foreground">{total} joueur{total !== 1 ? 's' : ''} au total</p>
             </div>
           </div>

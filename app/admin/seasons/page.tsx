@@ -92,7 +92,7 @@ export default async function AdminSeasonsPage() {
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight flex items-center gap-3">
             <Trophy className="w-8 h-8 text-amber-400" />
-            Gestion des Saisons
+            Gestion des saisons
           </h1>
           <p className="text-muted-foreground mt-1">
             Stats, classements et historique des saisons
@@ -102,7 +102,7 @@ export default async function AdminSeasonsPage() {
           href="/admin/settings"
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all"
         >
-          Paramètres Saison
+          Paramètres saison
         </Link>
       </div>
 
@@ -213,7 +213,7 @@ export default async function AdminSeasonsPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Award className="w-5 h-5 text-muted-foreground" />
-            Saisons Passées
+            Saisons passées
           </h2>
           <div className="grid gap-4">
             {pastSeasons.map(season => (

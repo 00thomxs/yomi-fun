@@ -87,7 +87,7 @@ export default function AdminCardsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">Cartes Profil</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Cartes profil</h1>
         <p className="text-muted-foreground">Gestion des cartes profil TCG</p>
       </div>
 
@@ -162,7 +162,7 @@ export default function AdminCardsPage() {
         <button
           onClick={handleAwardBetaCards}
           disabled={loadingBeta}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border hover:bg-surface-hover text-foreground font-semibold transition-colors disabled:opacity-50"
         >
           {loadingBeta ? (
             <>
@@ -210,7 +210,7 @@ export default function AdminCardsPage() {
         <button
           onClick={handleAwardSeasonCards}
           disabled={loadingSeasonCards}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border hover:bg-surface-hover text-foreground font-semibold transition-colors disabled:opacity-50"
         >
           {loadingSeasonCards ? (
             <>

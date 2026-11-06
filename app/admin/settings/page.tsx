@@ -13,7 +13,7 @@ export default async function AdminSettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">Paramètres de la Saison</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Paramètres de la saison</h1>
         <p className="text-muted-foreground mt-1">
           Configurez les récompenses, la durée de la saison et les actions système.
         </p>
@@ -22,7 +22,7 @@ export default async function AdminSettingsPage() {
       <div className="grid gap-8">
         {/* Season Configuration Form */}
         <div className="bg-card border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-6">Configuration Actuelle</h2>
+          <h2 className="text-xl font-semibold mb-6">Configuration actuelle</h2>
           {settings ? (
             <SettingsForm settings={settings} />
           ) : (

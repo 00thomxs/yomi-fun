@@ -261,7 +261,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         <div className="flex items-center gap-3">
           <XCircle className="w-6 h-6 text-muted-foreground" />
           <div>
-            <p className="font-semibold">⏸️ Aucune Saison Active</p>
+            <p className="font-semibold">Aucune saison active</p>
             <p className="text-xs text-muted-foreground">
               {settings.rewards_distributed 
                 ? 'Dernière saison terminée, récompenses distribuées'
@@ -279,7 +279,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Season Title */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-brand" /> Titre de la Saison
+            <Trophy className="w-5 h-5 text-brand" /> Titre de la saison
           </h3>
           <div className="space-y-2">
             <input
@@ -301,7 +301,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Date & Time Selection */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-brand" /> Date de Fin de Saison
+            <Calendar className="w-5 h-5 text-brand" /> Date de fin de saison
           </h3>
             <div className="space-y-2">
             <div className="relative">
@@ -354,7 +354,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Cash Prize */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Coins className="w-5 h-5 text-amber-400" /> Cash Prize (1ère Place)
+            <Coins className="w-5 h-5 text-amber-400" /> Cash prize (1re place)
           </h3>
           <div className="space-y-2">
             <input
@@ -376,7 +376,7 @@ export function SettingsForm({ settings }: { settings: SeasonSettings }) {
         {/* Physical Prizes */}
         <div>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-500" /> Prix Physiques (Top 3)
+            <Trophy className="w-5 h-5 text-yellow-500" /> Prix physiques (Top 3)
           </h3>
           <p className="text-xs text-muted-foreground mb-4">Ces prix sont à distribuer manuellement par l'admin.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

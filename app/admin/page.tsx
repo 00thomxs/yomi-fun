@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all flex items-center gap-2"
         >
           <PlayCircle className="w-4 h-4" />
-          Créer un Event
+          Créer un event
         </Link>
       </div>
 
@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-semibold flex items-center gap-2">
               <Coins className="w-5 h-5 text-brand" />
-              Masse Monétaire (Zeny)
+              Masse monétaire (Zeny)
             </h2>
             {metrics && (
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
@@ -113,7 +113,7 @@ export default async function AdminDashboard() {
               {/* Main Stats - 4 columns compact */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-xs text-muted-foreground font-medium">Supply Joueurs</p>
+                  <p className="text-xs text-muted-foreground font-medium">Supply joueurs</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1">
                   {metrics.total_supply.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
@@ -123,7 +123,7 @@ export default async function AdminDashboard() {
               </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-xs text-muted-foreground font-medium">Total Burned</p>
+                  <p className="text-xs text-muted-foreground font-medium">Total burned</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-amber-400">
                   {metrics.total_burned.toLocaleString('fr-FR')} <CurrencySymbol />
                 </p>
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
                 </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-border">
-                  <p className="text-xs text-muted-foreground font-medium">Réserve Admin</p>
+                  <p className="text-xs text-muted-foreground font-medium">Réserve admin</p>
                   <p className="text-lg font-semibold mt-1 font-mono flex items-center gap-1 text-muted-foreground">
                     {metrics.admin_balance.toLocaleString('fr-FR')} <CurrencySymbol />
                   </p>
@@ -170,7 +170,7 @@ export default async function AdminDashboard() {
                   <Flame className="w-4 h-4 text-amber-400" />
                   <div className="flex-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Burn Rate</span>
+                      <span className="text-muted-foreground">Burn rate</span>
                       <span className="font-mono font-medium">
                         {((metrics.total_burned / (metrics.total_supply + metrics.total_burned)) * 100).toFixed(2)}%
                       </span>
@@ -212,30 +212,28 @@ export default async function AdminDashboard() {
 
       {/* Pending Resolution Alert */}
       {pendingResolutionMarkets.length > 0 && (
-        <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 overflow-hidden">
-          <div className="p-4 border-b border-amber-500/20 flex items-center justify-between">
+        <div className="rounded-lg bg-card border border-amber-500/40 overflow-hidden">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-500">
-                <Gavel className="w-5 h-5" />
-              </div>
+              <Gavel className="w-4 h-4 text-amber-400" aria-hidden />
               <div>
-                <h2 className="font-semibold text-amber-500">Action Requise</h2>
-                <p className="text-xs text-amber-500/80">{pendingResolutionMarkets.length} event(s) en attente de résolution</p>
+                <h2 className="text-base font-semibold">Action requise</h2>
+                <p className="text-xs text-muted-foreground">{pendingResolutionMarkets.length} event(s) en attente de résolution</p>
               </div>
             </div>
           </div>
-          <div className="divide-y divide-amber-500/10">
+          <div className="divide-y divide-border">
             {pendingResolutionMarkets.map((market) => (
-              <div key={market.id} className="p-4 flex items-center justify-between hover:bg-amber-500/5 transition-colors">
+              <div key={market.id} className="px-4 py-3 flex items-center justify-between hover:bg-surface-hover transition-colors">
                 <div className="flex items-center gap-4">
-                  <span className="text-xs font-mono text-amber-500/60">
+                  <span className="text-xs font-mono text-muted-foreground">
                     {new Date(market.closes_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}
                   </span>
                   <span className="font-medium text-sm">{market.question}</span>
                 </div>
                 <Link
                   href={`/admin/resolve/${market.id}`}
-                  className="px-4 py-2 bg-amber-500 text-black rounded-lg font-semibold text-xs uppercase tracking-wide hover:bg-amber-400 transition-all shadow-lg"
+                  className="h-9 px-4 inline-flex items-center rounded-md bg-amber-500 text-black text-sm font-semibold hover:bg-amber-400 transition-colors"
                 >
                   Résoudre
                 </Link>
