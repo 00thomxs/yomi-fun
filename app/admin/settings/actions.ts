@@ -269,7 +269,7 @@ export async function endSeason() {
     return { error: "Aucune saison active à terminer" }
   }
 
-  if (settings.rewards_distributed) {
+  if (settings.rewards_distributed || !(await claimSeasonRewards())) {
     return { error: "Les récompenses ont déjà été distribuées" }
   }
 
@@ -348,13 +348,8 @@ export async function endSeason() {
     }
 
     if (reward > 0) {
-      const newBalance = player.balance + reward
-
-      // Update player balance
       const { error: updateError } = await supabaseAdmin
-        .from('profiles')
-        .update({ balance: newBalance })
-        .eq('id', player.id)
+        .rpc('increment_balance', { p_user_id: player.id, p_amount: reward })
 
       if (!updateError) {
         distributionResults.push({
@@ -428,6 +423,12 @@ export async function endSeason() {
 export async function checkAndDistributeRewards(): Promise<{ distributed: boolean; message?: string }> {
   const supabase = await createClient()
 
+  // This is a public endpoint: only an admin may trigger the payout.
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { distributed: false }
+  const { data: caller } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (caller?.role !== 'admin') return { distributed: false }
+
   const { data: settings, error } = await supabase
     .from('season_settings')
     .select('*')
@@ -459,6 +460,7 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
     if (now.getTime() >= seasonEnd.getTime()) {
       console.log('[AutoEnd] Season has ended! Distributing rewards...')
       // Season has ended naturally, distribute rewards
+      if (!(await claimSeasonRewards())) return { distributed: false }
       const result = await endSeasonInternal(settings)
       return { distributed: true, message: result.message }
     }
@@ -468,6 +470,18 @@ export async function checkAndDistributeRewards(): Promise<{ distributed: boolea
 }
 
 // Internal function for auto-distribution (bypasses admin check)
+// Flip rewards_distributed false -> true in one statement: only one caller can win, so rewards are paid once.
+async function claimSeasonRewards(): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from('season_settings')
+    .update({ rewards_distributed: true })
+    .eq('id', '00000000-0000-0000-0000-000000000001')
+    .eq('is_active', true)
+    .eq('rewards_distributed', false)
+    .select('id')
+  return !!data && data.length > 0
+}
+
 async function endSeasonInternal(settings: any) {
   // Get active season ID from seasons table
   const { data: activeSeason } = await supabaseAdmin
@@ -541,12 +555,8 @@ async function endSeasonInternal(settings: any) {
     }
 
     if (reward > 0) {
-      const newBalance = player.balance + reward
-
       await supabaseAdmin
-        .from('profiles')
-        .update({ balance: newBalance })
-        .eq('id', player.id)
+        .rpc('increment_balance', { p_user_id: player.id, p_amount: reward })
 
       // Log transaction (using 'bonus' type as 'season_reward' is not in CHECK constraint)
       await supabaseAdmin.from('transactions').insert({

@@ -87,6 +87,14 @@ supabase/migrations/add_storage_bucket.sql
 
 ---
 
+## Stripe : anti double crédit
+```
+supabase/migrations/add_stripe_session_id_to_transactions.sql
+```
+> À exécuter AVANT de déployer le webhook qui écrit `stripe_session_id`.
+
+---
+
 ## ÉTAPE FINALE : Verrouillage sécurité (toujours en dernier)
 ```
 supabase/migrations/lock_down_profiles_and_rpcs.sql
