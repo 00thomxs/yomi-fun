@@ -96,6 +96,17 @@ export async function resolveMarket(
       isWinner = bet.outcome_id === winningOutcomeId
     }
 
+    // Claim the bet before paying it: a double-click or a second resolve can never pay it twice.
+    // Status stays 'pending' here because update_winner_stats/update_loser_stats count settled bets.
+    const { data: claimed } = await supabaseAdmin
+      .from('bets')
+      .update({ resolved_at: new Date().toISOString() })
+      .eq('id', bet.id)
+      .eq('status', 'pending')
+      .is('resolved_at', null)
+      .select('id')
+    if (!claimed || claimed.length === 0) continue
+
     // Get current PnL from HISTORY (most robust way)
     const { data: lastHistory } = await supabaseAdmin
       .from('user_pnl_history')
@@ -347,6 +358,17 @@ export async function resolveMarketMulti(
       // Bet FOR (default YES): Win if outcome IS winner
       isBetWinner = isOutcomeWinner
     }
+
+    // Claim the bet before paying it: a double-click or a second resolve can never pay it twice.
+    // Status stays 'pending' here because update_winner_stats/update_loser_stats count settled bets.
+    const { data: claimed } = await supabaseAdmin
+      .from('bets')
+      .update({ resolved_at: new Date().toISOString() })
+      .eq('id', bet.id)
+      .eq('status', 'pending')
+      .is('resolved_at', null)
+      .select('id')
+    if (!claimed || claimed.length === 0) continue
 
     // Get current PnL from HISTORY
     const { data: lastHistory } = await supabaseAdmin

@@ -43,14 +43,15 @@ export async function placeBet(
 
   const { data: market, error: marketError } = await supabase
     .from('markets')
-    .select('pool_yes, pool_no, volume, status, is_live, type, initial_liquidity')
+    .select('pool_yes, pool_no, volume, status, is_live, type, initial_liquidity, closes_at')
     .eq('id', marketId)
     .single()
 
   if (marketError || !market) return { error: "Marché introuvable." }
   
   // 2.1 Check if market is still open
-  if (market.status !== 'open' || !market.is_live) {
+  // closes_at is checked here too: the cron that flips status may run late.
+  if (market.status !== 'open' || !market.is_live || (market.closes_at && new Date(market.closes_at) <= new Date())) {
     return { error: "Ce marché est fermé aux paris." }
   }
 
@@ -175,7 +176,7 @@ export async function placeBet(
   
   // Note: PnL (total_won) is NOT updated here anymore. It's updated at resolution.
 
-  const { error: debitError } = await supabaseAdmin
+  const { data: debited, error: debitError } = await supabaseAdmin
     .from('profiles')
     .update({ 
       balance: profile.balance - amount, 
@@ -184,8 +185,11 @@ export async function placeBet(
       level: newLevel
     })
     .eq('id', user.id)
+    .eq('balance', profile.balance) // fails if another bet/credit changed the balance since we read it
+    .select('id')
 
   if (debitError) return { error: "Erreur lors du débit." }
+  if (!debited || debited.length === 0) return { error: "Ton solde vient de changer, réessaie." }
 
   // B. Update Market Volume & Pools
   let updateData: any = { volume: (market.volume || 0) + amount }
@@ -311,7 +315,7 @@ export async function placeBet(
 
   if (updateError) {
     // Rollback
-    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.rpc('increment_balance', { p_user_id: user.id, p_amount: amount })
     return { error: "Erreur mise à jour marché." }
   }
 
@@ -338,7 +342,7 @@ export async function placeBet(
 
   if (betError) {
     // Rollback hard
-    await supabaseAdmin.from('profiles').update({ balance: profile.balance }).eq('id', user.id)
+    await supabaseAdmin.rpc('increment_balance', { p_user_id: user.id, p_amount: amount })
     return { error: `Erreur création pari: ${betError.message}` }
   }
 
